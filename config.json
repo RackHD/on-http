@@ -1,6 +1,12 @@
 {
     "amqp": "amqp://localhost",
-    "port": 514,
+    "mongo": {
+        "host": "localhost",
+        "port": 27017,
+        "database": "pxe",
+        "user": "",
+        "password": ""
+    },
     "verbose": true,
     "color": true
 }
