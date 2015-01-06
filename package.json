@@ -1,0 +1,23 @@
+{
+  "name": "renasar-http",
+  "version": "0.0.0",
+  "description": "Renasar Http Server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/renasar/renasar-http.git"
+  },
+  "author": "",
+  "license": "Proprietary",
+  "bugs": {
+    "url": "https://github.com/renasar/renasar-http/issues"
+  },
+  "homepage": "https://github.com/renasar/renasar-http",
+  "dependencies": {
+    "di": "git+ssh://git@github.com/renasar/di.js.git",
+    "renasar-core": "git+ssh://git@github.com/renasar/renasar-core.git"
+  }
+}
