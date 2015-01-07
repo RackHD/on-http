@@ -17,7 +17,17 @@
   },
   "homepage": "https://github.com/renasar/renasar-http",
   "dependencies": {
+    "body-parser": "^1.10.1",
+    "cors": "^2.5.2",
     "di": "git+ssh://git@github.com/renasar/di.js.git",
+    "ejs": "^2.0.8",
+    "es6-shim": "^0.22.2",
+    "express": "^4.10.7",
+    "glob": "^4.3.2",
+    "gridfs-stream": "^0.5.3",
+    "lru-cache": "^2.5.0",
+    "mongodb": "^1.4.28",
+    "on-finished": "^2.2.0",
     "renasar-core": "git+ssh://git@github.com/renasar/renasar-core.git"
   }
 }
