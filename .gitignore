@@ -1,3 +1,6 @@
+# User overrides config file
+overrides.json
+
 # Logs
 logs
 *.log

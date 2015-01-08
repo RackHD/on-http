@@ -4,22 +4,40 @@
 'use strict';
 
 var di = require('di'),
+    _ = require('lodash'),
     core = require('renasar-core')(di),
     injector = new di.Injector(
-        core.injectables
+        _.flatten([
+            core.injectables,
+            // use __dirname workaround so we can npm link in development and still locate things
+            core.helper.simpleWrapper(require('express')(), 'express-app', undefined, __dirname),
+            core.helper.requireGlob(__dirname + '/lib/**/*.js'),
+            require('./app')
+        ])
     ),
-    logger = injector.get('Logger').initialize('Server.Http'),
-    lookup = injector.get('Services.Lookup'),
-    waterline = injector.get('Services.Waterline');
+    http = injector.get('Http'),
+    logger = injector.get('Logger').initialize('Http');
 
-waterline.start().then(function () {
-    logger.info('Hello Http');
-
-    lookup.macAddressToNode('00-11-22-33-44-55').then(function (node) {
-        console.log(node);
-    }).fail(function (error) {
-        console.log(error);
+http.start()
+.catch(function(error) {
+    logger.error('Failure starting HTTP server', {
+        error: error
     });
-}).fail(function (error) {
-    logger.error(error);
+    process.nextTick(function() {
+        process.exit(1);
+    });
+});
+
+process.on('SIGINT', function() {
+    http.stop()
+    .catch(function(error) {
+        logger.error('Failure cleaning up HTTP server', {
+            error: error
+        });
+    })
+    .fin(function() {
+        process.nextTick(function() {
+            process.exit(1);
+        });
+    });
 });
