@@ -8,5 +8,15 @@
         "password": ""
     },
     "verbose": true,
-    "color": true
+    "color": true,
+    "server": "10.1.1.1",
+    "httpport": 80,
+    "subnetnetmask": "255.255.255.0",
+    "gatewayaddr": "10.1.1.1",
+    "broadcastaddr": "10.1.1.255",
+    "httpStaticDirectory": "./static/http",
+    "httpFrontendDirectory": "../renasar-fog-ui",
+    "httpApiDocsDirectory": "./build/apidoc",
+    "logfileLocation": "./logs",
+    "maxTaskPayloadSize": "10mb"
 }
