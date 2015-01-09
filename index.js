@@ -15,12 +15,11 @@ var di = require('di'),
             require('./app')
         ])
     ),
-    http = injector.get('Http'),
-    logger = injector.get('Logger').initialize('Http');
+    http = injector.get('Http');
 
 http.start()
 .catch(function(error) {
-    logger.error('Failure starting HTTP server', {
+    console.error('Failure starting HTTP server', {
         error: error
     });
     process.nextTick(function() {
@@ -31,7 +30,7 @@ http.start()
 process.on('SIGINT', function() {
     http.stop()
     .catch(function(error) {
-        logger.error('Failure cleaning up HTTP server', {
+        console.error('Failure cleaning up HTTP server', {
             error: error
         });
     })
