@@ -18,14 +18,14 @@ var di = require('di'),
     http = injector.get('Http');
 
 http.start()
-.catch(function(error) {
-    console.error('Failure starting HTTP server', {
-        error: error
+    .catch(function(error) {
+        console.error('Failure starting HTTP server', {
+            error: error
+        });
+        process.nextTick(function() {
+            process.exit(1);
+        });
     });
-    process.nextTick(function() {
-        process.exit(1);
-    });
-});
 
 process.on('SIGINT', function() {
     http.stop()

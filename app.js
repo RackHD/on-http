@@ -6,6 +6,7 @@
 var di = require('di');
 
 module.exports = Runner;
+
 di.annotate(Runner, new di.Provide('Http'));
 di.annotate(Runner, new di.Inject(
         'Http.Server',
@@ -15,35 +16,30 @@ di.annotate(Runner, new di.Inject(
         'Services.Configuration',
         'express-app',
         'common-api-router'
-        //'stomp-service',
-        //'common-stomp-resources',
     )
 );
-//function Runner(waterline, app, router, stomp, resources) {
+
 function Runner(http, waterline, messenger, httpProtocol, configuration, app, router) {
     function start() {
         return waterline.start()
-        .then(function() {
-            return messenger.start();
-        })
-        .then(function() {
-            return httpProtocol.start();
-        })
-        .then(function() {
-            // /api/rack is deprecated in favor of /api/common
-            app.use('/api/rack', router);
-            app.use('/api/common', router);
-            //resources.register(stomp);
+            .then(function() {
+                return messenger.start();
+            })
+            .then(function() {
+                return httpProtocol.start();
+            })
+            .then(function() {
+                app.use('/api/common', router);
 
-            http.listen(configuration.get('httpport'));
-        });
+                http.listen(configuration.get('httpport'));
+            });
     }
 
     function stop() {
         return waterline.stop()
-        .then(function() {
-            return messenger.stop();
-        });
+            .then(function() {
+                return messenger.stop();
+            });
     }
 
     return {
