@@ -15,11 +15,16 @@ var di = require('di'),
             require('./app')
         ])
     ),
-    http = injector.get('Http');
+    http = injector.get('Http'),
+    logger = injector.get('Logger').initialize('Http.Server');
 
 http.start()
+    .then(function () {
+        logger.info('Server Started.');
+    })
     .catch(function(error) {
-        console.error('Failure starting HTTP server: ' + error.stack);
+        logger.error('Server Startup Error.', { error: error });
+
         process.nextTick(function() {
             process.exit(1);
         });
@@ -28,7 +33,7 @@ http.start()
 process.on('SIGINT', function() {
     http.stop()
         .catch(function(error) {
-            console.error('Failure cleaning up HTTP server: ' + error.stack);
+            logger.error('Server Shutdown Error.', { error: error });
         })
         .fin(function() {
             process.nextTick(function() {
