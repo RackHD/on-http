@@ -10,24 +10,16 @@ module.exports = Runner;
 di.annotate(Runner, new di.Provide('Http'));
 di.annotate(Runner, new di.Inject(
         'Http.Server',
-        'Services.Waterline',
-        'Services.Messenger',
-        'Protocol.Http',
+        'Services.Core',
         'Services.Configuration',
         'express-app',
-        'common-api-router'
+        'common-api-router',
+        'Q'
     )
 );
-
-function Runner(http, waterline, messenger, httpProtocol, configuration, app, router) {
+function Runner(http, core, configuration, app, router, Q) {
     function start() {
-        return waterline.start()
-            .then(function() {
-                return messenger.start();
-            })
-            .then(function() {
-                return httpProtocol.start();
-            })
+        return core.start()
             .then(function() {
                 app.use('/api/common', router);
 
@@ -36,9 +28,12 @@ function Runner(http, waterline, messenger, httpProtocol, configuration, app, ro
     }
 
     function stop() {
-        return waterline.stop()
+        return Q.resolve()
             .then(function() {
-                return messenger.stop();
+                return http.close();
+            })
+            .then(function() {
+                return core.stop();
             });
     }
 
