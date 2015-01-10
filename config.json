@@ -15,7 +15,7 @@
     "gatewayaddr": "10.1.1.1",
     "broadcastaddr": "10.1.1.255",
     "httpStaticDirectory": "./static/http",
-    "httpFrontendDirectory": "../renasar-fog-ui",
+    "httpFrontendDirectory": "../renasar-fog-ui/dist",
     "httpApiDocsDirectory": "./build/apidoc",
     "logfileLocation": "./logs",
     "maxTaskPayloadSize": "10mb"
