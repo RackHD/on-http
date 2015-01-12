@@ -19,9 +19,7 @@ var di = require('di'),
 
 http.start()
     .catch(function(error) {
-        console.error('Failure starting HTTP server', {
-            error: error
-        });
+        console.error('Failure starting HTTP server: ' + error.stack);
         process.nextTick(function() {
             process.exit(1);
         });
@@ -29,14 +27,12 @@ http.start()
 
 process.on('SIGINT', function() {
     http.stop()
-    .catch(function(error) {
-        console.error('Failure cleaning up HTTP server', {
-            error: error
+        .catch(function(error) {
+            console.error('Failure cleaning up HTTP server: ' + error.stack);
+        })
+        .fin(function() {
+            process.nextTick(function() {
+                process.exit(1);
+            });
         });
-    })
-    .fin(function() {
-        process.nextTick(function() {
-            process.exit(1);
-        });
-    });
 });
