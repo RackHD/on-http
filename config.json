@@ -18,5 +18,6 @@
     "httpFrontendDirectory": "../renasar-fog-ui/dist",
     "httpApiDocsDirectory": "./build/apidoc",
     "logfileLocation": "./logs",
-    "maxTaskPayloadSize": "10mb"
+    "maxTaskPayloadSize": "10mb",
+    "statsdPrefix": "http."
 }
