@@ -14,16 +14,19 @@ di.annotate(Runner, new di.Inject(
         'Services.Configuration',
         'express-app',
         'common-api-router',
+        'gridfs',
         'Q'
     )
 );
-function Runner(http, core, configuration, app, router, Q) {
+function Runner(http, core, configuration, app, router, gridfs, Q) {
     function start() {
         return core.start()
             .then(function() {
                 app.use('/api/common', router);
 
                 http.listen(configuration.get('httpport'));
+
+                return gridfs.start();
             });
     }
 
