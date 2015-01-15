@@ -30,7 +30,9 @@
     "lru-cache": "^2.5.0",
     "mongodb": "^1.4.28",
     "on-finished": "^2.2.0",
-    "renasar-core": "git+ssh://git@github.com/renasar/renasar-core.git"
+    "renasar-core": "git+ssh://git@github.com/renasar/renasar-core.git",
+    "renasar-mq": "git+ssh://git@github.com/renasar/renasar-mq.git",
+    "sockjs": "^0.3.12"
   },
   "devDependencies": {
     "chai": "^1.10.0",

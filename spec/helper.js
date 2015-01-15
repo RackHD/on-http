@@ -30,8 +30,9 @@ global.should = chai.should(); // jshint ignore:line
 *  set up di for testing
 */
 var di = require('di');
-var _ = require('lodash');
-var core = require('renasar-core')(di)
+global._ = require('lodash');
+var core = require('renasar-core')(di);
+global.dihelper = core.helper;
 
 global.helper = {
 
@@ -42,6 +43,12 @@ global.helper = {
         return require(this.relativeToRoot(file));
     },
 
+    /**
+     * Helper for glob requiring files based on the cwd which is the root of the project.
+     */
+    requireGlob: function (pathPattern) {
+        return dihelper.requireGlob(this.relativeToRoot(pathPattern));
+    },
     /**
     * Helper to generate a full path relative to the root directory.
     */
