@@ -17,6 +17,9 @@
     "httpStaticDirectory": "./static/http",
     "httpFrontendDirectory": "../renasar-fog-ui/dist",
     "httpApiDocsDirectory": "./build/apidoc",
+    "stompLogLevel": "info",
+    "stompIdentifier": "Renasar",
+    "sockJsStompPrefix": "/sockjs_stomp",
     "logfileLocation": "./logs",
     "maxTaskPayloadSize": "10mb",
     "statsdPrefix": "http."

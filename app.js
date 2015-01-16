@@ -12,17 +12,21 @@ di.annotate(Runner, new di.Inject(
         'Http.Server',
         'Services.Core',
         'Services.Configuration',
+        'stomp',
         'express-app',
         'common-api-router',
+        'common-stomp-resources',
         'gridfs',
         'Q'
     )
 );
-function Runner(http, core, configuration, app, router, gridfs, Q) {
+function Runner(http, core, configuration, stomp, app, router, resources, gridfs, Q) {
     function start() {
         return core.start()
             .then(function() {
                 app.use('/api/common', router);
+
+                resources.register(stomp);
 
                 http.listen(configuration.get('httpport'));
 
