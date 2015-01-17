@@ -1,4 +1,4 @@
-// Copyright 2014, Renasar Technologies Inc.
+// Copyright 2014-2015, Renasar Technologies Inc.
 /* jshint node: true */
 
 "use strict";
@@ -13,31 +13,32 @@ di.annotate(Runner, new di.Inject(
         'Services.Core',
         'Services.Configuration',
         'stomp',
-        'express-app',
         'common-api-router',
         'common-stomp-resources',
         'gridfs',
         'Q'
     )
 );
-function Runner(http, core, configuration, stomp, app, router, resources, gridfs, Q) {
+function Runner(app, core, configuration, stomp, router, resources, gridfs, Q) {
     function start() {
         return core.start()
             .then(function() {
+
                 app.use('/api/common', router);
 
                 resources.register(stomp);
 
-                http.listen(configuration.get('httpport'));
-
                 return gridfs.start();
+            })
+            .then(function() {
+                app.listen(configuration.get('httpport'));
             });
     }
 
     function stop() {
         return Q.resolve()
             .then(function() {
-                return http.close();
+                return app.close();
             })
             .then(function() {
                 return core.stop();
