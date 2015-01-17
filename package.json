@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "doc": "jsdoc lib -r -d docs",
-    "test": "mocha $(find spec -name '*-spec.js') -R spec --require spec/helper.js"
+    "test": "mocha $(find spec -name '*-spec.js') -R spec --require spec/helper.js",
+    "apidoc": "apidoc -i lib -f '.*\\.js$' -o build/apidoc"
   },
   "repository": {
     "type": "git",
@@ -35,6 +36,7 @@
     "sockjs": "^0.3.12"
   },
   "devDependencies": {
+    "apidoc": "^0.12.1",
     "chai": "^1.10.0",
     "chai-as-promised": "^4.1.1",
     "istanbul": "^0.3.5",
@@ -46,5 +48,20 @@
     "sinon-promise": "^0.1.3",
     "supertest": "^0.15.0",
     "xunit-file": "0.0.6"
+  },
+  "apidoc": {
+    "name": "Renasar API Documentation",
+    "version": "0.0.0",
+    "description": "Renasar API Documentation",
+    "title": "Renasar API Documentation",
+    "url": "http://servername:80",
+    "header": {
+      "title": "About",
+      "filename": "static/apidoc/header.md"
+    },
+    "footer": {
+      "title": "Other Information",
+      "filename": "static/apidoc/footer.md"
+    }
   }
 }
