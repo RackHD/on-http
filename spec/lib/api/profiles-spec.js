@@ -3,6 +3,6 @@
 
 'use strict';
 
-describe(__filename, function () {
-    it('needs specs');
+describe('Profiles API', function () {
+    it("should get a profile ");
 });

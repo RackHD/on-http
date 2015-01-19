@@ -24,6 +24,11 @@ function Runner(app, core, configuration, stomp, router, resources, gridfs, Q) {
         return core.start()
             .then(function() {
 
+                // TODO (benbp): Remove this, it's deprecated. Issue is the overlay
+                // rc.local script still has this URL in it and we would need
+                // to update the overlays at a customer site. Time-saving
+                // workaround for now, since we ship tomorrow.
+                app.use('/api/rack', router);
                 app.use('/api/common', router);
 
                 resources.register(stomp);
