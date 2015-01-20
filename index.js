@@ -6,9 +6,12 @@
 var di = require('di'),
     _ = require('lodash'),
     core = require('renasar-core')(di),
+    tasks = require('renasar-tasks'),
     injector = new di.Injector(
         _.flatten([
             core.injectables,
+            // get OBM service
+            tasks.injectables,
             // use __dirname workaround so we can npm link in development and still locate things
             core.helper.simpleWrapper(require('renasar-mq'), 'MQ'),
             core.helper.simpleWrapper(require('express')(), 'express-app', undefined, __dirname),
