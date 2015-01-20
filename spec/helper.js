@@ -31,7 +31,7 @@ global.should = chai.should(); // jshint ignore:line
 */
 var di = require('di');
 global._ = require('lodash');
-var core = require('renasar-core')(di);
+global.core = require('renasar-core')(di);
 global.dihelper = core.helper;
 
 global.helper = {
