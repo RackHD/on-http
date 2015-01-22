@@ -1,0 +1,70 @@
+install
+text
+unsupported_hardware
+url --url http://<%=server%>:<%=port%>/centos/6.5/os/x86_64
+lang en_US.UTF-8
+keyboard us
+timezone --utc America/Denver
+firewall --enabled --port 22:tcp
+selinux --permissive
+bootloader --location=mbr --driveorder=sda --append="crashkernel=auth rhgb"
+
+#enable syslog
+logging --host=<%=server%> --level=info
+
+# create a renasar user
+authconfig --enableshadow --passalgo=sha512 --enablefingerprint
+user --name=<%=username%> --uid=<%=uid%> --iscrypted --password $6$Qey9BDGE2c1$qNz2CArubDFY9n3qIb7spwFx9Tp.lBR9zfO/1eDyq7PTF5XwEAO8s7hcLfH5gkS/JUE0UABCutH474wkfaBII1
+
+# create an emc user
+user --name=emc --iscrypted --password $6$kS13aboz$s3V1/argaAqwpUR5xgCl3zc8x1nndOwGJfyMJMPrLBJp5TFtMY2.ymKVm.KTLWa0FAqtrQreGilBUtloK.rYr1
+
+#Set the root password
+rootpw --iscrypted $6$sdf/X8EE0A$IPj0CkwyeXzBvxYL0aDwRtd4CC8E/RYHBK3REOYNh40nt2j5QbOCEo72gUPn63YvpJLx2.LlnLv3GFIGUOwTT0
+
+# Disk Partitioning
+zerombr
+clearpart --all --initlabel
+#clearpart --all --initlabel --drives=sda
+part /boot --fstype=ext4 --size=200
+part pv.1 --grow --size=1
+volgroup vg1 --pesize=4096 pv.1
+
+logvol / --fstype=ext4 --name=lv001 --vgname=vg1 --size=6000
+logvol /var --fstype=ext4 --name=lv002 --vgname=vg1 --grow --size=1
+logvol swap --name=lv003 --vgname=vg1 --size=2048
+# END of Disk Partitioning
+
+# Make sure we reboot into the new system when we are finished
+reboot
+
+# Package Selection
+%packages --nobase --excludedocs
+@core
+-*firmware
+-iscsi*
+-fcoe*
+-b43-openfwwf
+kernel-firmware
+-efibootmgr
+wget
+sudo
+perl
+libselinux-python
+net-tools
+%pre
+%end
+
+%post --log=/root/install-post.log
+(
+# PLACE YOUR POST DIRECTIVES HERE
+PATH=/bin:/sbin:/usr/bin:/usr/sbin
+export PATH
+echo "renasar ALL=(ALL)       ALL" >> /etc/sudoers
+echo "emc ALL=(ALL)       ALL" >> /etc/sudoers
+mkdir /home/<%=username%>/.ssh;
+/usr/bin/wget http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub -O /home/<%=username%>/.ssh/authorized_keys
+chown -R <%=username%>:<%=username%> /home/<%=username%>/.ssh
+
+) 2>&1 >/root/install-post-sh.log
+%end
