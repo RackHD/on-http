@@ -1,0 +1,5 @@
+echo Starting CoreOS Stable installer
+set base-url http://<%=server%>:<%=port%>/coreos
+kernel ${base-url}/coreos_production_pxe.vmlinuz cloud-config-url=http://<%=server%>:<%=port%>/api/common/templates/pxe-cloud-config.yml
+initrd ${base-url}/coreos_production_pxe_image.cpio.gz
+boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell

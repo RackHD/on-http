@@ -1,0 +1,8 @@
+echo Starting openSUSE 13.2 x64 installer >
+set base-url http://<%=server%>:<%=port%>/suse/distribution/13.2/repo/oss
+set params linux ifcfg=*=dhcp4 install=${base-url} autoyast=http://<%=server%>:<%=port%>/api/common/templates/autoinst_13.2.xml
+kernel ${base-url}/boot/x86_64/loader/linux
+initrd ${base-url}/boot/x86_64/loader/initrd
+imgargs linux ${params}
+boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell
+

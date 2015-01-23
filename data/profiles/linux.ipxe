@@ -1,0 +1,5 @@
+set base-url http://<%=server%>:<%=port%>
+kernel ${base-url}/<%=kernel%>
+initrd ${base-url}/<%=initrd%>
+imgargs <%=kernelversion%> auto=true SYSLOGSERVER=<%=server%> API_CB=<%=server%>:<%=port%> BASEFS=<%=basefs%> OVERLAYFS=<%=overlayfs%> BOOTIF=01-<%=macaddress%> <%=kargs%>
+boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell

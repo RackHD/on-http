@@ -1,0 +1,11 @@
+set base-url http://<%=server%>:<%=port%>
+kernel ${base-url}/wimboot
+initrd ${base-url}/winpe/bootmgr                      bootmgr
+initrd ${base-url}/winpe/Boot/BCD                     BCD
+initrd ${base-url}/winpe/Boot/Fonts/segmono_boot.ttf  segmono_boot.ttf
+initrd ${base-url}/winpe/Boot/Fonts/segoe_slboot.ttf  segoe_slboot.ttf
+initrd ${base-url}/winpe/Boot/Fonts/segoen_slboot.ttf segoen_slboot.ttf
+initrd ${base-url}/winpe/Boot/Fonts/wgl4_boot.ttf     wgl4_boot.ttf
+initrd ${base-url}/winpe/Boot/boot.sdi                boot.sdi
+initrd ${base-url}/winpe/sources/renasar_x64.wim             boot.wim
+boot
