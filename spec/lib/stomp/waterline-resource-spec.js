@@ -5,13 +5,13 @@
 
 var _ = require('lodash');
 
-describe(__filename, function () {
+describe(require('path').basename(__filename), function () {
     var StompSubscription;
     var WaterlineResource;
 
     var collection;
     var waterline;
-
+git
     beforeEach(function() {
         collection = {
             findSinceLastUpdate: sinon.stub(),

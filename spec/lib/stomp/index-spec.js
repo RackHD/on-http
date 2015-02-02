@@ -5,7 +5,7 @@
 
 var di = require('di');
 
-describe(__filename, function () {
+describe(require('path').basename(__filename), function () {
     var server;
     var resources;
     var injector;
