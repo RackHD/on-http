@@ -5,7 +5,7 @@
 
 var _ = require('lodash');
 
-describe(__filename, function () {
+describe(require('path').basename(__filename), function () {
     var injector;
     beforeEach(function() {
         injector = helper.baseInjector.createChild(_.flatten([
@@ -23,6 +23,7 @@ describe(__filename, function () {
     it('should attach stomp to an https server', function () {
         var server = injector.get('SockJS.Server');
         server.listen(require('https').createServer({
+
             // dummy key + cert
             key: [
                 '-----BEGIN RSA PRIVATE KEY-----',

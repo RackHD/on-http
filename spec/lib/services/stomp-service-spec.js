@@ -5,7 +5,7 @@
 
 var _ = require('lodash');
 
-describe(__filename, function () {
+describe(require('path').basename(__filename), function () {
     var injector;
     beforeEach(function() {
         injector = helper.baseInjector.createChild(_.flatten([
