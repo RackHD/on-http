@@ -11,7 +11,7 @@ describe(require('path').basename(__filename), function () {
 
     var collection;
     var waterline;
-git
+
     beforeEach(function() {
         collection = {
             findSinceLastUpdate: sinon.stub(),
