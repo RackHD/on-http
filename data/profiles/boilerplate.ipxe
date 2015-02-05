@@ -17,6 +17,9 @@ set ifIndexMax:int8 10
 set ifBootAttempt:int8 0
 set ifBootAttemptMax:int8 5
 
+# Close all the interfaces to begin with.
+ifclose
+
 # Iterate the interfaces to find a match by MAC Address.
 :ifFind
 iseq ${ifIndex} ${ifIndexMax} && goto ifFindFailure || goto ifFindContinue
@@ -28,7 +31,7 @@ iseq ${interface} ${net${ifIndex}/mac} && goto ifBoot || inc ifIndex && goto ifF
 iseq ${ifBootAttempt} ${ifBootAttemptMax} && goto ifBootFailure || goto ifBootContinue
 :ifBootContinue
 ifopen net${ifIndex}
-ifconf net${ifIndex} && goto ifConfigured || ifclose net${ifIndex} && inc ifBootAttempt && goto ifBoot
+ifconf net${ifIndex} && goto ifConfigured || inc ifBootAttempt && goto ifBoot
 
 # Find Interface Failure
 :ifFindFailure
