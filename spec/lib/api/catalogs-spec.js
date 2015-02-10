@@ -3,6 +3,6 @@
 
 'use strict';
 
-describe('/obms', function () {
+describe('/catalogs', function () {
     it('needs specs');
 });

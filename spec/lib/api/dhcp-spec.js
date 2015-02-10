@@ -3,6 +3,6 @@
 
 'use strict';
 
-describe(require('path').basename(__filename), function () {
+describe('/dhcp', function () {
     it('needs specs');
 });
