@@ -3,14 +3,24 @@
 
 'use strict';
 
-var _ = require('lodash');
-
-describe(require('path').basename(__filename), function () {
+describe('Stomp.WaterlineResource', function () {
     var StompSubscription;
     var WaterlineResource;
 
     var collection;
     var waterline;
+
+    helper.before(function() {
+        return _.flatten([
+            helper.require('/lib/stomp/waterline-resource.js'),
+            dihelper.simpleWrapper(require('renasar-mq'), 'MQ')
+        ]);
+    });
+
+    before(function () {
+        StompSubscription = helper.injector.get('MQ').StompSubscription;
+        WaterlineResource = helper.injector.get('Stomp.WaterlineResource');
+    });
 
     beforeEach(function() {
         collection = {
@@ -19,15 +29,7 @@ describe(require('path').basename(__filename), function () {
             primaryKey: 'id'
         };
 
-        var injector = helper.baseInjector.createChild(_.flatten([
-            helper.require('/lib/stomp/waterline-resource.js'),
-            dihelper.simpleWrapper(require('renasar-mq'), 'MQ')
-        ]));
-
-        StompSubscription = injector.get('MQ').StompSubscription;
-        WaterlineResource = injector.get('Stomp.WaterlineResource');
-
-        waterline = injector.get('Services.Waterline');
+        waterline = helper.injector.get('Services.Waterline');
         waterline.observe = sinon.spy(function () {
             var observable = {
                 subscribe: sinon.spy(function () {
@@ -41,6 +43,8 @@ describe(require('path').basename(__filename), function () {
         });
     });
 
+    helper.after();
+
     function createMockSubscription(params, query) {
         var subscription = sinon.createStubInstance(StompSubscription);
         subscription.headers = {};
@@ -51,7 +55,7 @@ describe(require('path').basename(__filename), function () {
         return subscription;
     }
 
-    it('should observe to events on the collection', function () {
+    it('should observe events on the collection', function () {
         var resource = new WaterlineResource(collection);
         resource.activate('/dummy');
         var subscription = createMockSubscription();
