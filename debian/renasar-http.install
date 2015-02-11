@@ -6,3 +6,4 @@ build /var/renasar/renasar-http
 index.js /var/renasar/renasar-http
 app.js /var/renasar/renasar-http
 config.json /var/renasar/renasar-http
+commitstring.txt /var/renasar/renasar-http
