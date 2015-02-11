@@ -75,6 +75,7 @@
         "sinon": false,
         "dihelper": false,
         "_": false,
+        "Q": false,
         "core": false
     }
 }
