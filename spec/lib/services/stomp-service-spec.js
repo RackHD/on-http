@@ -3,12 +3,10 @@
 
 'use strict';
 
-var _ = require('lodash');
-
-describe(require('path').basename(__filename), function () {
-    var injector;
+describe('stomp', function () {
     beforeEach(function() {
-        injector = helper.baseInjector.createChild(_.flatten([
+        // use helper.setupInjector because we don't want to start core services
+        helper.setupInjector(_.flatten([
             helper.require('/lib/services/stomp-service.js'),
             dihelper.simpleWrapper(require('renasar-mq'), 'MQ')
         ]));
@@ -16,6 +14,6 @@ describe(require('path').basename(__filename), function () {
 
 
     it('should initialize', function () {
-        injector.get('stomp');
+        helper.injector.get('stomp');
     });
 });

@@ -3,25 +3,24 @@
 
 'use strict';
 
-var _ = require('lodash');
-
-describe(require('path').basename(__filename), function () {
-    var injector;
-    beforeEach(function() {
-        injector = helper.baseInjector.createChild(_.flatten([
+describe('SockJS.Server', function () {
+    helper.before(function() {
+        return _.flatten([
             helper.require('/lib/services/sockjs-service.js'),
             helper.require('/lib/services/stomp-service.js'),
             dihelper.simpleWrapper(require('renasar-mq'), 'MQ')
-        ]));
+        ]);
     });
 
+    helper.after();
+
     it('should attach stomp to an http server', function () {
-        var server = injector.get('SockJS.Server');
+        var server = helper.injector.get('SockJS.Server');
         server.listen(require('http').createServer());
     });
 
     it('should attach stomp to an https server', function () {
-        var server = injector.get('SockJS.Server');
+        var server = helper.injector.get('SockJS.Server');
         server.listen(require('https').createServer({
 
             // dummy key + cert
@@ -65,7 +64,7 @@ describe(require('path').basename(__filename), function () {
     });
 
     it('should attach stomp to a TCP socket', function () {
-        var server = injector.get('SockJS.Server');
+        var server = helper.injector.get('SockJS.Server');
         server.listen(require('net').createServer({ allowHalfOpen: true }));
     });
 });

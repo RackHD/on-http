@@ -3,6 +3,6 @@
 
 'use strict';
 
-describe(require('path').basename(__filename), function () {
+describe('/tasks', function () {
     it('needs specs');
 });

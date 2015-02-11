@@ -3,6 +3,6 @@
 
 'use strict';
 
-describe('/obms', function () {
+describe('/config', function () {
     it('needs specs');
 });
