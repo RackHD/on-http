@@ -29,3 +29,30 @@ helper.startServer = function (overrides) {
 helper.stopServer = function () {
     return helper.injector.get('Http').stop();
 };
+
+helper.request = function () {
+    var obj = request('http://localhost:8089');
+
+    // monkeypatch supertest objects to have a "then" function so they can be used as promises
+    _.methods(obj).forEach(function (method) {
+        var orig = obj[method];
+        obj[method] = function () {
+            var test = orig.apply(obj, arguments);
+            test.then = function (successCallback, errorCallback) {
+                var deferred = Q.defer();
+                test.end(function(err, res) {
+                    if (err) {
+                        deferred.reject(err);
+                        return;
+                    } else {
+                        deferred.resolve(res);
+                    }
+                });
+                return deferred.promise.then(successCallback, errorCallback);
+            };
+            return test;
+        };
+    });
+
+    return obj;
+};
