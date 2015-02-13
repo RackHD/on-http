@@ -15,11 +15,11 @@ di.annotate(Runner, new di.Inject(
         'stomp',
         'common-api-router',
         'common-stomp-resources',
-        'gridfs',
+        'fileService',
         'Q'
     )
 );
-function Runner(app, core, configuration, stomp, router, resources, gridfs, Q) {
+function Runner(app, core, configuration, stomp, router, resources, fileService, Q) {
     function start() {
         return core.start()
             .then(function() {
@@ -33,7 +33,7 @@ function Runner(app, core, configuration, stomp, router, resources, gridfs, Q) {
 
                 resources.register(stomp);
 
-                return gridfs.start();
+                return fileService.start(configuration.get("fileService"));
             })
             .then(function() {
                 app.listen(configuration.get('httpport'));
