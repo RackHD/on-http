@@ -6,6 +6,7 @@
 describe('Pollers API', function () {
     var taskProtocol;
     before(function () {
+        this.timeout(5000);
         taskProtocol = {
             requestPollerCache: sinon.stub()
         };
