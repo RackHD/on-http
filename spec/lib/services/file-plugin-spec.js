@@ -111,7 +111,7 @@ describe("fileService disk backend", function() {
         fakeFile.toJSON.returns(fakeFile);
         findStub.returns(q.resolve([fakeFile]));
 
-        var arrayPromise = backend.list();
+        var arrayPromise = backend.list({});
 
         return arrayPromise.should.eventually.deep.equal([fakeFile]);
     });
@@ -124,7 +124,7 @@ describe("fileService disk backend", function() {
 
 
 
-        findStub.returns(q.resolve('file not found'));
+        findStub.returns(q.reject('file not found'));
 
         var deletionPromise = backend.delete('a uuid');
 

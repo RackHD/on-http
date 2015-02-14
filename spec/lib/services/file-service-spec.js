@@ -38,7 +38,6 @@ var MockBack = function (){
 
 describe("File Service", function() {
     var injector,
-        FileService,
         fileService,
         fakeStream,
         config;
@@ -69,8 +68,7 @@ describe("File Service", function() {
             }
         };
 
-        var  FileService = helper.injector.get('fileService');
-        fileService = new FileService();
+        fileService = helper.injector.get('fileService');
         fileService.injectorMap.MockFS = 'Files.Mock';
         fileService.start(config);
     });
@@ -103,7 +101,7 @@ describe("File Service", function() {
                     ])
             );
 
-        FileService = helper.injector.get('fileService');
+        fileService = helper.injector.get('fileService');
 
     });
 
@@ -121,8 +119,8 @@ describe("File Service", function() {
                     type: 'FileSystem',
                     root:'someFileRoot'
                 }
-        },
-        fileService = new FileService();
+        };
+
         fileService.injectorMap.MockFS = 'Files.Mock';
         fileService.start(config);
 
@@ -155,8 +153,7 @@ describe("File Service", function() {
                 };
 
             q = helper.injector.get('Q');
-            FileService = helper.injector.get('fileService');
-            fileService = new FileService();
+            fileService = helper.injector.get('fileService');
             fileService.injectorMap.MockFS = 'Files.Mock';
             fileService.start(config);
             fakeStream = new EventEmitter();
