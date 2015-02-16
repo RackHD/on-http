@@ -7,6 +7,12 @@
         "user": "",
         "password": ""
     },
+    "fileService": {
+        "defaultBackend": {
+            "type": "FileSystem",
+            "root": "./static/files/"
+        }
+    },
     "verbose": true,
     "color": true,
     "server": "10.1.1.1",
