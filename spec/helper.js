@@ -13,10 +13,10 @@ helper.startServer = function (overrides) {
             dihelper.simpleWrapper(require('renasar-mq'), 'MQ'),
             dihelper.simpleWrapper(require('express')(), 'express-app'),
             dihelper.simpleWrapper({
-                publishLog: sinon.stub().returns(Q.resolve())
+                publishLog: sinon.stub().resolves()
             }, 'Protocol.Logging'),
             dihelper.simpleWrapper({
-                lookupIpLease: sinon.stub().returns(Q.resolve('00:00:00:00:00:00'))
+                lookupIpLease: sinon.stub().resolves('00:00:00:00:00:00')
             }, 'Protocol.Dhcp'),
             helper.requireGlob('/lib/**/*.js'),
             helper.require('/app.js')

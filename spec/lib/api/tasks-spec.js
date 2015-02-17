@@ -15,8 +15,9 @@ describe('Tasks API', function () {
 
     beforeEach(function () {
         var taskProtocol = helper.injector.get('Protocol.Task');
-        taskProtocol.activeTaskExists = sinon.promise().resolves({});
-        taskProtocol.requestCommands = sinon.promise().resolves({ testcommands: 'cmd' });
+        // Defaults, you can tack on .resolves().rejects().resolves(), etc. like so
+        taskProtocol.activeTaskExists = sinon.stub().resolves();
+        taskProtocol.requestCommands = sinon.stub().resolves({ testcommands: 'cmd' });
         return helper.reset();
     });
 
@@ -44,7 +45,7 @@ describe('Tasks API', function () {
     });
 
     it("should error if an active task exists but no commands are sent", function() {
-        taskProtocol.requestCommands = sinon.promise().rejects(new Error(''));
+        taskProtocol.requestCommands.rejects(new Error(''));
         return helper.request().get('/api/common/tasks/testnodeid')
             .expect(404)
             .expect(function (res) {
