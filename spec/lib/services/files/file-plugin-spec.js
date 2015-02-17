@@ -22,7 +22,6 @@ describe("fileService disk backend", function() {
             ])
         );
 
-
         config = {
             root: ''
         };
@@ -40,29 +39,35 @@ describe("fileService disk backend", function() {
         backend = new BackendFS(config);
     });
 
-    it("should expose get/put/list/delete methods", function(){
-
+    it("should expose a get method", function(){
         backend.should.have.property('get')
         .that.is.a('function').with.length(1);
+    });
 
+    it("should expose a put method", function() {
         backend.should.have.property('put')
         .that.is.a('function').with.length(1);
+    });
 
+    it("should expose a getMeta method", function() {
         backend.should.have.property('getMeta')
         .that.is.a('function').with.length(1);
+    });
 
+    it("should expose a delete method", function() {
         backend.should.have.property('delete')
         .that.is.a('function').with.length(1);
+    });
 
+    it("should expose a list method", function() {
         backend.should.have.property('list')
         .that.is.a('function').with.length(1);
-
     });
+
 
     beforeEach(function() {
 
-       waterline = helper.injector.get('Services.Waterline');
-
+        waterline = helper.injector.get('Services.Waterline');
         waterline.files = {};
         waterline.files.create = sinon.stub();
         waterline.files.destroy = sinon.stub();
@@ -70,7 +75,6 @@ describe("fileService disk backend", function() {
         waterline.files.findOne = sinon.stub();
 
         fs = helper.injector.get('fs');
-
         fs.unlink = sinon.stub();
         fs.exists = sinon.stub();
         fs.createReadStream = sinon.stub();
@@ -83,14 +87,9 @@ describe("fileService disk backend", function() {
                 helper.require('/lib/services/files/file-plugin')
             ])
         );
-
-
-
-
     });
 
     it("should resolve a promise on successful get", function() {
-
         execker.exec = sinon.stub();
         execker.exec.callsArgWith(0, null, fakeFile);
 
@@ -98,14 +97,12 @@ describe("fileService disk backend", function() {
         fs.exists.callsArgWith(1, true);
         fs.createReadStream.returnsArg(0);
 
-
         var rdStreamPromise = backend.get('a uuid');
 
         return rdStreamPromise.should.eventually.equal(fakeFile.filename);
     });
 
     it("should fail on get if the file is not found", function() {
-
         execker.exec = sinon.stub();
         execker.exec.callsArgWith(0, null, fakeFile);
 
@@ -122,7 +119,6 @@ describe("fileService disk backend", function() {
         var fakeStream = new EventEmitter();
 
         fs.createWriteStream.returns(fakeStream);
-
 
         var streamObjPromise = backend.put('file.txt');
 
@@ -158,10 +154,8 @@ describe("fileService disk backend", function() {
         execker.exec = sinon.stub();
         execker.exec.callsArgWith(0, null, files);
         waterline.files.find.returns(execker);
-
         fakeFile.toJSON = sinon.stub();
         fakeFile.toJSON.returns(fakeFile);
-
 
         var arrayPromise = backend.list({});
 
@@ -189,7 +183,6 @@ describe("fileService disk backend", function() {
         execker.exec.callsArgWith(0, null, fakeFile);
         waterline.files.findOne.returns(execker);
         fs.exists.callsArgWith(1, false);
-
 
         var deletionPromise = backend.delete('a uuid');
 

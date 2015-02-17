@@ -33,9 +33,6 @@ var MockBack = function (){
     return this;
    };
 
-
-
-
 describe("File Service", function() {
     var injector,
         fileService,
@@ -103,11 +100,7 @@ describe("File Service", function() {
                 );
 
             fileService = helper.injector.get('fileService');
-
-        });
-
-        it("should dynamically load the config specified backends", function() {
-            var config = {
+            config = {
                     MockFS: {
                         type: 'MockFS'
                     },
@@ -123,13 +116,21 @@ describe("File Service", function() {
             };
 
             fileService.injectorMap.MockFS = 'Files.Mock';
+        });
+
+        it("should initialize plugins with the config specified fields", function(){
             fileService.start(config);
-
             fileService.backEnds.FileSystem.root.should.equal('someFileRoot');
+        });
 
-            fileService.backEnds.FileSystem.should.have.property('put')
+        it("should initialize the defaultBackend", function() {
+            fileService.start(config);
+            fileService.backEnds.defaultBackend.should.have.property('put')
                 .that.is.a('function');
+        });
 
+        it("should initialize other backend plugins", function() {
+            fileService.start(config);
             fileService.backEnds.MockFS.should.have.property('put')
                 .that.is.a('function');
         });
@@ -144,9 +145,7 @@ describe("File Service", function() {
 
             fileService.start.bind(fileService, config).should
             .throw("No defaultBackend in config");
-
         });
-
 
         it("should throw an error if the backend string is not in the injectorMap", function() {
             var config = {
@@ -158,7 +157,6 @@ describe("File Service", function() {
 
             fileService.start.bind(fileService, config).should
             .throw("unrecognized back end string");
-
         });
     });
 
@@ -189,7 +187,6 @@ describe("File Service", function() {
             mockBack = fileService.backEnds.defaultBackend;
         });
 
-
         it("should provide the correct hashes for uploaded files", function() {
             var crypto = require('crypto'),
                 stringToHash = fileService.backEnds.defaultBackend.readString,
@@ -197,7 +194,6 @@ describe("File Service", function() {
                 shaHash = crypto.createHash('sha256'),
                 emittedHash = {},
                 deferred = q.defer();
-
 
             fileService.backEnds.defaultBackend.put.returns(q.resolve(
                 {
@@ -215,7 +211,6 @@ describe("File Service", function() {
             };
 
             mockBack.mockWrStream.on('metadata', function(meta) {
-
                 emittedHash.md5 = meta.md5;
                 emittedHash.sha = meta.sha256;
                 deferred.resolve(emittedHash);
@@ -231,14 +226,12 @@ describe("File Service", function() {
 
 
         it("should return a promise for a readstream on get ", function() {
-
             fileService.backEnds.defaultBackend.get
             .returns(q.resolve(mockBack.mockRdStream));
 
             return fileService.get({filename: 'unimportant.txt'})
             .should.eventually.deep
             .equal(fileService.backEnds.defaultBackend.mockRdStream);
-
         });
 
         it("should return a rejected promise " +
@@ -247,7 +240,6 @@ describe("File Service", function() {
 
             return fileService.get({filename: 'notInDatabase.fake'})
             .should.be.rejectedWith('file not found');
-
         });
 
         it("should return a rejected promise for attemtps to delete " +
@@ -256,17 +248,15 @@ describe("File Service", function() {
 
             return fileService.delete({filename: "notInDatabase.txt"})
             .should.be.rejectedWith('file not found');
-
         });
-
 
         it("should return a promise for an array of files " +
                 "received from the backend on verify", function() {
             var aritraryArray = ["I'm a file", "I'm also a file", "I'm a file too"];
             mockBack.getMeta.returns(q.resolve(aritraryArray));
 
-            return fileService.verify("aFile.txt").should.be.fullfilled;
-
+            return fileService.verify("aFile.txt").should.eventually
+            .deep.equal(aritraryArray);
         });
 
         it("should return a promise for the list " +
@@ -277,7 +267,6 @@ describe("File Service", function() {
 
             return fileService.list().should.eventually
             .deep.equal(fileList);
-
         });
 
     });
