@@ -36,7 +36,7 @@ function Runner(app, core, configuration, stomp, router, resources, fileService,
                 return fileService.start(configuration.get("fileService"));
             })
             .then(function() {
-                app.listen(configuration.get('httpport'));
+                app.listen();
             });
     }
 

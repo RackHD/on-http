@@ -5,10 +5,17 @@
 
 describe('Http.Server', function () {
     var sockJs = {};
-    var app = require('express')();
+    var app;
     var server;
 
-    before(function() {
+    before('create express app', function () {
+        app = require('express')();
+        app.use('/test', function (req, res) {
+            res.send('Hello World!');
+        });
+    });
+
+    before('set up test dependencies', function() {
         // use helper.setupInjector because we don't want to start core services
         helper.setupInjector(_.flatten([
             helper.require('/lib/services/http-service.js'),
@@ -16,15 +23,115 @@ describe('Http.Server', function () {
             dihelper.simpleWrapper(app, 'express-app', undefined, __dirname),
         ]));
 
-        sockJs.listen = sinon.stub();
         server = helper.injector.get('Http.Server');
     });
 
-    it('should listen on HTTP port and start the websocket listener', function () {
-        // can't use port 80 because it requires setuid root
-        server.listen(8089);
-        expect(sockJs.listen).to.have.been.calledOnce;
-        server.close();
+    before('allow self signed certs', function () {
+       process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     });
 
+    after('disallow self signed certs', function () {
+       process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
+    });
+
+    describe('http', function () {
+        before('set up mocks', function () {
+            sockJs.listen = sinon.stub();
+        });
+
+        before('listen', function () {
+            helper.injector.get('Services.Configuration')
+                .set('http', true)
+                .set('https', false)
+            // can't use port 80 because it requires setuid root
+                .set('httpPort', 8089);
+            server.listen();
+        });
+
+        it('should respond to requests', function () {
+            return helper.request('http://localhost:8089')
+            .get('/test')
+            .expect(200)
+            .expect('Hello World!');
+        });
+
+        it('should have started the SockJS listener', function () {
+            expect(sockJs.listen).to.have.been.calledOnce;
+        });
+
+        after('close', function () {
+            server.close();
+        });
+    });
+
+    describe('https', function () {
+        before('set up mocks', function () {
+            sockJs.listen = sinon.stub();
+        });
+
+        before('listen', function () {
+            helper.injector.get('Services.Configuration')
+                .set('http', false)
+                .set('https', true)
+                .set('httpsCert', 'data/dev-cert.pem')
+                .set('httpsKey', 'data/dev-key.pem')
+            // can't use port 443 because it requires setuid root
+                .set('httpsPort', 8443);
+            server.listen();
+        });
+
+        it('should respond to requests', function () {
+            return helper.request('https://localhost:8443')
+            .get('/test')
+            .expect(200)
+            .expect('Hello World!');
+        });
+
+        it('should have started the SockJS listener', function () {
+            expect(sockJs.listen).to.have.been.calledOnce;
+        });
+        after('close', function () {
+            server.close();
+        });
+    });
+
+    describe('https with pfx', function () {
+        before('set up mocks', function () {
+            sockJs.listen = sinon.stub();
+        });
+
+        before('listen', function () {
+            helper.injector.get('Services.Configuration')
+                .set('http', false)
+                .set('https', true)
+                .set('httpsPfx', 'data/dev.pfx')
+            // can't use port 443 because it requires setuid root
+                .set('httpsPort', 8444);
+            server.listen();
+        });
+
+        it('should respond to requests', function () {
+            return helper.request('https://localhost:8444')
+            .get('/test')
+            .expect(200)
+            .expect('Hello World!');
+        });
+
+        it('should have started the SockJS listener', function () {
+            expect(sockJs.listen).to.have.been.calledOnce;
+        });
+        after('close', function () {
+            server.close();
+        });
+    });
+
+    it('should throw an error if http and https are both disabled', function () {
+        helper.injector.get('Services.Configuration')
+        .set('http', false)
+        .set('https', false);
+
+        expect(function () {
+            server.listen();
+        }).to.throw(Error);
+    });
 });

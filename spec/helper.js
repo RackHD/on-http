@@ -22,7 +22,10 @@ helper.startServer = function (overrides) {
             helper.require('/app.js')
     ].concat(overrides || [])));
     helper.setupTestConfig();
-    helper.injector.get('Services.Configuration').set('httpport', 8089);
+    helper.injector.get('Services.Configuration')
+        .set('http', true)
+        .set('https', false)
+        .set('httpPort', 8089);
     return helper.injector.get('Http').start();
 };
 
@@ -30,14 +33,14 @@ helper.stopServer = function () {
     return helper.injector.get('Http').stop();
 };
 
-helper.request = function () {
-    var obj = request('http://localhost:8089');
+helper.request = function (url, options) {
+    var agent = request(url || 'http://localhost:8089', options);
 
     // monkeypatch supertest objects to have a "then" function so they can be used as promises
-    _.methods(obj).forEach(function (method) {
-        var orig = obj[method];
-        obj[method] = function () {
-            var test = orig.apply(obj, arguments);
+    _.methods(agent).forEach(function (method) {
+        var orig = agent[method];
+        agent[method] = function () {
+            var test = orig.apply(agent, arguments);
             test.then = function (successCallback, errorCallback) {
                 var deferred = Q.defer();
                 test.end(function(err, res) {
@@ -54,5 +57,5 @@ helper.request = function () {
         };
     });
 
-    return obj;
+    return agent;
 };
