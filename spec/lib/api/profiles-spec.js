@@ -37,6 +37,12 @@ describe('Profiles API', function () {
                     profileApiService[key].restore();
                 }
             });
+            _.forEach(_.keys(taskProtocol), function(key) {
+                // Restore original methods if they are stubs
+                if (_.has(taskProtocol[key], 'restore')) {
+                    taskProtocol[key].restore();
+                }
+            });
             _.forEach(_.keys(taskGraphProtocol), function(key) {
                 // Restore original methods if they are stubs
                 if (_.has(taskGraphProtocol[key], 'restore')) {
@@ -70,6 +76,24 @@ describe('Profiles API', function () {
             profileApiService.getNode = sinon.stub(profileApiService, 'getNode').resolves({});
             taskGraphProtocol.getActiveTaskGraph = sinon.stub(
                 taskGraphProtocol, 'getActiveTaskGraph').resolves(null);
+            return helper.request().get('/api/common/profiles')
+                .query({ macs: '00:00:de:ad:be:ef' })
+                .expect(200)
+                .expect(function() {
+                    expect(profileService.get.calledWith('error.ipxe')).to.be.true;
+                });
+        });
+
+        it("should send down error.ipxe on failing to retrieve workflow properties", function() {
+            profileApiService.createNodeAndRunDiscovery = sinon.stub(
+                profileApiService, 'createNodeAndRunDiscovery').resolves({});
+            profileApiService.getNode = sinon.stub(profileApiService, 'getNode').resolves({});
+            taskGraphProtocol.getActiveTaskGraph = sinon.stub(
+                taskGraphProtocol, 'getActiveTaskGraph').resolves(true);
+            taskProtocol.requestProfile = sinon.stub(
+                taskProtocol, 'requestProfile').resolves('test.profile');
+            taskProtocol.requestProperties = sinon.stub(taskProtocol, 'requestProperties').rejects(
+                    new Error('Test workflow properties error'));
             return helper.request().get('/api/common/profiles')
                 .query({ macs: '00:00:de:ad:be:ef' })
                 .expect(200)
