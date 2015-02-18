@@ -15,12 +15,12 @@ var MockBack = function (){
     this.mockWrStream = new stream.Writable();
 
     this.mockRdStream._read = function() {
-        this.push(self.readableString);
+        this.push(self.readString);
         this.push(null);
     };
 
     this.mockWrStream._write = function(chunk, encoding, done) {
-        self.writableString += chunk.toString();
+        self.writeString += chunk.toString();
         done();
     };
 
@@ -32,9 +32,6 @@ var MockBack = function (){
 
     return this;
    };
-
-
-
 
 describe("File Service", function() {
     var injector,
@@ -92,45 +89,75 @@ describe("File Service", function() {
             .that.is.a('function').with.length(2);
     });
 
-    before(function() {
-        injector = helper.setupInjector(
-            _.flatten([
-                helper.require('/lib/services/file-service'),
-                helper.require('/lib/services/files/file-plugin'),
-                dihelper.simpleWrapper(MockBack, 'Files.Mock')
-                    ])
-            );
+    describe("fileService startup", function() {
+        beforeEach(function() {
+            injector = helper.setupInjector(
+                _.flatten([
+                    helper.require('/lib/services/file-service'),
+                    helper.require('/lib/services/files/file-plugin'),
+                    dihelper.simpleWrapper(MockBack, 'Files.Mock')
+                        ])
+                );
 
-        fileService = helper.injector.get('fileService');
+            fileService = helper.injector.get('fileService');
+            config = {
+                    MockFS: {
+                        type: 'MockFS'
+                    },
 
-    });
+                    defaultBackend: {
+                        type: 'MockFS'
+                    },
 
-    it("should dynamically load the config specified backends", function() {
-        var config = {
-                MockFS: {
-                    type: 'MockFS'
-                },
+                    FileSystem: {
+                        type: 'FileSystem',
+                        root:'someFileRoot'
+                    }
+            };
 
-                defaultBackend: {
-                    type: 'MockFS'
-                },
+            fileService.injectorMap.MockFS = 'Files.Mock';
+        });
 
+        it("should initialize plugins with the config specified fields", function(){
+            fileService.start(config);
+            fileService.backEnds.FileSystem.root.should.equal('someFileRoot');
+        });
+
+        it("should initialize the defaultBackend", function() {
+            fileService.start(config);
+            fileService.backEnds.defaultBackend.should.have.property('put')
+                .that.is.a('function');
+        });
+
+        it("should initialize other backend plugins", function() {
+            fileService.start(config);
+            fileService.backEnds.MockFS.should.have.property('put')
+                .that.is.a('function');
+        });
+
+        it("should throw an error if there is no defaultBackend in config", function() {
+            var config = {
                 FileSystem: {
-                    type: 'FileSystem',
-                    root:'someFileRoot'
-                }
-        };
+                        type: 'FileSystem',
+                        root:'someFileRoot'
+                    }
+            };
 
-        fileService.injectorMap.MockFS = 'Files.Mock';
-        fileService.start(config);
+            fileService.start.bind(fileService, config).should
+            .throw("No defaultBackend in config");
+        });
 
-        fileService.backEnds.FileSystem.root.should.equal('someFileRoot');
+        it("should throw an error if the backend string is not in the injectorMap", function() {
+            var config = {
+                defaultBackend: {
+                        type: 'notFileSystem',
+                        root:'someFileRoot'
+                    }
+            };
 
-        fileService.backEnds.FileSystem.should.have.property('put')
-            .that.is.a('function');
-
-        fileService.backEnds.MockFS.should.have.property('put')
-            .that.is.a('function');
+            fileService.start.bind(fileService, config).should
+            .throw("unrecognized back end string");
+        });
     });
 
     describe("File Service Methods", function() {
@@ -160,14 +187,13 @@ describe("File Service", function() {
             mockBack = fileService.backEnds.defaultBackend;
         });
 
-
         it("should provide the correct hashes for uploaded files", function() {
             var crypto = require('crypto'),
                 stringToHash = fileService.backEnds.defaultBackend.readString,
                 md5Hash = crypto.createHash('md5'),
                 shaHash = crypto.createHash('sha256'),
-                emittedHash = {};
-
+                emittedHash = {},
+                deferred = q.defer();
 
             fileService.backEnds.defaultBackend.put.returns(q.resolve(
                 {
@@ -185,32 +211,27 @@ describe("File Service", function() {
             };
 
             mockBack.mockWrStream.on('metadata', function(meta) {
-
                 emittedHash.md5 = meta.md5;
                 emittedHash.sha = meta.sha256;
+                deferred.resolve(emittedHash);
             });
 
             fileService.put(fakeStream, {filename:'unimportant'})
             .then(function(streamObj) {
-                mockBack.mockRdStream.pipe(streamObj.stream);
-            })
-            .then(function() {
-                emittedHash.should.deep.equal(hashes);
+                mockBack.mockRdStream.pipe(streamObj.transformHashStream);
             });
 
-
+            return deferred.promise.should.eventually.deep.equal(hashes);
         });
 
 
         it("should return a promise for a readstream on get ", function() {
-
             fileService.backEnds.defaultBackend.get
             .returns(q.resolve(mockBack.mockRdStream));
 
             return fileService.get({filename: 'unimportant.txt'})
             .should.eventually.deep
             .equal(fileService.backEnds.defaultBackend.mockRdStream);
-
         });
 
         it("should return a rejected promise " +
@@ -219,7 +240,6 @@ describe("File Service", function() {
 
             return fileService.get({filename: 'notInDatabase.fake'})
             .should.be.rejectedWith('file not found');
-
         });
 
         it("should return a rejected promise for attemtps to delete " +
@@ -228,9 +248,16 @@ describe("File Service", function() {
 
             return fileService.delete({filename: "notInDatabase.txt"})
             .should.be.rejectedWith('file not found');
-
         });
 
+        it("should return a promise for an array of files " +
+                "received from the backend on verify", function() {
+            var aritraryArray = ["I'm a file", "I'm also a file", "I'm a file too"];
+            mockBack.getMeta.returns(q.resolve(aritraryArray));
+
+            return fileService.verify("aFile.txt").should.eventually
+            .deep.equal(aritraryArray);
+        });
 
         it("should return a promise for the list " +
         "received from call to backend's list method",function() {
@@ -240,7 +267,6 @@ describe("File Service", function() {
 
             return fileService.list().should.eventually
             .deep.equal(fileList);
-
         });
 
     });
