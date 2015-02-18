@@ -3,6 +3,6 @@ enable
 echo "STARTING RENASAR ZEROTOUCH"
 copy http://<%=server%>:<%=port%>/api/common/templates/<%=startupConfig%> flash:startup-config
 copy http://<%=server%>:<%=port%>/api/common/templates/<%=bootConfig%> flash:boot-config
-copy http://<%=server%>:<%=port%>/common/<%=eosImage%> flash:
+copy http://<%=server%>:<%=port%>/<%=eosImage%> flash:
 echo "RENASAR ZEROTOUCH FINISHED"
 exit
