@@ -50,7 +50,7 @@ describe('Versions API', function () {
             }));
             return helper.request().get('/api/common/versions/')
                 .expect('Content-Type', /^application\/json/)
-                .expect(501)
+                .expect(501);
         });
     });
 
