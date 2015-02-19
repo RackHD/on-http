@@ -6,7 +6,7 @@
 describe('Profiles API', function () {
     var taskGraphProtocol;
     var taskProtocol;
-    var profileService;
+    var profiles;
     var profileApiService;
 
     before(function () {
@@ -17,8 +17,8 @@ describe('Profiles API', function () {
     beforeEach(function () {
         taskProtocol = helper.injector.get('Protocol.Task');
         taskGraphProtocol = helper.injector.get('Protocol.TaskGraphRunner');
-        profileService = helper.injector.get('Services.Profile');
-        profileService.get = sinon.stub().returns('');
+        profiles = helper.injector.get('Profiles');
+        profiles.get = sinon.stub().returns('');
         profileApiService = helper.injector.get('Http.Services.Api.Profiles');
         taskProtocol.activeTaskExists = sinon.stub().resolves({});
         taskProtocol.requestCommands = sinon.stub().resolves({ testcommands: 'cmd' });
@@ -55,7 +55,7 @@ describe('Profiles API', function () {
             return helper.request().get('/api/common/profiles')
                 .expect(200)
                 .expect(function() {
-                    expect(profileService.get.calledWith('redirect.ipxe')).to.be.true;
+                    expect(profiles.get.calledWith('redirect.ipxe')).to.be.true;
                 });
         });
 
@@ -66,7 +66,7 @@ describe('Profiles API', function () {
                 .query({ macs: '00:00:de:ad:be:ef' })
                 .expect(200)
                 .expect(function() {
-                    expect(profileService.get.calledWith('redirect.ipxe')).to.be.true;
+                    expect(profiles.get.calledWith('redirect.ipxe')).to.be.true;
                 });
         });
 
@@ -80,7 +80,7 @@ describe('Profiles API', function () {
                 .query({ macs: '00:00:de:ad:be:ef' })
                 .expect(200)
                 .expect(function() {
-                    expect(profileService.get.calledWith('error.ipxe')).to.be.true;
+                    expect(profiles.get.calledWith('error.ipxe')).to.be.true;
                 });
         });
 
@@ -98,7 +98,7 @@ describe('Profiles API', function () {
                 .query({ macs: '00:00:de:ad:be:ef' })
                 .expect(200)
                 .expect(function() {
-                    expect(profileService.get.calledWith('error.ipxe')).to.be.true;
+                    expect(profiles.get.calledWith('error.ipxe')).to.be.true;
                 });
         });
 
@@ -116,7 +116,7 @@ describe('Profiles API', function () {
                 .query({ macs: '00:00:de:ad:be:ef' })
                 .expect(200)
                 .expect(function() {
-                    expect(profileService.get.calledWith('test.profile')).to.be.true;
+                    expect(profiles.get.calledWith('test.profile')).to.be.true;
                 });
         });
     });
