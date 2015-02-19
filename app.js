@@ -12,6 +12,8 @@ di.annotate(Runner, new di.Inject(
         'Http.Server',
         'Services.Core',
         'Services.Configuration',
+        'Profiles',
+        'Templates',
         'stomp',
         'common-api-router',
         'common-stomp-resources',
@@ -19,9 +21,14 @@ di.annotate(Runner, new di.Inject(
         'Q'
     )
 );
-function Runner(app, core, configuration, stomp, router, resources, fileService, Q) {
+function Runner(app, core, configuration, profiles, templates,
+                stomp, router, resources, fileService, Q) {
+
     function start() {
         return core.start()
+            .then(function() {
+                return Q.all([profiles.load(), templates.load()]);
+            })
             .then(function() {
 
                 // TODO (benbp): Remove this, it's deprecated. Issue is the overlay
