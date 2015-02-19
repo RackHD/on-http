@@ -29,7 +29,7 @@ describe('Versions API', function () {
 
     describe('/api/common/versions', function() {
 
-        it('GET should return', function () {
+        it('GET should a package version structure', function () {
             stubRun.returns(Q.resolve({
                 stdout: 'ii somePackage 1.0',
                 stderr: undefined
@@ -41,8 +41,16 @@ describe('Versions API', function () {
                     expect(res.body).to.be.an("Array").with.length(1);
                     expect(res.body[0]).to.be.an("Object").with.property('package', 'somePackage');
                     expect(res.body[0]).to.be.an("Object").with.property('version', '1.0');
-                    //console.log(res.body);
                 });
+        });
+
+        it('GET should return a 501 error if dpkg command fails', function () {
+            stubRun.returns(Q.reject({
+                code: '-1'
+            }));
+            return helper.request().get('/api/common/versions/')
+                .expect('Content-Type', /^application\/json/)
+                .expect(501)
         });
     });
 
