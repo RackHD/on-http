@@ -6,7 +6,7 @@
 describe('DHCP API', function () {
 
     before(function () {
-        this.timeout(5000);
+        this.timeout(10000);
         return helper.startServer([
             dihelper.simpleWrapper({
                 lookupIpLease: sinon.stub().returns(Q.resolve('00:00:00:00:00:00')),
