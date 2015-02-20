@@ -27,14 +27,14 @@ describe('Versions API', function () {
         return helper.stopServer();
     });
 
-    describe('/api/common/versions', function() {
+    describe('/api/1.1/versions', function() {
 
         it('GET should a package version structure', function () {
             stubRun.returns(Q.resolve({
                 stdout: 'ii somePackage 1.0',
                 stderr: undefined
             }));
-            return helper.request().get('/api/common/versions/')
+            return helper.request().get('/api/1.1/versions/')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function (res) {
@@ -48,7 +48,7 @@ describe('Versions API', function () {
             stubRun.returns(Q.reject({
                 code: '-1'
             }));
-            return helper.request().get('/api/common/versions/')
+            return helper.request().get('/api/1.1/versions/')
                 .expect('Content-Type', /^application\/json/)
                 .expect(501);
         });

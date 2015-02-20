@@ -52,7 +52,7 @@ describe('Profiles API', function () {
         });
 
         it("should send down redirect.ipxe if 'macs' are not in req.param", function() {
-            return helper.request().get('/api/common/profiles')
+            return helper.request().get('/api/1.1/profiles')
                 .expect(200)
                 .expect(function() {
                     expect(profiles.get.calledWith('redirect.ipxe')).to.be.true;
@@ -62,7 +62,7 @@ describe('Profiles API', function () {
         it("should send down redirect.ipxe if a node is new", function() {
             taskGraphProtocol.runTaskGraph = sinon.stub(
                 taskGraphProtocol, 'runTaskGraph').resolves();
-            return helper.request().get('/api/common/profiles')
+            return helper.request().get('/api/1.1/profiles')
                 .query({ macs: '00:00:de:ad:be:ef' })
                 .expect(200)
                 .expect(function() {
@@ -76,7 +76,7 @@ describe('Profiles API', function () {
             profileApiService.getNode = sinon.stub(profileApiService, 'getNode').resolves({});
             taskGraphProtocol.getActiveTaskGraph = sinon.stub(
                 taskGraphProtocol, 'getActiveTaskGraph').resolves(null);
-            return helper.request().get('/api/common/profiles')
+            return helper.request().get('/api/1.1/profiles')
                 .query({ macs: '00:00:de:ad:be:ef' })
                 .expect(200)
                 .expect(function() {
@@ -94,7 +94,7 @@ describe('Profiles API', function () {
                 taskProtocol, 'requestProfile').resolves('test.profile');
             taskProtocol.requestProperties = sinon.stub(taskProtocol, 'requestProperties').rejects(
                     new Error('Test workflow properties error'));
-            return helper.request().get('/api/common/profiles')
+            return helper.request().get('/api/1.1/profiles')
                 .query({ macs: '00:00:de:ad:be:ef' })
                 .expect(200)
                 .expect(function() {
@@ -112,7 +112,7 @@ describe('Profiles API', function () {
                 taskProtocol, 'requestProfile').resolves('test.profile');
             taskProtocol.requestProperties = sinon.stub(
                 taskProtocol, 'requestProperties').resolves({});
-            return helper.request().get('/api/common/profiles')
+            return helper.request().get('/api/1.1/profiles')
                 .query({ macs: '00:00:de:ad:be:ef' })
                 .expect(200)
                 .expect(function() {
