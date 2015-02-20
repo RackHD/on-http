@@ -16,10 +16,6 @@ describe('Node API', function () {
             Q = helper.injector.get('Q');
             var w = helper.injector.get('Services.Waterline');
             stubFindByIdentifier = sinon.stub(w.nodes, "findByIdentifier");
-
-            //TODO(remove when https://github.com/renasar/renasar-core/pull/114 is merged
-            w.catalogs.findLatestCatalogOfSource = function() {};
-
             stubFindLatestCatalogOfSource = sinon.stub(w.catalogs, "findLatestCatalogOfSource");
         });
 
