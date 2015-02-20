@@ -3,6 +3,83 @@
 
 'use strict';
 
-describe('/nodes', function () {
-    it('needs specs');
+describe('Node API', function () {
+
+    var Q;
+    var stubFindByIdentifier;
+    var stubFindLatestCatalogOfSource;
+
+    before(function () {
+        this.timeout(5000);
+        return helper.startServer([
+        ]).then(function () {
+            Q = helper.injector.get('Q');
+            var w = helper.injector.get('Services.Waterline');
+            stubFindByIdentifier = sinon.stub(w.nodes, "findByIdentifier");
+
+            //TODO(remove when https://github.com/renasar/renasar-core/pull/114 is merged
+            w.catalogs.findLatestCatalogOfSource = function() {};
+
+            stubFindLatestCatalogOfSource = sinon.stub(w.catalogs, "findLatestCatalogOfSource");
+        });
+
+    });
+
+    beforeEach(function () {
+        return helper.reset();
+    });
+
+    after(function () {
+        return helper.stopServer();
+    });
+
+    describe('/api/common/nodes/:identifier/catalogs/:source', function() {
+        it('GET should return a single catalog', function () {
+
+            stubFindByIdentifier.returns(Q.resolve({
+                id: '123',
+                name: '123'
+            }));
+            stubFindLatestCatalogOfSource.returns(Q.resolve([
+                {
+                    node: '123',
+                    source: 'dummysource',
+                    data: {
+                        foo: 'bar'
+                    }
+                }
+            ]));
+
+            return helper.request().get('/api/common/nodes/123/catalogs/dummysource')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function (res) {
+                    expect(res.body).to.be.an("Object").with.property('source', 'dummysource');
+                    expect(res.body).to.be.an("Object").with.property('node', '123');
+                });
+        });
+
+        it('GET should return a 404 if an empty list is returned', function () {
+
+            stubFindByIdentifier.returns(Q.resolve({
+                id: '123',
+                name: '123'
+            }));
+            stubFindLatestCatalogOfSource.returns(Q.resolve([]));
+
+            return helper.request().get('/api/common/nodes/123/catalogs/dummysource')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404)
+        });
+
+        it("GET should return a 404 if the node wasn't found", function () {
+
+            stubFindByIdentifier.returns(Q.resolve());
+
+            return helper.request().get('/api/common/nodes/123/catalogs/dummysource')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404)
+        });
+    });
+
 });
