@@ -40,7 +40,7 @@ describe('Node API', function () {
                 id: '123',
                 name: '123'
             }));
-            stubFindLatestCatalogOfSource.returns(Q.resolve([
+            stubFindLatestCatalogOfSource.returns(Q.resolve(
                 {
                     node: '123',
                     source: 'dummysource',
@@ -48,7 +48,7 @@ describe('Node API', function () {
                         foo: 'bar'
                     }
                 }
-            ]));
+            ));
 
             return helper.request().get('/api/common/nodes/123/catalogs/dummysource')
                 .expect('Content-Type', /^application\/json/)
@@ -65,11 +65,11 @@ describe('Node API', function () {
                 id: '123',
                 name: '123'
             }));
-            stubFindLatestCatalogOfSource.returns(Q.resolve([]));
+            stubFindLatestCatalogOfSource.returns(Q.resolve());
 
             return helper.request().get('/api/common/nodes/123/catalogs/dummysource')
                 .expect('Content-Type', /^application\/json/)
-                .expect(404)
+                .expect(404);
         });
 
         it("GET should return a 404 if the node wasn't found", function () {
@@ -78,7 +78,7 @@ describe('Node API', function () {
 
             return helper.request().get('/api/common/nodes/123/catalogs/dummysource')
                 .expect('Content-Type', /^application\/json/)
-                .expect(404)
+                .expect(404);
         });
     });
 
