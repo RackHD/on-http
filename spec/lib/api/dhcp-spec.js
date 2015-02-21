@@ -56,9 +56,9 @@ describe('DHCP API', function () {
         return helper.stopServer();
     });
 
-    describe('/api/common/dhcp', function() {
+    describe('/api/1.1/dhcp', function() {
         it('GET should return all the leases peekLeaseTable', function () {
-            return helper.request().get('/api/common/dhcp/')
+            return helper.request().get('/api/1.1/dhcp/')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function (res) {
@@ -67,10 +67,10 @@ describe('DHCP API', function () {
                 });
         });
     });
-    describe('/api/common/dhcp/lease/:macaddress', function() {
+    describe('/api/1.1/dhcp/lease/:macaddress', function() {
 
         it('GET should return the lease detail from peekLeaseTable', function () {
-            return helper.request().get('/api/common/dhcp/lease/08:00:27:52:d2:a4')
+            return helper.request().get('/api/1.1/dhcp/lease/08:00:27:52:d2:a4')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function (res) {
@@ -81,7 +81,7 @@ describe('DHCP API', function () {
         });
 
         it('GET should return 404 if the mac isnt in the lease table', function () {
-            return helper.request().get('/api/common/dhcp/lease/00:00:00:11:11:11')
+            return helper.request().get('/api/1.1/dhcp/lease/00:00:00:11:11:11')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });

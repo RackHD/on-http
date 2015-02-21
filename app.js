@@ -31,12 +31,9 @@ function Runner(app, core, configuration, profiles, templates,
             })
             .then(function() {
 
-                // TODO (benbp): Remove this, it's deprecated. Issue is the overlay
-                // rc.local script still has this URL in it and we would need
-                // to update the overlays at a customer site. Time-saving
-                // workaround for now, since we ship tomorrow.
-                app.use('/api/rack', router);
                 app.use('/api/common', router);
+                app.use('/api/current', router);
+                app.use('/api/1.1', router);
 
                 resources.register(stomp);
 

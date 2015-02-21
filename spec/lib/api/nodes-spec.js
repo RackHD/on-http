@@ -29,7 +29,7 @@ describe('Node API', function () {
         return helper.stopServer();
     });
 
-    describe('/api/common/nodes/:identifier/catalogs/:source', function() {
+    describe('/api/1.1/nodes/:identifier/catalogs/:source', function() {
         it('GET should return a single catalog', function () {
 
             stubFindByIdentifier.returns(Q.resolve({
@@ -46,7 +46,7 @@ describe('Node API', function () {
                 }
             ));
 
-            return helper.request().get('/api/common/nodes/123/catalogs/dummysource')
+            return helper.request().get('/api/1.1/nodes/123/catalogs/dummysource')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function (res) {
@@ -63,7 +63,7 @@ describe('Node API', function () {
             }));
             stubFindLatestCatalogOfSource.returns(Q.resolve());
 
-            return helper.request().get('/api/common/nodes/123/catalogs/dummysource')
+            return helper.request().get('/api/1.1/nodes/123/catalogs/dummysource')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -72,7 +72,7 @@ describe('Node API', function () {
 
             stubFindByIdentifier.returns(Q.resolve());
 
-            return helper.request().get('/api/common/nodes/123/catalogs/dummysource')
+            return helper.request().get('/api/1.1/nodes/123/catalogs/dummysource')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });

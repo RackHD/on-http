@@ -27,7 +27,7 @@ describe('Tasks API', function () {
 
     it("should send down tasks", function() {
         taskProtocol.activeTaskExists.resolves(null);
-        return helper.request().get('/api/common/tasks/testnodeid')
+        return helper.request().get('/api/1.1/tasks/testnodeid')
             .expect(200)
             .expect(function (res) {
                 expect(res.body).to.deep.equal({ testcommands: 'cmd' });
@@ -37,7 +37,7 @@ describe('Tasks API', function () {
     it("should noop if no active task exists", function() {
         var tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
         taskProtocol.activeTaskExists.rejects(new tasksApiService.NoActiveTaskError());
-        return helper.request().get('/api/common/tasks/testnodeid')
+        return helper.request().get('/api/1.1/tasks/testnodeid')
             .expect(204)
             .expect(function (res) {
                 expect(res.body).to.be.empty;
@@ -46,7 +46,7 @@ describe('Tasks API', function () {
 
     it("should error if an active task exists but no commands are sent", function() {
         taskProtocol.requestCommands.rejects(new Error(''));
-        return helper.request().get('/api/common/tasks/testnodeid')
+        return helper.request().get('/api/1.1/tasks/testnodeid')
             .expect(404)
             .expect(function (res) {
                 expect(res.body).to.be.empty;

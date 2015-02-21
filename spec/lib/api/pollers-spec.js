@@ -24,13 +24,13 @@ describe('Pollers API', function () {
     });
 
     it('should return an empty array from GET /pollers', function () {
-        return helper.request().get('/api/common/pollers')
+        return helper.request().get('/api/1.1/pollers')
             .expect('Content-Type', /^application\/json/)
             .expect(200, []);
     });
 
     it('should create an IPMI poller with POST /pollers', function () {
-        return helper.request().post('/api/common/pollers')
+        return helper.request().post('/api/1.1/pollers')
             .send({
                 type: 'ipmi',
                 pollInterval: 5000,
@@ -62,7 +62,7 @@ describe('Pollers API', function () {
     });
 
     it('should create an SNMP poller with POST /pollers', function () {
-        return helper.request().post('/api/common/pollers')
+        return helper.request().post('/api/1.1/pollers')
             .send({
                 type: 'snmp',
                 pollInterval: 6000,
@@ -155,19 +155,19 @@ describe('Pollers API', function () {
     ];
 
     it('should retrieve the library with GET /pollers/library', function () {
-        return helper.request().get('/api/common/pollers/library')
+        return helper.request().get('/api/1.1/pollers/library')
             .expect('Content-Type', /^application\/json/)
             .expect(200, library);
     });
 
     it('should retrieve the ipmi library entry with GET /pollers/library/ipmi', function () {
-        return helper.request().get('/api/common/pollers/library/ipmi')
+        return helper.request().get('/api/1.1/pollers/library/ipmi')
             .expect('Content-Type', /^application\/json/)
             .expect(200, library[0]);
     });
 
     it('should retrieve the snmp library entry with GET /pollers/library/snmp', function () {
-        return helper.request().get('/api/common/pollers/library/snmp')
+        return helper.request().get('/api/1.1/pollers/library/snmp')
             .expect('Content-Type', /^application\/json/)
             .expect(200, library[1]);
     });
@@ -175,18 +175,18 @@ describe('Pollers API', function () {
     describe('non-existent node id', function () {
         var badId = 'bad';
         it('should 404 with GET /pollers/:id ', function () {
-            return helper.request().get('/api/common/pollers/' + badId)
+            return helper.request().get('/api/1.1/pollers/' + badId)
             .expect(404);
         });
 
         it('should 404 with PATCH /pollers/:id', function () {
-            return helper.request().patch('/api/common/pollers/' + badId)
+            return helper.request().patch('/api/1.1/pollers/' + badId)
             .send()
             .expect(404);
         });
 
         it('should 404 with DELETE /pollers/:id', function () {
-            return helper.request().delete('/api/common/pollers/' + badId)
+            return helper.request().delete('/api/1.1/pollers/' + badId)
             .expect(404);
         });
     });
@@ -194,7 +194,7 @@ describe('Pollers API', function () {
     describe('POST /pollers afterwards', function () {
         var poller;
         beforeEach(function () {
-           return helper.request().post('/api/common/pollers')
+           return helper.request().post('/api/1.1/pollers')
             .send({ type: 'ipmi', pollInterval: 5000 })
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -203,20 +203,20 @@ describe('Pollers API', function () {
             });
         });
         it('should contain the new poller in GET /pollers', function () {
-            return helper.request().get('/api/common/pollers')
+            return helper.request().get('/api/1.1/pollers')
             .expect('Content-Type', /^application\/json/)
             .expect(200, [poller]);
         });
 
         it('should return the same poller from GET /pollers/:id', function () {
-            return helper.request().get('/api/common/pollers/' + poller.id)
+            return helper.request().get('/api/1.1/pollers/' + poller.id)
             .expect('Content-Type', /^application\/json/)
             .expect(200, poller);
         });
 
         it(' should update with PATCH /pollers', function () {
             poller.pollInterval = 20000;
-            return helper.request().patch('/api/common/pollers/' + poller.id)
+            return helper.request().patch('/api/1.1/pollers/' + poller.id)
             .send(poller)
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -238,14 +238,14 @@ describe('Pollers API', function () {
         });
 
         it('should delete the poller with DELETE /pollers/:id', function () {
-            return helper.request().delete('/api/common/pollers/' + poller.id)
+            return helper.request().delete('/api/1.1/pollers/' + poller.id)
                 .expect(204);
         });
 
         it('should return poller data from GET /pollers/:id/data', function () {
             var mockPollerData = [ { data: 'dummy' } ];
             taskProtocol.requestPollerCache.returns(Q.resolve(mockPollerData));
-            return helper.request().get('/api/common/pollers/' + poller.id + '/data')
+            return helper.request().get('/api/1.1/pollers/' + poller.id + '/data')
             .expect('Content-Type', /^application\/json/)
             .expect(200, mockPollerData);
         });
