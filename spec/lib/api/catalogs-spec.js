@@ -34,7 +34,7 @@ describe('Catalogs API', function () {
             stubFind.reset();
         });
 
-        it("GET should a list of all catalogs", function() {
+        it("should a list of all catalogs", function() {
 
             stubFind.returns(Q.resolve([
                 {
@@ -54,7 +54,7 @@ describe('Catalogs API', function () {
                 });
         });
 
-        it("GET return an emptry array if no catalogs exist", function() {
+        it("should return an empty array if no catalogs exist", function() {
 
             stubFind.returns(Q.resolve([]));
 
@@ -66,7 +66,7 @@ describe('Catalogs API', function () {
                 });
         });
 
-        it("GET should pass through query from query params", function() {
+        it("should pass through query from query params", function() {
             stubFind.returns(Q.resolve([
                 {
                     id: '123',
@@ -81,14 +81,14 @@ describe('Catalogs API', function () {
                 .expect(200)
                 .expect(function (res) {
                     expect(res.body).to.be.an("Array").with.length(1);
-                    expect(stubFind.firstCall.calledWith({source: 'somesource'})).to.equal(true);
+                    expect(stubFind.firstCall).to.have.been.calledWith({source: 'somesource'});
                 });
 
         });
     });
 
     describe("/catalogs/:identifier", function() {
-        it("GET should an individual catalogs", function() {
+        it("should return an individual catalog", function() {
             stubFindByIdentifier.returns(Q.resolve({
                     id: '123',
                     node: '123',
@@ -106,7 +106,7 @@ describe('Catalogs API', function () {
                 });
         });
 
-        it("GET return a 404 if no catalogs can be found", function() {
+        it("should return a 404 if no catalogs can be found", function() {
 
             stubFind.returns(Q.resolve());
 
