@@ -1,7 +1,7 @@
 echo Starting CentOS x64 installer for ${hostidentifier}
 set base-url http://<%=server%>:<%=port%>/centos/6.5/os/x86_64/images/pxeboot
 set repo http://<%=server%>:<%=port%>/centos/6.5/os/x86_64
-set params ks=http://<%=server%>:<%=port%>/api/common/templates/centos65-ks hostname=<%=hostname%> ksdevice=bootif BOOTIF=01-${netX/mac} console=tty0 console=<%=comport%>,115200n8
+set params ks=http://<%=server%>:<%=port%>/api/common/templates/centos65-ks hostname=<%=hostname%> ksdevice=bootif BOOTIF=01-${netX/mac} console=<%=comport%>,115200n8 console=tty0 
 kernel ${base-url}/vmlinuz repo=${repo} ${params}
 initrd ${base-url}/initrd.img
 boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell
