@@ -22,7 +22,7 @@
     "httpsPort": 443,
     "httpsCert": "data/dev-cert.pem",
     "httpsKey": "data/dev-key.pem",
-    "subnetnetmask": "255.255.255.0",
+    "subnetmask": "255.255.255.0",
     "gatewayaddr": "10.1.1.1",
     "broadcastaddr": "10.1.1.255",
     "httpStaticDirectory": "./static/http",
