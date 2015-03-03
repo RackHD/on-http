@@ -3,20 +3,17 @@
 
 'use strict';
 
-describe('Tasks API', function () {
+describe('Http.Api.Tasks', function () {
     var taskProtocol;
     var tasksApiService;
     var waterline;
 
-    before(function () {
+    before('start HTTP server', function () {
         this.timeout(5000);
-        taskProtocol = {};
-        return helper.startServer([
-            dihelper.simpleWrapper(taskProtocol, 'Protocol.Task')
-        ]);
+        return helper.startServer();
     });
 
-    beforeEach(function () {
+    beforeEach('set up mocks', function () {
         taskProtocol = helper.injector.get('Protocol.Task');
         // Defaults, you can tack on .resolves().rejects().resolves(), etc. like so
         taskProtocol.activeTaskExists = sinon.stub().resolves();
@@ -32,39 +29,43 @@ describe('Tasks API', function () {
         return helper.reset();
     });
 
-    after(function () {
+    after('stop HTTP server', function () {
         return helper.stopServer();
     });
 
-    it("should send down tasks", function() {
-        taskProtocol.activeTaskExists.resolves(null);
-        return helper.request().get('/api/1.1/tasks/testnodeid')
+    describe('GET /tasks/:id', function () {
+        it("should send down tasks", function() {
+            taskProtocol.activeTaskExists.resolves(null);
+            return helper.request().get('/api/1.1/tasks/testnodeid')
             .expect(200)
             .expect(function (res) {
                 expect(res.body).to.deep.equal({ testcommands: 'cmd' });
             });
-    });
+        });
 
-    it("should noop if no active task exists", function() {
-        var tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
-        taskProtocol.activeTaskExists.rejects(new tasksApiService.NoActiveTaskError());
-        return helper.request().get('/api/1.1/tasks/testnodeid')
+        it("should return 204 if no active task exists", function() {
+            var tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
+            taskProtocol.activeTaskExists.rejects(new tasksApiService.NoActiveTaskError());
+            return helper.request().get('/api/1.1/tasks/testnodeid')
             .expect(204)
             .expect(function (res) {
                 expect(res.body).to.be.empty;
             });
-    });
+        });
 
-    it("should error if an active task exists but no commands are sent", function() {
-        taskProtocol.requestCommands.rejects(new Error(''));
-        return helper.request().get('/api/1.1/tasks/testnodeid')
+        it("should error if an active task exists but no commands are sent", function() {
+            taskProtocol.requestCommands.rejects(new Error(''));
+            return helper.request().get('/api/1.1/tasks/testnodeid')
             .expect(404)
             .expect(function (res) {
                 expect(res.body).to.be.empty;
             });
+        });
+
+
     });
 
-    describe("/api/common/tasks/bootstrap.js", function() {
+    describe("GET /tasks/bootstrap.js", function() {
         it("should render a bootstrap for the node", function() {
             tasksApiService.getNode.resolves({ id: '123' });
             waterline.templates.findOne.resolves({
@@ -72,7 +73,7 @@ describe('Tasks API', function () {
                 contents: 'test contents'
             });
 
-            return helper.request().get('/api/common/tasks/bootstrap.js?macAddress=00:11:22:33:44:55')
+            return helper.request().get('/api/1.1/tasks/bootstrap.js?macAddress=00:11:22:33:44:55')
                 .expect(200)
                 .expect('Content-Type', /^text\/html/)
                 .expect(function (res) {
@@ -89,29 +90,36 @@ describe('Tasks API', function () {
             });
 
             return helper.request()
-                .get('/api/common/tasks/bootstrap.js?macAddress=00:11:22:33:44:55')
+                .get('/api/1.1/tasks/bootstrap.js?macAddress=00:11:22:33:44:55')
                 .expect(404);
         });
 
+        it("should render a 500 if tasksApiService.getNode errors", function() {
+            tasksApiService.getNode.rejects(new Error('asdf'));
+            return helper.request()
+                .get('/api/1.1/tasks/bootstrap.js?macAddress=00:11:22:33:44:55')
+                .expect(500);
+        });
     });
 
-    it("verify tasks accept a large entity response", function() {
-
-        function createBigString() {
-            var x = "";
-            for (var i = 0; i < 200000; i+=1) {
-                x += "1";
+    describe("POST /tasks/:id", function () {
+        it("should accept a large entity response", function() {
+            function createBigString() {
+                var x = "";
+                for (var i = 0; i < 200000; i+=1) {
+                    x += "1";
+                }
+                return x;
             }
-            return x;
-        }
 
-        var data = { foo: createBigString() };
+            var data = { foo: createBigString() };
 
-        return helper.request().post('/api/common/tasks/123')
+            return helper.request().post('/api/1.1/tasks/123')
             .send(data)
             .expect(function () {
                 expect(taskProtocol.respondCommands).to.have.been.calledWith('123', data);
             })
             .expect(201);
+        });
     });
 });

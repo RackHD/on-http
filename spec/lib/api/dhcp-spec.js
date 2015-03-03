@@ -3,9 +3,9 @@
 
 'use strict';
 
-describe('DHCP API', function () {
+describe('Http.Api.Dhcp', function () {
 
-    before(function () {
+    before('start HTTP server', function () {
         this.timeout(10000);
         return helper.startServer([
             dihelper.simpleWrapper({
@@ -48,16 +48,12 @@ describe('DHCP API', function () {
         ]);
     });
 
-    beforeEach(function () {
-        return helper.reset();
-    });
-
-    after(function () {
+    after('stop HTTP server', function () {
         return helper.stopServer();
     });
 
-    describe('/api/1.1/dhcp', function() {
-        it('GET should return all the leases peekLeaseTable', function () {
+    describe('GET /dhcp', function() {
+        it('should return all the leases peekLeaseTable', function () {
             return helper.request().get('/api/1.1/dhcp/')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
@@ -67,9 +63,9 @@ describe('DHCP API', function () {
                 });
         });
     });
-    describe('/api/1.1/dhcp/lease/:macaddress', function() {
+    describe('GET /dhcp/lease/:macaddress', function() {
 
-        it('GET should return the lease detail from peekLeaseTable', function () {
+        it('should return the lease detail from peekLeaseTable', function () {
             return helper.request().get('/api/1.1/dhcp/lease/08:00:27:52:d2:a4')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
@@ -80,7 +76,7 @@ describe('DHCP API', function () {
                 });
         });
 
-        it('GET should return 404 if the mac isnt in the lease table', function () {
+        it('should return 404 if the mac isn\'t in the lease table', function () {
             return helper.request().get('/api/1.1/dhcp/lease/00:00:00:11:11:11')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);

@@ -3,6 +3,6 @@
 
 'use strict';
 
-describe('/workflows', function () {
+describe('Http.Api.Workflows', function () {
     it('needs specs');
 });
