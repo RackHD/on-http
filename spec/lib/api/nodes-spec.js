@@ -3,13 +3,13 @@
 
 'use strict';
 
-describe('Node API', function () {
+describe('Http.Api.Nodes', function () {
 
     var Q;
     var stubFindByIdentifier;
     var stubFindLatestCatalogOfSource;
 
-    before(function () {
+    before('start HTTP server', function () {
         this.timeout(5000);
         return helper.startServer([
         ]).then(function () {
@@ -21,16 +21,12 @@ describe('Node API', function () {
 
     });
 
-    beforeEach(function () {
-        return helper.reset();
-    });
-
-    after(function () {
+    after('stop HTTP server', function () {
         return helper.stopServer();
     });
 
-    describe('/api/1.1/nodes/:identifier/catalogs/:source', function() {
-        it('GET should return a single catalog', function () {
+    describe('GET /nodes/:identifier/catalogs/:source', function() {
+        it('should return a single catalog', function () {
 
             stubFindByIdentifier.returns(Q.resolve({
                 id: '123',
@@ -55,7 +51,7 @@ describe('Node API', function () {
                 });
         });
 
-        it('GET should return a 404 if an empty list is returned', function () {
+        it('should return a 404 if an empty list is returned', function () {
 
             stubFindByIdentifier.returns(Q.resolve({
                 id: '123',
@@ -68,7 +64,7 @@ describe('Node API', function () {
                 .expect(404);
         });
 
-        it("GET should return a 404 if the node wasn't found", function () {
+        it("should return a 404 if the node wasn't found", function () {
 
             stubFindByIdentifier.returns(Q.resolve());
 

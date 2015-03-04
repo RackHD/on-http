@@ -3,9 +3,9 @@
 
 'use strict';
 
-describe('Pollers API', function () {
+describe('Http.Api.Pollers', function () {
     var taskProtocol;
-    before(function () {
+    before('start HTTP server', function () {
         this.timeout(5000);
         taskProtocol = {
             requestPollerCache: sinon.stub()
@@ -15,11 +15,11 @@ describe('Pollers API', function () {
         ]);
     });
 
-    beforeEach(function () {
+    beforeEach('reset test DB', function () {
         return helper.reset();
     });
 
-    after(function () {
+    after('stop HTTP server', function () {
         return helper.stopServer();
     });
 

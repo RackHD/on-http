@@ -3,11 +3,11 @@
 
 'use strict';
 
-describe('Versions API', function () {
+describe('Http.Api.Versions', function () {
 
     var stubRun;
 
-    before(function () {
+    before('start HTTP server', function () {
         this.timeout(5000);
 
         stubRun = sinon.stub();
@@ -19,17 +19,13 @@ describe('Versions API', function () {
         ]);
     });
 
-    beforeEach(function () {
-        return helper.reset();
-    });
-
-    after(function () {
+    after('stop HTTP server', function () {
         return helper.stopServer();
     });
 
-    describe('/api/1.1/versions', function() {
+    describe('GET /versions', function() {
 
-        it('GET should a package version structure', function () {
+        it('should return a package version structure', function () {
             stubRun.returns(Q.resolve({
                 stdout: 'ii somePackage 1.0',
                 stderr: undefined
@@ -44,7 +40,7 @@ describe('Versions API', function () {
                 });
         });
 
-        it('GET should return a 501 error if dpkg command fails', function () {
+        it('should return a 501 error if dpkg command fails', function () {
             stubRun.returns(Q.reject({
                 code: '-1'
             }));

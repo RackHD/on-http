@@ -3,6 +3,6 @@
 
 'use strict';
 
-describe('/files', function () {
+describe('Http.Api.Files', function () {
     it('needs specs');
 });

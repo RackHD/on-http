@@ -3,13 +3,13 @@
 
 'use strict';
 
-describe('Catalogs API', function () {
+describe('Http.Api.Catalogs', function () {
 
     var Q;
     var stubFindByIdentifier;
     var stubFind;
 
-    before(function () {
+    before('start HTTP server', function () {
         this.timeout(5000);
         return helper.startServer([
         ]).then(function () {
@@ -20,19 +20,16 @@ describe('Catalogs API', function () {
         });
     });
 
-    beforeEach(function () {
-        return helper.reset();
-    });
-
-    after(function () {
+    after('stop HTTP server', function () {
         return helper.stopServer();
     });
 
-    describe("/catalogs", function() {
+    beforeEach("reset stubs", function() {
+        stubFind.reset();
+        stubFindByIdentifier.reset();
+    });
 
-        beforeEach("/catalogs beforeEach", function() {
-            stubFind.reset();
-        });
+    describe("GET /catalogs", function() {
 
         it("should a list of all catalogs", function() {
 
@@ -87,7 +84,8 @@ describe('Catalogs API', function () {
         });
     });
 
-    describe("/catalogs/:identifier", function() {
+    describe("GET /catalogs/:identifier", function() {
+
         it("should return an individual catalog", function() {
             stubFindByIdentifier.returns(Q.resolve({
                     id: '123',
