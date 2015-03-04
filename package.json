@@ -33,7 +33,8 @@
     "renasar-core": "git+ssh://git@github.com/renasar/renasar-core.git",
     "renasar-mq": "git+ssh://git@github.com/renasar/renasar-mq.git",
     "renasar-tasks": "git+ssh://git@github.com/renasar/renasar-tasks.git",
-    "sockjs": "^0.3.12"
+    "sockjs": "^0.3.12",
+    "pluralize": "~1.1.2"
   },
   "devDependencies": {
     "apidoc": "^0.12.1",
