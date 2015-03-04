@@ -26,7 +26,6 @@
     "es6-shim": "^0.22.2",
     "express": "^4.10.7",
     "glob": "^4.3.2",
-    "gridfs-stream": "^0.5.3",
     "lodash": "^2.4.1",
     "lru-cache": "^2.5.0",
     "mongodb": "^1.4.28",
