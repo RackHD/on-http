@@ -404,39 +404,63 @@ describe('Http.Api.Nodes', function () {
         });
     });
 
-    describe('POST /nodes/:macaddress/dhcp/whitelist', function () {
-        it('should add a MAC to an empty DHCP whitelist', function () {
-            var configuration = helper.injector.get('Services.Configuration');
-            configuration.set('whitelist', undefined);
+    var configuration;
+    function mockConfiguration() {
+        beforeEach('set up mocks', function () {
+            configuration = helper.injector.get('Services.Configuration');
+            sinon.stub(configuration, 'get');
+            sinon.stub(configuration, 'set').returns(configuration);
+        });
 
+        afterEach('tear down mocks', function () {
+            configuration.get.restore();
+            configuration.set.restore();
+        });
+    }
+
+    describe('POST /nodes/:macaddress/dhcp/whitelist', function () {
+        mockConfiguration();
+        it('should add a MAC to an empty DHCP whitelist', function () {
+            configuration.get.returns(undefined);
             return helper.request().post('/api/1.1/nodes/00:11:22:33:44:55/dhcp/whitelist')
                 .expect(201)
                 .expect(function () {
-                    expect(configuration.get('whitelist')).to.deep.equal(['00-11-22-33-44-55']);
+                    expect(configuration.get).to.have.been.calledWith('whitelist');
+                    expect(configuration.set).to.have.been.calledOnce
+                        .and.to.have.deep.property('firstCall.args')
+                        .that.deep.equals(['whitelist', ['00-11-22-33-44-55']]);
                 });
         });
 
         it('should append a MAC to an existing DHCP whitelist', function () {
             var configuration = helper.injector.get('Services.Configuration');
-            configuration.set('whitelist', ['00-00-00-00-00-00']);
+            configuration.get.returns(['00-00-00-00-00-00']);
 
             return helper.request().post('/api/1.1/nodes/00:11:22:33:44:ab/dhcp/whitelist')
                 .expect(201)
                 .expect(function () {
-                    expect(configuration.get('whitelist'))
-                    .to.deep.equal(['00-00-00-00-00-00', '00-11-22-33-44-ab']);
+                    expect(configuration.get).to.have.been.calledWith('whitelist');
+                    expect(configuration.set).to.have.been.calledOnce
+                        .and.to.have.deep.property('firstCall.args')
+                        .that.deep.equals(['whitelist',
+                                          ['00-00-00-00-00-00', '00-11-22-33-44-ab']]);
                 });
         });
     });
 
     describe('DELETE /nodes/:macaddress/dhcp/whitelist', function () {
+        mockConfiguration();
+
         it('should remove a MAC from the DHCP whitelist', function () {
-            var configuration = helper.injector.get('Services.Configuration');
-            configuration.set('whitelist', ['00-11-22-33-44-ab']);
+            configuration.get.returns(['00-11-22-33-44-ab']);
 
             return helper.request().delete('/api/1.1/nodes/00:11:22:33:44:ab/dhcp/whitelist')
                 .expect(204)
                 .expect(function () {
+                    expect(configuration.get).to.have.been.calledWith('whitelist');
+                    expect(configuration.set).to.have.been.calledOnce
+                        .and.to.have.deep.property('firstCall.args')
+                        .that.deep.equals(['whitelist', []]);
                     expect(configuration.get('whitelist'))
                     .to.deep.equal([]);
                 });
@@ -444,23 +468,25 @@ describe('Http.Api.Nodes', function () {
 
         it('should do nothing if the DHCP whitelist is empty', function () {
             var configuration = helper.injector.get('Services.Configuration');
-            configuration.set('whitelist', []);
+            configuration.get.returns([]);
 
             return helper.request().delete('/api/1.1/nodes/00:11:22:33:44:55/dhcp/whitelist')
                 .expect(204)
                 .expect(function () {
-                    expect(configuration.get('whitelist')).to.deep.equal([]);
+                    expect(configuration.get).to.have.been.calledWith('whitelist');
+                    expect(configuration.set).to.not.have.been.called;
                 });
         });
 
         it('should do nothing if the DHCP whitelist is undefined', function () {
             var configuration = helper.injector.get('Services.Configuration');
-            configuration.set('whitelist', undefined);
+            configuration.get.returns(undefined);
 
             return helper.request().delete('/api/1.1/nodes/00:11:22:33:44:55/dhcp/whitelist')
                 .expect(204)
                 .expect(function () {
-                    expect(configuration.get('whitelist')).to.be.undefined;
+                    expect(configuration.get).to.have.been.calledWith('whitelist');
+                    expect(configuration.set).to.not.have.been.called;
                 });
         });
     });

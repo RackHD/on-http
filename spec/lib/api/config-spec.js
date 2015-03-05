@@ -4,9 +4,21 @@
 'use strict';
 
 describe('Http.Api.Config', function () {
+    var configuration;
     before('start HTTP server', function () {
         this.timeout(5000);
         return helper.startServer();
+    });
+
+    beforeEach('set up mocks', function () {
+        configuration = helper.injector.get('Services.Configuration');
+        sinon.stub(configuration, 'set').returns(configuration);
+        sinon.stub(configuration, 'getAll').returns({});
+    });
+
+    afterEach('tear down mocks', function () {
+        configuration.set.restore();
+        configuration.getAll.restore();
     });
 
     after('stop HTTP server', function () {
@@ -14,24 +26,23 @@ describe('Http.Api.Config', function () {
     });
 
     it('should return configuration', function () {
-        var configuration = helper.injector.get('Services.Configuration');
         return helper.request().get('/api/1.1/config')
             .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function (res) {
-                expect(res.body).to.deep.equal(configuration.getAll());
+            .expect(200, {})
+            .expect(function () {
+                expect(configuration.getAll).to.have.been.calledOnce;
             });
     });
 
     it('should edit configuration', function () {
-        var configuration = helper.injector.get('Services.Configuration');
         return helper.request().patch('/api/1.1/config')
             .send({ dummySetting: 'magic' })
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function (res) {
-                expect(res.body).to.have.property('dummySetting').that.equals('magic');
-                expect(res.body).to.deep.equal(configuration.getAll());
+            .expect(function () {
+                expect(configuration.set).to.have.been.calledOnce;
+                expect(configuration.set).to.have.been.calledWith('dummySetting', 'magic');
+                expect(configuration.getAll).to.have.been.calledOnce;
             });
     });
 });

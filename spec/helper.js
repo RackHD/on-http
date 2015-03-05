@@ -3,6 +3,7 @@
 require('renasar-core/spec/helper');
 
 var di = require('di');
+var util = require('util');
 global.core = require('renasar-core')(di);
 global.dihelper = core.helper;
 
@@ -45,6 +46,12 @@ helper.request = function (url, options) {
                 var deferred = Q.defer();
                 test.end(function(err, res) {
                     if (err) {
+                        // if a status check fails, supertest will pass the res object as well.
+                        // so, append some extra verbosity to the error for the report.
+                        if (res) {
+                            var output = res.body || res.text;
+                            err.message += '\nResponse body:\n' + util.inspect(output);
+                        }
                         deferred.reject(err);
                         return;
                     } else {
