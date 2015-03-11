@@ -9,7 +9,8 @@ describe('common-api-router', function () {
         return [
             helper.require('/lib/api/index.js'),
             helper.requireGlob('/lib/**/*.js'),
-            dihelper.simpleWrapper({}, 'Task.Services.OBM')
+            dihelper.simpleWrapper({}, 'Task.Services.OBM'),
+            dihelper.simpleWrapper({}, 'ipmi-obm-service')
         ];
     });
 

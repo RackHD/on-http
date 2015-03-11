@@ -6,7 +6,7 @@
 describe('Http.Api.Nodes', function () {
     var configuration;
     var waterline;
-    var obmService;
+    var ObmService;
     var taskGraphProtocol;
     var Q;
     var Errors;
@@ -23,10 +23,9 @@ describe('Http.Api.Nodes', function () {
             sinon.stub(waterline.catalogs);
             sinon.stub(waterline.workitems);
             sinon.stub(waterline.graphobjects);
-
-            obmService = helper.injector.get('Task.Services.OBM');
-            sinon.stub(obmService);
-
+            ObmService = helper.injector.get('Task.Services.OBM');
+            sinon.stub(ObmService.prototype, 'identifyOn');
+            sinon.stub(ObmService.prototype, 'identifyOff');
             taskGraphProtocol = helper.injector.get('Protocol.TaskGraphRunner');
             sinon.stub(taskGraphProtocol);
 
@@ -48,8 +47,10 @@ describe('Http.Api.Nodes', function () {
         resetStubs(waterline.catalogs);
         resetStubs(waterline.workitems);
         resetStubs(waterline.graphobjects);
-        resetStubs(obmService);
         resetStubs(taskGraphProtocol);
+
+        ObmService.prototype.identifyOn.reset();
+        ObmService.prototype.identifyOff.reset();
     });
 
     after('stop HTTP server', function () {
@@ -247,29 +248,29 @@ describe('Http.Api.Nodes', function () {
     describe('POST /nodes/:identifier/obm/identify', function () {
         it('should enable OBM identify on a node', function () {
             waterline.nodes.needByIdentifier.resolves(node);
-            obmService.identifyOn.resolves({});
+            ObmService.prototype.identifyOn.resolves({});
 
             return helper.request().post('/api/1.1/nodes/1234/obm/identify')
                 .send({ value: true })
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function () {
-                    expect(obmService.identifyOn).to.have.been.calledOnce;
-                    expect(obmService.identifyOn).to.have.been.calledWith(node.id);
+                    expect(ObmService.prototype.identifyOn).to.have.been.calledOnce;
+                    expect(ObmService.prototype.identifyOn).to.have.been.calledWith(node.id);
                 });
         });
 
         it('should disable OBM identify on a node', function () {
             waterline.nodes.needByIdentifier.resolves(node);
-            obmService.identifyOff.resolves({});
+            ObmService.prototype.identifyOff.resolves({});
 
             return helper.request().post('/api/1.1/nodes/1234/obm/identify')
                 .send({ value: false })
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function () {
-                    expect(obmService.identifyOff).to.have.been.calledOnce;
-                    expect(obmService.identifyOff).to.have.been.calledWith(node.id);
+                    expect(ObmService.prototype.identifyOff).to.have.been.calledOnce;
+                    expect(ObmService.prototype.identifyOff).to.have.been.calledWith(node.id);
                 });
         });
 
