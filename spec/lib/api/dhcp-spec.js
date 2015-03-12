@@ -67,7 +67,7 @@ describe('Http.Api.Dhcp', function () {
                     pinned :{"00:11:22:33:44:55":"10.1.1.200"}
                 }))
             }, 'Protocol.Dhcp')
-        ])
+        ]);
     });
 
     after('stop HTTP server', function () {
