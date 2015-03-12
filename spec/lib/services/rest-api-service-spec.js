@@ -26,27 +26,64 @@ function expressAppSetup(callback) {
 describe('Http.Server', function () {
     var rest;
     var Errors;
-    var Validatable;
+    var Serializable;
+    var MockSerializable;
+    var ThrowSerializable;
 
-    function MockDeserializer() {
-        MockDeserializer.super_.call(this, MockDeserializer.rules);
-    }
-
-    function MockSerializer() {
-    }
 
     before('set up test dependencies', function() {
-        // use helper.setupInjector because we don't want to start core services
+        MockSerializable = function () {
+            Serializable.call(
+                this,
+                {
+                    id: 'MockSerializable',
+                    type: 'object',
+                    properties: {
+                        value: {
+                            type: 'string'
+                        }
+                    }
+                }
+            );
+        };
+
+        ThrowSerializable = function () {
+
+            Serializable.call(
+                this,
+                {
+                    id: 'MockSerializable',
+                    type: 'object',
+                    properties: {
+                        value: {
+                            type: 'string'
+                        }
+                    }
+                }
+            );
+        };
+
         helper.setupInjector(_.flatten([
             helper.require('/lib/services/rest-api-service.js'),
-            helper.di.simpleWrapper(MockDeserializer, 'MockDeserializer'),
-            helper.di.simpleWrapper(MockSerializer, 'MockSerializer'),
+            helper.di.simpleWrapper(MockSerializable, 'MockSerializable'),
+            helper.di.simpleWrapper(ThrowSerializable, 'ThrowSerializable'),
             require('renasar-core/spec/mocks/logger')
         ]));
 
         rest = helper.injector.get('Http.Services.RestApi');
         Errors = helper.injector.get('Errors');
-        Validatable = helper.injector.get('Validatable');
+        Serializable = helper.injector.get('Serializable');
+
+        util.inherits(MockSerializable, Serializable);
+        util.inherits(ThrowSerializable, Serializable);
+
+        ThrowSerializable.prototype.serialize = function () {
+            throw new Error('serialize');
+        };
+
+        ThrowSerializable.prototype.deserialize = function () {
+            throw new Error('deserialize');
+        };
     });
 
     describe('rest()', function () {
@@ -231,7 +268,6 @@ describe('Http.Server', function () {
                 .expect('Content-Type', /^application\/json/)
                 .expect(500)
                 .expect(function (req) {
-                    console.log(req.body);
                     expect(req.body).to.have.property('message')
                     .that.equals('Unspecified Error');
                 });
@@ -396,120 +432,59 @@ describe('Http.Server', function () {
                 .expect(400);
         });
 
-        before('set up mock deserializer', function () {
-            util.inherits(MockDeserializer, Validatable);
-
-            MockDeserializer.rules = {
-                value: {
-                    string: true
-                }
-            };
-
-            MockDeserializer.prototype.deserialize = function (data) {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                return {
-                    val: data.value + 'dummyin'
-                };
-            };
-        });
-
-
         it('should get a deserializer from the injector', function () {
             app.post('/testinjectdeserializer', rest(function (req) {
-                expect(req.body).to.have.property('val').that.equals('asdfdummyin');
+                expect(req.body).to.have.property('value').that.equals('asdf');
                 return {
-                    val: req.body.val
+                    value: req.body.value
                 };
-            }, { deserializer: 'MockDeserializer' }));
+            }, { deserializer: 'MockSerializable' }));
 
             return helper.request(TESTURL).post('/testinjectdeserializer')
                 .send({ value: 'asdf' })
                 .expect('Content-Type', /^application\/json/)
-                .expect(200, { val: 'asdfdummyin' });
-        });
-
-        it('should 400 if a deserializer from the injector throws a ValidationError',
-           function () {
-            app.post('/testinjectdeserializervalidationfail', rest(function () {
-                return {};
-            }, { deserializer: 'MockDeserializer' }));
-
-            return helper.request(TESTURL).post('/testinjectdeserializervalidationfail')
-                .send({ value: 1234 })
-                .expect('Content-Type', /^application\/json/)
-                .expect(400);
+                .expect(200, { value: 'asdf' });
         });
 
         it('should 500 if a deserializer from the injector throws an Error',
            function () {
             app.post('/testinjectdeserializervalidationfail', rest(function () {
                 return {};
-            }, { deserializer: 'MockDeserializer' }));
+            }, { deserializer: 'ThrowSerializable' }));
 
             return helper.request(TESTURL).post('/testinjectdeserializervalidationfail')
-                .send({ value: 'asfd', error: 'me' })
+                .send({ value: 'asfd' })
                 .expect('Content-Type', /^application\/json/)
                 .expect(500)
                 .expect(function (req) {
-                    expect(req.body).to.have.property('message').that.equals('me');
+                    expect(req.body).to.have.property('message').that.equals('deserialize');
                 });
-        });
-
-        before('set up mock serializer', function () {
-            MockSerializer.prototype.validate = function (data) {
-                if (typeof data.val !== 'string') {
-                    throw new Errors.ValidationError('val must be a string');
-                }
-            };
-
-            MockSerializer.prototype.serialize = function (data) {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                return {
-                    value: data.val + 'dummyout'
-                };
-            };
         });
 
         it('should get a serializer from the injector', function () {
             app.post('/testinjectserializer', rest(function (req) {
-                expect(req.body).to.have.property('val').that.equals('asdf');
+                expect(req.body).to.have.property('value').that.equals('asdf');
                 return req.body;
-            }, { serializer: 'MockSerializer' }));
+            }, { serializer: 'MockSerializable' }));
 
             return helper.request(TESTURL).post('/testinjectserializer')
-                .send({ val: 'asdf' })
+                .send({ value: 'asdf' })
                 .expect('Content-Type', /^application\/json/)
-                .expect(200, { value: 'asdfdummyout' });
-        });
-
-        it('should 500 if a serializer from the injector throws a ValidationError',
-           function () {
-            app.post('/testinjectserializervalidationfail', rest(function (req) {
-                return req.body;
-            }, { serializer: 'MockSerializer' }));
-
-            return helper.request(TESTURL).post('/testinjectserializervalidationfail')
-                .send({ val: 1234 })
-                .expect('Content-Type', /^application\/json/)
-                .expect(500);
+                .expect(200, { value: 'asdf' });
         });
 
         it('should 500 if a serializer from the injector throws an Error',
            function () {
             app.post('/testinjectserializerfail', rest(function (req) {
                 return req.body;
-            }, { serializer: 'MockSerializer' }));
+            }, { serializer: 'ThrowSerializable' }));
 
             return helper.request(TESTURL).post('/testinjectserializerfail')
-                .send({ val: 'asfd', error: 'you' })
+                .send({ val: 'asfd' })
                 .expect('Content-Type', /^application\/json/)
                 .expect(500)
                 .expect(function (req) {
-                    expect(req.body).to.have.property('message').that.equals('you');
+                    expect(req.body).to.have.property('message').that.equals('serialize');
                 });
         });
     });
