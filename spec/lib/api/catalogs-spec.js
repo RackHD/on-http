@@ -6,16 +6,17 @@
 describe('Http.Api.Catalogs', function () {
 
     var Q;
-    var stubFindByIdentifier;
+    var Errors;
+    var stubNeedByIdentifier;
     var stubFind;
 
     before('start HTTP server', function () {
         this.timeout(5000);
-        return helper.startServer([
-        ]).then(function () {
+        return helper.startServer([]).then(function () {
             Q = helper.injector.get('Q');
+            Errors = helper.injector.get('Errors');
             var w = helper.injector.get('Services.Waterline');
-            stubFindByIdentifier = sinon.stub(w.catalogs, "findByIdentifier");
+            stubNeedByIdentifier = sinon.stub(w.catalogs, "needByIdentifier");
             stubFind = sinon.stub(w.catalogs, "find");
         });
     });
@@ -26,7 +27,7 @@ describe('Http.Api.Catalogs', function () {
 
     beforeEach("reset stubs", function() {
         stubFind.reset();
-        stubFindByIdentifier.reset();
+        stubNeedByIdentifier.reset();
     });
 
     describe("GET /catalogs", function() {
@@ -87,7 +88,7 @@ describe('Http.Api.Catalogs', function () {
     describe("GET /catalogs/:identifier", function() {
 
         it("should return an individual catalog", function() {
-            stubFindByIdentifier.returns(Q.resolve({
+            stubNeedByIdentifier.returns(Q.resolve({
                     id: '123',
                     node: '123',
                     source: 'foo',
@@ -99,14 +100,14 @@ describe('Http.Api.Catalogs', function () {
                 .expect(200)
                 .expect(function (res) {
                     expect(res.body).to.have.property("node", "123");
-                    expect(stubFindByIdentifier.calledWith('123')).to.equal(true);
+                    expect(stubNeedByIdentifier.calledWith('123')).to.equal(true);
                     expect(res.body).to.be.an("Object").with.property('id', "123");
                 });
         });
 
         it("should return a 404 if no catalogs can be found", function() {
 
-            stubFind.returns(Q.resolve());
+            stubFind.returns(Q.reject(new Errors.NotFoundError('Not Found')));
 
             return helper.request().get('/api/1.1/catalogs')
                 .expect('Content-Type', /^application\/json/)
