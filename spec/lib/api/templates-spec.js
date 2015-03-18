@@ -33,7 +33,7 @@ describe('Http.Api.Templates', function () {
             dihelper.simpleWrapper(taskGraphProtocol, 'Protocol.TaskGraphRunner'),
             dihelper.simpleWrapper(waterline, 'Services.Waterline'),
             dihelper.simpleWrapper(resources, 'common-stomp-resources'),
-            require('renasar-core/spec/mocks/logger')
+            require('on-core/spec/mocks/logger')
         ]);
     });
 

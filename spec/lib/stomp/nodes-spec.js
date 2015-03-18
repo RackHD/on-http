@@ -11,7 +11,7 @@ describe('STOMP /nodes', function () {
     helper.before(function() {
         return _.flatten([
             helper.require('/lib/stomp/waterline-resource.js'),
-            dihelper.simpleWrapper(require('renasar-mq'), 'MQ')
+            dihelper.simpleWrapper(require('on-mq'), 'MQ')
         ]);
     });
 

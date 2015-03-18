@@ -67,7 +67,7 @@ describe('Http.Server', function () {
             helper.require('/lib/services/rest-api-service.js'),
             helper.di.simpleWrapper(MockSerializable, 'MockSerializable'),
             helper.di.simpleWrapper(ThrowSerializable, 'ThrowSerializable'),
-            require('renasar-core/spec/mocks/logger')
+            require('on-core/spec/mocks/logger')
         ]));
 
         rest = helper.injector.get('Http.Services.RestApi');

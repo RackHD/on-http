@@ -1,7 +1,7 @@
 {
-  "name": "renasar-http",
+  "name": "on-http",
   "version": "0.0.0",
-  "description": "Renasar Http Server",
+  "description": "OnRack Http Server",
   "main": "index.js",
   "scripts": {
     "doc": "jsdoc lib -r -d docs",
@@ -10,18 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/renasar/renasar-http.git"
+    "url": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-http.git"
   },
   "author": "",
   "license": "Proprietary",
-  "bugs": {
-    "url": "https://github.com/renasar/renasar-http/issues"
-  },
-  "homepage": "https://github.com/renasar/renasar-http",
   "dependencies": {
     "body-parser": "^1.10.1",
     "cors": "^2.5.2",
-    "di": "git+ssh://git@github.com/renasar/di.js.git",
+    "di": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/di.js.git",
     "ejs": "^2.0.8",
     "es6-shim": "^0.22.2",
     "express": "^4.10.7",
@@ -30,9 +26,9 @@
     "lru-cache": "^2.5.0",
     "mongodb": "^1.4.28",
     "on-finished": "^2.2.0",
-    "renasar-core": "git+ssh://git@github.com/renasar/renasar-core.git",
-    "renasar-mq": "git+ssh://git@github.com/renasar/renasar-mq.git",
-    "renasar-tasks": "git+ssh://git@github.com/renasar/renasar-tasks.git",
+    "on-core": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-core.git",
+    "on-mq": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-mq.git",
+    "on-tasks": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-tasks.git",
     "sockjs": "^0.3.12",
     "pluralize": "~1.1.2"
   },

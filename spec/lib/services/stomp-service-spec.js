@@ -8,7 +8,7 @@ describe('stomp', function () {
         // use helper.setupInjector because we don't want to start core services
         helper.setupInjector(_.flatten([
             helper.require('/lib/services/stomp-service.js'),
-            dihelper.simpleWrapper(require('renasar-mq'), 'MQ')
+            dihelper.simpleWrapper(require('on-mq'), 'MQ')
         ]));
     });
 
