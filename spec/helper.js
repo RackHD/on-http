@@ -1,17 +1,17 @@
 'use strict';
 
-require('renasar-core/spec/helper');
+require('on-core/spec/helper');
 
 var di = require('di');
 var util = require('util');
-global.core = require('renasar-core')(di);
+global.core = require('on-core')(di);
 global.dihelper = core.helper;
 
 helper.startServer = function (overrides) {
 
     helper.setupInjector(_.flatten([
-            require('renasar-tasks').injectables,
-            dihelper.simpleWrapper(require('renasar-mq'), 'MQ'),
+            require('on-tasks').injectables,
+            dihelper.simpleWrapper(require('on-mq'), 'MQ'),
             dihelper.simpleWrapper(require('express')(), 'express-app'),
             dihelper.simpleWrapper({
                 publishLog: sinon.stub().resolves()

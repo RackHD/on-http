@@ -21,7 +21,7 @@ describe('Http.Api.Workflows', function () {
             dihelper.simpleWrapper(taskGraphRunner, 'Protocol.TaskGraphRunner'),
             dihelper.simpleWrapper(waterline, 'Services.Waterline'),
             dihelper.simpleWrapper(resources, 'common-stomp-resources'),
-            require('renasar-core/spec/mocks/logger')
+            require('on-core/spec/mocks/logger')
         ]);
     });
 

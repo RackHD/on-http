@@ -10,7 +10,7 @@ describe('SockJS.Server', function () {
         return _.flatten([
             helper.require('/lib/services/sockjs-service.js'),
             helper.require('/lib/services/stomp-service.js'),
-            dihelper.simpleWrapper(require('renasar-mq'), 'MQ')
+            dihelper.simpleWrapper(require('on-mq'), 'MQ')
         ]);
     });
 
