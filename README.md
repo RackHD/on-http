@@ -1,7 +1,7 @@
-renasar-http
-============
+# on-http
 
-Renasar HTTP Server
+
+Monorail HTTP Server
 
 ## installation
 
@@ -15,12 +15,13 @@ Renasar HTTP Server
 Note: requires MongoDB and RabbitMQ to be running to start correctly.
 
     sudo node index.js
+    
 ## config
 
 the fileService requires a "fileService" key which holds keys mapping backend
 strings to their individual config values; it requires at least "defaultBackend"
- to be among the backend keys. More strings may be added and mapped to 
-injector strings in the fileSevice.injectorMap attribute. 
+ to be among the backend keys. More strings may be added and mapped to
+injector strings in the fileSevice.injectorMap attribute.
 
 ## debuging
 
@@ -45,4 +46,3 @@ To run tests and get coverage for CI:
     ./node_modules/.bin/istanbul report cobertura
     # if you want HTML reports locally
     ./node_modules/.bin/istanbul report html
-
