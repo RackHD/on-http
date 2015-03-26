@@ -9,6 +9,7 @@ pushd packagebuild
 
 rm -rf node_modules
 npm install
+npm run apidoc
 npm prune --production
 git log -n 1 --pretty=format:%h.%ai.%s > commitstring.txt
 
