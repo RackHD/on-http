@@ -6,6 +6,7 @@
 describe('Http.Api.Profiles', function () {
     var taskGraphProtocol;
     var taskProtocol;
+    var lookupService;
     var profiles;
     var profileApiService;
 
@@ -16,6 +17,10 @@ describe('Http.Api.Profiles', function () {
 
     beforeEach('set up mocks', function () {
         taskProtocol = helper.injector.get('Protocol.Task');
+        lookupService = helper.injector.get('Services.Lookup');
+
+        sinon.stub(lookupService, 'ipAddressToMacAddress').resolves('00:00:00:00:00:00');
+
         sinon.stub(taskProtocol, 'activeTaskExists').resolves({});
         sinon.stub(taskProtocol, 'requestCommands').resolves({ testcommands: 'cmd' });
         sinon.stub(taskProtocol, 'requestProfile').resolves();
@@ -43,6 +48,7 @@ describe('Http.Api.Profiles', function () {
                 }
             });
         }
+        resetMocks(lookupService);
         resetMocks(taskProtocol);
         resetMocks(taskGraphProtocol);
         resetMocks(profiles);
