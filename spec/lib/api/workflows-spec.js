@@ -117,8 +117,8 @@ describe('Http.Api.Workflows', function () {
     });
 
     describe('GET /workflows/library/:id', function () {
-        it('should retrieve the graph library', function () {
-            var graph = { name: 'foobar' };
+        it('should retrieve a graph from the graph library', function () {
+            var graph = { friendlyName: 'foobar' };
             taskGraphRunner.getTaskGraphLibrary.resolves([graph]);
 
             return helper.request().get('/api/1.1/workflows/library/1234')
@@ -127,10 +127,8 @@ describe('Http.Api.Workflows', function () {
             .expect(function () {
                 expect(taskGraphRunner.getTaskGraphLibrary).to.have.been.calledOnce;
                 expect(taskGraphRunner.getTaskGraphLibrary.firstCall.args[0])
-                .to.have.property('id').that.equals('1234');
+                .to.have.property('injectableName').that.equals('1234');
             });
         });
     });
-
 });
-
