@@ -69,27 +69,65 @@ definitions:
     properties:
       id:
         type: string
+      source:
+        type: string
+      node:
+        $ref: '#/definitions/node'
       data:
         type: object
         description: arbitrary json object
-  Activities:
+  node:
     properties:
-      offset:
-        type: integer
-        format: int32
-        description: Position in pagination.
-      limit:
-        type: integer
-        format: int32
-        description: Number of items to retrieve (100 max).
-      count:
-        type: integer
-        format: int32
-        description: Total number of items available.
-      history:
+      id:
+        type: string
+      profile:
+        type: string
+      name:
+        type: string
+      obmSettings:
+        type: object
+      ipAddresses:
+        type: object
+      workflows:
+        type: array
+        items:
+          $ref: '#/definitions/graphobject'
+      catalogs:
         type: array
         items:
           $ref: '#/definitions/catalog'
+      sku:
+        $ref: '#/definitions/sku'
+  graphobject:
+    properties:
+      id:
+        type: string
+      instanceid:
+        type: string
+      context:
+        type: object
+      definition:
+        type: object
+      tasks:
+        type: object
+      node:
+        $ref: '#/definitions/node'
+  sku:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      rules:
+        type: object
+      nodes:
+        type: array
+        items:
+          $ref: '#/definitions/node'
+      discoveryGraphName:
+        type: string
+      discoveryGraphOptions:
+        type: object
   Error:
     properties:
       code:
