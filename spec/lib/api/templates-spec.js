@@ -32,8 +32,7 @@ describe('Http.Api.Templates', function () {
             dihelper.simpleWrapper(taskProtocol, 'Protocol.Task'),
             dihelper.simpleWrapper(taskGraphProtocol, 'Protocol.TaskGraphRunner'),
             dihelper.simpleWrapper(waterline, 'Services.Waterline'),
-            dihelper.simpleWrapper(resources, 'common-stomp-resources'),
-            require('on-core/spec/mocks/logger')
+            dihelper.simpleWrapper(resources, 'common-stomp-resources')
         ]);
     });
 

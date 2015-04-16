@@ -20,8 +20,7 @@ describe('Http.Api.Workflows', function () {
         return helper.startServer([
             dihelper.simpleWrapper(taskGraphRunner, 'Protocol.TaskGraphRunner'),
             dihelper.simpleWrapper(waterline, 'Services.Waterline'),
-            dihelper.simpleWrapper(resources, 'common-stomp-resources'),
-            require('on-core/spec/mocks/logger')
+            dihelper.simpleWrapper(resources, 'common-stomp-resources')
         ]);
     });
 
