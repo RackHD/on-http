@@ -27,7 +27,6 @@
     "mongodb": "^1.4.28",
     "on-finished": "^2.2.0",
     "on-core": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-core.git",
-    "on-mq": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-mq.git",
     "on-tasks": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-tasks.git",
     "sockjs": "^0.3.12",
     "pluralize": "~1.1.2"

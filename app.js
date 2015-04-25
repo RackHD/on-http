@@ -14,15 +14,21 @@ di.annotate(Runner, new di.Inject(
         'Services.Configuration',
         'Profiles',
         'Templates',
-        'stomp',
         'common-api-router',
-        'common-stomp-resources',
         'fileService',
         'Q'
     )
 );
-function Runner(app, core, configuration, profiles, templates,
-                stomp, router, resources, fileService, Q) {
+function Runner(
+    app,
+    core,
+    configuration,
+    profiles,
+    templates,
+    router,
+    fileService,
+    Q
+) {
 
     function start() {
         return core.start()
@@ -34,8 +40,6 @@ function Runner(app, core, configuration, profiles, templates,
                 app.use('/api/common', router);
                 app.use('/api/current', router);
                 app.use('/api/1.1', router);
-
-                resources.register(stomp);
 
                 return fileService.start(configuration.get("fileService"));
             })

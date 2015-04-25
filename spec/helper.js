@@ -11,7 +11,6 @@ helper.startServer = function (overrides) {
 
     helper.setupInjector(_.flatten([
             require('on-tasks').injectables,
-            dihelper.simpleWrapper(require('on-mq'), 'MQ'),
             dihelper.simpleWrapper(require('express')(), 'express-app'),
             dihelper.simpleWrapper({
                 publishLog: sinon.stub().resolves()
