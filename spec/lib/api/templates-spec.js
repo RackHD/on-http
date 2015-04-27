@@ -10,7 +10,6 @@ describe('Http.Api.Templates', function () {
     var taskProtocol;
     var taskGraphProtocol;
     var waterline;
-    var resources;
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -23,16 +22,12 @@ describe('Http.Api.Templates', function () {
             start: sinon.stub(),
             stop: sinon.stub()
         };
-        resources = {
-            register: sinon.stub(),
-            unregister: sinon.stub()
-        };
+
         return helper.startServer([
             dihelper.simpleWrapper(templates, 'Templates'),
             dihelper.simpleWrapper(taskProtocol, 'Protocol.Task'),
             dihelper.simpleWrapper(taskGraphProtocol, 'Protocol.TaskGraphRunner'),
             dihelper.simpleWrapper(waterline, 'Services.Waterline'),
-            dihelper.simpleWrapper(resources, 'common-stomp-resources')
         ]);
     });
 
@@ -48,6 +43,7 @@ describe('Http.Api.Templates', function () {
         configuration = helper.injector.get('Services.Configuration');
         lookupService = helper.injector.get('Services.Lookup');
         lookupService.ipAddressToMacAddress = sinon.stub().resolves();
+        lookupService.ipAddressToNodeId = sinon.stub().resolves();
         taskGraphProtocol.getActiveTaskGraph = sinon.stub().resolves();
         taskProtocol.requestProperties = sinon.stub().resolves();
         waterline.nodes = {
