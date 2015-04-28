@@ -7,6 +7,7 @@ describe('Http.Api.Tasks', function () {
     var taskProtocol;
     var tasksApiService;
     var waterline;
+    var lookupService;
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -26,6 +27,9 @@ describe('Http.Api.Tasks', function () {
 
         tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
         tasksApiService.getNode = sinon.stub();
+
+        lookupService = helper.injector.get('Services.Lookup');
+        lookupService.ipAddressToMacAddress = sinon.stub().resolves('00:11:22:33:44:55');
         return helper.reset();
     });
 
@@ -75,7 +79,6 @@ describe('Http.Api.Tasks', function () {
 
             return helper.request().get('/api/1.1/tasks/bootstrap.js?macAddress=00:11:22:33:44:55')
                 .expect(200)
-                .expect('Content-Type', /^text\/html/)
                 .expect(function (res) {
                     expect(tasksApiService.getNode).to.have.been.calledWith('00:11:22:33:44:55');
                     expect(res.text).to.equal('test contents');

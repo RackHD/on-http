@@ -49,7 +49,10 @@ helper.request = function (url, options) {
                         // so, append some extra verbosity to the error for the report.
                         if (res) {
                             var output = res.body || res.text;
-                            err.message += '\nResponse body:\n' + util.inspect(output) + '\n' + err.stack;
+                            err.message +=
+                            '\nResponse body:\n'+
+                            util.inspect(output) +
+                            '\n' + err.stack;
                         }
                         deferred.reject(err);
                         return;
