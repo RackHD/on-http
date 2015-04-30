@@ -19,7 +19,6 @@ describe('Http.Server', function () {
         // use helper.setupInjector because we don't want to start core services
         helper.setupInjector(_.flatten([
             helper.require('/lib/services/http-service.js'),
-            dihelper.simpleWrapper(sockJs, 'SockJS.Server'),
             dihelper.simpleWrapper(app, 'express-app', undefined, __dirname),
         ]));
 
@@ -55,10 +54,6 @@ describe('Http.Server', function () {
             .expect('Hello World!');
         });
 
-        it('should have started the SockJS listener', function () {
-            expect(sockJs.listen).to.have.been.calledOnce;
-        });
-
         after('close', function () {
             server.close();
         });
@@ -87,9 +82,6 @@ describe('Http.Server', function () {
             .expect('Hello World!');
         });
 
-        it('should have started the SockJS listener', function () {
-            expect(sockJs.listen).to.have.been.calledOnce;
-        });
         after('close', function () {
             server.close();
         });
@@ -117,9 +109,6 @@ describe('Http.Server', function () {
             .expect('Hello World!');
         });
 
-        it('should have started the SockJS listener', function () {
-            expect(sockJs.listen).to.have.been.calledOnce;
-        });
         after('close', function () {
             server.close();
         });
