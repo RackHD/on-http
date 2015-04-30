@@ -63,9 +63,95 @@ paths:
               $ref: '#/definitions/catalog'
         default:
           description: NotFound error
+  /dhcp:
+    get:
+      summary: |
+        get DHCP lease table
+      description: |
+        Fetch the dhcp leases.
+      tags:
+        - dhcp
+      responses:
+        200:
+          description: |
+            A list of all DHCP leases registered with this instance of the service.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/lease'
+        default:
+          description: NotFound error
+  /dhcp/lease/{mac}:
+    get:
+      summary: |
+        fetch lease information for the mac specified
+      description: |
+        Fetch lease information for the mac specified.
+      parameters:
+        - name: mac
+          in: path
+          description: identifier of a mac address
+          required: true
+          type: string
+      tags:
+        - dhcp
+      responses:
+        200:
+          description: A single lease
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/lease'
+        default:
+          description: NotFound error
+    delete:
+      summary: get list of all catalogs
+      description: |
+        Delete the lease for the mac specified and return information about deleted lease.
+      parameters:
+        - name: mac
+          in: path
+          description: identifier of a mac address
+          required: true
+          type: string
+      tags:
+        - dhcp
+      responses:
+        200:
+          description: A single lease
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/lease'
+        default:
+          description: NotFound error
+  /dhcp/lease/{mac}:
+    get:
+      summary: get list of all catalogs
+      description: |
+        The catalogs endpoint returns json data that represent the catalogs of
+        all hardware in the system.
+      parameters:
+        - name: mac
+          in: path
+          description: identifier of a mac address
+          required: true
+          type: string
+      tags:
+        - dhcp
+      responses:
+        200:
+          description: A single lease
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/lease'
+        default:
+          description: NotFound error
 
 definitions:
   catalog:
+    type: object
     properties:
       id:
         type: string
@@ -76,7 +162,12 @@ definitions:
       data:
         type: object
         description: arbitrary json object
+    required:
+    - id
+    - source
+    - node
   node:
+    type: object
     properties:
       id:
         type: string
@@ -98,6 +189,9 @@ definitions:
           $ref: '#/definitions/catalog'
       sku:
         $ref: '#/definitions/sku'
+    required:
+    - profile
+    - name
   graphobject:
     properties:
       id:
@@ -128,6 +222,58 @@ definitions:
         type: string
       discoveryGraphOptions:
         type: object
+  lease:
+    properties:
+      mac:
+        type: string
+      ipAddress:
+        type: string
+      reservationTimer:
+        type: integer
+        format: int32
+      reservationExpiresAt:
+        type: integer
+        format: int64
+      renewalTimer:
+        type: integer
+        format: int32
+      rebindingTimer:
+        type: integer
+        format: int32
+      expirationTimer:
+        type: integer
+        format: int32
+      renewalExpiresAt:
+        type: integer
+        format: int64
+      rebindExpiresAt:
+        type: integer
+        format: int64
+      leaseExpiresAt:
+        type: integer
+        format: int64
+      boundFlag:
+        type: boolean
+      reservedFlag:
+        type: boolean
+      reserveTimer:
+        type: string
+        format: int64
+    example:
+      mac: 08:00:27:52:d2:a4
+      ipAddress: 10.1.1.2
+      reservationTimer: 30
+      renewalTimer: 21600
+      rebindingTimer: 4320
+      expirationTimer: 86400
+      renewalExpiresAt: 1424149074811
+      rebindExpiresAt: 1424131794811
+      leaseExpiresAt: 1424213874811
+      boundFlag: true
+      reservedFlag: false
+    required:
+    - mac
+    - ipAddress
   Error:
     properties:
       code:
