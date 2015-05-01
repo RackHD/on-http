@@ -1,5 +1,3 @@
-# this is an example of the Uber API
-# as a demonstration of an API spec in YAML
 swagger: '2.0'
 info:
   title: Monorail API
@@ -8,187 +6,12 @@ info:
 schemes:
   - http
   - https
-# will be prefixed to all paths
 basePath: /api/1.1
 produces:
   - application/json
   # x-gzip explicitly for files
   - application/x-gzip
 paths:
-  /lookups:
-    get:
-      summary: |
-        find all
-      description: |
-        find all
-      tags:
-        - lookups
-      responses:
-        200:
-          description: array of all
-          schema:
-            type: array
-            items: 
-              type: object
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    post:
-      summary: |
-        find all
-      description: |
-        put all
-      parameters:
-      - name: content
-        in: body
-        description: foo
-        required: true
-        schema:
-          type: object
-      tags:
-        - lookups
-      responses:
-        200:
-          description: waterline response
-          schema:
-            type: object
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /files/{fileidentifier}:
-    get:
-      summary: |
-        get file based on uuid
-      description: |
-        Get file based on uuid.
-      parameters:
-        - name: fileidentifier
-          in: path
-          description: uuid of a file as provided when you originally stored it.
-          required: true
-          type: string
-      tags:
-        - files
-      responses:
-# https://github.com/swagger-api/swagger-spec/issues/260 means we can't 
-# describe the return of a file easily today until jsonspec and swagger 
-# are "fixed"
-        200:
-          description: The file requested
-          schema:
-            type: object
-        404:
-          description: File not found.
-          schema:
-            $ref: '#/definitions/Error'
-        500:
-          description: Failed to serve file request.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    put:
-      summary: |
-        put file based on filename
-      description: |
-        Put file based on filename, returns the uuid of the stored file.
-      parameters:
-        - name: fileidentifier
-          in: path
-          description: filename of the file you want to store
-          required: true
-          type: string
-# https://github.com/swagger-api/swagger-spec/issues/326 does not yet accept files
-#       - name: content
-#          in: body
-#          description: the attachment content
-#          required: true
-#          schema:
-#            type: file
-#      consumes:
-#        - application/octet-stream
-      tags:
-        - files
-      responses:
-        200:
-          description: The file was stored
-          schema:
-            type: object
-        201:
-          description: Ready.
-          schema:
-            type: string
-        500:
-          description: Failure serving file request.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    delete:
-      summary: |
-        delete file based on uuid
-      description: |
-        Put file based on filename, returns the uuid of the stored file.
-      parameters:
-        - name: fileidentifier
-          in: path
-          description: filename identifier of the file you wish to delete
-          required: true
-          type: string
-      tags:
-        - files
-      responses:
-        204:
-          description: File successfully deleted.
-        404:
-          description: File not found.
-          schema:
-            $ref: '#/definitions/Error'
-        500:
-          description: Error deleting file from the database.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /config:
-    get:
-      summary: get server configuration
-      description: |
-        Get server configuration.
-      tags:
-        - config
-      responses:
-        200:
-          description: An array of configuration objects
-          schema:
-            type: object
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    patch:
-      summary: patch/update server configuration
-      description: |
-        Patch/update server configurationm and then return the patched configuration.
-      tags:
-        - config
-      responses:
-        200:
-          description: An array of configuration objects
-          schema:
-            type: object
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
   /lookups:
     get:
       summary: |
@@ -420,7 +243,8 @@ paths:
             $ref: '#/definitions/Error'
   /catalogs:
     get:
-      summary: get list of all catalogs
+      summary: |
+        get list of all catalogs
       description: |
         The catalogs endpoint returns json data that represent the catalogs of
         all hardware in the system.
@@ -445,7 +269,8 @@ paths:
             $ref: '#/definitions/Error'
   /catalogs/{identifier}:
     get:
-      summary: get list of all catalogs
+      summary: |
+        get list of all catalogs
       description: |
         The catalogs endpoint returns json data that represent the catalogs of
         all hardware in the system.
@@ -511,29 +336,6 @@ paths:
       summary: get list of all catalogs
       description: |
         Delete the lease for the mac specified and return information about deleted lease.
-      parameters:
-        - name: mac
-          in: path
-          description: identifier of a mac address
-          required: true
-          type: string
-      tags:
-        - dhcp
-      responses:
-        200:
-          description: A single lease
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/lease'
-        default:
-          description: NotFound error
-  /dhcp/lease/{mac}:
-    get:
-      summary: get list of all catalogs
-      description: |
-        The catalogs endpoint returns json data that represent the catalogs of
-        all hardware in the system.
       parameters:
         - name: mac
           in: path
