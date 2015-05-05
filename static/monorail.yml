@@ -12,6 +12,50 @@ produces:
   # x-gzip explicitly for files
   - application/x-gzip
 paths:
+  /nodes:
+    get:
+      summary: |
+        List of all nodes or if there are none an empty object
+      description: |
+        List of all nodes or if there are none an empty object
+      tags:
+        - nodes
+      responses:
+        200:
+          description: array of all
+          schema:
+            type: array
+            items: 
+              type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        post
+      description: |
+        post
+      parameters:
+      - name: identifiers
+        in: body
+        description: |
+          Mac addresses and unique aliases to identify the node by, |
+          expect a string or an array of strings.
+        required: true
+        schema:
+          type: object
+      tags:
+        - lookups
+      responses:
+        201:
+          description: waterline response
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /lookups:
     get:
       summary: |
