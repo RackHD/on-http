@@ -12,6 +12,98 @@ produces:
   # x-gzip explicitly for files
   - application/x-gzip
 paths:
+  /nodes/{identifier}:
+    get:
+      summary: |
+        List of all nodes or if there are none an empty object
+      description: |
+        List of all nodes or if there are none an empty object
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+      responses:
+        200:
+          description: array of all
+          schema:
+            type: array
+            items: 
+              type: object
+        404:
+          description: The node with the identifier was not found.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: |
+        Delete specified node.
+      description: |
+        Delete specified node.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+      responses:
+        200:
+          description: Delete successful
+        404:
+          description: The node with the identifier was not found.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: |
+        Patch specified node
+      description: |
+        Patch specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            object patches to apply.
+          required: true
+          schema: 
+            type: object
+      tags:
+        - nodes
+      responses:
+        200:
+          description: patch succeeded
+          schema:
+            type: object
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /nodes:
     get:
       summary: |
@@ -27,6 +119,10 @@ paths:
             type: array
             items: 
               type: object
+        400:
+          description: invalidAttributes - 1 attribute is invalid
+          schema:
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -46,7 +142,7 @@ paths:
         schema:
           type: object
       tags:
-        - lookups
+        - nodes
       responses:
         201:
           description: waterline response
