@@ -12,6 +12,140 @@ produces:
   # x-gzip explicitly for files
   - application/x-gzip
 paths:
+  /nodes/{identifier}/obm/identify:
+    get:
+      summary: |
+        Fetch status of identify light on node through OBM (if supported)
+      description: |
+        Fetch status of identify light on node through OBM (if supported)
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - obm
+        - identity
+      responses:
+        200:
+          description: obm identity light settings
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found or has no obm settings.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        Enable or disable identify light on node through OBM (if supported)
+      description: |
+        Enable or disable identify light on node through OBM (if supported)
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            obm settings to apply.
+          required: true
+          schema: 
+            type: boolean
+      tags:
+        - nodes
+        - obm
+        - identity
+      responses:
+        201:
+          description: obm settings accepted
+        404:
+          description: |
+            The node with the identifier was not found or has no obm settings.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /nodes/{identifier}/obm:
+    get:
+      summary: |
+        get the obm settings associated with a node.
+      description: |
+        get the obm settings associated with a node.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - obm
+      responses:
+        200:
+          description: obm settings
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found or has no obm settings.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        set the obm settings associated with a node.
+      description: |
+        set he obm settings associated with a node.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            obm settings to apply.
+          required: true
+          schema: 
+            type: object
+      tags:
+        - nodes
+        - obm
+      responses:
+        201:
+          description: obm settings accepted
+        404:
+          description: |
+            The node with the identifier was not found or has no obm settings.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /nodes/{identifier}:
     get:
       summary: |
