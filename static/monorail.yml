@@ -13,6 +13,114 @@ produces:
   #   in comments below are fixed by swagger team.
   - application/x-gzip
 paths:
+  /workflows/library:
+    get:
+      summary: |
+        List all workflows available to run
+      description: |
+        List all workflows available to run
+      tags:
+        - workflow
+        - get
+      responses:
+        200:
+          description: |
+            List all workflows available to run
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /workflows/tasks:
+    get:
+      summary: |
+        Fetch tasks from task library
+      description: |
+        Fetch tasks from task library
+      tags:
+        - workflow
+        - task
+        - get
+      responses:
+        200:
+          description: |
+            Fetch tasks from task library
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: |
+        Add tasks to task library
+      description: |
+        Add tasks to task library
+      tags:
+        - workflow
+        - task
+        - put
+      responses:
+        200:
+          description: |
+            Add tasks to task library
+          schema: 
+            type: object
+        500:
+          description: |
+            Error problem was encountered, task was not written.
+          schema: 
+            $ref: '#/definitions/Error'
+        default:
+          description: Upload failed
+          schema:
+            $ref: '#/definitions/Error'
+  
+  /workflows:
+    get:
+      summary: |
+        Fetch workflows
+      description: |
+        Fetch workflows
+      tags:
+        - workflow
+        - get
+      responses:
+        200:
+          description: |
+            Fetch workflows
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: |
+        define new workflow
+      description: |
+        define new workflow
+      tags:
+        - workflow
+        - put
+      responses:
+        200:
+          description: |
+            Fetch workflows
+          schema: 
+            type: object
+        500:
+          description: |
+            Error problem was encountered, workflow was not written.
+          schema: 
+            $ref: '#/definitions/Error'
+        default:
+          description: Upload failed
+          schema:
+            $ref: '#/definitions/Error'
+  
   /nodes/{identifier}/workflows/active:
     get:
       summary: |
