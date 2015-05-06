@@ -13,6 +13,71 @@ produces:
   #   in comments below are fixed by swagger team.
   - application/x-gzip
 paths:
+  /nodes/{identifier}/workflows/active:
+    get:
+      summary: |
+        Fetch currently running workflows for specified node
+      description: |
+        Fetch currently running workflows for specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - workflow
+        - get
+      responses:
+        200:
+          description: |
+            Fetch currently running workflows for specified node
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: |
+        Cancel currently running workflows for specified node
+      description: |
+        Cancel currently running workflows for specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - workflow
+        - delete
+      responses:
+        200:
+          description: |
+            Canceled workflows for specified node
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /nodes/{identifier}/workflows:
     get:
       summary: |
