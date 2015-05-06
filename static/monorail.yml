@@ -13,7 +13,70 @@ produces:
   #   in comments below are fixed by swagger team.
   - application/x-gzip
 paths:
-
+  /nodes/{macaddress}/dhcp/whitelist:
+    post:
+      summary: |
+        Add a whitelist of specified mac address 
+      description: |
+        Add a whitelist of specified mac address
+      parameters:
+        - name: macaddress
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - dhcp
+        - whitelist
+      responses:
+        201:
+          description: |
+            the add was successful and it returns the whitelist
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: |
+        Remove a whitelist of specified mac address
+      description: |
+        Remove a whitelist of specified mac address
+      parameters:
+        - name: macaddress
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - dhcp
+        - whitelist
+      responses:
+        204:
+          description: |
+            delete completed successfully
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    
   /nodes/{identifier}/pollers:
     get:
       summary: |
