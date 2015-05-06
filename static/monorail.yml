@@ -13,6 +13,80 @@ produces:
   #   in comments below are fixed by swagger team.
   - application/x-gzip
 paths:
+
+  /nodes/{identifier}/pollers:
+    get:
+      summary: |
+        Fetch all pollers for specified node
+      description: |
+        Fetch all pollers for specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - pollers
+      responses:
+        200:
+          description: |
+            all pollers of specified node, empty object if none exist.
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+  /nodes/{identifier}/catalogs/{source}:
+    get:
+      summary: |
+        Fetch catalog of specified node for given source
+      description: |
+        Fetch catalog of specified node for given source
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+        - name: source
+          in: path
+          description: |
+            Source catalog name to fetch
+          required: true
+          type: string
+      tags:
+        - nodes
+        - catalogs
+      responses:
+        200:
+          description: |
+            specific source catalog of specified node, |
+            empty object if none exist.
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /nodes/{identifier}/catalogs:
     get:
       summary: |
