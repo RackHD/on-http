@@ -8,6 +8,6 @@ initrd ${base-url}/winpe/Boot/Fonts/segoe_slboot.ttf  segoe_slboot.ttf
 initrd ${base-url}/winpe/Boot/Fonts/segoen_slboot.ttf segoen_slboot.ttf
 initrd ${base-url}/winpe/Boot/Fonts/wgl4_boot.ttf     wgl4_boot.ttf
 initrd ${base-url}/winpe/Boot/boot.sdi                boot.sdi
-initrd ${base-url}/winpe/sources/${arch}.wim          boot.wim
+initrd ${base-url}/winpe/Boot/sources/${arch}.wim          boot.wim
 boot
 
