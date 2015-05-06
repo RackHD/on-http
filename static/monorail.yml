@@ -13,6 +13,39 @@ produces:
   #   in comments below are fixed by swagger team.
   - application/x-gzip
 paths:
+  /nodes/{identifier}/workflows:
+    get:
+      summary: |
+        Fetch all workflows for specified node
+      description: |
+        Fetch all workflows for specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - workflow
+        - get
+      responses:
+        200:
+          description: |
+            all workflows for specified node, empty object if none exist.
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /nodes/{macaddress}/dhcp/whitelist:
     post:
       summary: |
@@ -31,6 +64,7 @@ paths:
         - nodes
         - dhcp
         - whitelist
+        - post
       responses:
         201:
           description: |
@@ -63,6 +97,7 @@ paths:
         - nodes
         - dhcp
         - whitelist
+        - delete
       responses:
         204:
           description: |
@@ -94,6 +129,7 @@ paths:
       tags:
         - nodes
         - pollers
+        - get
       responses:
         200:
           description: |
@@ -133,6 +169,7 @@ paths:
       tags:
         - nodes
         - catalogs
+        - get
       responses:
         200:
           description: |
@@ -167,6 +204,7 @@ paths:
       tags:
         - nodes
         - catalogs
+        - get
       responses:
         200:
           description: |
@@ -201,6 +239,7 @@ paths:
         - nodes
         - obm
         - identify
+        - get
       responses:
         200:
           description: obm identity light settings
@@ -239,6 +278,7 @@ paths:
         - nodes
         - obm
         - identify
+        - post
       responses:
         201:
           description: obm settings accepted
@@ -268,6 +308,7 @@ paths:
       tags:
         - nodes
         - obm
+        - get
       responses:
         200:
           description: obm settings
@@ -305,6 +346,7 @@ paths:
       tags:
         - nodes
         - obm
+        - post
       responses:
         201:
           description: obm settings accepted
@@ -333,6 +375,7 @@ paths:
           type: string
       tags:
         - nodes
+        - get
       responses:
         200:
           description: array of all
@@ -363,6 +406,7 @@ paths:
           type: string
       tags:
         - nodes
+        - delete
       responses:
         200:
           description: Delete successful
@@ -396,6 +440,7 @@ paths:
             type: object
       tags:
         - nodes
+        - patch
       responses:
         200:
           description: patch succeeded
@@ -417,6 +462,7 @@ paths:
         List of all nodes or if there are none an empty object
       tags:
         - nodes
+        - get
       responses:
         200:
           description: array of all
@@ -448,6 +494,7 @@ paths:
           type: object
       tags:
         - nodes
+        - post
       responses:
         201:
           description: waterline response
@@ -465,6 +512,7 @@ paths:
         find all
       tags:
         - lookups
+        - get
       responses:
         200:
           description: array of all
@@ -490,6 +538,7 @@ paths:
           type: object
       tags:
         - lookups
+        - post
       responses:
         200:
           description: waterline response
@@ -513,6 +562,7 @@ paths:
           type: string
       tags:
         - lookups
+        - get
       responses:
         200:
           description: array of all
@@ -543,6 +593,7 @@ paths:
           type: object
       tags:
         - lookups
+        - post
       responses:
         200:
           description: waterline response
@@ -566,6 +617,7 @@ paths:
           type: string
       tags:
         - files
+        - get
       responses:
 # https://github.com/swagger-api/swagger-spec/issues/260 means we can't 
 # describe the return of a file easily today until jsonspec and swagger 
@@ -608,6 +660,7 @@ paths:
 #        - application/octet-stream
       tags:
         - files
+        - post
       responses:
         200:
           description: The file was stored
@@ -638,6 +691,7 @@ paths:
           type: string
       tags:
         - files
+        - delete
       responses:
         204:
           description: File successfully deleted.
@@ -661,6 +715,7 @@ paths:
         Get server configuration.
       tags:
         - config
+        - get
       responses:
         200:
           description: An array of configuration objects
@@ -677,6 +732,7 @@ paths:
         Patch/update server configurationm and then return the patched configuration.
       tags:
         - config
+        - patch
       responses:
         200:
           description: An array of configuration objects
@@ -701,6 +757,7 @@ paths:
           type: string
       tags:
         - catalog
+        - get
       responses:
         200:
           description: An array of catalogs
@@ -727,6 +784,7 @@ paths:
           type: string
       tags:
         - catalog
+        - get
       responses:
         200:
           description: A single catalog
@@ -744,6 +802,7 @@ paths:
         Fetch the dhcp leases.
       tags:
         - dhcp
+        - get
       responses:
         200:
           description: |
@@ -768,6 +827,7 @@ paths:
           type: string
       tags:
         - dhcp
+        - get
       responses:
         200:
           description: A single lease
@@ -789,6 +849,7 @@ paths:
           type: string
       tags:
         - dhcp
+        - delete
       responses:
         200:
           description: A single lease
