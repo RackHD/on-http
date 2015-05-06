@@ -9,9 +9,43 @@ schemes:
 basePath: /api/1.1
 produces:
   - application/json
-  # x-gzip explicitly for files
+  # x-gzip explicitly for files once the bugs listed 
+  #   in comments below are fixed by swagger team.
   - application/x-gzip
 paths:
+  /nodes/{identifier}/catalogs:
+    get:
+      summary: |
+        Fetch catalog of specified node
+      description: |
+        Fetch catalog of specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - catalogs
+      responses:
+        200:
+          description: |
+            all catalogs of specified node, empty object if none exist.
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
   /nodes/{identifier}/obm/identify:
     get:
       summary: |
@@ -29,7 +63,7 @@ paths:
       tags:
         - nodes
         - obm
-        - identity
+        - identify
       responses:
         200:
           description: obm identity light settings
@@ -67,7 +101,7 @@ paths:
       tags:
         - nodes
         - obm
-        - identity
+        - identify
       responses:
         201:
           description: obm settings accepted
