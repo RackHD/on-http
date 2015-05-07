@@ -13,6 +13,29 @@ produces:
   #   in comments below are fixed by swagger team.
   - application/x-gzip
 paths:
+  /versions:
+    get:
+      summary: |
+        get list of all versions of all packages plus our code
+      description: |
+        get list of all versions of all packages plus our code
+      tags:
+        - versions
+        - get
+      responses:
+        200:
+          description: |
+            get list of all versions of all packages plus our code
+          schema:
+            type: object
+        501:
+          description: Not implemented.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /skus:
     get:
       summary: |
