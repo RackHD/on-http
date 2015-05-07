@@ -13,6 +13,59 @@ produces:
   #   in comments below are fixed by swagger team.
   - application/x-gzip
 paths:
+  /obms/library:
+    get:
+      summary: |
+        get list of possible OBM services
+      description: |
+        get list of possible OBM services
+      tags:
+        - obms
+        - get
+      responses:
+        200:
+          description: |
+            get list of possible OBM services
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
+  /obms/library/{identifier}:
+    get:
+      summary: |
+        get a single OBM service
+      description: |
+        get a single OBM service
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The obm service name.
+          required: true
+          type: string
+      tags:
+        - obms
+        - get
+      responses:
+        200:
+          description: |
+            return OBM service
+          schema: 
+            type: object
+        404:
+          description: |
+            The obm service with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+
   /workflows/library:
     get:
       summary: |
