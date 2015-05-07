@@ -13,6 +13,87 @@ produces:
   #   in comments below are fixed by swagger team.
   - application/x-gzip
 paths:
+  /templates/library:
+    get:
+      summary: |
+        get list of possible templates
+      description: |
+        get list of possible templates
+      tags:
+        - templates
+        - get
+      responses:
+        200:
+          description: |
+            list of possible templates
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /templates/library/{identifier}:
+    get:
+      summary: |
+        get a single template
+      description: |
+        get a single template
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            template identifier
+          required: true
+          type: string
+      tags:
+        - templates
+        - get
+      responses:
+        200:
+          description: |
+            single template
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no template with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: |
+        put a single template
+      description: |
+        put a single template
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            objectid of template
+          required: true
+          type: string
+      tags:
+        - templates
+        - get
+      responses:
+        200:
+          description: |
+            return template
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no template with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /versions:
     get:
       summary: |
