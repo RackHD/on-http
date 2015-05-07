@@ -13,6 +13,177 @@ produces:
   #   in comments below are fixed by swagger team.
   - application/x-gzip
 paths:
+  /skus:
+    get:
+      summary: |
+        get list of skus
+      description: |
+        get list of skus
+      tags:
+        - skus
+        - get
+      responses:
+        200:
+          description: |
+             list of skus
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        create a sku
+      description: |
+        create a sku
+      tags:
+        - skus
+        - post
+      responses:
+        200:
+          description: |
+            sku to create
+          schema: 
+            type: object
+        500:
+          description: |
+            Upload failed.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /skus/{identifier}:
+    get:
+      summary: |
+        get a single sku
+      description: |
+        get a single sku
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            objectid of sku
+          required: true
+          type: string
+      tags:
+        - skus
+        - get
+      responses:
+        200:
+          description: |
+            return sku
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no sku with identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: |
+        patch a single sku
+      description: |
+        patch a single sku
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The profile name.
+          required: true
+          type: string
+      tags:
+        - skus
+        - patch
+      responses:
+        200:
+          description: |
+            sku to patch
+          schema: 
+            type: object
+        404:
+          description: |
+            Not found, no sku with identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: |
+            Patch failed.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: |
+        Delete specific sku.
+      description: |
+        Delete specific sku.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The sku objectid.
+          required: true
+          type: string
+      tags:
+        - profiles
+        - put
+      responses:
+        204:
+          description: |
+            return all skus
+          schema: 
+            type: object
+        404:
+          description: |
+            sku with identifier not found, failed.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /skus/{identifier}/nodes:
+    get:
+      summary: |
+        get nodes for specific sku
+      description: |
+        get nodes for specific sku
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The profile name.
+          required: true
+          type: string
+      tags:
+        - skus
+        - nodes
+        - get
+      responses:
+        200:
+          description: |
+            return nodes associated with that sku
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no sku with identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /profiles/library:
     get:
       summary: |
@@ -113,7 +284,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-            
   /obms/library/{identifier}:
     get:
       summary: |
@@ -211,7 +381,6 @@ paths:
           description: Upload failed
           schema:
             $ref: '#/definitions/Error'
-  
   /workflows:
     get:
       summary: |
