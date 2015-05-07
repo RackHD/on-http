@@ -13,6 +13,87 @@ produces:
   #   in comments below are fixed by swagger team.
   - application/x-gzip
 paths:
+  /profiles/library:
+    get:
+      summary: |
+        get list of possible profiles
+      description: |
+        get list of possible profiles
+      tags:
+        - profiles
+        - get
+      responses:
+        200:
+          description: |
+            list of possible profiles
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /profiles/library/{identifier}:
+    get:
+      summary: |
+        get a single profile
+      description: |
+        get a single profile
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The profile name.
+          required: true
+          type: string
+      tags:
+        - profiles
+        - get
+      responses:
+        200:
+          description: |
+            return profile
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no profile in the library with identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: |
+        put a single profile
+      description: |
+        put a single profile
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The profile name.
+          required: true
+          type: string
+      tags:
+        - profiles
+        - put
+      responses:
+        200:
+          description: |
+            profile to put
+          schema: 
+            type: object
+        500:
+          description: |
+            Upload failed.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
   /obms/library:
     get:
       summary: |
