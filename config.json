@@ -25,6 +25,7 @@
     "subnetmask": "255.255.255.0",
     "gatewayaddr": "10.1.1.1",
     "broadcastaddr": "10.1.1.255",
+    "httpStaticDirectoryExternal": "/opt/monorail/static/http",
     "httpStaticDirectory": "./static/http",
     "httpFrontendDirectory": "../renasar-fog-ui/dist",
     "httpApiDocsDirectory": "./build/apidoc",
