@@ -13,6 +13,213 @@ produces:
   #   in comments below are fixed by swagger team.
   - application/x-gzip
 paths:
+  /pollers/library:
+    get:
+      summary: |
+        get list of possible library pollers
+      description: |
+        get list of possible library pollers
+      tags:
+        - pollers
+        - get
+      responses:
+        200:
+          description: |
+            list of all pollers
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /pollers/library/{identifier}:
+    get:
+      summary: |
+        get a single library poller
+      description: |
+        get a single library poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            library poller identifier
+          required: true
+          type: string
+      tags:
+        - pollers
+        - get
+      responses:
+        200:
+          description: |
+            single library poller 
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no library poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /pollers:
+    get:
+      summary: |
+        get list of all pollers
+      description: |
+        get list of all pollers
+      tags:
+        - pollers
+        - get
+      responses:
+        200:
+          description: |
+            list of all pollers
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        create a poller
+      description: |
+        create a poller
+      tags:
+        - pollers
+        - get
+      responses:
+        200:
+          description: |
+            poller created
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /pollers/{identifier}:
+    get:
+      summary: |
+        Get specifics of the specified poller
+      description: |
+        Get specifics of the specified poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            poller identifier
+          required: true
+          type: string
+      tags:
+        - pollers
+        - get
+      responses:
+        200:
+          description: |
+            Specifics of the specified poller 
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no  poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: |
+        patch specifics of the specified poller
+      description: |
+        patch specifics of the specified poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            poller identifier
+          required: true
+          type: string
+      tags:
+        - pollers
+        - patch
+      responses:
+        200:
+          description: |
+            Specifics of the patched poller 
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: |
+        delete the specified poller
+      description: |
+        delete the specified poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            poller identifier
+          required: true
+          type: string
+      tags:
+        - pollers
+        - delete
+      responses:
+        204:
+          description: |
+            Poller delete successfully 
+        404:
+          description: |
+            There is no poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /pollers/{identifier}/data:
+    get:
+      summary: |
+        Get data for the specific poller
+      description: |
+        Get data for the specific poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            identifier (ip address or NodeId) for the data from a poller
+          required: true
+          type: string
+      tags:
+        - templates
+        - get
+      responses:
+        200:
+          description: |
+            data for poller
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /templates/library:
     get:
       summary: |
