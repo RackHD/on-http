@@ -1,0 +1,1815 @@
+swagger: '2.0'
+info:
+  title: Monorail API
+  description: Monorail CI core API
+  version: "1.1.0"
+schemes:
+  - http
+  - https
+basePath: /api/1.1
+produces:
+  - application/json
+  # x-gzip explicitly for files once the bugs listed 
+  #   in comments below are fixed by swagger team.
+  - application/x-gzip
+paths:
+  /pollers/library:
+    get:
+      summary: |
+        get list of possible library pollers
+      description: |
+        get list of possible library pollers
+      tags:
+        - pollers
+        - get
+      responses:
+        200:
+          description: |
+            list of all pollers
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /pollers/library/{identifier}:
+    get:
+      summary: |
+        get a single library poller
+      description: |
+        get a single library poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            library poller identifier
+          required: true
+          type: string
+      tags:
+        - pollers
+        - get
+      responses:
+        200:
+          description: |
+            single library poller 
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no library poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /pollers:
+    get:
+      summary: |
+        get list of all pollers
+      description: |
+        get list of all pollers
+      tags:
+        - pollers
+        - get
+      responses:
+        200:
+          description: |
+            list of all pollers
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        create a poller
+      description: |
+        create a poller
+      tags:
+        - pollers
+        - get
+      responses:
+        200:
+          description: |
+            poller created
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /pollers/{identifier}:
+    get:
+      summary: |
+        Get specifics of the specified poller
+      description: |
+        Get specifics of the specified poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            poller identifier
+          required: true
+          type: string
+      tags:
+        - pollers
+        - get
+      responses:
+        200:
+          description: |
+            Specifics of the specified poller 
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no  poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: |
+        patch specifics of the specified poller
+      description: |
+        patch specifics of the specified poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            poller identifier
+          required: true
+          type: string
+      tags:
+        - pollers
+        - patch
+      responses:
+        200:
+          description: |
+            Specifics of the patched poller 
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: |
+        delete the specified poller
+      description: |
+        delete the specified poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            poller identifier
+          required: true
+          type: string
+      tags:
+        - pollers
+        - delete
+      responses:
+        204:
+          description: |
+            Poller delete successfully 
+        404:
+          description: |
+            There is no poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /pollers/{identifier}/data:
+    get:
+      summary: |
+        Get data for the specific poller
+      description: |
+        Get data for the specific poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            identifier (ip address or NodeId) for the data from a poller
+          required: true
+          type: string
+      tags:
+        - templates
+        - get
+      responses:
+        200:
+          description: |
+            data for poller
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /templates/library:
+    get:
+      summary: |
+        get list of possible templates
+      description: |
+        get list of possible templates
+      tags:
+        - templates
+        - get
+      responses:
+        200:
+          description: |
+            list of possible templates
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /templates/library/{identifier}:
+    get:
+      summary: |
+        get a single template
+      description: |
+        get a single template
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            template identifier
+          required: true
+          type: string
+      tags:
+        - templates
+        - get
+      responses:
+        200:
+          description: |
+            single template
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no template with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: |
+        put a single template
+      description: |
+        put a single template
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            objectid of template
+          required: true
+          type: string
+      tags:
+        - templates
+        - put
+      responses:
+        200:
+          description: |
+            return template
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no template with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /versions:
+    get:
+      summary: |
+        get list of all versions of all packages plus our code
+      description: |
+        get list of all versions of all packages plus our code
+      tags:
+        - versions
+        - get
+      responses:
+        200:
+          description: |
+            get list of all versions of all packages plus our code
+          schema:
+            type: object
+        501:
+          description: Not implemented.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /skus:
+    get:
+      summary: |
+        get list of skus
+      description: |
+        get list of skus
+      tags:
+        - skus
+        - get
+      responses:
+        200:
+          description: |
+             list of skus
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        create a sku
+      description: |
+        create a sku
+      tags:
+        - skus
+        - post
+      responses:
+        200:
+          description: |
+            sku to create
+          schema: 
+            type: object
+        500:
+          description: |
+            Upload failed.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /skus/{identifier}:
+    get:
+      summary: |
+        get a single sku
+      description: |
+        get a single sku
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            objectid of sku
+          required: true
+          type: string
+      tags:
+        - skus
+        - get
+      responses:
+        200:
+          description: |
+            return sku
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no sku with identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: |
+        patch a single sku
+      description: |
+        patch a single sku
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The profile name.
+          required: true
+          type: string
+      tags:
+        - skus
+        - patch
+      responses:
+        200:
+          description: |
+            sku to patch
+          schema: 
+            type: object
+        404:
+          description: |
+            Not found, no sku with identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: |
+            Patch failed.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: |
+        Delete specific sku.
+      description: |
+        Delete specific sku.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The sku objectid.
+          required: true
+          type: string
+      tags:
+        - profiles
+        - put
+      responses:
+        204:
+          description: |
+            return all skus
+          schema: 
+            type: object
+        404:
+          description: |
+            sku with identifier not found, failed.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /skus/{identifier}/nodes:
+    get:
+      summary: |
+        get nodes for specific sku
+      description: |
+        get nodes for specific sku
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The profile name.
+          required: true
+          type: string
+      tags:
+        - skus
+        - nodes
+        - get
+      responses:
+        200:
+          description: |
+            return nodes associated with that sku
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no sku with identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /profiles/library:
+    get:
+      summary: |
+        get list of possible profiles
+      description: |
+        get list of possible profiles
+      tags:
+        - profiles
+        - get
+      responses:
+        200:
+          description: |
+            list of possible profiles
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /profiles/library/{identifier}:
+    get:
+      summary: |
+        get a single profile
+      description: |
+        get a single profile
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The profile name.
+          required: true
+          type: string
+      tags:
+        - profiles
+        - get
+      responses:
+        200:
+          description: |
+            return profile
+          schema: 
+            type: object
+        404:
+          description: |
+            There is no profile in the library with identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: |
+        put a single profile
+      description: |
+        put a single profile
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The profile name.
+          required: true
+          type: string
+      tags:
+        - profiles
+        - put
+      responses:
+        200:
+          description: |
+            profile to put
+          schema: 
+            type: object
+        500:
+          description: |
+            Upload failed.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+  /obms/library:
+    get:
+      summary: |
+        get list of possible OBM services
+      description: |
+        get list of possible OBM services
+      tags:
+        - obms
+        - get
+      responses:
+        200:
+          description: |
+            get list of possible OBM services
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /obms/library/{identifier}:
+    get:
+      summary: |
+        get a single OBM service
+      description: |
+        get a single OBM service
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The obm service name.
+          required: true
+          type: string
+      tags:
+        - obms
+        - get
+      responses:
+        200:
+          description: |
+            return OBM service
+          schema: 
+            type: object
+        404:
+          description: |
+            The obm service with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+
+  /workflows/library:
+    get:
+      summary: |
+        List all workflows available to run
+      description: |
+        List all workflows available to run
+      tags:
+        - workflow
+        - get
+      responses:
+        200:
+          description: |
+            List all workflows available to run
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /workflows/tasks:
+    get:
+      summary: |
+        Fetch tasks from task library
+      description: |
+        Fetch tasks from task library
+      tags:
+        - workflow
+        - task
+        - get
+      responses:
+        200:
+          description: |
+            Fetch tasks from task library
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: |
+        Add tasks to task library
+      description: |
+        Add tasks to task library
+      tags:
+        - workflow
+        - task
+        - put
+      responses:
+        200:
+          description: |
+            Add tasks to task library
+          schema: 
+            type: object
+        500:
+          description: |
+            Error problem was encountered, task was not written.
+          schema: 
+            $ref: '#/definitions/Error'
+        default:
+          description: Upload failed
+          schema:
+            $ref: '#/definitions/Error'
+  /workflows:
+    get:
+      summary: |
+        Fetch workflows
+      description: |
+        Fetch workflows
+      tags:
+        - workflow
+        - get
+      responses:
+        200:
+          description: |
+            Fetch workflows
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: |
+        define new workflow
+      description: |
+        define new workflow
+      tags:
+        - workflow
+        - put
+      responses:
+        200:
+          description: |
+            Fetch workflows
+          schema: 
+            type: object
+        500:
+          description: |
+            Error problem was encountered, workflow was not written.
+          schema: 
+            $ref: '#/definitions/Error'
+        default:
+          description: Upload failed
+          schema:
+            $ref: '#/definitions/Error'
+  
+  /nodes/{identifier}/workflows/active:
+    get:
+      summary: |
+        Fetch currently running workflows for specified node
+      description: |
+        Fetch currently running workflows for specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - workflow
+        - get
+      responses:
+        200:
+          description: |
+            Fetch currently running workflows for specified node
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: |
+        Cancel currently running workflows for specified node
+      description: |
+        Cancel currently running workflows for specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - workflow
+        - delete
+      responses:
+        200:
+          description: |
+            Canceled workflows for specified node
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /nodes/{identifier}/workflows:
+    get:
+      summary: |
+        Fetch all workflows for specified node
+      description: |
+        Fetch all workflows for specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - workflow
+        - get
+      responses:
+        200:
+          description: |
+            all workflows for specified node, empty object if none exist.
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        create workflow for specified node
+      description: |
+        create workflow for specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - workflow
+        - post
+      responses:
+        200:
+          description: |
+            the workflow that was created
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /nodes/{macaddress}/dhcp/whitelist:
+    post:
+      summary: |
+        Add a whitelist of specified mac address 
+      description: |
+        Add a whitelist of specified mac address
+      parameters:
+        - name: macaddress
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - dhcp
+        - whitelist
+        - post
+      responses:
+        201:
+          description: |
+            the add was successful and it returns the whitelist
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: |
+        Remove a whitelist of specified mac address
+      description: |
+        Remove a whitelist of specified mac address
+      parameters:
+        - name: macaddress
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - dhcp
+        - whitelist
+        - delete
+      responses:
+        204:
+          description: |
+            delete completed successfully
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    
+  /nodes/{identifier}/pollers:
+    get:
+      summary: |
+        Fetch all pollers for specified node
+      description: |
+        Fetch all pollers for specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - pollers
+        - get
+      responses:
+        200:
+          description: |
+            all pollers of specified node, empty object if none exist.
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+  /nodes/{identifier}/catalogs/{source}:
+    get:
+      summary: |
+        Fetch catalog of specified node for given source
+      description: |
+        Fetch catalog of specified node for given source
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+        - name: source
+          in: path
+          description: |
+            Source catalog name to fetch
+          required: true
+          type: string
+      tags:
+        - nodes
+        - catalogs
+        - get
+      responses:
+        200:
+          description: |
+            specific source catalog of specified node, |
+            empty object if none exist.
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /nodes/{identifier}/catalogs:
+    get:
+      summary: |
+        Fetch catalog of specified node
+      description: |
+        Fetch catalog of specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - catalogs
+        - get
+      responses:
+        200:
+          description: |
+            all catalogs of specified node, empty object if none exist.
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found 
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+  /nodes/{identifier}/obm/identify:
+    get:
+      summary: |
+        Fetch status of identify light on node through OBM (if supported)
+      description: |
+        Fetch status of identify light on node through OBM (if supported)
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - obm
+        - identify
+        - get
+      responses:
+        200:
+          description: obm identity light settings
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found or has no obm settings.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        Enable or disable identify light on node through OBM (if supported)
+      description: |
+        Enable or disable identify light on node through OBM (if supported)
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            obm settings to apply.
+          required: true
+          schema: 
+            type: boolean
+      tags:
+        - nodes
+        - obm
+        - identify
+        - post
+      responses:
+        201:
+          description: obm settings accepted
+        404:
+          description: |
+            The node with the identifier was not found or has no obm settings.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /nodes/{identifier}/obm:
+    get:
+      summary: |
+        get the obm settings associated with a node.
+      description: |
+        get the obm settings associated with a node.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - obm
+        - get
+      responses:
+        200:
+          description: obm settings
+          schema: 
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found or has no obm settings.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        set the obm settings associated with a node.
+      description: |
+        set he obm settings associated with a node.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            obm settings to apply.
+          required: true
+          schema: 
+            type: object
+      tags:
+        - nodes
+        - obm
+        - post
+      responses:
+        201:
+          description: obm settings accepted
+        404:
+          description: |
+            The node with the identifier was not found or has no obm settings.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /nodes/{identifier}:
+    get:
+      summary: |
+        List of all nodes or if there are none an empty object
+      description: |
+        List of all nodes or if there are none an empty object
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - get
+      responses:
+        200:
+          description: array of all
+          schema:
+            type: array
+            items: 
+              type: object
+        404:
+          description: The node with the identifier was not found.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: |
+        Delete specified node.
+      description: |
+        Delete specified node.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+      tags:
+        - nodes
+        - delete
+      responses:
+        200:
+          description: Delete successful
+        404:
+          description: The node with the identifier was not found.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: |
+        Patch specified node
+      description: |
+        Patch specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            object patches to apply.
+          required: true
+          schema: 
+            type: object
+      tags:
+        - nodes
+        - patch
+      responses:
+        200:
+          description: patch succeeded
+          schema:
+            type: object
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /nodes:
+    get:
+      summary: |
+        List of all nodes or if there are none an empty object
+      description: |
+        List of all nodes or if there are none an empty object
+      tags:
+        - nodes
+        - get
+      responses:
+        200:
+          description: array of all
+          schema:
+            type: array
+            items: 
+              type: object
+        400:
+          description: invalidAttributes - 1 attribute is invalid
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        post
+      description: |
+        post
+      parameters:
+      - name: identifiers
+        in: body
+        description: |
+          Mac addresses and unique aliases to identify the node by, |
+          expect a string or an array of strings.
+        required: true
+        schema:
+          type: object
+      tags:
+        - nodes
+        - post
+      responses:
+        201:
+          description: waterline response
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /lookups:
+    get:
+      summary: |
+        find all
+      description: |
+        find all
+      tags:
+        - lookups
+        - get
+      responses:
+        200:
+          description: array of all
+          schema:
+            type: array
+            items: 
+              type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        find all
+      description: |
+        put all
+      parameters:
+      - name: content
+        in: body
+        description: foo
+        required: true
+        schema:
+          type: object
+      tags:
+        - lookups
+        - post
+      responses:
+        200:
+          description: waterline response
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /lookups/{id}:
+    get:
+      summary: |
+        lookup id
+      description: |
+        lookup id
+      parameters:
+        - name: id
+          in: path
+          description: id of thing to lookup
+          required: true
+          type: string
+      tags:
+        - lookups
+        - get
+      responses:
+        200:
+          description: array of all
+          schema:
+            type: array
+            items: 
+              type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        post id
+      description: |
+        post id
+      parameters:
+      - name: id
+        in: path
+        description: id of thing to lookup
+        required: true
+        type: string
+      - name: content
+        in: body
+        description: foo
+        required: true
+        schema:
+          type: object
+      tags:
+        - lookups
+        - post
+      responses:
+        200:
+          description: waterline response
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /files/{fileidentifier}:
+    get:
+      summary: |
+        get file based on uuid
+      description: |
+        Get file based on uuid.
+      parameters:
+        - name: fileidentifier
+          in: path
+          description: uuid of a file as provided when you originally stored it.
+          required: true
+          type: string
+      tags:
+        - files
+        - get
+      responses:
+# https://github.com/swagger-api/swagger-spec/issues/260 means we can't 
+# describe the return of a file easily today until jsonspec and swagger 
+# are "fixed"
+        200:
+          description: The file requested
+          schema:
+            type: object
+        404:
+          description: File not found.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Failed to serve file request.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: |
+        put file based on filename
+      description: |
+        Put file based on filename, returns the uuid of the stored file.
+      parameters:
+        - name: fileidentifier
+          in: path
+          description: filename of the file you want to store
+          required: true
+          type: string
+# https://github.com/swagger-api/swagger-spec/issues/326 does not yet accept files
+#       - name: content
+#          in: body
+#          description: the attachment content
+#          required: true
+#          schema:
+#            type: file
+#      consumes:
+#        - application/octet-stream
+      tags:
+        - files
+        - post
+      responses:
+        200:
+          description: The file was stored
+          schema:
+            type: object
+        201:
+          description: Ready.
+          schema:
+            type: string
+        500:
+          description: Failure serving file request.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: |
+        delete file based on uuid
+      description: |
+        Put file based on filename, returns the uuid of the stored file.
+      parameters:
+        - name: fileidentifier
+          in: path
+          description: filename identifier of the file you wish to delete
+          required: true
+          type: string
+      tags:
+        - files
+        - delete
+      responses:
+        204:
+          description: File successfully deleted.
+        404:
+          description: File not found.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Error deleting file from the database.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /config:
+    get:
+      summary: |
+        get server configuration
+      description: |
+        Get server configuration.
+      tags:
+        - config
+        - get
+      responses:
+        200:
+          description: An array of configuration objects
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: |
+        patch/update server configuration
+      description: |
+        Patch/update server configurationm and then return the patched configuration.
+      tags:
+        - config
+        - patch
+      responses:
+        200:
+          description: An array of configuration objects
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /catalogs:
+    get:
+      summary: |
+        get list of all catalogs
+      description: |
+        The catalogs endpoint returns json data that represent the catalogs of
+        all hardware in the system.
+      parameters:
+        - name: query
+          in: query
+          description: query object to pass through to waterline.
+          required: false
+          type: string
+      tags:
+        - catalog
+        - get
+      responses:
+        200:
+          description: An array of catalogs
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/catalog'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /catalogs/{identifier}:
+    get:
+      summary: |
+        get list of all catalogs
+      description: |
+        The catalogs endpoint returns json data that represent the catalogs of
+        all hardware in the system.
+      parameters:
+        - name: identifier
+          in: path
+          description: identifier of a catalog
+          required: true
+          type: string
+      tags:
+        - catalog
+        - get
+      responses:
+        200:
+          description: A single catalog
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/catalog'
+        default:
+          description: NotFound error
+  /dhcp:
+    get:
+      summary: |
+        get DHCP lease table
+      description: |
+        Fetch the dhcp leases.
+      tags:
+        - dhcp
+        - get
+      responses:
+        200:
+          description: |
+            A list of all DHCP leases registered with this instance of the service.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/lease'
+        default:
+          description: NotFound error
+  /dhcp/lease/{mac}:
+    get:
+      summary: |
+        fetch lease information for the mac specified
+      description: |
+        Fetch lease information for the mac specified.
+      parameters:
+        - name: mac
+          in: path
+          description: identifier of a mac address
+          required: true
+          type: string
+      tags:
+        - dhcp
+        - get
+      responses:
+        200:
+          description: A single lease
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/lease'
+        default:
+          description: NotFound error
+    delete:
+      summary: get list of all catalogs
+      description: |
+        Delete the lease for the mac specified and return information about deleted lease.
+      parameters:
+        - name: mac
+          in: path
+          description: identifier of a mac address
+          required: true
+          type: string
+      tags:
+        - dhcp
+        - delete
+      responses:
+        200:
+          description: A single lease
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/lease'
+        default:
+          description: NotFound error
+
+definitions:
+  catalog:
+    type: object
+    properties:
+      id:
+        type: string
+      source:
+        type: string
+      node:
+        $ref: '#/definitions/node'
+      data:
+        type: object
+        description: arbitrary json object
+    required:
+    - id
+    - source
+    - node
+  node:
+    type: object
+    properties:
+      id:
+        type: string
+      profile:
+        type: string
+      name:
+        type: string
+      obmSettings:
+        type: object
+      ipAddresses:
+        type: object
+      workflows:
+        type: array
+        items:
+          $ref: '#/definitions/graphobject'
+      catalogs:
+        type: array
+        items:
+          $ref: '#/definitions/catalog'
+      sku:
+        $ref: '#/definitions/sku'
+    required:
+    - profile
+    - name
+  graphobject:
+    properties:
+      id:
+        type: string
+      instanceid:
+        type: string
+      context:
+        type: object
+      definition:
+        type: object
+      tasks:
+        type: object
+      node:
+        $ref: '#/definitions/node'
+  sku:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      rules:
+        type: object
+      nodes:
+        type: array
+        items:
+          $ref: '#/definitions/node'
+      discoveryGraphName:
+        type: string
+      discoveryGraphOptions:
+        type: object
+  lease:
+    properties:
+      mac:
+        type: string
+      ipAddress:
+        type: string
+      reservationTimer:
+        type: integer
+        format: int32
+      reservationExpiresAt:
+        type: integer
+        format: int64
+      renewalTimer:
+        type: integer
+        format: int32
+      rebindingTimer:
+        type: integer
+        format: int32
+      expirationTimer:
+        type: integer
+        format: int32
+      renewalExpiresAt:
+        type: integer
+        format: int64
+      rebindExpiresAt:
+        type: integer
+        format: int64
+      leaseExpiresAt:
+        type: integer
+        format: int64
+      boundFlag:
+        type: boolean
+      reservedFlag:
+        type: boolean
+      reserveTimer:
+        type: string
+        format: int64
+    example:
+      mac: 08:00:27:52:d2:a4
+      ipAddress: 10.1.1.2
+      reservationTimer: 30
+      renewalTimer: 21600
+      rebindingTimer: 4320
+      expirationTimer: 86400
+      renewalExpiresAt: 1424149074811
+      rebindExpiresAt: 1424131794811
+      leaseExpiresAt: 1424213874811
+      boundFlag: true
+      reservedFlag: false
+    required:
+    - mac
+    - ipAddress
+  Error:
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
