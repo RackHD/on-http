@@ -1,6 +1,8 @@
 #!ipxe
+set user-class MonoRail
+
 echo
-echo Renasar Boilerplate iPXE...
+echo MonoRail Boilerplate iPXE...
 set syslog <%=server%>
 
 # Interface that requested an IP originally.
@@ -48,5 +50,5 @@ reboot
 # Configure the booted interface
 :ifConfigured
 route
-echo Renasar Boilerplate iPXE Completed.
+echo MonoRail Boilerplate iPXE Completed.
 echo
