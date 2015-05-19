@@ -3,23 +3,22 @@
 
 'use strict';
 
-describe('Obm Serializable', function () {
-    var Obm;
+describe('Obm Serializable V1', function () {
+    var Serializable;
 
     helper.before(function () {
         return helper.requireGlob('/lib/serializables/**/*.js');
     });
 
     before(function () {
-        Obm = helper.injector.get('Serializables.V1.Obm');
-
+        Serializable = helper.injector.get('Serializables.V1.Obm');
     });
 
     helper.after();
 
     describe('deserialize', function () {
         beforeEach(function () {
-            this.subject = new Obm();
+            this.subject = new Serializable();
         });
 
         it('should encrypt password fields in config', function() {
@@ -49,4 +48,3 @@ describe('Obm Serializable', function () {
         });
     });
 });
-
