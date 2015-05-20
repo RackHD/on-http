@@ -59,6 +59,7 @@ describe('Http.Api.Nodes', function () {
 
     var node = {
         id: '1234abcd1234abcd1234abcd',
+        name: 'name',
         obmSettings: [
             {
                 service: 'ipmi-obm-service',
@@ -91,7 +92,9 @@ describe('Http.Api.Nodes', function () {
                 .expect(201, node)
                 .expect(function () {
                     expect(waterline.nodes.create).to.have.been.calledOnce;
-                    expect(waterline.nodes.create.firstCall.args[0]).to.deep.equal(node);
+                    expect(
+                        waterline.nodes.create.firstCall.args[0]
+                    ).to.have.property('id').and.equal(node.id);
                 });
         });
     });
@@ -128,8 +131,9 @@ describe('Http.Api.Nodes', function () {
                 .expect(function () {
                     expect(waterline.nodes.updateByIdentifier).to.have.been.calledOnce;
                     expect(waterline.nodes.updateByIdentifier).to.have.been.calledWith('1234');
-                    expect(waterline.nodes.updateByIdentifier.firstCall.args[1])
-                    .to.deep.equal(node);
+                    expect(
+                        waterline.nodes.updateByIdentifier.firstCall.args[1]
+                    ).to.have.property('id').and.equal(node.id);
                 });
         });
 
