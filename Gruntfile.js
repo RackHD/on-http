@@ -170,7 +170,7 @@ function prepareGrunt(grunt) {
     grunt.loadNpmTasks('grunt-swagger-js-codegen');
     grunt.loadNpmTasks('grunt-yaml');
 
-    // Whenever the "foo" task is run, run these tasks
+    // Whenever the "swagger" task is run, run these tasks
     grunt.registerTask('swagger', ['yaml:monorail','swagger-js-codegen']);
 
     // Whenever the "coverage" task is run, run these tasks
