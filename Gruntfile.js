@@ -39,7 +39,7 @@ function prepareGrunt(grunt) {
     // grunt configuration.
     grunt.initConfig({
 
-        // grunt-contrib-jshint
+            // grunt-contrib-jshint
             jshint: {
                 // grunt jshint:source
                 // will check the source files only
@@ -66,7 +66,7 @@ function prepareGrunt(grunt) {
                 }
             },
 
-        // grunt-contrib-watch
+            // grunt-contrib-watch
             watch: {
                 // use with 'grunt watch' from command line ensure we reload
                 // our watches when ANY of these files change.
@@ -77,7 +77,7 @@ function prepareGrunt(grunt) {
                 jshint: {
                     files: allFiles,
                     tasks: ['jshint'],
-                    options:{
+                    options: {
                         interrupt: true,
                         atBegin: true
                     }
@@ -86,14 +86,14 @@ function prepareGrunt(grunt) {
                 mochaTest: {
                     files: allFiles,
                     tasks: ['coverage'],
-                    options:{
+                    options: {
                         interrupt: true,
                         atBegin: true
                     }
                 }
             },
 
-        // grunt-mocha-test
+            // grunt-mocha-test
             mochaTest: {
                 // run all tests
                 test: {
@@ -127,6 +127,37 @@ function prepareGrunt(grunt) {
                         ]
                     }
                 }
+            },
+            yaml: {
+                monorail: {
+                    options: {
+                        ignored: /^_/,
+                        space: 4,
+                        customTypes: {
+                        }
+                    },
+                    files: [
+                        {
+                            expand: true,
+                            cwd: 'static/',
+                            src: ['monorail.yml'],
+                            dest: 'build/swagger-json/'
+                        }
+                    ]
+                },
+            },
+            'swagger-js-codegen': {
+                options: {
+                    apis: [
+                        {
+                            swagger: 'build/swagger-json/monorail.json',
+                            fileName: 'monorail_node_client.js',
+                            className: 'Monorail'
+                        }
+                    ],
+                    dest: 'build/monorail-node-client'
+                },
+                dist: {}
             }
         });
 
@@ -136,6 +167,11 @@ function prepareGrunt(grunt) {
     grunt.loadNpmTasks('grunt-mocha-test');
     grunt.loadNpmTasks('grunt-mocha-istanbul');
     grunt.loadNpmTasks('grunt-notify');
+    grunt.loadNpmTasks('grunt-swagger-js-codegen');
+    grunt.loadNpmTasks('grunt-yaml');
+
+    // Whenever the "swagger" task is run, run these tasks
+    grunt.registerTask('swagger', ['yaml:monorail','swagger-js-codegen']);
 
     // Whenever the "coverage" task is run, run these tasks
     grunt.registerTask('coverage', ['mocha_istanbul:coverage']);
@@ -144,6 +180,6 @@ function prepareGrunt(grunt) {
     grunt.registerTask('test', ['jshint', 'mochaTest:test']);
 
     // By default, lint and run all tests.
-    grunt.registerTask('default', ['jshint', 'coverage']);
+    grunt.registerTask('default', ['jshint', 'coverage', 'swagger']);
 }
 

@@ -25,11 +25,11 @@
     "lodash": "^2.4.1",
     "lru-cache": "^2.5.0",
     "mongodb": "^1.4.28",
-    "on-finished": "^2.2.0",
     "on-core": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-core.git",
+    "on-finished": "^2.2.0",
     "on-tasks": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-tasks.git",
-    "sockjs": "^0.3.12",
-    "pluralize": "~1.1.2"
+    "pluralize": "~1.1.2",
+    "sockjs": "^0.3.12"
   },
   "devDependencies": {
     "apidoc": "^0.12.1",
@@ -42,6 +42,7 @@
     "grunt-mocha-istanbul": "^2.3.1",
     "grunt-mocha-test": "^0.12.7",
     "grunt-notify": "^0.4.1",
+    "grunt-yaml": "^0.4.1",
     "istanbul": "^0.3.5",
     "jsdoc": "^3.3.0-alpha13",
     "jshint": "^2.5.11",
