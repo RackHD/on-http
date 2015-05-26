@@ -16,7 +16,8 @@ di.annotate(Runner, new di.Inject(
         'Templates',
         'common-api-router',
         'fileService',
-        'Q'
+        'Q',
+        'Services.StatsD'
     )
 );
 function Runner(
@@ -27,7 +28,8 @@ function Runner(
     templates,
     router,
     fileService,
-    Q
+    Q,
+    statsd
 ) {
 
     function start() {
@@ -36,7 +38,8 @@ function Runner(
                 return Q.all([profiles.load(), templates.load()]);
             })
             .then(function() {
-
+                statsd.gauge('hello.world', 1);
+console.log('metric sent');
                 app.use('/api/common', router);
                 app.use('/api/current', router);
                 app.use('/api/1.1', router);
