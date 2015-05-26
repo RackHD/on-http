@@ -591,6 +591,15 @@ describe('Http.Api.Nodes', function () {
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
+
+        it('should return a 400 on a bad request', function () {
+            waterline.nodes.needByIdentifier.resolves({ id: '123' });
+            taskGraphProtocol.runTaskGraph.rejects(new Errors.BadRequestError('test'));
+
+            return helper.request().post('/api/1.1/nodes/123/workflows')
+                .send({})
+                .expect(400);
+        });
     });
 
     describe('GET /nodes/:identifier/workflows/active', function() {
