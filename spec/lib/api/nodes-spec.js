@@ -218,8 +218,9 @@ describe('Http.Api.Nodes', function () {
                 .expect(function () {
                     expect(waterline.nodes.updateByIdentifier).to.have.been.calledOnce;
                     expect(waterline.nodes.updateByIdentifier).to.have.been.calledWith('1234');
-                    expect(waterline.nodes.updateByIdentifier.firstCall.args[1])
-                        .to.have.property('obmSettings').that.deep.equals(updated.obmSettings);
+                    expect(
+                        waterline.nodes.updateByIdentifier.firstCall.args[1].obmSettings
+                    ).to.stringify(updated.obmSettings);
                 });
         });
 
@@ -234,8 +235,9 @@ describe('Http.Api.Nodes', function () {
                 .expect(function () {
                     expect(waterline.nodes.updateByIdentifier).to.have.been.calledOnce;
                     expect(waterline.nodes.updateByIdentifier).to.have.been.calledWith('1234');
-                    expect(waterline.nodes.updateByIdentifier.firstCall.args[1])
-                        .to.have.property('obmSettings').that.deep.equals(updated.obmSettings);
+                    expect(
+                        waterline.nodes.updateByIdentifier.firstCall.args[1].obmSettings
+                    ).to.stringify(updated.obmSettings);
                 });
         });
 
