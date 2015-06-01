@@ -55,10 +55,10 @@
     "xunit-file": "0.0.6"
   },
   "apidoc": {
-    "name": "Renasar API Documentation",
+    "name": "Monorail API Documentation",
     "version": "1.1.0",
-    "description": "Renasar API Documentation",
-    "title": "Renasar API Documentation",
+    "description": "Monorail API Documentation",
+    "title": "Monorai API Documentation",
     "url": "http://servername:80",
     "header": {
       "title": "About",
