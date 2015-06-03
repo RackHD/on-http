@@ -141,7 +141,7 @@ function prepareGrunt(grunt) {
                             expand: true,
                             cwd: 'static/',
                             src: ['monorail.yml'],
-                            dest: 'build/swagger-json/'
+                            dest: 'build/client_libs/'
                         }
                     ]
                 },
@@ -150,12 +150,12 @@ function prepareGrunt(grunt) {
                 options: {
                     apis: [
                         {
-                            swagger: 'build/swagger-json/monorail.json',
+                            swagger: 'build/client_libs/monorail.json',
                             fileName: 'monorail_node_client.js',
                             className: 'Monorail'
                         }
                     ],
-                    dest: 'build/monorail-node-client'
+                    dest: 'build/nodejs'
                 },
                 dist: {}
             }
