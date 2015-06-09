@@ -40,6 +40,7 @@ node_modules
 .idea
 
 # static images
+static/files/
 static/http/
 static/tftp/
 static/smb/
