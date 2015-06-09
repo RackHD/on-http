@@ -1,9 +1,8 @@
+// Copyright 2015, EMC Corporation
+
 "use strict";
 
-require('../../../helper.js');
-
 var EventEmitter = require('events').EventEmitter;
-
 
 describe("fileService disk backend", function() {
     var BackendFS,
