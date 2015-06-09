@@ -36,7 +36,7 @@ process.on('SIGINT', function() {
         .catch(function(error) {
             logger.error('Server Shutdown Error.', { error: error });
         })
-        .fin(function() {
+        .finally(function() {
             process.nextTick(function() {
                 process.exit(1);
             });
