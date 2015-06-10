@@ -249,6 +249,14 @@ describe('Http.Api.Pollers', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(200, mockPollerData);
         });
+
+        it('should return poller data from GET /pollers/:id/data', function () {
+            var mockPollerData = [ { data: 'dummy' }, { data: 'dummy latest'} ];
+            taskProtocol.requestPollerCache.returns(Q.resolve([mockPollerData[1]]));
+            return helper.request().get('/api/1.1/pollers/' + poller.id + '/data/current')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200, [mockPollerData[1]]);
+        });
     });
 
 });
