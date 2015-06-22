@@ -7,7 +7,7 @@ keyboard us
 timezone --utc America/Denver
 firewall --enabled --port 22:tcp
 selinux --permissive
-bootloader --location=mbr --driveorder=sda --append="crashkernel=auth rhgb"
+bootloader --location=mbr --driveorder=usb,sda --append="crashkernel=auth rhgb"
 
 #enable syslog
 logging --host=<%=server%> --level=info
