@@ -4,6 +4,7 @@
 'use strict';
 
 describe('Obm Serializable V1', function () {
+    var encryption;
     var Serializable;
 
     helper.before(function () {
@@ -11,10 +12,43 @@ describe('Obm Serializable V1', function () {
     });
 
     before(function () {
+        encryption = helper.injector.get('Services.Encryption');
         Serializable = helper.injector.get('Serializables.V1.Obm');
     });
 
     helper.after();
+
+    describe('serialize', function () {
+        beforeEach(function () {
+            this.subject = new Serializable();
+        });
+
+        it('should decrypt password fields in config', function() {
+            return this.subject.serialize(
+                {
+                    service: 'fake-service',
+                    config: {
+                        password: encryption.encrypt('foobar')
+                    }
+                }
+            ).should.eventually.have.deep.property(
+                'config.password'
+            ).and.equal('foobar');
+        });
+
+        it('should decrypt community fields in config', function() {
+            return this.subject.serialize(
+                {
+                    service: 'fake-service',
+                    config: {
+                        community: encryption.encrypt('foobar')
+                    }
+                }
+            ).should.eventually.have.deep.property(
+                'config.community'
+            ).and.equal('foobar');
+        });
+    });
 
     describe('deserialize', function () {
         beforeEach(function () {
