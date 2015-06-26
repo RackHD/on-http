@@ -1,4 +1,5 @@
 accepteula
+clearpart --alldrives
 install --firstdisk --overwritevmfs
 rootpw password
 network --bootproto=dhcp --device=vmnic0
