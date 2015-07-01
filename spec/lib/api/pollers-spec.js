@@ -214,7 +214,7 @@ describe('Http.Api.Pollers', function () {
             .expect(200, poller);
         });
 
-        it(' should update with PATCH /pollers', function () {
+        it('should update with PATCH /pollers', function () {
             poller.pollInterval = 20000;
             return helper.request().patch('/api/1.1/pollers/' + poller.id)
             .send(poller)
@@ -234,7 +234,68 @@ describe('Http.Api.Pollers', function () {
                 .to.not.equal(poller.updatedAt);
                 expect(res.body).to.have.property('lastStarted', poller.lastStarted);
                 expect(res.body).to.have.property('lastFinished', poller.lastFinished);
+                expect(res.body).to.have.property('paused', false);
             });
+        });
+
+        it('should create pollers that are not paused by default', function () {
+            return helper.request().get('/api/1.1/pollers/' + poller.id)
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function (res) {
+                expect(res.body).to.have.property('paused', false);
+            });
+        });
+
+        it('should set the pause field to true with PATCH /pollers/:id/pause', function () {
+            return helper.request().patch('/api/1.1/pollers/' + poller.id + '/pause')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function (res) {
+                expect(res.body).to.have.property('paused', true);
+                //all other fields should be unchanged
+                expect(res.body).to.have.property('pollInterval', 5000);
+                expect(res.body).to.have.property('type', poller.type);
+                expect(res.body).to.have.property('node', poller.node);
+                expect(res.body).to.have.property('failureCount', poller.failureCount);
+                expect(res.body).to.have.property('config').to.be.an('object');
+                expect(res.body).to.have.property('config').to.be.empty;
+                expect(res.body).to.have.property('id', poller.id);
+                expect(res.body).to.have.property('createdAt', poller.createdAt);
+                expect(res.body).to.have.property('updatedAt')
+                .to.not.equal(poller.updatedAt);
+                expect(res.body).to.have.property('lastStarted', poller.lastStarted);
+                expect(res.body).to.have.property('lastFinished', poller.lastFinished);
+            });
+        });
+
+        it('should set the pause field to false with PATCH /pollers/:id/resume', function () {
+          /*  before(function () {
+                return helper.request().patch('/api/1.1/pollers' + poller.id + '/pause')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200);
+            });
+*/
+            return helper.request().patch('/api/1.1/pollers/' + poller.id + '/resume')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function (res) {
+                expect(res.body).to.have.property('paused', false);
+                //all other fields should be unchanged
+                expect(res.body).to.have.property('pollInterval', 5000);
+                expect(res.body).to.have.property('type', poller.type);
+                expect(res.body).to.have.property('node', poller.node);
+                expect(res.body).to.have.property('failureCount', poller.failureCount);
+                expect(res.body).to.have.property('config').to.be.an('object');
+                expect(res.body).to.have.property('config').to.be.empty;
+                expect(res.body).to.have.property('id', poller.id);
+                expect(res.body).to.have.property('createdAt', poller.createdAt);
+                expect(res.body).to.have.property('updatedAt')
+                .to.not.equal(poller.updatedAt);
+                expect(res.body).to.have.property('lastStarted', poller.lastStarted);
+                expect(res.body).to.have.property('lastFinished', poller.lastFinished);
+            });
+
         });
 
         it('should delete the poller with DELETE /pollers/:id', function () {
