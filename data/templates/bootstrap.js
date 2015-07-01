@@ -1,10 +1,14 @@
 "use strict";
 
 var http = require('http'),
-    exec = require('child_process').exec,
+    fs = require('fs'),
+    path = require('path'),
+    childProcess = require('child_process'),
+    exec = childProcess.exec,
+    execFile = childProcess.execFile,
     server = '<%=server%>',
     port = '<%=port%>',
-    path = '/api/common/tasks/<%=identifier%>',
+    tasksPath = '/api/common/tasks/<%=identifier%>',
     RETRIES = 5;
 
 /**
@@ -54,7 +58,7 @@ function updateTasks(data, timeout, retries) {
     var request = http.request({
         hostname: server,
         port: port,
-        path: path,
+        path: tasksPath,
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -113,34 +117,56 @@ function updateTasks(data, timeout, retries) {
  * @param timeout
  */
 function executeTasks(data, timeout) {
-    eachSeries(data.tasks, function (task, done) {
-        console.log(task.cmd);
+    var handleExecResult = function(_task, _done, error, stdout, stderr) {
+        _task.stdout = stdout;
+        _task.stderr = stderr;
+        _task.error = error;
 
-        exec(task.cmd, function (error, stdout, stderr) {
-            task.stdout = stdout;
-            task.stderr = stderr;
-            task.error = error;
+        console.log(_task.stdout);
+        console.log(_task.stderr);
+        console.log(_task.error);
 
-            console.log(task.stdout);
-            console.log(task.stderr);
+        if (_task.error !== null) {
+            console.log("_task Error (" + _task.error.code + "): " +
+                        _task.stdout + "\n" +
+                        _task.stderr + "\n" +
+                        _task.error.toString());
+            console.log("ACCEPTED RESPONSES " + _task.acceptedResponseCodes);
+            if (_task.acceptedResponseCodes &&
+                _task.acceptedResponseCodes.indexOf(_task.error.code) >= 0) {
 
-            if (task.error !== null) {
-                console.log("Task Error (" + task.error.code + "): " +
-                                task.stdout);
-                console.log("ACCEPTED RESPONSES " + task.acceptedResponseCodes);
-                if (task.acceptedResponseCodes &&
-                    task.acceptedResponseCodes.indexOf(task.error.code) >= 0) {
-
-                    console.log("Task " + task.cmd + " error code " + task.error.code +
-                       " is acceptable, continuing...");
-                    done();
-                } else {
-                    done(error);
-                }
+                console.log("_task " + _task.cmd + " error code " + _task.error.code +
+                   " is acceptable, continuing...");
+                _done();
             } else {
-                done();
+                _done(error);
             }
-        });
+        } else {
+            _done();
+        }
+    };
+
+    eachSeries(data.tasks, function (task, done) {
+        if (task.downloadUrl) {
+            getFile(task.downloadUrl, function(error) {
+                // This would be from an error downloading the file, not running it.
+                // Call error.toString() so when it is JSON.stringified it doesn't
+                // end up as '{}' before we send it back to the server.
+                if (error) {
+                    handleExecResult(task, done, error.toString());
+                } else {
+                    console.log(task.cmd);
+                    execFile(task.cmd, function(error, stdout, stderr) {
+                        handleExecResult(task, done, error, stdout, stderr);
+                    });
+                }
+            });
+        } else {
+            console.log(task.cmd);
+            exec(task.cmd, function (error, stdout, stderr) {
+                handleExecResult(task, done, error, stdout, stderr, done);
+            });
+        }
     }, function () {
         updateTasks(data, timeout);
     });
@@ -155,7 +181,7 @@ function getTasks(timeout) {
     http.request({
         hostname: server,
         port: port,
-        path: path,
+        path: tasksPath,
         method: 'GET'
     }, function (res) {
         var data = "";
@@ -195,6 +221,48 @@ function getTasks(timeout) {
         } else {
             console.log("Task Execution Complete");
         }
+    }).end();
+}
+
+/**
+ * Get Tasks - Retrieves a script from the API server (via several potential
+ *             API routes such as /files, /templates, or static files)
+ * @private
+ * @param downloadUrl
+ * @param cb
+ */
+function getFile(downloadUrl, cb) {
+    http.request({
+        hostname: server,
+        port: port,
+        path: downloadUrl,
+        method: 'GET'
+    }, function (res) {
+        var filename = path.basename(downloadUrl);
+        var stream = fs.createWriteStream(filename);
+
+        res.on('end', function () {
+            stream.end(function() {
+                // Close to a noop on windows, just flips the R/W bit
+                fs.chmod(filename, "0555", function(error) {
+                    if (error) {
+                        cb(error);
+                    } else {
+                        cb(null);
+                    }
+                });
+            });
+        });
+
+        res.on('error', function (error) {
+            stream.end();
+            cb(error);
+        });
+
+        res.pipe(stream);
+
+    }).on('error', function (error) {
+        cb(error);
     }).end();
 }
 
