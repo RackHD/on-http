@@ -270,12 +270,12 @@ describe('Http.Api.Pollers', function () {
         });
 
         it('should set the pause field to false with PATCH /pollers/:id/resume', function () {
-          /*  before(function () {
+            before(function () {
                 return helper.request().patch('/api/1.1/pollers' + poller.id + '/pause')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200);
             });
-*/
+
             return helper.request().patch('/api/1.1/pollers/' + poller.id + '/resume')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
