@@ -9,6 +9,7 @@ var http = require('http'),
     server = '<%=server%>',
     port = '<%=port%>',
     tasksPath = '/api/common/tasks/<%=identifier%>',
+    MAX_BUFFER = 1000 * 1024,
     RETRIES = 5;
 
 /**
@@ -156,15 +157,19 @@ function executeTasks(data, timeout) {
                     handleExecResult(task, done, error.toString());
                 } else {
                     console.log(task.cmd);
-                    execFile(task.cmd, function(error, stdout, stderr) {
+                    execFile(task.cmd, { maxBuffer: MAX_BUFFER }, function(error, stdout, stderr) {
                         handleExecResult(task, done, error, stdout, stderr);
                     });
                 }
             });
         } else {
             console.log(task.cmd);
-            exec(task.cmd, function (error, stdout, stderr) {
-                handleExecResult(task, done, error, stdout, stderr, done);
+            exec(task.cmd, { maxBuffer: MAX_BUFFER }, function (error, stdout, stderr) {
+                if (error) {
+                    handleExecResult(task, done, error.toString());
+                } else {
+                    handleExecResult(task, done, error, stdout, stderr, done);
+                }
             });
         }
     }, function () {
