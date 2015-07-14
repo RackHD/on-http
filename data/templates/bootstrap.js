@@ -106,6 +106,11 @@ function updateTasks(data, timeout, retries) {
         }
     });
 
+    // Call error.toString() on certain errors so when it is JSON.stringified
+    // it doesn't end up as '{}' before we send it back to the server.
+    if (data.error && !data.error.code) {
+        data.error = data.error.toString();
+    }
     request.write(JSON.stringify(data));
     request.write("\n");
     request.end();
@@ -125,7 +130,6 @@ function executeTasks(data, timeout) {
 
         console.log(_task.stdout);
         console.log(_task.stderr);
-        console.log(_task.error);
 
         if (_task.error !== null) {
             console.log("_task Error (" + _task.error.code + "): " +
@@ -150,11 +154,8 @@ function executeTasks(data, timeout) {
     eachSeries(data.tasks, function (task, done) {
         if (task.downloadUrl) {
             getFile(task.downloadUrl, function(error) {
-                // This would be from an error downloading the file, not running it.
-                // Call error.toString() so when it is JSON.stringified it doesn't
-                // end up as '{}' before we send it back to the server.
                 if (error) {
-                    handleExecResult(task, done, error.toString());
+                    handleExecResult(task, done, error);
                 } else {
                     console.log(task.cmd);
                     execFile(task.cmd, { maxBuffer: MAX_BUFFER }, function(error, stdout, stderr) {
@@ -166,7 +167,7 @@ function executeTasks(data, timeout) {
             console.log(task.cmd);
             exec(task.cmd, { maxBuffer: MAX_BUFFER }, function (error, stdout, stderr) {
                 if (error) {
-                    handleExecResult(task, done, error.toString());
+                    handleExecResult(task, done, error);
                 } else {
                     handleExecResult(task, done, error, stdout, stderr, done);
                 }
