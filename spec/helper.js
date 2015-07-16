@@ -23,9 +23,9 @@ helper.startServer = function (overrides) {
     ].concat(overrides || [])));
     helper.setupTestConfig();
     helper.injector.get('Services.Configuration')
-        .set('http', true)
-        .set('https', false)
-        .set('httpPort', 8089);
+        .set('httpEnabled', true)
+        .set('httpsEnabled', false)
+        .set('httpBindPort', 8089);
     return helper.injector.get('Http').start();
 };
 

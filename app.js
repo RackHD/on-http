@@ -40,7 +40,12 @@ function Runner(
                 app.use('/api/current', router);
                 app.use('/api/1.1', router);
 
-                return fileService.start(configuration.get("fileService"));
+                return fileService.start({
+                    defaultBackend: {
+                        type: configuration.get('httpFileServiceType', 'FileSystem'),
+                        root: configuration.get('httpFileServiceRoot', './static/files')
+                    }
+                });
             })
             .then(function() {
                 app.listen();

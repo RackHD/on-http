@@ -128,14 +128,14 @@ describe('Http.Api.Templates', function () {
         it('should render a template with the server', function () {
             return templateRequest(
                 '<%= server %>',
-                configuration.get('server')
+                configuration.get('apiServerAddress', '10.1.1.1')
             );
         });
 
         it('should render a template with the http port', function () {
             return templateRequest(
                 '<%= port %>',
-                configuration.get('httpPort').toString()
+                configuration.get('apiServerPort', 80).toString()
             );
         });
 
@@ -149,14 +149,14 @@ describe('Http.Api.Templates', function () {
         it('should render a template with the subnet mask', function () {
             return templateRequest(
                 '<%= netmask %>',
-                configuration.get('subnetmask')
+                configuration.get('dhcpSubnetMask', '255.255.255.0')
             );
         });
 
         it('should render a template with the gateway IP', function () {
             return templateRequest(
                 '<%= gateway %>',
-                configuration.get('server')
+                configuration.get('dhcpGateway', '10.1.1.1')
             );
         });
 
@@ -216,4 +216,3 @@ describe('Http.Api.Templates', function () {
         });
     });
 });
-
