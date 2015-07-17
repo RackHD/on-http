@@ -69,6 +69,11 @@ for_each_repo "add_file \"/var/renasar/$repository/config.json\""
 add_file "/opt/onrack/etc/monorail.json"
 
 # --------
+# Version/commit information. These won't get restored but provide useful debug information.
+# --------
+for_each_repo "add_file \"/var/renasar/$repository/commitstring.txt\""
+
+# --------
 # DHCP
 # --------
 add_file "/var/lib/dhcp/dhcpd.leases"
