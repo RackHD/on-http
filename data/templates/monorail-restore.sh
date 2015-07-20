@@ -29,6 +29,10 @@ function echo_progress() {
     echo
 }
 
+function get_config_value() {
+    cat /opt/onrack/etc/monorail.json | python -m json.tool | grep $1 | cut -f4 -d '"'
+}
+
 if [ -z "$restore_file" ];
 then
     echo "Path to restore file is not set!"
@@ -48,7 +52,10 @@ fi
 # Mongo
 # --------
 echo_progress "Dropping existing mongo database..."
-mongo pxe --eval "db.dropDatabase()"
+mongodb=`get_config_value mongo`
+# Get last field delimited by '/'
+db=${mdb##*/}
+mongo $db --eval "db.dropDatabase()"
 echo_progress "Restoring mongo database..."
 tar -xzvf $restore_file "./dump"
 mongorestore ./dump
@@ -59,7 +66,7 @@ mongorestore ./dump
 echo_progress "Restoring configuration files..."
 if tar -tzf $restore_file | grep -q "opt\/onrack\/etc\/monorail.json";
 then
-    static_files=`cat /opt/onrack/etc/monorail.json | python -m json.tool | grep httpStaticRoot | cut -f4 -d '"'`
+    static_files=`httpStaticRoot
     file_service_files=`cat /opt/onrack/etc/monorail.json | python -m json.tool | grep httpFileServiceRoot | cut -f4 -d '"'`
     tar -xzvf $restore_file "opt/onrack/etc/monorail.json" -C /
 fi
