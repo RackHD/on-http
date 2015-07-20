@@ -1,4 +1,5 @@
 set -e
+set -o pipefail
 
 cd /tmp
 rm -f /tmp/monorail_backup_files.txt
@@ -65,7 +66,6 @@ add_file "./dump"
 # --------
 # Configuration
 # --------
-for_each_repo "add_file \"/var/renasar/$repository/config.json\""
 add_file "/opt/onrack/etc/monorail.json"
 
 # --------
@@ -81,8 +81,11 @@ add_file "/var/lib/dhcp/dhcpd.leases"
 # --------
 # Files
 # --------
-add_file "/var/renasar/on-http/.tmp"
 add_file "/var/renasar/on-http/static"
+static_files=`cat /opt/onrack/etc/monorail.json | python -m json.tool | grep httpStaticRoot | cut -f4 -d '"'`
+add_file static_files
+file_service_files=`cat /opt/onrack/etc/monorail.json | python -m json.tool | grep httpFileServiceRoot | cut -f4 -d '"'`
+add_file file_service_files
 
 # --------
 # Make the upgrade blob
@@ -92,3 +95,6 @@ echo -e $file_list > files.txt
 sudo tar --ignore-failed-read -czvf $backup_file -T /tmp/monorail_backup_files.txt
 
 echo_progress "Upgrade blob created at /tmp/$backup_file"
+
+echo_progress "Restarting services..."
+for_each_repo "sudo initctl start \"$repository\""

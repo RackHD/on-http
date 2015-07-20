@@ -57,9 +57,10 @@ mongorestore ./dump
 # Configuration
 # --------
 echo_progress "Restoring configuration files..."
-tar --wildcards "var/renasar/*/config.json" -xzvf $restore_file -C /
 if tar -tzf $restore_file | grep -q "opt\/onrack\/etc\/monorail.json";
 then
+    static_files=`cat /opt/onrack/etc/monorail.json | python -m json.tool | grep httpStaticRoot | cut -f4 -d '"'`
+    file_service_files=`cat /opt/onrack/etc/monorail.json | python -m json.tool | grep httpFileServiceRoot | cut -f4 -d '"'`
     tar -xzvf $restore_file "opt/onrack/etc/monorail.json" -C /
 fi
 
@@ -74,6 +75,14 @@ tar -C / -xzvf $restore_file "var/lib/dhcp/dhcpd.leases"
 # --------
 echo_progress "Restoring static and user files (not overwriting existing ones)..."
 tar -C / --keep-old-files --wildcards "var/renasar/on-http/static/*" -xzvf $restore_file
+if [ -z "$static_files" ];
+then
+    tar -C / --keep-old-files -xzvf "$static_files"
+fi
+if [ -z "$file_service_files" ];
+then
+    tar -C / --keep-old-files -xzvf "$file_service_files"
+fi
 
 # --------
 # Start
