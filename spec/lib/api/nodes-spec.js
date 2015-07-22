@@ -97,6 +97,33 @@ describe('Http.Api.Nodes', function () {
                     ).to.have.property('id').and.equal(node.id);
                 });
         });
+
+        it('should run discovery if the requested node is an autoDiscoverable switch',
+        function() {
+            var switchNode = {
+                id: '1234abcd1234abcd1234abcd',
+                name: 'name',
+                snmpSettings: {
+                    host: '1.2.3.4',
+                    community: 'community'
+                },
+                autoDiscover: true,
+                type: 'switch'
+            };
+            waterline.nodes.create.resolves(switchNode);
+            taskGraphProtocol.runTaskGraph.resolves({});
+
+            return helper.request().post('/api/1.1/nodes')
+                .send(switchNode)
+                .expect(function () {
+                    expect(taskGraphProtocol.runTaskGraph)
+                    .to.have.been.calledWith(
+                            'Graph.Switch.Discovery',
+                            { defaults: switchNode.snmpSettings },
+                            switchNode.id
+                    );
+                });
+        });
     });
 
     describe('GET /nodes/:id', function () {
