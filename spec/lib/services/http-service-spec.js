@@ -40,10 +40,10 @@ describe('Http.Server', function () {
 
         before('listen', function () {
             helper.injector.get('Services.Configuration')
-                .set('http', true)
-                .set('https', false)
+                .set('httpEnabled', true)
+                .set('httpsEnabled', false)
             // can't use port 80 because it requires setuid root
-                .set('httpPort', 8089);
+                .set('httpBindPort', 8089);
             server.listen();
         });
 
@@ -66,12 +66,12 @@ describe('Http.Server', function () {
 
         before('listen', function () {
             helper.injector.get('Services.Configuration')
-                .set('http', false)
-                .set('https', true)
+                .set('httpEnabled', false)
+                .set('httpsEnabled', true)
                 .set('httpsCert', 'data/dev-cert.pem')
                 .set('httpsKey', 'data/dev-key.pem')
             // can't use port 443 because it requires setuid root
-                .set('httpsPort', 8443);
+                .set('httpsBindPort', 8443);
             server.listen();
         });
 
@@ -94,11 +94,11 @@ describe('Http.Server', function () {
 
         before('listen', function () {
             helper.injector.get('Services.Configuration')
-                .set('http', false)
-                .set('https', true)
+                .set('httpEnabled', false)
+                .set('httpsEnabled', true)
                 .set('httpsPfx', 'data/dev.pfx')
             // can't use port 443 because it requires setuid root
-                .set('httpsPort', 8444);
+                .set('httpsBindPort', 8444);
             server.listen();
         });
 
@@ -116,8 +116,8 @@ describe('Http.Server', function () {
 
     it('should throw an error if http and https are both disabled', function () {
         helper.injector.get('Services.Configuration')
-        .set('http', false)
-        .set('https', false);
+        .set('httpEnabled', false)
+        .set('httpsEnabled', false);
 
         expect(function () {
             server.listen();
