@@ -177,16 +177,27 @@ describe("fileService disk backend", function() {
         }).should.be.fulfilled;
     });
 
-    it("should fail on delete if the file is not found", function() {
+    it("should fail on delete if the file is not found on disk", function() {
         execker.exec = sinon.stub();
         execker.exec.callsArgWith(0, null, fakeFile);
         waterline.files.findOne.returns(execker);
         fs.exists.callsArgWith(1, false);
 
-        var deletionPromise = backend.delete('a uuid');
-
-        return deletionPromise.should.eventually
-        .be.rejectedWith('File not found');
+        return backend.delete('a uuid')
+        .catch(function(err) {
+            err.message.should.equal("File not found on disk");
+        });
     });
 
+    it("should fail on delete if the file is not found in the database", function() {
+        execker.exec = sinon.stub();
+        execker.exec.callsArgWith(0, null, null);
+        waterline.files.findOne.returns(execker);
+        fs.exists.callsArgWith(1, true);
+
+        return backend.delete('a uuid')
+        .catch(function(err) {
+            err.message.should.equal("File not found in database");
+        });
+    });
 });
