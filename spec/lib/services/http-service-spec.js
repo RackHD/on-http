@@ -4,26 +4,29 @@
 'use strict';
 
 describe('Http.Server', function () {
-    var sockJs = {};
-    var app;
-    var server;
+    var app, server;
 
-    before('create express app', function () {
-        app = require('express')();
+    helper.before(function () {
+        return [
+            dihelper.simpleWrapper(require('express')(), 'express-app', undefined, __dirname),
+            dihelper.simpleWrapper({}, 'Task.Services.OBM'),
+            dihelper.simpleWrapper({}, 'ipmi-obm-service'),
+            helper.require('/lib/services/http-service'),
+            helper.requireGlob('/lib/**/*.js')
+        ];
+    });
+
+    before(function () {
+        app = helper.injector.get('express-app');
+
         app.use('/test', function (req, res) {
             res.send('Hello World!');
         });
-    });
-
-    before('set up test dependencies', function() {
-        // use helper.setupInjector because we don't want to start core services
-        helper.setupInjector(_.flatten([
-            helper.require('/lib/services/http-service.js'),
-            dihelper.simpleWrapper(app, 'express-app', undefined, __dirname),
-        ]));
 
         server = helper.injector.get('Http.Server');
     });
+
+    helper.after();
 
     before('allow self signed certs', function () {
        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -34,10 +37,6 @@ describe('Http.Server', function () {
     });
 
     describe('http', function () {
-        before('set up mocks', function () {
-            sockJs.listen = sinon.stub();
-        });
-
         before('listen', function () {
             helper.injector.get('Services.Configuration')
                 .set('httpEnabled', true)
@@ -60,10 +59,6 @@ describe('Http.Server', function () {
     });
 
     describe('https', function () {
-        before('set up mocks', function () {
-            sockJs.listen = sinon.stub();
-        });
-
         before('listen', function () {
             helper.injector.get('Services.Configuration')
                 .set('httpEnabled', false)
@@ -88,10 +83,6 @@ describe('Http.Server', function () {
     });
 
     describe('https with pfx', function () {
-        before('set up mocks', function () {
-            sockJs.listen = sinon.stub();
-        });
-
         before('listen', function () {
             helper.injector.get('Services.Configuration')
                 .set('httpEnabled', false)
