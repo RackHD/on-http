@@ -36,10 +36,6 @@ function Runner(
                 return Promise.all([profiles.load(), templates.load()]);
             })
             .then(function() {
-                app.use('/api/common', router);
-                app.use('/api/current', router);
-                app.use('/api/1.1', router);
-
                 return fileService.start({
                     defaultBackend: {
                         type: configuration.get('httpFileServiceType', 'FileSystem'),
