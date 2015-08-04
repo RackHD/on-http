@@ -166,6 +166,33 @@ describe('Http.Api.Nodes', function () {
                     );
                 });
         });
+
+        it('should run discovery if the requested node is an autoDiscoverable PDU',
+        function() {
+            var pduNode = {
+                id: '1234abcd1234abcd1234abcd',
+                name: 'name',
+                snmpSettings: {
+                    host: '1.2.3.4',
+                    community: 'community'
+                },
+                autoDiscover: true,
+                type: 'pdu'
+            };
+            waterline.nodes.create.resolves(pduNode);
+            taskGraphProtocol.runTaskGraph.resolves({});
+
+            return helper.request().post('/api/1.1/nodes')
+                .send(pduNode)
+                .expect(function () {
+                    expect(taskGraphProtocol.runTaskGraph)
+                    .to.have.been.calledWith(
+                            'Graph.PDU.Discovery',
+                            { defaults: pduNode.snmpSettings },
+                            pduNode.id
+                    );
+                });
+        });
     });
 
     describe('GET /nodes/:id', function () {
