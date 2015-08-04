@@ -124,6 +124,48 @@ describe('Http.Api.Nodes', function () {
                     );
                 });
         });
+
+        it('should run discovery if the requested node is an autoDiscoverable mgmt server',
+        function() {
+            var mgmtNode = {
+                id: '1234abcd1234abcd1234abce',
+                name: 'mgmt server',
+                obmSettings: [
+                    {
+                        config: {
+                            host: '1.2.3.4',
+                            user: 'user',
+                            password: 'password'
+                        },
+                        service: 'ipmi-obm-service'
+                    }
+                ],
+                autoDiscover: true,
+                type: 'mgmt'
+            };
+            var options = {
+                defaults: {
+                    graphOptions: {
+                        target: mgmtNode.id
+                    },
+                    nodeId: mgmtNode.id
+                }
+            };
+
+            waterline.nodes.create.resolves(mgmtNode);
+            taskGraphProtocol.runTaskGraph.resolves({});
+
+            return helper.request().post('/api/1.1/nodes')
+                .send(mgmtNode)
+                .expect(function () {
+                    expect(taskGraphProtocol.runTaskGraph)
+                    .to.have.been.calledWith(
+                            'Graph.MgmtSKU.Discovery',
+                            options,
+                            undefined
+                    );
+                });
+        });
     });
 
     describe('GET /nodes/:id', function () {
