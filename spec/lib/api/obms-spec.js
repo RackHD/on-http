@@ -41,4 +41,15 @@ describe('Http.Api.Obms', function () {
                 expect(res.body).to.have.property('config').that.is.an('object');
             });
     });
+
+    it('should get the panduit obm service type', function () {
+        return helper.request().get('/api/1.1/obms/library/panduit-obm-service')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function (res) {
+                expect(res.body).to.have.property('service').that.equals('panduit-obm-service');
+                expect(res.body).to.have.property('config').that.is.an('object');
+            });
+
+    });
 });
