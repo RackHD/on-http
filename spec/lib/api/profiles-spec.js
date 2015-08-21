@@ -9,6 +9,7 @@ describe('Http.Api.Profiles', function () {
     var lookupService;
     var profiles;
     var profileApiService;
+    var Errors;
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -18,6 +19,7 @@ describe('Http.Api.Profiles', function () {
     beforeEach('set up mocks', function () {
         taskProtocol = helper.injector.get('Protocol.Task');
         lookupService = helper.injector.get('Services.Lookup');
+        Errors = helper.injector.get('Errors');
 
         sinon.stub(lookupService, 'ipAddressToMacAddress').resolves('00:00:00:00:00:00');
 
@@ -28,7 +30,7 @@ describe('Http.Api.Profiles', function () {
 
         taskGraphProtocol = helper.injector.get('Protocol.TaskGraphRunner');
         sinon.stub(taskGraphProtocol, 'getActiveTaskGraph').resolves({});
-        sinon.stub(taskGraphProtocol, 'runTaskGraph').resolves();
+        sinon.stub(taskGraphProtocol, 'runTaskGraph').resolves({ instanceId: 'test' });
 
         profiles = helper.injector.get('Profiles');
         sinon.stub(profiles, 'getAll').resolves([]);
@@ -38,6 +40,7 @@ describe('Http.Api.Profiles', function () {
         profileApiService = helper.injector.get('Http.Services.Api.Profiles');
         sinon.stub(profileApiService, 'getNode').resolves({});
         sinon.stub(profileApiService, 'createNodeAndRunDiscovery').resolves({});
+        sinon.stub(profileApiService, 'runDiscovery').resolves({});
     });
 
     afterEach('teardown mocks', function () {
@@ -184,6 +187,27 @@ describe('Http.Api.Profiles', function () {
                 .expect(function() {
                     expect(profiles.get).to.have.been.calledWith('test.profile');
                 });
+        });
+
+        it("should send down retry.ipxe if we are maximum discovery graph capacity", function() {
+            profileApiService.getNode.rejects(new Errors.MaxGraphsRunningError());
+            return helper.request().get('/api/1.1/profiles')
+                .query({ macs: '00:00:de:ad:be:ef' })
+                .expect(200)
+                .expect(function() {
+                    expect(profiles.get).to.have.been.calledWith('retry.ipxe');
+                });
+        });
+
+        it("should fail chainload if we have already sent down retry.ipxe and " +
+                "are still at maximum discovery graph capacity", function() {
+            var error = new Errors.MaxGraphsRunningError();
+            error.retryLater = true;
+            profileApiService.getNode.rejects(error);
+
+            return helper.request().get('/api/1.1/profiles')
+                .query({ macs: '00:00:de:ad:be:ef' })
+                .expect(500);
         });
     });
 });
