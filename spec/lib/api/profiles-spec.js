@@ -207,7 +207,7 @@ describe('Http.Api.Profiles', function () {
 
             return helper.request().get('/api/1.1/profiles')
                 .query({ macs: '00:00:de:ad:be:ef' })
-                .expect(500);
+                .expect(503);
         });
     });
 });
