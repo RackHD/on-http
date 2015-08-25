@@ -7,6 +7,8 @@ describe("Http.Services.Api.Profiles", function () {
     var profileApiService;
     var Errors;
     var taskProtocol;
+    var taskGraphProtocol;
+    var eventsProtocol;
     var waterline;
 
     before("Http.Services.Api.Profiles before", function() {
@@ -20,6 +22,8 @@ describe("Http.Services.Api.Profiles", function () {
             findByIdentifier: function() {}
         };
         taskProtocol = helper.injector.get("Protocol.Task");
+        taskGraphProtocol = helper.injector.get("Protocol.TaskGraphRunner");
+        eventsProtocol = helper.injector.get("Protocol.Events");
     });
 
     beforeEach("Http.Services.Api.Profiles beforeEach", function() {
@@ -103,6 +107,116 @@ describe("Http.Services.Api.Profiles", function () {
             this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
 
             return expect(profileApiService.getNode('testmac')).to.become(node);
+        });
+    });
+
+    describe("runDiscovery", function() {
+        afterEach(function() {
+            profileApiService.activeNodeGraphs = 0;
+        });
+
+        it("should fail if activeNodeGraphs >= maxNodeGraphs", function() {
+            profileApiService.activeNodeGraphs = profileApiService.maxNodeGraphs;
+
+            return expect(profileApiService.runDiscovery('testnode'))
+                        .to.be.rejectedWith(Errors.MaxGraphsRunningError);
+        });
+
+        it("should increment active node graphs", function() {
+            this.sandbox.stub(taskGraphProtocol, 'runTaskGraph').resolves({ instanceId: 'foo' });
+            this.sandbox.stub(eventsProtocol, 'subscribeGraphFinished').resolves();
+            this.sandbox.stub(profileApiService, 'waitForDiscoveryStart').resolves();
+
+            var oldActiveGraphs = profileApiService.activeNodeGraphs;
+            return profileApiService.runDiscovery({ id: 'bar' }).then(function() {
+                expect(profileApiService.activeNodeGraphs).to.equal(oldActiveGraphs + 1);
+            });
+        });
+
+        it("should decrement completed node graphs", function() {
+            this.sandbox.stub(taskGraphProtocol, 'runTaskGraph').resolves({ instanceId: 'foo' });
+            this.sandbox.stub(eventsProtocol, 'subscribeGraphFinished').resolves();
+            this.sandbox.stub(profileApiService, 'waitForDiscoveryStart').resolves();
+
+            var oldActiveGraphs = profileApiService.activeNodeGraphs;
+            return profileApiService.runDiscovery({ id: 'bar' }).then(function() {
+                expect(profileApiService.activeNodeGraphs).to.equal(oldActiveGraphs + 1);
+            });
+        });
+
+        it("should decrement on failure to run a taskgraph", function() {
+            this.sandbox.stub(taskGraphProtocol, 'runTaskGraph').rejects(new Error());
+            var oldActiveGraphs = profileApiService.activeNodeGraphs;
+
+            return expect(profileApiService.runDiscovery({ id: 'bar' }))
+                        .to.be.rejected
+                        .then(function() {
+                            expect(profileApiService.activeNodeGraphs).to.equal(oldActiveGraphs);
+                        });
+        });
+
+        it("should decrement on completion of a taskgraph", function() {
+            this.sandbox.stub(taskGraphProtocol, 'runTaskGraph').resolves({ instanceId: 'foo' });
+            this.sandbox.stub(eventsProtocol, 'subscribeGraphFinished').resolves();
+            this.sandbox.stub(profileApiService, 'waitForDiscoveryStart').resolves();
+            var oldActiveGraphs = profileApiService.activeNodeGraphs;
+
+            return profileApiService.runDiscovery({ id: 'bar' }).then(function() {
+                var cb = eventsProtocol.subscribeGraphFinished.firstCall.args[1];
+                expect(profileApiService.activeNodeGraphs).to.equal(oldActiveGraphs + 1);
+                cb();
+                expect(profileApiService.activeNodeGraphs).to.equal(oldActiveGraphs);
+            });
+        });
+
+        it("should set retryLater:true to the error if the node should retry", function(done) {
+            this.sandbox.stub(taskGraphProtocol, 'runTaskGraph').resolves({ instanceId: 'foo' });
+            this.sandbox.stub(eventsProtocol, 'subscribeGraphFinished').resolves();
+            this.sandbox.stub(profileApiService, 'waitForDiscoveryStart').resolves();
+
+            profileApiService.maxNodeGraphs = 0;
+
+            return profileApiService.runDiscovery({ id: 'bar' })
+            .then(function() {
+                done(new Error("Expected runDiscovery to throw MaxGraphsRunningError"));
+            })
+            .catch(Errors.MaxGraphsRunningError, function() {
+                return profileApiService.runDiscovery({ id: 'bar' });
+            })
+            .catch(Errors.MaxGraphsRunningError, function(error) {
+                expect(profileApiService.nodesRetrying).to.have.property('bar').that.equals(true);
+                expect(error).to.have.property('retryLater').that.equals(true);
+                done();
+            })
+            .catch(function(err) {
+                done(err);
+            });
+        });
+
+        it("should delete node from nodesRetrying once the server " +
+                "can discover it", function(done) {
+            this.sandbox.stub(taskGraphProtocol, 'runTaskGraph').resolves({ instanceId: 'foo' });
+            this.sandbox.stub(eventsProtocol, 'subscribeGraphFinished').resolves();
+            this.sandbox.stub(profileApiService, 'waitForDiscoveryStart').resolves();
+
+            profileApiService.maxNodeGraphs = 0;
+            profileApiService.nodesRetrying = {};
+
+            return profileApiService.runDiscovery({ id: 'bar' })
+            .then(function() {
+                done(new Error("Expected runDiscovery to throw MaxGraphsRunningError"));
+            })
+            .catch(Errors.MaxGraphsRunningError, function() {
+                profileApiService.maxNodeGraphs = 1;
+                return profileApiService.runDiscovery({ id: 'bar' });
+            })
+            .then(function() {
+                expect(profileApiService.nodesRetrying).to.be.empty;
+                done();
+            })
+            .catch(function(err) {
+                done(err);
+            });
         });
     });
 });
