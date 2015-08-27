@@ -13,14 +13,10 @@ describe('Http.Api.Workflows', function () {
             start: sinon.stub(),
             stop: sinon.stub()
         };
-        var resources = {
-            register: sinon.stub(),
-            unregister: sinon.stub()
-        };
+
         return helper.startServer([
             dihelper.simpleWrapper(taskGraphRunner, 'Protocol.TaskGraphRunner'),
             dihelper.simpleWrapper(waterline, 'Services.Waterline'),
-            dihelper.simpleWrapper(resources, 'common-stomp-resources')
         ]);
     });
 
@@ -39,6 +35,13 @@ describe('Http.Api.Workflows', function () {
         waterline.graphobjects = {
             find: sinon.stub().resolves([]),
             findByIdentifier: sinon.stub().resolves()
+        };
+        waterline.lookups = {
+            // This method is for lookups only and it
+            // doesn't impact behavior whether it is a
+            // resolve or a reject since it's related
+            // to logging.
+            findOneByTerm: sinon.stub().rejects()
         };
     });
 
