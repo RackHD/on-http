@@ -1,13 +1,17 @@
 install
-text
+#text
+graphical
 unsupported_hardware
-url --url http://<%=server%>:<%=port%>/centos/6.5/os/x86_64
+url --url=<%=repo%>
+# eula --agreed
 lang en_US.UTF-8
-keyboard us
-timezone --utc America/Denver
-firewall --enabled --port 22:tcp
+keyboard 'us'
+timezone America/Los_Angeles --isUtc
+firewall --enabled --http --ssh
 selinux --permissive
 bootloader --location=mbr --driveorder=sda --append="crashkernel=auth rhgb"
+services --enabled=NetworkManager,sshd
+network --device=<%=macaddress%> --noipv6 --activate
 
 #enable syslog
 logging --host=<%=server%> --level=info
@@ -52,6 +56,8 @@ sudo
 perl
 libselinux-python
 net-tools
+%end
+
 %pre
 %end
 
@@ -67,4 +73,5 @@ mkdir /home/<%=username%>/.ssh;
 chown -R <%=username%>:<%=username%> /home/<%=username%>/.ssh
 
 ) 2>&1 >/root/install-post-sh.log
+EOF
 %end
