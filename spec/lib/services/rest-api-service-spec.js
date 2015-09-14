@@ -209,7 +209,7 @@ describe('Http.Server', function () {
 
         it('should 200 with a resolved promise', function () {
             app.get('/testfuncpromise', rest(function () {
-                return Q.resolve({ foo: 'baz' });
+                return Promise.resolve({ foo: 'baz' });
             }));
 
             return helper.request(TESTURL).get('/testfuncpromise')
@@ -219,7 +219,7 @@ describe('Http.Server', function () {
 
         it('should 500 error on rejected promise with an Error', function () {
             app.get('/testpromisereject', rest(function () {
-                return Q.reject(new Error('broken promise'));
+                return Promise.reject(new Error('broken promise'));
             }));
 
             return helper.request(TESTURL).get('/testpromisereject')
@@ -232,7 +232,7 @@ describe('Http.Server', function () {
 
         it('should 500 error on rejected promise with a string', function () {
             app.get('/testpromiserejectstring', rest(function () {
-                return Q.reject('broken promise string');
+                return Promise.reject('broken promise string');
             }));
 
             return helper.request(TESTURL).get('/testpromiserejectstring')
@@ -246,7 +246,7 @@ describe('Http.Server', function () {
 
         it('should 500 error on rejected promise with an object', function () {
             app.get('/testpromiserejectobject', rest(function () {
-                return Q.reject({ thing: 'errored' });
+                return Promise.reject({ thing: 'errored' });
             }));
 
             return helper.request(TESTURL).get('/testpromiserejectobject')
@@ -260,7 +260,7 @@ describe('Http.Server', function () {
 
         it('should 500 error on rejected promise with undefined', function () {
             app.get('/testpromiserejectundefined', rest(function () {
-                return Q.reject();
+                return Promise.reject();
             }));
 
             return helper.request(TESTURL).get('/testpromiserejectundefined')
@@ -312,7 +312,7 @@ describe('Http.Server', function () {
                 return { item: 'value' };
             }, { serializer: function (object) {
                 object.item += 'promised';
-                return Q.resolve(object);
+                return Promise.resolve(object);
             } }));
 
             return helper.request(TESTURL).get('/testpromiseserializer')
@@ -339,7 +339,7 @@ describe('Http.Server', function () {
             app.get('/testrejectserializer', rest(function () {
                 return { item: 'value' };
             }, { serializer: function () {
-                return Q.reject(new Error('serializer reject!'));
+                return Promise.reject(new Error('serializer reject!'));
             } }));
 
             return helper.request(TESTURL).get('/testrejectserializer')
@@ -375,7 +375,7 @@ describe('Http.Server', function () {
                     val: req.body.value
                 };
             }, { deserializer: function (object) {
-                return Q.resolve({
+                return Promise.resolve({
                     value: object.val + 2
                 });
             } }));
@@ -406,7 +406,7 @@ describe('Http.Server', function () {
             app.get('/testrejectdeserializer', rest(function () {
                 return { item: 'value' };
             }, { deserializer: function () {
-                return Q.reject(new Error('deserializer reject!'));
+                return Promise.reject(new Error('deserializer reject!'));
             } }));
 
             return helper.request(TESTURL).get('/testrejectdeserializer')
@@ -423,7 +423,7 @@ describe('Http.Server', function () {
             app.get('/testrejectvalidationdeserializer', rest(function () {
                 return { item: 'value' };
             }, { deserializer: function () {
-                return Q.reject(new Errors.ValidationError());
+                return Promise.reject(new Errors.ValidationError());
             } }));
 
             return helper.request(TESTURL).get('/testrejectvalidationdeserializer')

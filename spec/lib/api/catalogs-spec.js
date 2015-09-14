@@ -5,7 +5,7 @@
 
 describe('Http.Api.Catalogs', function () {
 
-    var Q;
+    var Promise;
     var Errors;
     var stubNeedByIdentifier;
     var stubFind;
@@ -13,7 +13,7 @@ describe('Http.Api.Catalogs', function () {
     before('start HTTP server', function () {
         this.timeout(5000);
         return helper.startServer([]).then(function () {
-            Q = helper.injector.get('Q');
+            Promise = helper.injector.get('Promise');
             Errors = helper.injector.get('Errors');
             var w = helper.injector.get('Services.Waterline');
             stubNeedByIdentifier = sinon.stub(w.catalogs, "needByIdentifier");
@@ -34,7 +34,7 @@ describe('Http.Api.Catalogs', function () {
 
         it("should a list of all catalogs", function() {
 
-            stubFind.returns(Q.resolve([
+            stubFind.returns(Promise.resolve([
                 {
                     id: '123',
                     node: '123',
@@ -54,7 +54,7 @@ describe('Http.Api.Catalogs', function () {
 
         it("should return an empty array if no catalogs exist", function() {
 
-            stubFind.returns(Q.resolve([]));
+            stubFind.returns(Promise.resolve([]));
 
             return helper.request().get('/api/1.1/catalogs')
                 .expect('Content-Type', /^application\/json/)
@@ -65,7 +65,7 @@ describe('Http.Api.Catalogs', function () {
         });
 
         it("should pass through query from query params", function() {
-            stubFind.returns(Q.resolve([
+            stubFind.returns(Promise.resolve([
                 {
                     id: '123',
                     node: '123',
@@ -88,7 +88,7 @@ describe('Http.Api.Catalogs', function () {
     describe("GET /catalogs/:identifier", function() {
 
         it("should return an individual catalog", function() {
-            stubNeedByIdentifier.returns(Q.resolve({
+            stubNeedByIdentifier.returns(Promise.resolve({
                     id: '123',
                     node: '123',
                     source: 'foo',
@@ -107,7 +107,7 @@ describe('Http.Api.Catalogs', function () {
 
         it("should return a 404 if no catalogs can be found", function() {
 
-            stubFind.returns(Q.reject(new Errors.NotFoundError('Not Found')));
+            stubFind.returns(Promise.reject(new Errors.NotFoundError('Not Found')));
 
             return helper.request().get('/api/1.1/catalogs')
                 .expect('Content-Type', /^application\/json/)

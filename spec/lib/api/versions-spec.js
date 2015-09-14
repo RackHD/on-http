@@ -26,7 +26,7 @@ describe('Http.Api.Versions', function () {
     describe('GET /versions', function() {
 
         it('should return a package version structure', function () {
-            stubRun.returns(Q.resolve({
+            stubRun.returns(Promise.resolve({
                 stdout: 'ii somePackage 1.0',
                 stderr: undefined
             }));
@@ -41,7 +41,7 @@ describe('Http.Api.Versions', function () {
         });
 
         it('should return a 501 error if dpkg command fails', function () {
-            stubRun.returns(Q.reject({
+            stubRun.returns(Promise.reject({
                 code: '-1'
             }));
             return helper.request().get('/api/1.1/versions/')

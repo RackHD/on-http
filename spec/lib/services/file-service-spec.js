@@ -161,7 +161,7 @@ describe("File Service", function() {
     });
 
     describe("File Service Methods", function() {
-        var q,
+        var Promise,
             mockBack;
 
         beforeEach(function() {
@@ -179,7 +179,7 @@ describe("File Service", function() {
 
                 };
 
-            q = helper.injector.get('Q');
+            Promise = helper.injector.get('Promise');
             fileService = helper.injector.get('fileService');
             fileService.injectorMap.MockFS = 'Files.Mock';
             fileService.start(config);
@@ -193,41 +193,41 @@ describe("File Service", function() {
                 md5Hash = crypto.createHash('md5'),
                 shaHash = crypto.createHash('sha256'),
                 emittedHash = {},
-                deferred = q.defer();
+                hashes = {};
 
-            fileService.backEnds.defaultBackend.put.returns(q.resolve(
-                {
-                    stream: mockBack.mockWrStream,
-                    id: 'a uuid'
-                }
-            ));
+            return new Promise(function (resolve) {
+                fileService.backEnds.defaultBackend.put.returns(Promise.resolve(
+                    {
+                        stream: mockBack.mockWrStream,
+                        id: 'a uuid'
+                    }
+                ));
 
-            md5Hash.update(stringToHash);
-            shaHash.update(stringToHash);
+                md5Hash.update(stringToHash);
+                shaHash.update(stringToHash);
 
-            var hashes = {
-                md5: md5Hash.digest('hex'),
-                sha: shaHash.digest('hex')
-            };
+                hashes = {
+                    md5: md5Hash.digest('hex'),
+                    sha: shaHash.digest('hex')
+                };
 
-            mockBack.mockWrStream.on('metadata', function(meta) {
-                emittedHash.md5 = meta.md5;
-                emittedHash.sha = meta.sha256;
-                deferred.resolve(emittedHash);
-            });
+                mockBack.mockWrStream.on('metadata', function(meta) {
+                    emittedHash.md5 = meta.md5;
+                    emittedHash.sha = meta.sha256;
+                    resolve(emittedHash);
+                });
 
-            fileService.put(fakeStream, {filename:'unimportant'})
-            .then(function(streamObj) {
-                mockBack.mockRdStream.pipe(streamObj.transformHashStream);
-            });
-
-            return deferred.promise.should.eventually.deep.equal(hashes);
+                fileService.put(fakeStream, {filename:'unimportant'})
+                .then(function(streamObj) {
+                    mockBack.mockRdStream.pipe(streamObj.transformHashStream);
+                });
+            }).should.eventually.deep.equal(hashes);
         });
 
 
         it("should return a promise for a readstream on get ", function() {
             fileService.backEnds.defaultBackend.get
-            .returns(q.resolve(mockBack.mockRdStream));
+            .returns(Promise.resolve(mockBack.mockRdStream));
 
             return fileService.get({filename: 'unimportant.txt'})
             .should.eventually.deep
@@ -236,7 +236,7 @@ describe("File Service", function() {
 
         it("should return a rejected promise " +
                 "if the backend doesn't have a requested file", function() {
-            mockBack.get.returns(q.reject('file not found'));
+            mockBack.get.returns(Promise.reject('file not found'));
 
             return fileService.get({filename: 'notInDatabase.fake'})
             .should.be.rejectedWith('file not found');
@@ -244,7 +244,7 @@ describe("File Service", function() {
 
         it("should return a rejected promise for attemtps to delete " +
         "a not found file", function() {
-            mockBack.delete.returns(q.reject('file not found'));
+            mockBack.delete.returns(Promise.reject('file not found'));
 
             return fileService.delete({filename: "notInDatabase.txt"})
             .should.be.rejectedWith('file not found');
@@ -253,7 +253,7 @@ describe("File Service", function() {
         it("should return a promise for an array of files " +
                 "received from the backend on verify", function() {
             var aritraryArray = ["I'm a file", "I'm also a file", "I'm a file too"];
-            mockBack.getMeta.returns(q.resolve(aritraryArray));
+            mockBack.getMeta.returns(Promise.resolve(aritraryArray));
 
             return fileService.verify("aFile.txt").should.eventually
             .deep.equal(aritraryArray);
@@ -263,7 +263,7 @@ describe("File Service", function() {
         "received from call to backend's list method",function() {
             var fileList = ['aFile.txt', 'fauxFile.txt', 'falseFile.txt'];
 
-            mockBack.list.returns(q.resolve(fileList));
+            mockBack.list.returns(Promise.resolve(fileList));
 
             return fileService.list().should.eventually
             .deep.equal(fileList);
