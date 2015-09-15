@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-http.git"
+    "url": "https://github.com/RackHD/on-http.git"
   },
   "author": "",
   "license": "Proprietary",
   "dependencies": {
     "body-parser": "^1.10.1",
     "cors": "^2.5.2",
-    "di": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/di.js.git",
+    "di": "git+http://5f5fdee3b5f3bc054cece98ad854c3090043f3c0:x-oauth-basic@github.com/RackHD/di.js.git",
     "ejs": "^2.0.8",
     "es6-shim": "^0.22.2",
     "express": "^4.10.7",
@@ -25,9 +25,9 @@
     "lodash": "^2.4.1",
     "lru-cache": "^2.5.0",
     "mongodb": "^1.4.28",
-    "on-core": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-core.git",
+    "on-core": "git+http://5f5fdee3b5f3bc054cece98ad854c3090043f3c0:x-oauth-basic@github.com/RackHD/on-core.git",
     "on-finished": "^2.2.0",
-    "on-tasks": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-tasks.git",
+    "on-tasks": "git+http://5f5fdee3b5f3bc054cece98ad854c3090043f3c0:x-oauth-basic@github.com/RackHD/on-tasks.git",
     "pluralize": "~1.1.2",
     "sockjs": "^0.3.12"
   },
