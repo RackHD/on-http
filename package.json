@@ -13,7 +13,7 @@
     "url": "https://github.com/RackHD/on-http.git"
   },
   "author": "",
-  "license": "Proprietary",
+  "license": "Apache-2.0",
   "dependencies": {
     "body-parser": "^1.10.1",
     "cors": "^2.5.2",
