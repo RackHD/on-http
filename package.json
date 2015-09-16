@@ -29,7 +29,8 @@
     "on-finished": "^2.2.0",
     "on-tasks": "git+https://5f5fdee3b5f3bc054cece98ad854c3090043f3c0:x-oauth-basic@github.com/RackHD/on-tasks.git",
     "pluralize": "~1.1.2",
-    "sockjs": "^0.3.12"
+    "sockjs": "^0.3.12",
+    "ws": "^0.8.0"
   },
   "devDependencies": {
     "apidoc": "^0.12.1",
