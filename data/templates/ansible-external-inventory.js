@@ -1,5 +1,6 @@
 #!/usr/bin/nodejs
 
+// Copyright 2015, EMC, Inc.
 'use strict';
 
 var command = process.argv[2];
