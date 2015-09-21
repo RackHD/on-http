@@ -29,7 +29,7 @@ describe('Http.Server', function () {
     var Serializable;
     var MockSerializable;
     var ThrowSerializable;
-
+    var Promise;
 
     before('set up test dependencies', function() {
         MockSerializable = function () {
@@ -72,6 +72,7 @@ describe('Http.Server', function () {
         rest = helper.injector.get('Http.Services.RestApi');
         Errors = helper.injector.get('Errors');
         Serializable = helper.injector.get('Serializable');
+        Promise = helper.injector.get('Promise');
 
         util.inherits(MockSerializable, Serializable);
         util.inherits(ThrowSerializable, Serializable);
