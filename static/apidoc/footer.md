@@ -1,2 +1,2 @@
 
-&copy;2014,2015 EMC
+&copy;2015, EMC, Inc.
