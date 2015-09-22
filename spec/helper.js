@@ -43,26 +43,29 @@ helper.request = function (url, options) {
         var orig = agent[method];
         agent[method] = function () {
             var test = orig.apply(agent, arguments);
+
             test.then = function (successCallback, errorCallback) {
-                var deferred = Q.defer();
-                test.end(function(err, res) {
-                    if (err) {
-                        // if a status check fails, supertest will pass the res object as well.
-                        // so, append some extra verbosity to the error for the report.
-                        if (res) {
-                            var output = res.body || res.text;
-                            err.message +=
-                            '\nResponse body:\n'+
-                            util.inspect(output) +
-                            '\n' + err.stack;
+                var deferred = new Promise(function (resolve, reject) {
+                    test.end(function(err, res) {
+                        if (err) {
+                            // if a status check fails, supertest will pass the res object as well.
+                            // so, append some extra verbosity to the error for the report.
+                            if (res) {
+                                var output = res.body || res.text;
+                                err.message +=
+                                '\nResponse body:\n'+
+                                util.inspect(output) +
+                                '\n' + err.stack;
+                            }
+                            reject(err);
+                            return;
+                        } else {
+                            resolve(res);
                         }
-                        deferred.reject(err);
-                        return;
-                    } else {
-                        deferred.resolve(res);
-                    }
+                    });
                 });
-                return deferred.promise.then(successCallback, errorCallback);
+
+                return deferred.then(successCallback, errorCallback);
             };
             return test;
         };

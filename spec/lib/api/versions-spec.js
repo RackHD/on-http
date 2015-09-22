@@ -26,10 +26,10 @@ describe('Http.Api.Versions', function () {
     describe('GET /versions', function() {
 
         it('should return a package version structure', function () {
-            stubRun.returns(Q.resolve({
+            stubRun.resolves({
                 stdout: 'ii somePackage 1.0',
                 stderr: undefined
-            }));
+            });
             return helper.request().get('/api/1.1/versions/')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
@@ -41,9 +41,9 @@ describe('Http.Api.Versions', function () {
         });
 
         it('should return a 501 error if dpkg command fails', function () {
-            stubRun.returns(Q.reject({
+            stubRun.resolves({
                 code: '-1'
-            }));
+            });
             return helper.request().get('/api/1.1/versions/')
                 .expect('Content-Type', /^application\/json/)
                 .expect(501);

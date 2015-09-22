@@ -8,7 +8,7 @@ describe('Http.Api.Nodes', function () {
     var waterline;
     var ObmService;
     var taskGraphProtocol;
-    var Q;
+    var Promise;
     var Errors;
 
     before('start HTTP server', function () {
@@ -29,7 +29,7 @@ describe('Http.Api.Nodes', function () {
             taskGraphProtocol = helper.injector.get('Protocol.TaskGraphRunner');
             sinon.stub(taskGraphProtocol);
 
-            Q = helper.injector.get('Q');
+            Promise = helper.injector.get('Promise');
             Errors = helper.injector.get('Errors');
         });
 
@@ -420,7 +420,7 @@ describe('Http.Api.Nodes', function () {
 
     describe('GET /nodes/:identifier/catalogs/:source', function() {
         it('should return a single catalog', function () {
-            waterline.nodes.needByIdentifier.resolves(Q.resolve({
+            waterline.nodes.needByIdentifier.resolves(Promise.resolve({
 
                 id: '123',
                 name: '123'

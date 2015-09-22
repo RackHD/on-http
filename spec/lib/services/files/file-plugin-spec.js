@@ -12,7 +12,7 @@ describe("fileService disk backend", function() {
         fs,
         waterline,
         execker,
-        Q;
+        Promise;
 
     beforeEach(function(){
         helper.setupInjector(
@@ -33,7 +33,7 @@ describe("fileService disk backend", function() {
             sha: 'I am another hash'
         };
 
-        Q = helper.injector.get('Q');
+        Promise = helper.injector.get('Promise');
         BackendFS = helper.injector.get('Files.FS');
         backend = new BackendFS(config);
     });
@@ -128,23 +128,20 @@ describe("fileService disk backend", function() {
     });
 
     it("should fail and clean up if waterline validation fails for put", function(){
-        var fakeStream = new EventEmitter(),
-            deferred = Q.defer();
+        var fakeStream = new EventEmitter();
 
-        fs.createWriteStream.returns(fakeStream);
-        fakeStream.on('error', function(){
-            deferred.resolve();
-        });
-        waterline.files.create.returns(Q.reject());
+        return new Promise(function (resolve) {
+            fs.createWriteStream.returns(fakeStream);
+            fakeStream.on('error', function(){
+                resolve();
+            });
+            waterline.files.create.returns(Promise.reject());
 
-        backend.put('aFilename.txt');
-        fakeStream.emit('metadata', {md5: 'an md5', sha256: 'a sha256'});
-
-        return deferred.promise.then(function() {
+            backend.put('aFilename.txt');
+            fakeStream.emit('metadata', {md5: 'an md5', sha256: 'a sha256'});
+        }).then(function() {
             fs.unlink.callCount.should.equal(1);
-        }).should.be.fulfilled;
-
-
+        });
     });
 
     it("should return a list of available files", function() {
