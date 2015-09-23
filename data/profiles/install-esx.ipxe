@@ -6,6 +6,6 @@ chain tftp://<%=server%>/undionly.kpxe
 boot
 
 :is_efi
-kernel http://<%=server%>:<%=port%>/vmware/efi/boot/bootx64.efi -c http://<%=se$
+kernel http://<%=server%>:<%=port%>/vmware/efi/boot/bootx64.efi -c http://<%=server%>:<%=port%>/api/common/templates/<%=esxBootConfigTemplate%>
 boot
 
