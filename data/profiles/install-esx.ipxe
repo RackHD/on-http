@@ -1,6 +1,11 @@
-set 209:string http://<%=server%>:<%=port%>/api/common/templates/esx-pxelinux-cfg
-chain tftp://<%=server%>/undionly.kpxe || goto uefiboot
+iseq ${platform} efi && goto is_efi || goto not_efi
+
+:not_efi
+set 209:string http://<%=server%>:<%=port%>/api/common/templates/esx-pxelinux-c$
+chain tftp://<%=server%>/undionly.kpxe
 boot
-:uefiboot
-kernel http://<%=repo%>/efi/boot/bootx64.efi -c http://<%=server%>:<%=port%>/api/common/templates/<%=esxBootConfigTemplate%>
+
+:is_efi
+kernel http://<%=server%>:<%=port%>/vmware/efi/boot/bootx64.efi -c http://<%=se$
 boot
+
