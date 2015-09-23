@@ -3,6 +3,8 @@
 
 'use strict';
 
+var ws = require('ws');
+
 describe('common-api-router', function () {
 
     helper.before(function () {
@@ -10,7 +12,8 @@ describe('common-api-router', function () {
             helper.require('/lib/api/index.js'),
             helper.requireGlob('/lib/**/*.js'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
-            dihelper.simpleWrapper({}, 'ipmi-obm-service')
+            dihelper.simpleWrapper({}, 'ipmi-obm-service'),
+            dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
         ];
     });
 

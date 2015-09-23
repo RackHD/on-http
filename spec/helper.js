@@ -4,30 +4,39 @@
 
 require('on-core/spec/helper');
 
-var di = require('di');
+var ws = require('ws');
+
 var util = require('util');
-global.core = require('on-core')(di);
-global.dihelper = core.helper;
+
+global.onHttpContext = require('../index')();
+
+// Legacy
+global.dihelper = onHttpContext.helper;
 
 helper.startServer = function (overrides) {
+    overrides = (overrides || []).concat([
+        onHttpContext.helper.simpleWrapper({
+            publishLog: sinon.stub().resolves()
+        }, 'Protocol.Logging'),
+        onHttpContext.helper.simpleWrapper({
+            lookupIpLease: sinon.stub().resolves('00:00:00:00:00:00')
+        }, 'Protocol.Dhcp')
+    ]);
 
     helper.setupInjector(_.flatten([
-            require('on-tasks').injectables,
-            dihelper.simpleWrapper(require('express')(), 'express-app'),
-            dihelper.simpleWrapper({
-                publishLog: sinon.stub().resolves()
-            }, 'Protocol.Logging'),
-            dihelper.simpleWrapper({
-                lookupIpLease: sinon.stub().resolves('00:00:00:00:00:00')
-            }, 'Protocol.Dhcp'),
-            helper.requireGlob('/lib/**/*.js'),
-            helper.require('/app.js')
-    ].concat(overrides || [])));
+        onHttpContext.prerequisiteInjectables,
+        onHttpContext.expressApp(),
+        onHttpContext.injectables,
+        overrides
+    ]));
+
     helper.setupTestConfig();
+
     helper.injector.get('Services.Configuration')
         .set('httpEnabled', true)
         .set('httpsEnabled', false)
         .set('httpBindPort', 8089);
+
     return helper.injector.get('Http').start();
 };
 

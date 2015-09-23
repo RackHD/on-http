@@ -3,42 +3,84 @@
 
 'use strict';
 
-var di = require('di'),
-    _ = require('lodash'),
-    core = require('on-core')(di),
-    tasks = require('on-tasks'),
-    injector = new di.Injector(
-        _.flatten([
-            core.injectables,
-            tasks.injectables,
-            core.helper.simpleWrapper(require('express')(), 'express-app', undefined, __dirname),
-            core.helper.requireGlob(__dirname + '/lib/**/*.js'),
+var _ = require('lodash'),
+    _di = require('di'),
+    express = require('express'),
+    onCore = require('on-core'),
+    onTasks = require('on-tasks'),
+    ws = require('ws');
+
+module.exports = onHttpContextFactory;
+
+function onHttpContextFactory(di, directory) {
+    di = di || _di;
+
+    var core = onCore(di, directory),
+        helper = core.helper;
+
+    return {
+        expressApp: function () {
+            return helper.simpleWrapper(express(), 'express-app', undefined, __dirname);
+        },
+
+        helper: helper,
+
+        initialize: function () {
+            var injector = new di.Injector(_.flatten([
+                core.injectables,
+                this.prerequisiteInjectables,
+                this.expressApp(),
+                this.injectables
+            ]));
+
+            this.http = injector.get('Http'),
+            this.injector = injector;
+            this.logger = injector.get('Logger').initialize('Http.Server');
+
+            return this;
+        },
+
+        injectables: _.flatten([
+            helper.requireGlob(__dirname + '/lib/**/*.js'),
             require('./app')
+        ]),
+
+        prerequisiteInjectables: _.flatten([
+            onTasks.injectables,
+            helper.simpleWrapper(ws, 'ws'),
+            helper.simpleWrapper(ws.Server, 'WebSocketServer')
         ])
-    ),
-    http = injector.get('Http'),
-    logger = injector.get('Logger').initialize('Http.Server');
+    }
+}
 
-http.start()
-    .then(function () {
-        logger.info('Server Started.');
-    })
-    .catch(function(error) {
-        logger.error('Server Startup Error.', { error: error });
+if (require.main === module) run();
 
-        process.nextTick(function() {
-            process.exit(1);
-        });
-    });
+function run() {
+    var onHttpContext = onHttpContextFactory().initialize(),
+        http = onHttpContext.http,
+        logger = onHttpContext.logger;
 
-process.on('SIGINT', function() {
-    http.stop()
-        .catch(function(error) {
-            logger.error('Server Shutdown Error.', { error: error });
+    http.start()
+        .then(function () {
+            logger.info('Server Started.');
         })
-        .finally(function() {
+        .catch(function(error) {
+            logger.error('Server Startup Error.', { error: error });
+
             process.nextTick(function() {
                 process.exit(1);
             });
         });
-});
+
+    process.on('SIGINT', function() {
+        http.stop()
+            .catch(function(error) {
+                logger.error('Server Shutdown Error.', { error: error });
+            })
+            .finally(function() {
+                process.nextTick(function() {
+                    process.exit(1);
+                });
+            });
+    });
+}

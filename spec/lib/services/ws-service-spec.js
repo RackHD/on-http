@@ -7,18 +7,14 @@ var WebSocket = require('ws');
 
 describe('Services.WebSocket', function () {
     var app,
-            server;
+        server;
 
     helper.before(function () {
         return [
-            dihelper.simpleWrapper(require('express')(), 'express-app', undefined, __dirname),
-            dihelper.simpleWrapper({}, 'Task.Services.OBM'),
-            dihelper.simpleWrapper({}, 'ipmi-obm-service'),
-            helper.require('/lib/services/ws-service'),
-            helper.require('/lib/services/http-service'),
-            helper.require('/node_modules/on-core/lib/services/waterline'),
-            helper.require('/node_modules/on-core/lib/models/catalog'),
-            helper.require('/node_modules/on-core/lib/services/messenger'),
+            onHttpContext.helper.simpleWrapper(require('express')(), 'express-app'),
+            onHttpContext.helper.simpleWrapper(WebSocket.Server, 'WebSocketServer'),
+            onHttpContext.helper.simpleWrapper({}, 'Task.Services.OBM'),
+            onHttpContext.helper.simpleWrapper({}, 'ipmi-obm-service'),
             helper.requireGlob('/lib/**/*.js')
         ];
     });

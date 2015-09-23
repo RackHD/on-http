@@ -3,12 +3,15 @@
 
 'use strict';
 
+var ws = require('ws');
+
 describe('Http.Server', function () {
     var app, server;
 
     helper.before(function () {
         return [
-            dihelper.simpleWrapper(require('express')(), 'express-app', undefined, __dirname),
+            dihelper.simpleWrapper(require('express')(), 'express-app'),
+            dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
             dihelper.simpleWrapper({}, 'ipmi-obm-service'),
             helper.require('/lib/services/http-service'),

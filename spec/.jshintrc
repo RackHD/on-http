@@ -76,7 +76,6 @@
         "dihelper": false,
         "_": false,
         "Q": false,
-        "core": false
+        "onHttpContext": false
     }
 }
-
