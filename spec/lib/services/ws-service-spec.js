@@ -32,7 +32,7 @@ describe('Services.WebSocket', function () {
 
     after(function () {
         server.close();
-    })
+    });
 
     helper.after();
 
@@ -82,7 +82,8 @@ describe('Services.WebSocket', function () {
                         expect(msg.handler).to.equal('list');
                         next();
                     };
-                    ws.send(JSON.stringify({handler: 'query', resource: 'catalogs', params: {id: null}}));
+                    ws.send(JSON.stringify(
+                        {handler: 'query', resource: 'catalogs', params: {id: null}}));
                 });
             });
 
@@ -110,7 +111,8 @@ describe('Services.WebSocket', function () {
                         expect(msg.handler).to.equal('item');
                         next();
                     };
-                    ws.send(JSON.stringify({handler: 'get', resource: 'catalogs', params: {id: null}}));
+                    ws.send(JSON.stringify(
+                        {handler: 'get', resource: 'catalogs', params: {id: null}}));
                 });
             });
 
@@ -179,7 +181,7 @@ describe('Services.WebSocket', function () {
             describe('stop', function () {
                 it('should unsubscribe', function (next) {
                     ws.onerror = next;
-                    ws.onmessage = function (event) {
+                    ws.onmessage = function () {
                         next('Got message when one was not expected');
                     };
                     ws.send(JSON.stringify({handler: 'stop', resource: 'catalogs'}));
@@ -231,7 +233,7 @@ describe('Services.WebSocket', function () {
             describe('stop', function () {
                 it('should unsubscribe', function (next) {
                     ws.onerror = next;
-                    ws.onmessage = function (event) {
+                    ws.onmessage = function () {
                         next('Got message when one was not expected');
                     };
                     ws.send(JSON.stringify({handler: 'stop', resource: 'mq', params: {
