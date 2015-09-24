@@ -1,5 +1,4 @@
 // Copyright 2015, EMC, Inc.
-/* jshint: node:true */
 
 'use strict';
 
@@ -50,10 +49,10 @@ function onHttpContextFactory(di, directory) {
             helper.simpleWrapper(ws, 'ws'),
             helper.simpleWrapper(ws.Server, 'WebSocketServer')
         ])
-    }
+    };
 }
 
-if (require.main === module) run();
+if (require.main === module) { run(); }
 
 function run() {
     var onHttpContext = onHttpContextFactory().initialize(),
