@@ -1,0 +1,53 @@
+accepteula
+clearpart --alldrives --overwritevmfs
+install --firstdisk --overwritevmfs
+rootpw password
+network --bootproto=dhcp --device=vmnic0
+reboot
+
+%firstboot --interpreter=busybox
+# enable VHV (Virtual Hardware Virtualization to run nested 64bit Guests + Hyper-V VM)
+grep -i "vhv.enable" /etc/vmware/config || echo "vhv.enable = \"TRUE\"" >> /etc/vmware/config
+
+vim-cmd hostsvc/enable_ssh
+vim-cmd hostsvc/start_ssh
+vim-cmd hostsvc/enable_esx_shell
+vim-cmd hostsvc/start_esx_shell
+
+#suppress shell warnings
+esxcli system settings advanced set -o /UserVars/SuppressShellWarning -i 1
+
+#Set the ESXi Shell Interactive idle time logout
+esxcli system settings advanced set -o /UserVars/ESXiShellInteractiveTimeout -i 3600
+
+# disable firewall
+esxcli network firewall set --default-action false --enabled no
+ 
+#copy the SSH key over 
+wget http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub -O /vmfs/volumes/datastore1/authorized_keys
+#wget <%=repo%>/api/common/templates/renasar-ansible.pub -O /vmfs/volumes/datastore1/authorized_keys
+
+cat /vmfs/volumes/datastore1/authorized_keys >> /etc/ssh/keys-root/authorized_keys
+rm /vmfs/volumes/datastore1/authorized_keys
+
+#setup ntp
+cat > /etc/ntp.conf << __NTP_CONFIG__
+restrict default kod nomodify notrap noquerynopeer
+restrict 127.0.0.1 kkl,lkl
+server 0.vmware.pool.ntp.org
+server 1.vmware.pool.ntp.org
+__NTP_CONFIG__
+/sbin/chkconfig ntpd on
+
+#backup ESXi configuration to persist it
+/sbin/auto-backup.sh
+
+#enter maintenance mode
+esxcli system maintenanceMode set -e true
+
+copy the first boot logs 
+cp /var/log/hostd.log "/vmfs/volumes/datastore1/firstboot-hostd.log"
+cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.log"
+
+#reboot the system after host configuration
+esxcli system shutdown reboot -d 5 -r "Rebooting after first boot host configuration"
