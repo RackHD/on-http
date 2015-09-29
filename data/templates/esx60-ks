@@ -1,7 +1,7 @@
 accepteula
 clearpart --alldrives --overwritevmfs
 install --firstdisk --overwritevmfs
-rootpw password
+rootpw <%=rootPlainPassword%>
 network --bootproto=dhcp --device=vmnic0
 reboot
 
@@ -22,13 +22,25 @@ esxcli system settings advanced set -o /UserVars/ESXiShellInteractiveTimeout -i 
 
 # disable firewall
 esxcli network firewall set --default-action false --enabled no
- 
-#copy the SSH key over 
-wget http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub -O /vmfs/volumes/datastore1/authorized_keys
-#wget <%=repo%>/api/common/templates/renasar-ansible.pub -O /vmfs/volumes/datastore1/authorized_keys
 
-cat /vmfs/volumes/datastore1/authorized_keys >> /etc/ssh/keys-root/authorized_keys
-rm /vmfs/volumes/datastore1/authorized_keys
+# set hostname and domain
+esxcli system hostname set --domain <%=domain%> --host <%=hostname%>
+
+#config root account
+rootpw
+<% if (typeof rootSshKey !== 'undefined') { %>
+    echo <%=rootSshKey%> > /etc/ssh/keys-root/authorized_keys
+<%} %>
+
+#create users
+<% for (var i = 0; i < users.length; i++) { %>
+    /usr/lib/vmware/auth/bin/adduser -s /bin/sh -G root -h / -D <%=users[i].name%>
+    echo <%=users[i].plainPassword%> | passwd <%=users[i].name%> --stdin
+    <% if (typeof users[i].sshKey != 'undefined') { %>
+        mkdir /etc/ssh/keys-<%=users[i].name%>
+        echo <%=users[i].sshKey%> > /etc/ssh/keys-<%=users[i].name%>/authorized_keys
+    <%} %>
+<%} %>
 
 #setup ntp
 cat > /etc/ntp.conf << __NTP_CONFIG__
@@ -45,9 +57,12 @@ __NTP_CONFIG__
 #enter maintenance mode
 esxcli system maintenanceMode set -e true
 
-copy the first boot logs 
+copy the first boot logs
 cp /var/log/hostd.log "/vmfs/volumes/datastore1/firstboot-hostd.log"
 cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.log"
+
+#signify ORA the installation completed
+/usr/bin/wget --spider http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub
 
 #reboot the system after host configuration
 esxcli system shutdown reboot -d 5 -r "Rebooting after first boot host configuration"
