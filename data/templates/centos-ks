@@ -16,15 +16,15 @@ network --device=<%=macaddress%> --noipv6 --activate
 #enable syslog
 logging --host=<%=server%> --level=info
 
-# create a renasar user
 authconfig --enableshadow --passalgo=sha512 --enablefingerprint
-user --name=<%=username%> --uid=<%=uid%> --iscrypted --password $6$Qey9BDGE2c1$qNz2CArubDFY9n3qIb7spwFx9Tp.lBR9zfO/1eDyq7PTF5XwEAO8s7hcLfH5gkS/JUE0UABCutH474wkfaBII1
 
-# create an emc user
-user --name=emc --iscrypted --password $6$kS13aboz$s3V1/argaAqwpUR5xgCl3zc8x1nndOwGJfyMJMPrLBJp5TFtMY2.ymKVm.KTLWa0FAqtrQreGilBUtloK.rYr1
+#Set the root account
+rootpw --iscrypted <%=rootEncryptedPassword%>
 
-#Set the root password
-rootpw --iscrypted $6$sdf/X8EE0A$IPj0CkwyeXzBvxYL0aDwRtd4CC8E/RYHBK3REOYNh40nt2j5QbOCEo72gUPn63YvpJLx2.LlnLv3GFIGUOwTT0
+#create all users
+<% users.forEach(function(user) { %>
+    user --name=<%=user.name%> --uid=<%=user.uid%> --iscrypted --password <%=user.encryptedPassword%>
+<% }) %>
 
 # Disk Partitioning
 zerombr
@@ -60,11 +60,27 @@ net-tools
 # PLACE YOUR POST DIRECTIVES HERE
 PATH=/bin:/sbin:/usr/bin:/usr/sbin
 export PATH
-echo "renasar ALL=(ALL)       ALL" >> /etc/sudoers
-echo "emc ALL=(ALL)       ALL" >> /etc/sudoers
-mkdir /home/<%=username%>/.ssh;
-/usr/bin/wget http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub -O /home/<%=username%>/.ssh/authorized_keys
-chown -R <%=username%>:<%=username%> /home/<%=username%>/.ssh
+
+# copying of SSH key
+<% if (typeof rootSshKey !== 'undefined') { %>
+    mkdir /root/.ssh
+    echo <%=rootSshKey%> > /root/.ssh/authorized_keys
+    chown -R root:root /root/.ssh
+<% } %>
+<% users.forEach(function(user) { %>
+    <% if (typeof user.sshKey !== 'undefined') { %>
+        mkdir /home/<%=user.name%>/.ssh
+        echo <%=user.sshKey%> > /home/<%=user.name%>/.ssh/authorized_keys
+        chown -R <%=user.name%>:<%=user.name%> /home/<%=user.name%>/.ssh
+    <% } %>
+<% }) %>
+
+#set hostname
+echo <%=hostname%> > /etc/hostname
+echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/network
+
+#signify ORA the installation completed
+/usr/bin/wget --spider http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub
 
 ) 2>&1 >/root/install-post-sh.log
 EOF
