@@ -22,9 +22,9 @@ authconfig --enableshadow --passalgo=sha512 --enablefingerprint
 rootpw --iscrypted <%=rootEncryptedPassword%>
 
 #create all users
-<% for (var i = 0; i < users.length; i++) { %>
-    user --name=<%=users[i].name%> --uid=<%=users[i].uid%> --iscrypted --password <%=users[i].encryptedPassword%>
-<% } %>
+<% users.forEach(function(user) { %>
+    user --name=<%=user.name%> --uid=<%=user.uid%> --iscrypted --password <%=user.encryptedPassword%>
+<% }) %>
 
 # Disk Partitioning
 zerombr
@@ -60,8 +60,6 @@ net-tools
 # PLACE YOUR POST DIRECTIVES HERE
 PATH=/bin:/sbin:/usr/bin:/usr/sbin
 export PATH
-#echo "renasar ALL=(ALL)       ALL" >> /etc/sudoers
-#echo "emc ALL=(ALL)       ALL" >> /etc/sudoers
 
 # copying of SSH key
 <% if (typeof rootSshKey !== 'undefined') { %>
@@ -69,13 +67,13 @@ export PATH
     echo <%=rootSshKey%> > /root/.ssh/authorized_keys
     chown -R root:root /root/.ssh
 <% } %>
-<% for (var i = 0; i < users.length; i++) { %>
-    <% if (typeof users[i].sshKey !== 'undefined') { %>
-        mkdir /home/<%=users[i].name%>/.ssh
-        echo <%=users[i].sshKey%> > /home/<%=users[i].name%>/.ssh/authorized_keys
-        chown -R <%=users[i].name%>:<%=users[i].name%> /home/<%=users[i].name%>/.ssh
+<% users.forEach(function(user) { %>
+    <% if (typeof user.sshKey !== 'undefined') { %>
+        mkdir /home/<%=user.name%>/.ssh
+        echo <%=user.sshKey%> > /home/<%=user.name%>/.ssh/authorized_keys
+        chown -R <%=user.name%>:<%=user.name%> /home/<%=user.name%>/.ssh
     <% } %>
-<% } %>
+<% }) %>
 
 #set hostname
 echo <%=hostname%> > /etc/hostname

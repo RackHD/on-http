@@ -27,20 +27,19 @@ esxcli network firewall set --default-action false --enabled no
 esxcli system hostname set --domain <%=domain%> --host <%=hostname%>
 
 #config root account
-rootpw
 <% if (typeof rootSshKey !== 'undefined') { %>
     echo <%=rootSshKey%> > /etc/ssh/keys-root/authorized_keys
 <%} %>
 
 #create users
-<% for (var i = 0; i < users.length; i++) { %>
-    /usr/lib/vmware/auth/bin/adduser -s /bin/sh -G root -h / -D <%=users[i].name%>
-    echo <%=users[i].plainPassword%> | passwd <%=users[i].name%> --stdin
-    <% if (typeof users[i].sshKey != 'undefined') { %>
-        mkdir /etc/ssh/keys-<%=users[i].name%>
-        echo <%=users[i].sshKey%> > /etc/ssh/keys-<%=users[i].name%>/authorized_keys
+<% users.forEach(function(user) { %>
+    /usr/lib/vmware/auth/bin/adduser -s /bin/sh -G root -h / -D <%=user.name%>
+    echo <%=user.plainPassword%> | passwd <%=user.name%> --stdin
+    <% if (typeof user.sshKey !== 'undefined') { %>
+        mkdir /etc/ssh/keys-<%=user.name%>
+        echo <%=user.sshKey%> > /etc/ssh/keys-<%=user.name%>/authorized_keys
     <%} %>
-<%} %>
+<%}) %>
 
 #setup ntp
 cat > /etc/ntp.conf << __NTP_CONFIG__
