@@ -7,7 +7,6 @@ var http = require('http'),
     path = require('path'),
     childProcess = require('child_process'),
     exec = childProcess.exec,
-    execFile = childProcess.execFile,
     server = '<%=server%>',
     port = '<%=port%>',
     tasksPath = '/api/common/tasks/<%=identifier%>',
@@ -160,7 +159,7 @@ function executeTasks(data, timeout) {
                     handleExecResult(task, done, error);
                 } else {
                     console.log(task.cmd);
-                    execFile(task.cmd, { maxBuffer: MAX_BUFFER }, function(error, stdout, stderr) {
+                    exec(task.cmd, { maxBuffer: MAX_BUFFER }, function(error, stdout, stderr) {
                         handleExecResult(task, done, error, stdout, stderr);
                     });
                 }
