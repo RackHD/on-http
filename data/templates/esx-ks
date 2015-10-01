@@ -1,5 +1,9 @@
 accepteula
-clearpart --alldrives
+<% if (version == "5.5") { %>
+  clearpart --alldrives
+<% } else { %>
+  clearpart --alldrives --overwritevmfs
+<% } %>
 install --firstdisk --overwritevmfs
 rootpw <%=rootPlainPassword%>
 network --bootproto=dhcp --device=vmnic0
@@ -56,12 +60,57 @@ __NTP_CONFIG__
 #enter maintenance mode
 esxcli system maintenanceMode set -e true
 
-copy the first boot logs
+#copy the first boot logs
 cp /var/log/hostd.log "/vmfs/volumes/datastore1/firstboot-hostd.log"
 cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.log"
+<% if( undefined !== dnsServers ) { %>
+  esxcli network ip dns search add <%=domain%>
+  <% dnsServers.forEach(function(dns) { %>
+    esxcli network ip dns server add --server=<%= dns %>
+  <% }); %>
+<% } %>
 
 #signify ORA the installation completed
 /usr/bin/wget --spider http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub
+
+<% vmkid = 0 %>
+<% if( undefined !== networkDevices ) { %>
+  <% networkDevices.forEach(function(n) { %>
+    <% if( undefined != n.ipv4 ) { %>
+      <% if( undefined != n.ipv4.vlanId ) { %>
+        <% n.ipv4.vlanId.forEach(function(vid) { %>
+          <% vmkname = 'vmk' + vmkid++ %>
+          esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+          esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>.<%=vid%>
+          esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
+          esxcli network vswitch standard portgroup set -p <%=n.device%>.<%=vid%> -v <%=vid %>
+        <% }); %>
+      <% } else { %>
+        <% vmkname = 'vmk' + vmkid++ %>
+        esxcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+        esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
+        esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
+      <% } %>
+    <% } %>
+    <% if( undefined != n.ipv6 ) { %>
+      <% if( undefined != n.ipv6.vlanId ) { %>
+        <% n.ipv6.vlanId.forEach(function(vid) { %>
+          <% vmkname = 'vmk' + vmkid++ %>
+          esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+          esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>.<%=vid%>
+          esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
+          esxcli network vswitch standard portgroup set -p <%=n.device%>.<%=vid%> -v <%=vid %>
+        <% }); %>
+      <% } else { %>
+        <% vmkname = 'vmk' + vmkid++ %>
+        esxcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+        esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
+        esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
+      <% } %>
+    <% } %>
+  <% }); %>
+<% } %>
+
 
 #reboot the system after host configuration
 esxcli system shutdown reboot -d 5 -r "Rebooting after first boot host configuration"
