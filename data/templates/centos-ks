@@ -79,6 +79,71 @@ export PATH
 echo <%=hostname%> > /etc/hostname
 echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/network
 
+# Setup static network configuration
+<% if( undefined !== networkDevices ) { %>
+  <% ipv6 = 0 %>
+  <% networkDevices.forEach(function(n) { %>
+    <% if( undefined != n.ipv4 ) { %>
+      <% if( undefined != n.ipv4.vlanId ) { %>
+        <% n.ipv4.vlanId.forEach(function(vid) { %>
+          echo "Configuring vlan <%=vid%> on <%=n.device%>"
+          echo "DEVICE=<%=n.device%>.<%=vid%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          echo "BOOTPROTO=none" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          echo "IPADDR=<%=n.ipv4.ipAddr%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          echo "NETMASK=<%=n.ipv4.netmask%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          echo "GATEWAY=<%=n.ipv4.gateway%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          echo "VLAN=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+        <% }); %>
+      <% } else { %>
+        echo "Configuring device <%=n.device%>"
+        echo "DEVICE=<%=n.device%>.<%=vid%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        echo "BOOTPROTO=none" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        echo "IPADDR=<%=n.ipv4.ipAddr%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        echo "NETMASK=<%=n.ipv4.netmask%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        echo "GATEWAY=<%=n.ipv4.gateway%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+      <% } %>
+    <% } %>
+    <% if( undefined != n.ipv6 ) { %>
+      <% if( undefined != n.ipv6.vlanId ) { %>
+        <% n.ipv6.vlanId.forEach(function(vid) { %>
+          echo "Configuring vlan <%=vid%> on <%=n.device%>"
+          echo "DEVICE=<%=n.device%>.<%=vid%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          echo "BOOTPROTO=none" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          echo "IPV6INIT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          echo "IPV6ADDR=<%=n.ipv6.ipAddr%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          echo "IPV6_DEFAULTGW=<%=n.ipv6.gateway%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          echo "VLAN=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          <% ipv6 = 1 %>
+        <% }); %>
+      <% } else { %>
+        echo "Configuring device <%=n.device%>"
+        echo "DEVICE=<%=n.device%>.<%=vid%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        echo "BOOTPROTO=none" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        echo "IPV6INIT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        echo "IPV6ADDR=<%=n.ipv6.ipAddr%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        echo "IPV6_DEFAULTGW=<%=n.ipv6.gateway%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        <% ipv6 = 1 %>
+      <% } %>
+    <% } %>
+  <% }); %>
+  <% if( ipv6 ) { %>
+    grep -q -F 'NETWORKING_IPV6=yes' /etc/sysconfig/network || echo "NETWORKING_IPV6=yes" >> /etc/sysconfig/network
+  <% } %>
+<% } %>
+
+# Setup DNS servers
+<% if( undefined !== dnsServers ) { %>
+  echo "search <%=domain%>" > /etc/resolv.conf
+  <% dnsServers.forEach(function(dns) { %>
+    echo "nameserver <%=dns%>" >> /etc/resolv.conf
+  <% }) %>
+  chattr +i /etc/resolv.conf
+<% } %>
+
 #signify ORA the installation completed
 /usr/bin/wget --spider http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub
 
