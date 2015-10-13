@@ -19,6 +19,7 @@ describe('Http.Api.Nodes', function () {
             sinon.stub(configuration);
 
             waterline = helper.injector.get('Services.Waterline');
+            sinon.stub(waterline.lookups);
             sinon.stub(waterline.nodes);
             sinon.stub(waterline.catalogs);
             sinon.stub(waterline.workitems);
@@ -43,6 +44,7 @@ describe('Http.Api.Nodes', function () {
         }
 
         resetStubs(configuration);
+        resetStubs(waterline.lookups);
         resetStubs(waterline.nodes);
         resetStubs(waterline.catalogs);
         resetStubs(waterline.workitems);
@@ -246,23 +248,29 @@ describe('Http.Api.Nodes', function () {
 
     describe('DELETE /nodes/:identifier', function () {
         it('should delete a node', function () {
-            waterline.nodes.destroyByIdentifier.resolves(node);
+            waterline.nodes.needByIdentifier.resolves(node)
+            taskGraphProtocol.getActiveTaskGraph.resolves();
+            waterline.lookups.destroy.resolves();
+            waterline.nodes.destroy.resolves();
+            waterline.catalogs.destroy.resolves();
             waterline.workitems.destroy.resolves();
 
             return helper.request().delete('/api/1.1/nodes/1234')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, node)
                 .expect(function () {
-                    expect(waterline.nodes.destroyByIdentifier).to.have.been.calledOnce;
-                    expect(waterline.nodes.destroyByIdentifier).to.have.been.calledWith('1234');
+                    expect(taskGraphProtocol.getActiveTaskGraph).to.have.been.calledOnce;
+                    expect(waterline.lookups.destroy).to.have.been.calledOnce;
+                    expect(waterline.nodes.destroy).to.have.been.calledOnce;
+                    expect(waterline.catalogs.destroy).to.have.been.calledOnce;
                     expect(waterline.workitems.destroy).to.have.been.calledOnce;
-                    expect(waterline.workitems.destroy.firstCall.args[0])
-                        .to.have.property('node').that.equals(node.id);
+                    expect(waterline.nodes.destroy.firstCall.args[0])
+                        .to.have.property('id').that.equals(node.id);
                 });
         });
 
         it('should return a 404 if the node was not found', function () {
-            waterline.nodes.destroyByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
             return helper.request().delete('/api/1.1/nodes/1234')
                 .expect('Content-Type', /^application\/json/)
