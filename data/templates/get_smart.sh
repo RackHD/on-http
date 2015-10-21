@@ -73,22 +73,21 @@ do
         # Added by Ted.Chen@emc.com
         #
         # Controller information including:
-        #     Controller Name - Example: LSI Logic / Symbios Logic MegaRAID SAS-3 3108 [Invader] (rev 02).
-        #     Controller ID
+        #     controller_name - Example: LSI Logic / Symbios Logic MegaRAID SAS-3 3108 [Invader] (rev 02).
+        #     controller_ID - The scsi host ID read from /sys/class/scsi_host/hostx
+        #     controller_PCI_BDF: The PCIe domain:bus:device.function ID of the SAS controller.
         ####################################
 
         is_megaraid=$(  echo "${my_type}" | grep -w "megaraid" );
 
         if [ $is_megaraid ] ; then 			# Seeking for HDDs with megaraid type
             # $line example :
-            #   $line = /dev/bus/0 -d megaraid,1 # /dev/bus/0 [megaraid_disk_01], SCSI device, or
-            #   $line = /dev/sda -d scsi # /dev/sda, SCSI device'
+            #   $line = /dev/bus/0 -d megaraid,1 # /dev/bus/0 [megaraid_disk_01], SCSI device
             my_ctrl_num=$( echo "$line" | awk '{print $1}' | awk -F / '{print $4}');    #The controller ID
         else # HDDs other than megaraid type
             # example :
-            #   $line = /dev/bus/0 -d megaraid,1 # /dev/bus/0 [megaraid_disk_01], SCSI device, or
             #   $line = /dev/sda -d scsi # /dev/sda, SCSI device'
-            my_disk_name=$( echo "$line" | awk '{print $1}');    #The controller ID
+            my_disk_name=$( echo "$line" | awk '{print $1}');    #The disk name, ie. /dev/sda
             # example of lsscsi output: [10:0:0:0]   disk    ATA      SATADOM-SV 3SE   710   /dev/sda
             my_ctrl_num=$(lsscsi | grep $my_disk_name | awk -F : '{print $1}' | awk -F [ '{print $2}' );
         fi
