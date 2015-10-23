@@ -250,7 +250,7 @@ describe('Http.Api.Nodes', function () {
         it('should delete a node', function () {
             waterline.nodes.needByIdentifier.resolves(node)
             taskGraphProtocol.getActiveTaskGraph.resolves();
-            waterline.lookups.destroy.resolves();
+            waterline.lookups.update.resolves();
             waterline.nodes.destroy.resolves();
             waterline.catalogs.destroy.resolves();
             waterline.workitems.destroy.resolves();
@@ -260,7 +260,7 @@ describe('Http.Api.Nodes', function () {
                 .expect(200, node)
                 .expect(function () {
                     expect(taskGraphProtocol.getActiveTaskGraph).to.have.been.calledOnce;
-                    expect(waterline.lookups.destroy).to.have.been.calledOnce;
+                    expect(waterline.lookups.update).to.have.been.calledOnce;
                     expect(waterline.nodes.destroy).to.have.been.calledOnce;
                     expect(waterline.catalogs.destroy).to.have.been.calledOnce;
                     expect(waterline.workitems.destroy).to.have.been.calledOnce;
