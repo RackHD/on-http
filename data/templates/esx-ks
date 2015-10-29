@@ -81,15 +81,19 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
         <% n.ipv4.vlanId.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
           esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+          esxcli network ip interface remove -i <%=vmkname%>
           esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>.<%=vid%>
           esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
+          esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%> 
           esxcli network vswitch standard portgroup set -p <%=n.device%>.<%=vid%> -v <%=vid %>
         <% }); %>
       <% } else { %>
         <% vmkname = 'vmk' + vmkid++ %>
         esxcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+        esxcli network ip interface remove -i <%=vmkname%>
         esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
         esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
+        esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%> 
       <% } %>
     <% } %>
     <% if( undefined != n.ipv6 ) { %>
@@ -97,6 +101,7 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
         <% n.ipv6.vlanId.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
           esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+          esxcli network ip interface remove -i <%=vmkname%>
           esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>.<%=vid%>
           esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
           esxcli network vswitch standard portgroup set -p <%=n.device%>.<%=vid%> -v <%=vid %>
@@ -104,6 +109,7 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
       <% } else { %>
         <% vmkname = 'vmk' + vmkid++ %>
         esxcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+        esxcli network ip interface remove -i <%=vmkname%>
         esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
         esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
       <% } %>
