@@ -250,7 +250,7 @@ describe('Http.Api.Nodes', function () {
                 obmSettings: [
                     {
                         config: {},
-                        service: 'noop-obm-service'
+                        service: 'panduit-obm-service'
                     }
                 ]
             };
@@ -269,7 +269,7 @@ describe('Http.Api.Nodes', function () {
 
     describe('DELETE /nodes/:identifier', function () {
         it('should delete a node', function () {
-            waterline.nodes.needByIdentifier.resolves(node)
+            waterline.nodes.needByIdentifier.resolves(node);
             taskGraphProtocol.getActiveTaskGraph.resolves();
             waterline.lookups.update.resolves();
             waterline.nodes.destroy.resolves();
@@ -351,7 +351,7 @@ describe('Http.Api.Nodes', function () {
 
         it('should add a new set of OBM settings if none exist', function () {
             waterline.nodes.needByIdentifier.resolves({ id: node.id });
-            var updated = { id: node.id, obmSettings: [ obmSetting] };
+            var updated = { id: node.id, obmSettings: [ obmSetting ] };
             waterline.nodes.updateByIdentifier.resolves(updated);
             return helper.request().post('/api/1.1/nodes/1234/obm')
                 .send(obmSetting)
@@ -378,7 +378,7 @@ describe('Http.Api.Nodes', function () {
         it('should not add a new unsupported OBM settings', function () {
             var invalidSetting = {
                 config: {},
-                service: 'noop-obm-service'
+                service: 'panduit-obm-service'
             };
 
             waterline.nodes.needByIdentifier.resolves(node);
