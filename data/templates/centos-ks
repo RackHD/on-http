@@ -99,7 +99,7 @@ echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/ne
         <% }); %>
       <% } else { %>
         echo "Configuring device <%=n.device%>"
-        echo "DEVICE=<%=n.device%>.<%=vid%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        echo "DEVICE=<%=n.device%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "BOOTPROTO=none" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "IPADDR=<%=n.ipv4.ipAddr%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
@@ -122,7 +122,7 @@ echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/ne
         <% }); %>
       <% } else { %>
         echo "Configuring device <%=n.device%>"
-        echo "DEVICE=<%=n.device%>.<%=vid%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        echo "DEVICE=<%=n.device%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "BOOTPROTO=none" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "IPV6INIT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
