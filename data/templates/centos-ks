@@ -9,7 +9,7 @@ keyboard 'us'
 timezone America/Los_Angeles --isUtc
 firewall --enabled --http --ssh
 selinux --permissive
-bootloader --location=mbr --driveorder=sda --append="crashkernel=auth rhgb net.ifnames=0 biosdevname=0"
+bootloader --location=mbr --driveorder=sda --append="crashkernel=auth rhgb"
 services --enabled=NetworkManager,sshd
 network --device=<%=macaddress%> --noipv6 --activate
 
@@ -58,8 +58,6 @@ net-tools
 %post --log=/root/install-post.log
 (
 # PLACE YOUR POST DIRECTIVES HERE
-rm -f /etc/sysconfig/network-scripts/ifcfg-*
-rm -f /etc/udev/rules.d/70-persistent-net.rule
 PATH=/bin:/sbin:/usr/bin:/usr/sbin
 export PATH
 
