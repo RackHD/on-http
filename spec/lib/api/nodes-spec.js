@@ -62,6 +62,7 @@ describe('Http.Api.Nodes', function () {
     var node = {
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
+        type: 'compute',
         obmSettings: [
             {
                 service: 'ipmi-obm-service',
@@ -220,8 +221,8 @@ describe('Http.Api.Nodes', function () {
 
     describe('PATCH /nodes/:identifier', function () {
         it('should update a node', function () {
+            waterline.nodes.needByIdentifier.resolves(node);
             waterline.nodes.updateByIdentifier.resolves(node);
-
             return helper.request().patch('/api/1.1/nodes/1234')
                 .send(node)
                 .expect('Content-Type', /^application\/json/)
@@ -236,19 +237,39 @@ describe('Http.Api.Nodes', function () {
         });
 
         it('should return a 404 if the node was not found', function () {
-            waterline.nodes.updateByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
             return helper.request().patch('/api/1.1/nodes/1234')
                 .send(node)
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
+
+        it('should not update a compute node with unsupported OBM settings', function () {
+            var invalidNode = {
+                obmSettings: [
+                    {
+                        config: {},
+                        service: 'panduit-obm-service'
+                    }
+                ]
+            };
+
+            waterline.nodes.needByIdentifier.resolves(node);
+            return helper.request().patch('/api/1.1/nodes/1234')
+                .send(invalidNode)
+                .expect('Content-Type', /^application\/json/)
+                .expect(400)
+                .expect(function () {
+                    expect(waterline.nodes.updateByIdentifier).to.not.have.been.called;
+                });
+        });
     });
 
 
     describe('DELETE /nodes/:identifier', function () {
         it('should delete a node', function () {
-            waterline.nodes.needByIdentifier.resolves(node)
+            waterline.nodes.needByIdentifier.resolves(node);
             taskGraphProtocol.getActiveTaskGraph.resolves();
             waterline.lookups.update.resolves();
             waterline.nodes.destroy.resolves();
@@ -306,7 +327,7 @@ describe('Http.Api.Nodes', function () {
 
     describe('POST /nodes/:identifier/obm', function () {
         var obmSetting = {
-            service: 'noop-obm-service',
+            service: 'ipmi-obm-service',
             config: {}
         };
 
@@ -330,7 +351,7 @@ describe('Http.Api.Nodes', function () {
 
         it('should add a new set of OBM settings if none exist', function () {
             waterline.nodes.needByIdentifier.resolves({ id: node.id });
-            var updated = { id: node.id, obmSettings: [ obmSetting] };
+            var updated = { id: node.id, obmSettings: [ obmSetting ] };
             waterline.nodes.updateByIdentifier.resolves(updated);
             return helper.request().post('/api/1.1/nodes/1234/obm')
                 .send(obmSetting)
@@ -353,6 +374,24 @@ describe('Http.Api.Nodes', function () {
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
+
+        it('should not add a new unsupported OBM settings', function () {
+            var invalidSetting = {
+                config: {},
+                service: 'panduit-obm-service'
+            };
+
+            waterline.nodes.needByIdentifier.resolves(node);
+
+            return helper.request().post('/api/1.1/nodes/1234/obm')
+                .send(invalidSetting)
+                .expect('Content-Type', /^application\/json/)
+                .expect(400)
+                .expect(function () {
+                    expect(waterline.nodes.updateByIdentifier).to.not.have.been.called;
+                });
+        });
+
     });
 
     describe('POST /nodes/:identifier/obm/identify', function () {
