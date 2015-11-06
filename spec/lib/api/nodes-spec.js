@@ -8,6 +8,7 @@ describe('Http.Api.Nodes', function () {
     var waterline;
     var ObmService;
     var taskGraphProtocol;
+    var nodeApiService;
     var Promise;
     var Errors;
 
@@ -28,7 +29,9 @@ describe('Http.Api.Nodes', function () {
             sinon.stub(ObmService.prototype, 'identifyOn');
             sinon.stub(ObmService.prototype, 'identifyOff');
             taskGraphProtocol = helper.injector.get('Protocol.TaskGraphRunner');
+            nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
             sinon.stub(taskGraphProtocol);
+            sinon.stub(nodeApiService);
 
             Promise = helper.injector.get('Promise');
             Errors = helper.injector.get('Errors');
@@ -50,6 +53,7 @@ describe('Http.Api.Nodes', function () {
         resetStubs(waterline.workitems);
         resetStubs(waterline.graphobjects);
         resetStubs(taskGraphProtocol);
+        resetStubs(nodeApiService);
 
         ObmService.prototype.identifyOn.reset();
         ObmService.prototype.identifyOff.reset();
@@ -270,23 +274,13 @@ describe('Http.Api.Nodes', function () {
     describe('DELETE /nodes/:identifier', function () {
         it('should delete a node', function () {
             waterline.nodes.needByIdentifier.resolves(node);
-            taskGraphProtocol.getActiveTaskGraph.resolves();
-            waterline.lookups.update.resolves();
-            waterline.nodes.destroy.resolves();
-            waterline.catalogs.destroy.resolves();
-            waterline.workitems.destroy.resolves();
+            nodeApiService.removeNode.resolves(node);
 
             return helper.request().delete('/api/1.1/nodes/1234')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, node)
                 .expect(function () {
-                    expect(taskGraphProtocol.getActiveTaskGraph).to.have.been.calledOnce;
-                    expect(waterline.lookups.update).to.have.been.calledOnce;
-                    expect(waterline.nodes.destroy).to.have.been.calledOnce;
-                    expect(waterline.catalogs.destroy).to.have.been.calledOnce;
-                    expect(waterline.workitems.destroy).to.have.been.calledOnce;
-                    expect(waterline.nodes.destroy.firstCall.args[0])
-                        .to.have.property('id').that.equals(node.id);
+                    expect(nodeApiService.removeNode).to.have.been.calledOnce;
                 });
         });
 
