@@ -1,9 +1,8 @@
+# on-http [![Build Status](https://travis-ci.org/RackHD/on-http.svg?branch=master)](https://travis-ci.org/RackHD/on-http) [![Code Climate](https://codeclimate.com/github/RackHD/on-http/badges/gpa.svg)](https://codeclimate.com/github/RackHD/on-http) [![Coverage Status](https://coveralls.io/repos/RackHD/on-http/badge.svg?branch=master&service=github)](https://coveralls.io/github/RackHD/on-http?branch=master)
+
+'on-http' is the HTTP server for RackHD
+
 Copyright 2015, EMC, Inc.
-
-# on-http
-
-
-Monorail HTTP Server
 
 ## installation
 
