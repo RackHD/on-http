@@ -119,4 +119,4 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
 
 
 #reboot the system after host configuration
-esxcli system shutdown reboot -d 5 -r "Rebooting after first boot host configuration"
+esxcli system shutdown reboot -d 10 -r "Rebooting after first boot host configuration"
