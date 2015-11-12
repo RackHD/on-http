@@ -1,9 +1,5 @@
 accepteula
-<% if (version == "5.5") { %>
-  clearpart --alldrives
-<% } else { %>
-  clearpart --alldrives --overwritevmfs
-<% } %>
+clearpart --alldrives --overwritevmfs
 install --firstdisk --overwritevmfs
 rootpw <%=rootPlainPassword%>
 
