@@ -1,12 +1,31 @@
 accepteula
-<% if (version == "5.5") { %>
-  clearpart --alldrives
-<% } else { %>
-  clearpart --alldrives --overwritevmfs
-<% } %>
+clearpart --alldrives --overwritevmfs
 install --firstdisk --overwritevmfs
 rootpw <%=rootPlainPassword%>
-network --bootproto=dhcp --device=vmnic0
+
+# Search the networkDevices and set the first vmnic# (if defined) up.
+# If no vmnic# device is specified in the networkDevices, then we fallback
+# to setting vmnic0 up as dhcp
+<% if( undefined !== networkDevices ) { %>
+  <% need_default = networkDevices.every(function(n) { %>
+    <% if( n.device.substring(0,5) === 'vmnic' ) { %>
+      <% if(typeof n.ipv4 !== 'undefined') { %>
+        <% ipopts = '--ip=' + n.ipv4.ipAddr + ' --gateway=' + n.ipv4.gateway + ' --netmask=' + n.ipv4.netmask %>
+        <% if (typeof n.ipv4.vlanId !== 'undefined' ) { %>
+          <% ipopts += ' --vlandid=' + n.ipv4.vlanId[0] %>
+        <% } %>
+        network --bootproto=static --device=<%=n.device%> <%=ipopts%>
+      <% } else { %>
+        network --bootproto=dhcp --device=<%=n.device%>
+      <% } %>
+      <% return false; %>
+    <% } %>
+    <% return true; %>
+  <% }); %>
+  <% if (need_default) { %>
+    network --bootproto=dhcp --device=vmnic0
+  <% } %>
+<% } %>
 reboot
 
 %firstboot --interpreter=busybox
@@ -70,17 +89,29 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
   <% }); %>
 <% } %>
 
-#signify ORA the installation completed
-/usr/bin/wget --spider http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub
+<% if ( typeof switchDevices !== 'undefined' ) { %>
+  <% switchDevices.forEach(function(n) { %>
+    esxcli network vswitch standard add -v "<%=n.switchName%>"
+    <% if( undefined !== n.uplinks ) { %>
+      <% n.uplinks.forEach(function(s) { %>
+        currsw=`esxcli --debug --formatter=csv network vswitch standard list | grep <%=s%> | awk -F, '{print $9}'`
+        if [ "$currsw" != "" ]; then
+          esxcli network vswitch standard uplink remove -v $currsw -u <%=s%>
+        fi
+        esxcli network vswitch standard uplink add -v <%=n.switchName%> -u <%=s%>
+      <% }); %>
+    <% } %>
+  <% }); %>
+<% } %>
 
 <% vmkid = 0 %>
 <% if( undefined !== networkDevices ) { %>
   <% networkDevices.forEach(function(n) { %>
-    <% if( undefined != n.ipv4 ) { %>
-      <% if( undefined != n.ipv4.vlanId ) { %>
+    <% if( undefined !== n.ipv4 ) { %>
+      <% if( undefined !== n.ipv4.vlanId ) { %>
         <% n.ipv4.vlanId.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
-          esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+          esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v "<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>"
           esxcli network ip interface remove -i <%=vmkname%>
           esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>.<%=vid%>
           esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
@@ -96,8 +127,8 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
         esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%> 
       <% } %>
     <% } %>
-    <% if( undefined != n.ipv6 ) { %>
-      <% if( undefined != n.ipv6.vlanId ) { %>
+    <% if( undefined !== n.ipv6 ) { %>
+      <% if( undefined !== n.ipv6.vlanId ) { %>
         <% n.ipv6.vlanId.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
           esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
@@ -114,9 +145,24 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
         esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
       <% } %>
     <% } %>
+    <% if( (undefined === n.ipv6) && (undefined === n.ipv4) ) { %>
+      <% vmkname = 'vmk' + vmkid++ %>
+      esxcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+      esxcli network ip interface remove -i <%=vmkname%>
+      esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
+      esxcli network ip interface ipv4 set -i <%=vmkname%> -t dhcp
+    <% } %>
   <% }); %>
 <% } %>
 
+<% if( typeof postInstallCommands !== 'undefined' ) { %>
+  <% postInstallCommands.forEach(function(n) { %>
+    <%=n%>
+  <% }); %>
+<% } %>
+
+#signify ORA the installation completed
+/usr/bin/wget --spider http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub
 
 #reboot the system after host configuration
-esxcli system shutdown reboot -d 5 -r "Rebooting after first boot host configuration"
+esxcli system shutdown reboot -d 10 -r "Rebooting after first boot host configuration"

@@ -3,5 +3,5 @@ NOHALT 1
 PROMPT 0
 TIMEOUT 80
 LABEL install
-  KERNEL <%=repo%>/mboot.c32
+  KERNEL <%=mbootFile%>
   APPEND -c http://<%=server%>:<%=port%>/api/common/templates/<%=esxBootConfigTemplate%>
