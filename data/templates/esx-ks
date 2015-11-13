@@ -1,6 +1,10 @@
 accepteula
 clearpart --alldrives --overwritevmfs
-install --firstdisk --overwritevmfs
+<% if (driveId === "firstdisk") { %>
+  install --firstdisk --overwritevmfs
+<% } else { %>
+  install --disk=<%=driveId%> --overwritevmfs
+<% } %>
 rootpw <%=rootPlainPassword%>
 
 # Search the networkDevices and set the first vmnic# (if defined) up.
