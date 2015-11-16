@@ -9,7 +9,11 @@ keyboard 'us'
 timezone America/Los_Angeles --isUtc
 firewall --enabled --http --ssh
 selinux --permissive
-bootloader --location=mbr --driveorder=sda --append="crashkernel=auth rhgb"
+<% if (version === "6.5") { %>
+  bootloader --location=mbr --driveorder=<%=driveId%> --append="crashkernel=auth rhgb"
+<% } else { %>
+  bootloader --location=mbr --driveorder=<%=driveId%> --boot-drive=<%=driveId%> --append="crashkernel=auth rhgb"
+<% } %>
 services --enabled=NetworkManager,sshd
 network --device=<%=macaddress%> --noipv6 --activate
 
