@@ -1,6 +1,6 @@
 // Copyright 2015, EMC, Inc.
 
-'use strict';
+"use strict";
 
 var _ = require('lodash'),
     _di = require('di'),
