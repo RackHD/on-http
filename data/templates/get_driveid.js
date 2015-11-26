@@ -25,27 +25,27 @@ function parseDriveWwid(idList) {
     });
     //According to SCSI-3 spec, vendor specified logic unit name string is 60
     var scsiLines = [], sataLines = [], requiredStrLen = 60;
-    for (var i=0; i<lines.length; i++) {
-        var line = lines[i];
+
+    lines.forEach(function(line){
         if ( line && !(line.match('part'))){
             var nameIndex = line.lastIndexOf('/'), idIndex = line.lastIndexOf('->');
             if (line.indexOf('scsi') === 0) {
-                scsiLines.push([line.slice(nameIndex+1), line.slice(0,idIndex)]);
+                scsiLines.push([line.slice(nameIndex + 1), line.slice(0, idIndex)]);
             }
             else if (line.indexOf('ata') === 0) {
-                sataLines.push([line.slice(nameIndex+1), line.slice(0,idIndex)]);
+                sataLines.push([line.slice(nameIndex + 1), line.slice(0, idIndex)]);
             }
         }
-    }
+    });
 
     var esxiSata = sataLines.map(function(esxiLine) {
         var line = esxiLine[1];
         var headIndex = line.indexOf('-'), snIndex = line.lastIndexOf('_');
         var headStr = ['t10.', line.slice(0, headIndex).toUpperCase(), '_____'].join(''),
-            vendorStr = line.slice(headIndex+1, snIndex+1),
-            snStr = line.slice(snIndex+1),
+            vendorStr = line.slice(headIndex + 1, snIndex + 1),
+            snStr = line.slice(snIndex + 1),
             dashStr = '';
-        for (var i =0; i< requiredStrLen - vendorStr.length - snStr.length; i++){
+        for (var i = 0; i< requiredStrLen - vendorStr.length - snStr.length; i += 1){
             dashStr += '_';
         }
         var strLine = [headStr, vendorStr, dashStr, snStr].join('');
@@ -54,8 +54,8 @@ function parseDriveWwid(idList) {
         var strArray = strLine.split('-');
         if (strArray.length !== 1) {
             strLine = strArray[0];
-            for (i=0; i<strArray.length -1; i++){
-                strLine = [strLine, (i+2).toString(), 'D', strArray[i+1]].join('');
+            for (i = 0; i < strArray.length -1; i += 1){
+                strLine = [strLine, (i + 2).toString(), 'D', strArray[i + 1]].join('');
             }
         }
         return [esxiLine[0], strLine];
@@ -86,18 +86,17 @@ function parseVdInfo(pathList) {
         return [split[8],split[10]].join('->');
     });
     var pciLines = [];
-    for (var i=0; i<lines.length; i++) {
-        var line = lines[i];
+    lines.forEach(function(line){
         if ( line && !(line.match('part'))){
             var nameIndex = line.lastIndexOf('/'), idIndex = line.lastIndexOf('->');
             if (line.indexOf('pci') === 0) {
-                pciLines.push([line.slice(nameIndex+1), line.slice(0,idIndex)]);
+                pciLines.push([line.slice(nameIndex + 1), line.slice(0,idIndex)]);
             }
         }
-    }
+    });
 
     return pciLines.map(function(line) {
-        var scsiId = line[1].slice(line[1].lastIndexOf('-')+1), vdStr;
+        var scsiId = line[1].slice(line[1].lastIndexOf('-') + 1), vdStr;
         if (scsiId.split(':').length === 4){
 		    var scsiIdArray = scsiId.split(':');
             vdStr = ['/c', scsiIdArray[0], '/v', scsiIdArray[2]].join('');
@@ -132,29 +131,32 @@ function buildDriveMap(wwidData, vdData, scsiData) {
         vdList = parseVdInfo(vdData);
     var linuxWwids = parsedWwids.linuxDriveIds, esxiWwids = parsedWwids.esxiDriveIds;
     var driveIds=[];
-	for (var i = 0; i < esxiWwids.length;i++){
-	    var esxiWwid = esxiWwids[i], linuxWwid = linuxWwids[i],
-            vd='', scsiId = '', diskPath = esxiWwid[0];
-		for (var j=0; j<vdList.length;j++){
-            if (typeof scsiList[j] !== 'undefined'){
-                if (vdList[j][0] === diskPath){
-                    vd = vdList[j][1];
+    esxiWwids.forEach(function(esxiWwid){
+        var vd = '', scsiId = '', diskPath = esxiWwid[0];
+        vdList.forEach(function(elem){
+            if (typeof elem !== 'undefined') {
+                if (elem[0] === diskPath) {
+                    vd = elem[1];
                 }
             }
-
-		}
-	    for (var k=0; k<scsiList.length;k++){
-			if (typeof scsiList[k] !== 'undefined'){
-				if(scsiList[k][0] === diskPath){
-			        scsiId = scsiList[k][1];
-				}
-		    }
-		}
-		driveIds.push({"identifier": i, "scsiId": scsiId, "virtualDisk": vd,
-            "esxiWwid": esxiWwid[1], "linuxWwid": linuxWwid[1], "devName": diskPath});
-	}
+        });
+        scsiList.forEach(function(elem){
+            if (typeof elem !== 'undefined'){
+                if(elem[0] === diskPath){
+                    scsiId = elem[1];
+                }
+            }
+        });
+        driveIds.push({"scsiId": scsiId, "virtualDisk": vd,
+            "esxiWwid": esxiWwid[1], "devName": diskPath});
+    });
+    var k=0;
+    linuxWwids.forEach(function(linuxWwid){
+        driveIds[k].identifier = k;
+        driveIds[k].linuxWwid = linuxWwid[1];
+        k += 1;
+    });
     console.log(JSON.stringify(driveIds));
-    //console.log(driveIds);
     return 0;
 }
 
