@@ -74,8 +74,8 @@ do
         #
         # Controller information including:
         #     controller_name - Example: LSI Logic / Symbios Logic MegaRAID SAS-3 3108 [Invader] (rev 02).
-        #     controller_ID - The scsi host ID read from /sys/class/scsi_host/hostx
         #     controller_PCI_BDF: The PCIe domain:bus:device.function ID of the SAS controller.
+        #     host_ID - The scsi host ID read from /sys/class/scsi_host/hostx
         ####################################
 
         is_megaraid=$(  echo "${my_type}" | grep -w "megaraid" );
@@ -83,7 +83,7 @@ do
         if [ $is_megaraid ] ; then 			# Seeking for HDDs with megaraid type
             # $line example :
             #   $line = /dev/bus/0 -d megaraid,1 # /dev/bus/0 [megaraid_disk_01], SCSI device
-            my_ctrl_num=$( echo "$line" | awk '{print $1}' | awk -F / '{print $4}');    #The controller ID
+            my_ctrl_num=$( echo "$line" | awk '{print $1}' | awk -F / '{print $4}');    #The host ID
         else # HDDs other than megaraid type
             # example :
             #   $line = /dev/sda -d scsi # /dev/sda, SCSI device'
@@ -100,8 +100,8 @@ do
 
         echo "###""HBA Controller Information for $my_dev $my_type";
         echo "controller_name=""$my_ctrl_name";
-        echo "controller_ID=""$my_ctrl_num";
         echo "controller_PCI_BDF=""$my_ctrl_bdf";
+        echo "host_ID=""$my_ctrl_num";
         continue;
     fi
 
