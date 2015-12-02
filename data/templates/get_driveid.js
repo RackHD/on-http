@@ -18,15 +18,16 @@ var options = {
  */
 function parseDriveWwid(idList) {
     //idList example
-    //lrwxrwxrwx. 1 root root  9 Nov 18 20:30 ata-SATADOM-SV_3SE_20150522AA9992050085 -> ../../sdb
+    //"lrwxrwxrwx. 1 root root  9 Nov 18 20:30 ata-SATADOM-SV_3SE_20150522AA9992050085 -> ../../sdb"
+    //returned string example
+    // "ata-SATADOM-SV_3SE_20150522AA9992050085->../../sdb"
     var lines = idList.split('\n').map(function(line) {
         var split = line.split(/\s+/);
-        //returned string example ata-SATADOM-SV_3SE_20150522AA9992050085->../../sdb
         return [split[8],split[10]].join('->');
     });
-    //According to SCSI-3 spec, vendor specified logic unit name string is 60
-    var scsiLines = [], sataLines = [], requiredStrLen = 60;
 
+    //According to SCSI-3 spec, vendor specified logic unit name string is 60
+    var scsiLines = [], sataLines = [], wwnLines = [], requiredStrLen = 60;
     lines.forEach(function(line){
         if ( line && !(line.match('part'))){
             var nameIndex = line.lastIndexOf('/'), idIndex = line.lastIndexOf('->');
@@ -36,13 +37,28 @@ function parseDriveWwid(idList) {
             else if (line.indexOf('ata') === 0) {
                 sataLines.push([line.slice(nameIndex + 1), line.slice(0, idIndex)]);
             }
+            else if (line.indexOf('wwn') === 0) {
+                wwnLines.push([line.slice(nameIndex + 1), line.slice(0, idIndex)]);
+            }
         }
+    });
+
+    //wwnLine example: wwn-0x5000cca23de9e287 -> ../../sdb
+    //esxiWwn example: ["sdb", "naa.5000cca23de9e287"]
+    var esxiWwn = wwnLines.map(function(wwnLine) {
+        var line = wwnLine[1];
+        var split = line.split(/-/);
+        return [wwnLine[0], 'naa.' + split[1].slice(2)];
     });
 
     //ESXi SATA WWID should be ('t10.ATA_____' + VendorInfo + Sub + SerialNumber)
     //VendorInfo + Sub + SerialNumber should be 60 characters.
     //Sub is made of N(N = 60 - VendorInfo - SerialNumber) underline '_' symbols
     //ESXi SATA WWID should finally replace remaing dashs '-' with '2D', '3D' ...
+    //esxiLine example:
+    //["sda", "ata-32GB_SATA_Flash_Drive_B061430580090000000F"]
+    //esxiSata example
+    //["sda", "t10.ATA_____32GB_SATA_Flash_Drive___________________B061430580090000000F"]
     //Todo: confrim above analysis is correct for all SATA disks.
     var esxiSata = sataLines.map(function(esxiLine) {
         var line = esxiLine[1];
@@ -67,12 +83,25 @@ function parseDriveWwid(idList) {
         return [esxiLine[0], strLine];
     });
 
+    //If one device Name is mapped to both WWN and SATA array, use WWN element instead
+    esxiWwn.forEach(function(line) {
+        esxiSata.forEach(function(subline){
+            if (line[0] === subline[0]){
+                subline [1] = line[1];
+            }
+        });
+    });
+
+    //esxiLine example: ["sda", "scsi-35000c500725f45d7"]
+    //esxiScsi example: ["sda", "naa.5000c500725f45d7"]
     var esxiScsi = scsiLines.map(function(esxiLine) {
         var line = esxiLine[1];
         var split = line.split(/-|_/);
         return [esxiLine[0], 'naa.' + split[1].slice(1)];
     });
 
+    //linuxLine example: ["sda", "scsi-35000c500725f45d7"]
+    //linuxParsed example: ["sda", "/dev/disk/by-id/scsi-35000c500725f45d7"]
     var linuxParsed = sataLines.concat(scsiLines).map(function(linuxLine) {
         return [linuxLine[0], '/dev/disk/by-id/' + linuxLine[1]];
     });
