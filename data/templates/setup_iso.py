@@ -29,8 +29,9 @@ def get_iso_info(fname):
     label1=subprocess.Popen(['isoinfo', '-i', fname, '-d'], stdout=subprocess.PIPE)
     return label1.stdout.read()
 
-def do_setup_repo(osname, osver, src, dest):
+def do_setup_repo(osname, osver, src, dest, link):
     print 'Installing {0} {1} to {2}/{0}/{1}'.format(osname, osver, dest)
+    print 'symbolic link base directory {0}'.format(link)
     dstpath=dest + '/' + osname + '/' + osver
     if os.path.isdir(dstpath):
         print 'Found existing directory, bailing...'
@@ -65,8 +66,9 @@ def do_setup_repo(osname, osver, src, dest):
 
         shutil.copyfile(src+'/isolinux/'+vmlinuz, dstpath+'/'+vmlinuz)
 
-    os.system('ln -sf ' + dest + "/" + osname + ' /var/renasar/on-http/static/http/')
-    os.system('ln -sf ' + dest + "/" + osname + ' /var/renasar/on-tftp/static/tftp/')
+
+    os.system('ln -sf ' + dest + "/" + osname + ' ' + link + '/on-http/static/http/')
+    os.system('ln -sf ' + dest + "/" + osname + ' ' + link + '/on-tftp/static/tftp/')
 
 def mount_iso(fname):
     # Mount the ISO to tmp directory
@@ -123,6 +125,7 @@ def show_progress(a,b,file_size):
 parser = argparse.ArgumentParser(description='Setup the OS repo from an ISO image')
 parser.add_argument('iso', metavar='N', help='the ISO image or URL to ISO image')
 parser.add_argument('dest', metavar='N', help='the destination directory to setup')
+parser.add_argument('--link', metavar='N', help='the symbolic link path', default='/var/renasar')
 args = parser.parse_args()
 
 
@@ -150,5 +153,5 @@ if not osname or not osver:
     print 'Failed to get os name and/or os version information'
     sys.exit(1)
 
-do_setup_repo(osname, osver, tmpdir, args.dest)
+do_setup_repo(osname, osver, tmpdir, args.dest, args.link)
 
