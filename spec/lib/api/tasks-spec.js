@@ -23,7 +23,7 @@ describe('Http.Api.Tasks', function () {
 
         // mock waterline templates to return a template for bootstrap
         waterline = helper.injector.get('Services.Waterline');
-        waterline.templates.findOne = sinon.stub();
+        waterline.templates.find = sinon.stub();
 
         tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
         tasksApiService.getNode = sinon.stub();
@@ -72,10 +72,10 @@ describe('Http.Api.Tasks', function () {
     describe("GET /tasks/bootstrap.js", function() {
         it("should render a bootstrap for the node", function() {
             tasksApiService.getNode.resolves({ id: '123' });
-            waterline.templates.findOne.resolves({
+            waterline.templates.find.resolves([{
                 name: 'bootstrap.js',
                 contents: 'test contents'
-            });
+            }]);
 
             return helper.request().get('/api/1.1/tasks/bootstrap.js?macAddress=00:11:22:33:44:55')
                 .expect(200)
@@ -87,10 +87,10 @@ describe('Http.Api.Tasks', function () {
 
         it("should render a 404 if node not found", function() {
             tasksApiService.getNode.resolves(null);
-            waterline.templates.findOne.resolves({
+            waterline.templates.find.resolves([{
                 name: 'bootstrap.js',
                 contents: 'test contents'
-            });
+            }]);
 
             return helper.request()
                 .get('/api/1.1/tasks/bootstrap.js?macAddress=00:11:22:33:44:55')
