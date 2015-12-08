@@ -207,10 +207,20 @@ function run() {
             wwidData = stdout0;
             exec(cmdVdInfo, options, function (err1, stdout1) {
                 if (err1) {
-                    console.error(err1.toString());
-                    process.exit(1);
+                    var errStr= "ls: cannot access /dev/disk/by-path: No such file or directory";
+                    //"/dev/disk/by-path" doesn't exist means only SATADOM exists, no HDDs
+                    // Ignore this error and use null string for vdData
+                    if (err1.toString().search(errStr) !== -1){
+                        vdData = '';
+                    }
+                    else {
+                        console.error(err1.toString());
+                        process.exit(1);
+                    }
                 }
-                vdData = stdout1;
+                else {
+                    vdData = stdout1;
+                }
                 exec(cmdScsiId, options, function (err2, stdout2) {
                     if (err2) {
                         console.error(err2.toString());
