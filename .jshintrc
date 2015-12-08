@@ -56,5 +56,23 @@
     "validthis" : false,
 
     // Environments
-    "node": true
+    "node": true,
+
+    //Custom Globals
+    "globals" : {
+        "describe": false,
+        "it": false,
+        "before": false,
+        "beforeEach": false,
+        "after": false,
+        "afterEach": false,
+        "expect": false,
+        "should": false,
+        "request": false,
+        "helper": false,
+        "chai": false,
+        "sinon": false,
+        "dihelper": false,
+        "onHttpContext": false
+    }
 }
