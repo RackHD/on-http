@@ -35,7 +35,8 @@ helper.startServer = function (overrides) {
     helper.injector.get('Services.Configuration')
         .set('httpEnabled', true)
         .set('httpsEnabled', false)
-        .set('httpBindPort', 8089);
+        .set('httpBindPort', 8089)
+        .set('skuPackRoot', 'spec/lib/services/sku-static');
 
     return helper.injector.get('app').start();
 };

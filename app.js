@@ -16,7 +16,8 @@ di.annotate(Runner, new di.Inject(
         'Templates',
         'common-api-router',
         'fileService',
-        'Promise'
+        'Promise',
+        'Http.Services.SkuPack'
     )
 );
 function Runner(
@@ -27,7 +28,8 @@ function Runner(
     templates,
     router,
     fileService,
-    Promise
+    Promise,
+    skuPack
 ) {
 
     function start() {
@@ -42,6 +44,9 @@ function Runner(
                         root: configuration.get('httpFileServiceRoot', './static/files')
                     }
                 });
+            })
+            .then(function() {
+                return skuPack.start(configuration.get('skuPackRoot', './skupack.d'));
             })
             .then(function() {
                 return app.listen();
