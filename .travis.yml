@@ -25,6 +25,7 @@ after_success:
  - cat ./coverage/lcov.info | node_modules/.bin/coveralls
 
 before_deploy:
+ - npm run apidoc
  - npm prune --production
  - mkdir -p packagebuild deb
  - cp -ar !(packagebuild) packagebuild/
