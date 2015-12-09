@@ -1,9 +1,10 @@
 accepteula
-clearpart --alldrives --overwritevmfs
-<% if (driveId === "firstdisk") { %>
+<% if (installDisk === "firstdisk") { %>
+  clearpart --firstdisk --overwritevmfs
   install --firstdisk --overwritevmfs
 <% } else { %>
-  install --disk=<%=driveId%> --overwritevmfs
+  clearpart --drives=<%=installDisk%> --overwritevmfs
+  install --disk=<%=installDisk%> --overwritevmfs
 <% } %>
 rootpw <%=rootPlainPassword%>
 
