@@ -8,7 +8,7 @@ describe('Http.Api.Templates', function () {
     var configuration;
     var lookupService;
     var taskProtocol;
-    var taskGraphProtocol;
+    var workflowApiService;
     var waterline;
 
     before('start HTTP server', function () {
@@ -17,7 +17,7 @@ describe('Http.Api.Templates', function () {
             load: sinon.stub()
         };
         taskProtocol = {};
-        taskGraphProtocol = {};
+        workflowApiService = {};
         waterline = {
             start: sinon.stub(),
             stop: sinon.stub()
@@ -26,7 +26,7 @@ describe('Http.Api.Templates', function () {
         return helper.startServer([
             dihelper.simpleWrapper(templates, 'Templates'),
             dihelper.simpleWrapper(taskProtocol, 'Protocol.Task'),
-            dihelper.simpleWrapper(taskGraphProtocol, 'Protocol.TaskGraphRunner'),
+            dihelper.simpleWrapper(workflowApiService, 'Http.Services.Api.Workflows'),
             dihelper.simpleWrapper(waterline, 'Services.Waterline'),
         ]);
     });
@@ -44,7 +44,7 @@ describe('Http.Api.Templates', function () {
         lookupService = helper.injector.get('Services.Lookup');
         lookupService.ipAddressToMacAddress = sinon.stub().resolves();
         lookupService.ipAddressToNodeId = sinon.stub().resolves();
-        taskGraphProtocol.getActiveTaskGraph = sinon.stub().resolves();
+        workflowApiService.findActiveGraphForTarget = sinon.stub().resolves();
         taskProtocol.requestProperties = sinon.stub().resolves();
         waterline.nodes = {
             findByIdentifier: sinon.stub().resolves()
@@ -110,7 +110,7 @@ describe('Http.Api.Templates', function () {
         function templateRequest(input, output) {
             lookupService.ipAddressToMacAddress.resolves('01:23:45:ab:cd:ef');
             waterline.nodes.findByIdentifier.resolves({ id: '01ab23cd45ef67fe89dc00ba' });
-            taskGraphProtocol.getActiveTaskGraph.resolves({});
+            workflowApiService.findActiveGraphForTarget.resolves({});
             templates.get.resolves({ contents: input });
 
             return helper.request().get('/api/1.1/templates/test_template')
@@ -197,7 +197,7 @@ describe('Http.Api.Templates', function () {
         it('should 500 error if the node does not have an active task graph', function () {
             lookupService.ipAddressToMacAddress.resolves('01:23:45:ab:cd:ef');
             waterline.nodes.findByIdentifier.resolves({ id: '01ab23cd45ef67fe89dc00ba' });
-            taskGraphProtocol.getActiveTaskGraph.resolves(undefined);
+            workflowApiService.findActiveGraphForTarget.resolves(undefined);
 
             return helper.request().get('/api/1.1/templates/test_template')
             .expect('Content-Type', /^application\/json/)
@@ -207,7 +207,7 @@ describe('Http.Api.Templates', function () {
         it('should 500 error if the template contains syntax errors', function () {
             lookupService.ipAddressToMacAddress.resolves('01:23:45:ab:cd:ef');
             waterline.nodes.findByIdentifier.resolves({ id: '01ab23cd45ef67fe89dc00ba' });
-            taskGraphProtocol.getActiveTaskGraph.resolves({});
+            workflowApiService.findActiveGraphForTarget.resolves({});
             templates.get.resolves({ contents: 'test_cmd<%adb-34n.cif}d%>\n' });
 
             return helper.request().get('/api/1.1/templates/test_template')

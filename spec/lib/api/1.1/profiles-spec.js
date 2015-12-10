@@ -1,10 +1,9 @@
-// Copyright 2015, EMC, Inc.
-/* jshint node:true */
+// Copyright 2015-2016, EMC, Inc.
 
 'use strict';
 
 describe('Http.Api.Profiles', function () {
-    var taskGraphProtocol;
+    var workflowApiService;
     var taskProtocol;
     var lookupService;
     var profiles;
@@ -28,9 +27,9 @@ describe('Http.Api.Profiles', function () {
         sinon.stub(taskProtocol, 'requestProfile').resolves();
         sinon.stub(taskProtocol, 'requestProperties').resolves();
 
-        taskGraphProtocol = helper.injector.get('Protocol.TaskGraphRunner');
-        sinon.stub(taskGraphProtocol, 'getActiveTaskGraph').resolves({});
-        sinon.stub(taskGraphProtocol, 'runTaskGraph').resolves({ instanceId: 'test' });
+        workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
+        sinon.stub(workflowApiService, 'findActiveGraphForTarget').resolves({});
+        sinon.stub(workflowApiService, 'createActiveGraph').resolves({ instanceId: 'test' });
 
         profiles = helper.injector.get('Profiles');
         sinon.stub(profiles, 'getAll').resolves([]);
@@ -53,7 +52,7 @@ describe('Http.Api.Profiles', function () {
         }
         resetMocks(lookupService);
         resetMocks(taskProtocol);
-        resetMocks(taskGraphProtocol);
+        resetMocks(workflowApiService);
         resetMocks(profiles);
         resetMocks(profileApiService);
     });
@@ -149,7 +148,7 @@ describe('Http.Api.Profiles', function () {
         it("should send down error.ipxe for a known node with no active graph", function() {
             profileApiService.createNodeAndRunDiscovery.resolves({});
             profileApiService.getNode.resolves({});
-            taskGraphProtocol.getActiveTaskGraph.resolves(null);
+            workflowApiService.findActiveGraphForTarget.resolves(null);
 
             return helper.request().get('/api/1.1/profiles')
                 .query({ macs: '00:00:de:ad:be:ef' })
@@ -162,7 +161,7 @@ describe('Http.Api.Profiles', function () {
         it("should send down error.ipxe on failing to retrieve workflow properties", function() {
             profileApiService.createNodeAndRunDiscovery.resolves({});
             profileApiService.getNode.resolves({});
-            taskGraphProtocol.getActiveTaskGraph.resolves({});
+            workflowApiService.findActiveGraphForTarget.resolves({});
             taskProtocol.requestProfile.resolves('test.profile');
             taskProtocol.requestProperties.rejects(new Error('Test workflow properties error'));
 
@@ -177,7 +176,7 @@ describe('Http.Api.Profiles', function () {
         it("should send down a task specific bootfile for a node with an active task", function() {
             profileApiService.createNodeAndRunDiscovery.resolves({});
             profileApiService.getNode.resolves({});
-            taskGraphProtocol.getActiveTaskGraph.resolves({});
+            workflowApiService.findActiveGraphForTarget.resolves({});
             taskProtocol.requestProfile.resolves('test.profile');
             taskProtocol.requestProperties.resolves({});
 
@@ -187,27 +186,6 @@ describe('Http.Api.Profiles', function () {
                 .expect(function() {
                     expect(profiles.get).to.have.been.calledWith('test.profile');
                 });
-        });
-
-        it("should send down retry.ipxe if we are maximum discovery graph capacity", function() {
-            profileApiService.getNode.rejects(new Errors.MaxGraphsRunningError());
-            return helper.request().get('/api/1.1/profiles')
-                .query({ macs: '00:00:de:ad:be:ef' })
-                .expect(200)
-                .expect(function() {
-                    expect(profiles.get).to.have.been.calledWith('retry.ipxe');
-                });
-        });
-
-        it("should fail chainload if we have already sent down retry.ipxe and " +
-                "are still at maximum discovery graph capacity", function() {
-            var error = new Errors.MaxGraphsRunningError();
-            error.retryLater = true;
-            profileApiService.getNode.rejects(error);
-
-            return helper.request().get('/api/1.1/profiles')
-                .query({ macs: '00:00:de:ad:be:ef' })
-                .expect(503);
         });
     });
 });

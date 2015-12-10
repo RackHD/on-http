@@ -4,7 +4,6 @@
 'use strict';
 
 describe('Http.Api.Catalogs', function () {
-
     var Promise;
     var Errors;
     var stubNeedByIdentifier;

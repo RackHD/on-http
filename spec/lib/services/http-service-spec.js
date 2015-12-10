@@ -1,5 +1,4 @@
-// Copyright 2015, EMC, Inc.
-/* jshint node:true */
+// Copyright 2015-2016, EMC, Inc.
 
 'use strict';
 
@@ -20,6 +19,8 @@ describe('Http.Server', function () {
                 'swagger', undefined, __dirname),
             dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
+            onHttpContext.helper.simpleWrapper({}, 'TaskGraph.TaskGraph'),
+            onHttpContext.helper.simpleWrapper({}, 'TaskGraph.Store'),
             dihelper.simpleWrapper({}, 'ipmi-obm-service'),
             dihelper.requireWrapper('rimraf', 'rimraf', undefined, __dirname),
             dihelper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),

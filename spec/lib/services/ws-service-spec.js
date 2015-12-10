@@ -1,5 +1,4 @@
-// Copyright 2014-2015, Renasar Technologies Inc.
-/* jshint node:true */
+// Copyright 2015-2016, EMC, Inc.
 
 'use strict';
 
@@ -15,6 +14,8 @@ describe('Services.WebSocket', function () {
                 'swagger', undefined, __dirname),
             onHttpContext.helper.simpleWrapper(WebSocket.Server, 'WebSocketServer'),
             onHttpContext.helper.simpleWrapper({}, 'Task.Services.OBM'),
+            onHttpContext.helper.simpleWrapper({}, 'TaskGraph.TaskGraph'),
+            onHttpContext.helper.simpleWrapper({}, 'TaskGraph.Store'),
             onHttpContext.helper.simpleWrapper({}, 'ipmi-obm-service'),
             onHttpContext.helper.requireWrapper('rimraf', 'rimraf', undefined, __dirname),
             onHttpContext.helper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),
