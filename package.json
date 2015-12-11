@@ -21,6 +21,7 @@
     "ejs": "^2.0.8",
     "es6-shim": "^0.22.2",
     "express": "^4.10.7",
+    "express-http-proxy": "^0.6.0",
     "glob": "^4.3.2",
     "lodash": "^2.4.1",
     "lru-cache": "^2.5.0",
