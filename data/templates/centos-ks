@@ -53,6 +53,13 @@ sudo
 perl
 libselinux-python
 net-tools
+<% if( undefined !== kvm ) { %>
+    kvm
+    virt-manager
+    libvirt
+    libvirt-python
+    python-virtinst
+<% } %>
 %end
 
 %pre
