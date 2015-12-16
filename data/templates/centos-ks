@@ -53,7 +53,7 @@ sudo
 perl
 libselinux-python
 net-tools
-<% if( undefined !== kvm ) { %>
+<% if( typeof kvm !== 'undefined' ) { %>
     kvm
     virt-manager
     libvirt
