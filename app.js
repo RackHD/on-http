@@ -44,7 +44,7 @@ function Runner(
                 });
             })
             .then(function() {
-                app.listen();
+                return app.listen();
             });
     }
 
