@@ -32,7 +32,7 @@ function onHttpContextFactory(di, directory) {
                 this.injectables
             ]));
 
-            this.http = injector.get('Http'),
+            this.app = injector.get('app'),
             this.injector = injector;
             this.logger = injector.get('Logger').initialize('Http.Server');
 
@@ -56,10 +56,10 @@ if (require.main === module) { run(); }
 
 function run() {
     var onHttpContext = onHttpContextFactory().initialize(),
-        http = onHttpContext.http,
+        app = onHttpContext.app,
         logger = onHttpContext.logger;
 
-    http.start()
+    app.start()
         .then(function () {
             logger.info('Server Started.');
         })
