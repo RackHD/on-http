@@ -5,6 +5,7 @@
 
 describe('Http.Api.Nodes', function () {
     var configuration;
+    var lookupService;
     var waterline;
     var ObmService;
     var taskGraphProtocol;
@@ -17,6 +18,9 @@ describe('Http.Api.Nodes', function () {
         return helper.startServer([
         ]).then(function () {
             configuration = helper.injector.get('Services.Configuration');
+            lookupService = helper.injector.get('Services.Lookup');
+            lookupService.ipAddressToMacAddress = sinon.stub().resolves();
+            lookupService.ipAddressToNodeId = sinon.stub().resolves();
             sinon.stub(configuration);
 
             waterline = helper.injector.get('Services.Waterline');
@@ -42,11 +46,14 @@ describe('Http.Api.Nodes', function () {
     beforeEach('reset stubs', function () {
         function resetStubs(obj) {
             _(obj).methods().forEach(function (method) {
-                obj[method].reset();
+                if (obj[method] && obj[method].reset) {
+                  obj[method].reset();
+                }
             });
         }
 
         resetStubs(configuration);
+        resetStubs(lookupService);
         resetStubs(waterline.lookups);
         resetStubs(waterline.nodes);
         resetStubs(waterline.catalogs);

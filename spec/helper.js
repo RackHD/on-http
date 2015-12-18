@@ -37,11 +37,11 @@ helper.startServer = function (overrides) {
         .set('httpsEnabled', false)
         .set('httpBindPort', 8089);
 
-    return helper.injector.get('Http').start();
+    return helper.injector.get('app').start();
 };
 
 helper.stopServer = function () {
-    return helper.injector.get('Http').stop();
+    return helper.injector.get('app').stop();
 };
 
 helper.request = function (url, options) {

@@ -7,7 +7,7 @@ var di = require('di');
 
 module.exports = Runner;
 
-di.annotate(Runner, new di.Provide('Http'));
+di.annotate(Runner, new di.Provide('app'));
 di.annotate(Runner, new di.Inject(
         'Http.Server',
         'Services.Core',
@@ -44,7 +44,7 @@ function Runner(
                 });
             })
             .then(function() {
-                app.listen();
+                return app.listen();
             });
     }
 
