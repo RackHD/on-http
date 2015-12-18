@@ -60,7 +60,7 @@
     "version": "1.1.0",
     "description": "RackHD API Documentation",
     "title": "RackHD API Documentation",
-    "url": "http://servername:80",
+    "url": "http://servername:8080",
     "header": {
       "title": "About",
       "filename": "static/apidoc/header.md"
