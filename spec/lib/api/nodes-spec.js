@@ -12,6 +12,7 @@ describe('Http.Api.Nodes', function () {
     var nodeApiService;
     var Promise;
     var Errors;
+    var lookupService;
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -24,7 +25,6 @@ describe('Http.Api.Nodes', function () {
             sinon.stub(configuration);
 
             waterline = helper.injector.get('Services.Waterline');
-            sinon.stub(waterline.lookups);
             sinon.stub(waterline.nodes);
             sinon.stub(waterline.catalogs);
             sinon.stub(waterline.workitems);
@@ -64,6 +64,10 @@ describe('Http.Api.Nodes', function () {
 
         ObmService.prototype.identifyOn.reset();
         ObmService.prototype.identifyOff.reset();
+
+        lookupService = helper.injector.get('Services.Lookup');
+        lookupService.ipAddressToMacAddress = sinon.stub().resolves();
+        lookupService.ipAddressToNodeId = sinon.stub().resolves();
     });
 
     after('stop HTTP server', function () {
