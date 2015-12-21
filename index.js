@@ -64,7 +64,7 @@ function run() {
             logger.info('Server Started.');
         })
         .catch(function(error) {
-            logger.error('Server Startup Error.', { error: error });
+            logger.critical('Server Startup Error.', { error: error });
 
             process.nextTick(function() {
                 process.exit(1);
@@ -74,7 +74,7 @@ function run() {
     process.on('SIGINT', function() {
         http.stop()
             .catch(function(error) {
-                logger.error('Server Shutdown Error.', { error: error });
+                logger.critical('Server Shutdown Error.', { error: error });
             })
             .finally(function() {
                 process.nextTick(function() {
