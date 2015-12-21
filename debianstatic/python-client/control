@@ -1,0 +1,13 @@
+Source: python-on-http
+Section: http
+Priority: optional
+Maintainer: Joseph Longever <joseph.longever@emc.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
+
+Package: python-on-http
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ python2.7 
+Description: python-on-http
+ Python client library for RackHD on-http service.

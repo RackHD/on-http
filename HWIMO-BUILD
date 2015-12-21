@@ -8,6 +8,7 @@
 
 git clone . packagebuild
 pushd packagebuild
+rsync -ar ../debianstatic/on-http/ debian
 
 rm -rf node_modules
 npm install
