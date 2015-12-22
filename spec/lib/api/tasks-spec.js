@@ -6,8 +6,8 @@
 describe('Http.Api.Tasks', function () {
     var taskProtocol;
     var tasksApiService;
-    var waterline;
     var lookupService;
+    var templates;
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -21,15 +21,14 @@ describe('Http.Api.Tasks', function () {
         taskProtocol.requestCommands = sinon.stub().resolves({ testcommands: 'cmd' });
         taskProtocol.respondCommands = sinon.stub();
 
-        // mock waterline templates to return a template for bootstrap
-        waterline = helper.injector.get('Services.Waterline');
-        waterline.templates.find = sinon.stub();
-
         tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
         tasksApiService.getNode = sinon.stub();
 
         lookupService = helper.injector.get('Services.Lookup');
         lookupService.ipAddressToMacAddress = sinon.stub().resolves('00:11:22:33:44:55');
+
+        templates = helper.injector.get('Templates');
+
         return helper.reset();
     });
 
@@ -70,13 +69,21 @@ describe('Http.Api.Tasks', function () {
     });
 
     describe("GET /tasks/bootstrap.js", function() {
-        it("should render a bootstrap for the node", function() {
-            tasksApiService.getNode.resolves({ id: '123' });
-            waterline.templates.find.resolves([{
-                name: 'bootstrap.js',
-                contents: 'test contents'
-            }]);
+        var stubTemplates;
 
+        before(function() {
+            stubTemplates = sinon.stub(templates, 'get');
+            stubTemplates.withArgs('bootstrap.js').resolves({
+                contents: 'test contents'
+            });
+        });
+
+        after(function() {
+            stubTemplates.restore();
+        });
+
+       it("should render a bootstrap for the node", function() {
+            tasksApiService.getNode.resolves({ id: '123' });
             return helper.request().get('/api/1.1/tasks/bootstrap.js?macAddress=00:11:22:33:44:55')
                 .expect(200)
                 .expect(function (res) {
@@ -87,11 +94,6 @@ describe('Http.Api.Tasks', function () {
 
         it("should render a 404 if node not found", function() {
             tasksApiService.getNode.resolves(null);
-            waterline.templates.find.resolves([{
-                name: 'bootstrap.js',
-                contents: 'test contents'
-            }]);
-
             return helper.request()
                 .get('/api/1.1/tasks/bootstrap.js?macAddress=00:11:22:33:44:55')
                 .expect(404);
