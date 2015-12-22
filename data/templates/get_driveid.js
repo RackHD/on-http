@@ -27,9 +27,10 @@ function parseDriveWwid(idList) {
     });
 
     //According to SCSI-3 spec, vendor specified logic unit name string is 60
+	//Only IDE and SCSI disk will be retrieved
     var scsiLines = [], sataLines = [], wwnLines = [], requiredStrLen = 60;
     lines.forEach(function(line){
-        if ( line && !(line.match('part'))){
+        if ( line && !(line.match('part')) && line.match(/sd[a-z]$|hd[a-z]$/i)){
             var nameIndex = line.lastIndexOf('/'), idIndex = line.lastIndexOf('->');
             if (line.indexOf('scsi') === 0) {
                 scsiLines.push([line.slice(nameIndex + 1), line.slice(0, idIndex)]);
