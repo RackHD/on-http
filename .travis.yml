@@ -1,5 +1,5 @@
 language: node_js
-
+sudo: true
 node_js:
   - "0.10"
   - "4"
@@ -15,6 +15,7 @@ addons:
       - devscripts
       - debhelper
       - git
+      - default-jdk
 
 services:
  - mongodb
@@ -26,17 +27,15 @@ after_success:
 
 before_deploy:
  - npm run apidoc
+ - npm run apidoc-swagger
  - npm prune --production
- - mkdir -p packagebuild deb
- - cp -ar !(packagebuild) packagebuild/
- - pushd packagebuild
- - git log -n 1 --pretty=format:%h.%ai.%s > commitstring.txt
- - export DEBFULLNAME=`git log -n 1 --pretty=format:%an`
- - export DEBEMAIL=`git log -n 1 --pretty=format:%ae`
- - dch -l `echo "${TRAVIS_BRANCH}" | sed 's/[\/\_]/-/g'` -u low `git log -n 1 --pretty=oneline --abbrev-commit`
- - debuild --no-lintian --no-tgz-check -us -uc
- - popd
- - cp -a *.deb deb/
+ - sudo apt-get install -y maven
+ - git clone --branch v2.1.4 https://github.com/swagger-api/swagger-codegen.git
+ - pushd ./swagger-codegen && mvn package && popd
+ - java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar generate -i build/apidoc-swagger/swagger.json -o python-client -l python --additional-properties packageName=on_http
+ - ./build-package.bash on-http "${TRAVIS_BRANCH}"
+ - ./build-package.bash python-client "${TRAVIS_BRANCH}"
+ - mkdir deb && cp -a *.deb deb/
 
 deploy:
   provider: bintray

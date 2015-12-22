@@ -6,7 +6,8 @@
   "scripts": {
     "doc": "./node_modules/.bin/jsdoc lib -r -d docs",
     "test": "./node_modules/.bin/mocha $(find spec -name '*-spec.js') -R spec --require spec/helper.js",
-    "apidoc": "./node_modules/.bin/apidoc -i lib -f '.*\\.js$' -o build/apidoc"
+    "apidoc": "./node_modules/.bin/apidoc -i lib -f '.*\\.js$' -o build/apidoc",
+    "apidoc-swagger": "./node_modules/.bin/apidoc-swagger --verbose -i lib -f '.*\\.js$' -o build/apidoc-swagger"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "apidoc": "^0.12.1",
+    "apidoc-swagger": "^0.2.2",
     "chai": "^2.0.0",
     "chai-as-promised": "^4.2.0",
     "coveralls": "^2.11.4",
