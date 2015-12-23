@@ -52,12 +52,12 @@ describe("SKU Pack Service", function() {
     it('should fail to start with an invalid root', function() {
         fs.readdirAsync.rejects();
         //SKU service swallowes the exception, so it should not throw error even for invalid root
-        skuService.start('./invalid').should.not.be.rejected;
+        return skuService.start('./invalid').should.not.be.rejected;
     });
 
     it('should start with a valid root', function() {
         fs.readdirAsync.withArgs('./valid').resolves([]);
-        skuService.start('./valid').should.be.fulfilled;
+        return skuService.start('./valid').should.be.fulfilled;
     });
 
     it('should load a valid configuration file', function() {
@@ -70,7 +70,7 @@ describe("SKU Pack Service", function() {
         fs.readFileAsync.withArgs('./valid/a.js').resolves(JSON.stringify(data));
         fs.readdirAsync.withArgs('./valid/a/templates').resolves([]);
 
-        skuService.start('./valid').then(function(vals) {
+        return skuService.start('./valid').then(function(vals) {
             expect(vals.length).to.equal(1);
             expect(('a' in skuService.skuHandlers)).to.equal(true);
         });
@@ -88,7 +88,7 @@ describe("SKU Pack Service", function() {
         fs.readdirAsync.withArgs('./valid/a/templates').resolves([]);
         fs.readdirAsync.withArgs('./valid/b/templates').resolves([]);
 
-        skuService.start('./valid').then(function(vals) {
+        return skuService.start('./valid').then(function(vals) {
             expect(vals.length).to.equal(1);
             expect(('a' in skuService.skuHandlers)).to.equal(false);
             expect(('b' in skuService.skuHandlers)).to.equal(true);
