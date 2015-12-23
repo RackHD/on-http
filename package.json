@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "apidoc": "^0.12.1",
-    "apidoc-swagger": "^0.2.2",
+    "apidoc-swagger": "git+https://github.com/jlongever/apidoc-swagger.git",
     "chai": "^2.0.0",
     "chai-as-promised": "^4.2.0",
     "coveralls": "^2.11.4",
