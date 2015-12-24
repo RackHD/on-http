@@ -193,8 +193,7 @@ function buildDriveMap(wwidData, vdData, scsiData) {
         driveIds[k].identifier = k;
         driveIds[k].linuxWwid = linuxWwid[1];
     });
-    console.log(JSON.stringify(driveIds));
-    return 0;
+    return JSON.stringify(driveIds);
 }
 
 function run() {
@@ -228,14 +227,8 @@ function run() {
                         process.exit(1);
                     }
                     scsiData = stdout2;
-                    if (buildDriveMap(wwidData, vdData, scsiData)) {
-                        console.error('build drive map failed, wwidData=' +
-                            wwidData + '\nvdData=' + vdData);
-                        process.exit(1);
-                    }
-                    else {
-                        process.exit(0);
-                    }
+                    var result = buildDriveMap(wwidData, vdData, scsiData);
+                    console.log(result);
                 });
             });
         });
@@ -246,4 +239,4 @@ function run() {
     }
 }
 
-return run();
+run();
