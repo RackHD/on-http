@@ -63,7 +63,7 @@ describe('get_driveid script', function() {
             ));
         });
 
-        it('should parser normal data', function() {
+        it('should parse normal data', function() {
             var result = buildDriveMap(mockWwidStd, mockVdInfoStd, mockScsiStd);
             expect(result).to.deep.equal(JSON.stringify(
                 //jshint ignore: start
