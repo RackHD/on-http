@@ -5,7 +5,15 @@
 var rewire = require('rewire');
 
 describe('get_driveid script', function() {
+    //when require/rewire the get_driveid.js, it will execute the function 'run',
+    //it may fail due to some command doesn't exist in the system, so we need to
+    //mock the child_process.exe before rewire the script.
+    var stubExec = sinon.stub(require('child_process'), 'exec');
     var getDriveId = rewire('../../../data/templates/get_driveid.js');
+
+    after(function() {
+        stubExec.restore();
+    });
 
     //Configure for case with DVD existing and VD info doesn't exist
     var mockScsiDvd =
