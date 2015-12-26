@@ -196,13 +196,16 @@ function buildDriveMap(wwidData, vdData, scsiData) {
     return JSON.stringify(driveIds);
 }
 
-function run() {
+/**
+ * Run commands and notify result via callback
+ * @param {Function} done - The callback which will be used to notify the result
+ */
+function run(done) {
     var wwidData, vdData, scsiData;
     try {
         exec(cmdDriveWwid, options, function (err0, stdout0) {
             if (err0) {
-                console.error(err0.toString());
-                process.exit(1);
+                return done(err0);
             }
             wwidData = stdout0;
             exec(cmdVdInfo, options, function (err1, stdout1) {
@@ -214,8 +217,7 @@ function run() {
                         vdData = '';
                     }
                     else {
-                        console.error(err1.toString());
-                        process.exit(1);
+                        return done(err1);
                     }
                 }
                 else {
@@ -223,20 +225,28 @@ function run() {
                 }
                 exec(cmdScsiId, options, function (err2, stdout2) {
                     if (err2) {
-                        console.error(err2.toString());
-                        process.exit(1);
+                        return done(err2);
                     }
                     scsiData = stdout2;
                     var result = buildDriveMap(wwidData, vdData, scsiData);
-                    console.log(result);
+                    return done(null, result);
                 });
             });
         });
     }
     catch (e) {
-        console.error(e.message);
-        process.exit(1);
+        return done(e);
     }
 }
 
-run();
+if (require.main === module) {
+    run(function(err, result) {
+        if (err) {
+            console.error(err.toString());
+            process.exit(1);
+        } else {
+            console.log(result);
+            process.exit(0);
+        }
+    });
+}

@@ -5,15 +5,7 @@
 var rewire = require('rewire');
 
 describe('get_driveid script', function() {
-    //when require/rewire the get_driveid.js, it will execute the function 'run',
-    //it may fail due to some command doesn't exist in the system, so we need to
-    //mock the child_process.exe before rewire the script.
-    var stubExec = sinon.stub(require('child_process'), 'exec');
     var getDriveId = rewire('../../../data/templates/get_driveid.js');
-
-    after(function() {
-        stubExec.restore();
-    });
 
     //Configure for case with DVD existing and VD info doesn't exist
     var mockScsiDvd =
@@ -50,7 +42,7 @@ describe('get_driveid script', function() {
         'lrwxrwxrwx 1 root root   9 Dec 24 11:05 wwn-0x600163600196c0401e0c0e6511cec3c0 -> ../../sdc'; //
     //jshint ignore: end
 
-    describe('run get driveid', function() {
+    describe('parser', function() {
         var buildDriveMap = getDriveId.__get__('buildDriveMap');
 
         it('should discard DVD info', function() {
@@ -104,7 +96,98 @@ describe('get_driveid script', function() {
                 //jshint ignore: end
             ));
         });
+    });
 
+    describe('run', function() {
+        var run = getDriveId.__get__('run');
+        var cmdDriveWwid = getDriveId.__get__('cmdDriveWwid');
+        var cmdVdInfo = getDriveId.__get__('cmdVdInfo');
+        var cmdScsiId = getDriveId.__get__('cmdScsiId');
+        var stubDone = sinon.stub();
+        var backupExec, backBuildDriveMap;
+
+        function setupExecMock(wwidError, vdInfoError, scsiIdError, selfError) {
+            var mockExec = function(cmd, option, callback) {
+                if (cmd === cmdDriveWwid) {
+                    if (wwidError) {
+                        callback(new Error(wwidError), '');
+                    }
+                    else {
+                        callback(false, mockWwidStd);
+                    }
+                } else if (cmd === cmdVdInfo) {
+                    if (vdInfoError) {
+                        callback(new Error(vdInfoError), '');
+                    }
+                    else {
+                        callback(false, mockVdInfoStd);
+                    }
+                } else if (cmd === cmdScsiId) {
+                    if (scsiIdError) {
+                        callback(new Error(scsiIdError), '');
+                    } else {
+                        callback(false, mockScsiStd);
+                    }
+                }
+
+                if (selfError) {
+                    throw new Error(selfError);
+                }
+            };
+            getDriveId.__set__('exec', mockExec);
+            getDriveId.__set__('buildDriveMap', sinon.stub().returns('testmap'));
+        }
+
+        before(function() {
+            backupExec = getDriveId.__get__('exec');
+            backBuildDriveMap = getDriveId.__get__('buildDriveMap');
+        });
+
+        after(function() {
+            getDriveId.__set__('exec', backupExec);
+            getDriveId.__set__('buildDriveMap', backBuildDriveMap);
+        });
+
+        beforeEach(function() {
+            stubDone.reset();
+        });
+
+        it('should call done with result', function() {
+            setupExecMock(false, false, false);
+            run(stubDone);
+            expect(stubDone).have.been.calledWith(null, 'testmap');
+        });
+
+        it('should call done with error if drive wwid command fails', function() {
+            setupExecMock('wwid error', false, false);
+            run(stubDone);
+            expect(stubDone).have.been.calledWith(new Error());
+        });
+
+        it('should call done with error if vd info command fails', function() {
+            setupExecMock(false, 'vd info error', false);
+            run(stubDone);
+            expect(stubDone).have.been.calledWith(new Error());
+        });
+
+        it('should not call done with error if vd info command cannot access', function() {
+            setupExecMock(false,
+                'ls: cannot access /dev/disk/by-path: No such file or directory',
+                false);
+            run(stubDone);
+            expect(stubDone).have.been.calledWith(null, 'testmap');
+        });
+
+        it('should call done with error if scsi id command fails', function() {
+            setupExecMock(false, false, 'scsiId error');
+            run(stubDone);
+            expect(stubDone).have.been.calledWith(new Error());
+        });
+
+        it('should call done with error if exec self throw execption', function() {
+            setupExecMock(false, false, false, 'exec self error');
+            run(stubDone);
+            expect(stubDone).have.been.calledWith(new Error());
+        });
     });
 });
-
