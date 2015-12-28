@@ -27,9 +27,10 @@ function parseDriveWwid(idList) {
     });
 
     //According to SCSI-3 spec, vendor specified logic unit name string is 60
+	//Only IDE and SCSI disk will be retrieved
     var scsiLines = [], sataLines = [], wwnLines = [], requiredStrLen = 60;
     lines.forEach(function(line){
-        if ( line && !(line.match('part'))){
+        if ( line && !(line.match('part')) && line.match(/sd[a-z]$|hd[a-z]$/i)){
             var nameIndex = line.lastIndexOf('/'), idIndex = line.lastIndexOf('->');
             if (line.indexOf('scsi') === 0) {
                 scsiLines.push([line.slice(nameIndex + 1), line.slice(0, idIndex)]);
@@ -192,17 +193,19 @@ function buildDriveMap(wwidData, vdData, scsiData) {
         driveIds[k].identifier = k;
         driveIds[k].linuxWwid = linuxWwid[1];
     });
-    console.log(JSON.stringify(driveIds));
-    return 0;
+    return JSON.stringify(driveIds);
 }
 
-function run() {
+/**
+ * Run commands and notify result via callback
+ * @param {Function} done - The callback which will be used to notify the result
+ */
+function run(done) {
     var wwidData, vdData, scsiData;
     try {
         exec(cmdDriveWwid, options, function (err0, stdout0) {
             if (err0) {
-                console.error(err0.toString());
-                process.exit(1);
+                return done(err0);
             }
             wwidData = stdout0;
             exec(cmdVdInfo, options, function (err1, stdout1) {
@@ -214,8 +217,7 @@ function run() {
                         vdData = '';
                     }
                     else {
-                        console.error(err1.toString());
-                        process.exit(1);
+                        return done(err1);
                     }
                 }
                 else {
@@ -223,26 +225,28 @@ function run() {
                 }
                 exec(cmdScsiId, options, function (err2, stdout2) {
                     if (err2) {
-                        console.error(err2.toString());
-                        process.exit(1);
+                        return done(err2);
                     }
                     scsiData = stdout2;
-                    if (buildDriveMap(wwidData, vdData, scsiData)) {
-                        console.error('build drive map failed, wwidData=' +
-                            wwidData + '\nvdData=' + vdData);
-                        process.exit(1);
-                    }
-                    else {
-                        process.exit(0);
-                    }
+                    var result = buildDriveMap(wwidData, vdData, scsiData);
+                    return done(null, result);
                 });
             });
         });
     }
     catch (e) {
-        console.error(e.message);
-        process.exit(1);
+        return done(e);
     }
 }
 
-return run();
+if (require.main === module) {
+    run(function(err, result) {
+        if (err) {
+            console.error(err.toString());
+            process.exit(1);
+        } else {
+            console.log(result);
+            process.exit(0);
+        }
+    });
+}
