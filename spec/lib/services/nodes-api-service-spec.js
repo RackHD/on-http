@@ -76,48 +76,48 @@ describe("Http.Services.Api.Nodes", function () {
         this.sandbox.restore();
     });
 
-    describe("_findDsNodes", function() {
-        before("_findDsNodes before", function() {
+    describe("_findTargetNodes", function() {
+        before("_findTargetNodes before", function() {
         });
 
         beforeEach(function() {
         });
 
-        it("_findDsNodes should find related enclosure nodes", function() {
+        it("_findTargetNodes should find related enclosure nodes", function() {
             needByIdentifier.resolves(enclosureNode);
 
-            return nodeApiService._findDsNodes(computeNode, 'enclosedBy')
+            return nodeApiService._findTargetNodes(computeNode, 'enclosedBy')
             .then(function (nodes) {
                 expect(needByIdentifier).to.have.been.calledOnce;
                 expect(nodes[0]).to.equal(enclosureNode);
             });
         });
 
-        it("_findDsNodes should return nothing if cannot find enclosure node", function() {
+        it("_findTargetNodes should return nothing if cannot find enclosure node", function() {
             needByIdentifier.rejects(Errors.NotFoundError(''));
 
-            return nodeApiService._findDsNodes(computeNode, 'enclosedBy')
+            return nodeApiService._findTargetNodes(computeNode, 'enclosedBy')
             .then(function (nodes) {
                 expect(needByIdentifier).to.have.been.calledOnce;
                 expect(nodes[0]).to.equal(undefined);
             });
         });
 
-        it("_findDsNodes should return nothing if don't have relations", function() {
+        it("_findTargetNodes should return nothing if don't have relations", function() {
             var node = {
                 id: '1234abcd1234abcd1234abcd',
                 type: 'compute'
             };
 
-            return nodeApiService._findDsNodes(node, 'enclosedBy')
+            return nodeApiService._findTargetNodes(node, 'enclosedBy')
             .then(function (nodes) {
                 expect(nodes).to.equal(undefined);
             });
         });
 
-        it("_findDsNodes should return nothing if node is null", function() {
+        it("_findTargetNodes should return nothing if node is null", function() {
 
-            return nodeApiService._findDsNodes(null, 'enclosedBy')
+            return nodeApiService._findTargetNodes(null, 'enclosedBy')
             .then(function (nodes) {
                 expect(nodes).to.equal(undefined);
             });
