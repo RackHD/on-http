@@ -256,63 +256,6 @@ describe("Http.Services.Api.Nodes", function () {
         });
     });
 
-    describe("_findEmpty", function() {
-        before("_findEmpty before", function() {
-        });
-
-        beforeEach(function() {
-        });
-
-        it("_findEmpty should return false if no sub node", function() {
-
-            return expect(nodeApiService._findEmpty(null, 'enclosedBy')).to.equal(false);
-        });
-
-        it("_findEmpty should return true if no relation field", function() {
-            var enclNodes = {
-                id: '1234abcd1234abcd1234abcd',
-                type: 'enclNode'
-            };
-
-            return expect(nodeApiService._findEmpty(enclNodes, 'encloses')).to.equal(true);
-        });
-
-        it("_findEmpty should return true if the specefic relation is empty", function() {
-            var enclNodes = {
-                id: '1234abcd1234abcd1234abcd',
-                type: 'enclNode',
-                relations: [
-                    {
-                        "relationType": "powerBy",
-                        "targets": [
-                            "1234abcd1234abcd1234abcd",
-                        ]
-                    }
-                ]
-            };
-
-            return expect(nodeApiService._findEmpty(enclNodes, 'encloses')).to.equal(true);
-        });
-
-        it("_findEmpty should return false if the specefic relation isn't empty", function() {
-            var enclNodes = {
-                id: '1234abcd1234abcd1234abcd',
-                type: 'enclNode',
-                relations: [
-                    {
-                        "relationType": "encloses",
-                        "targets": [
-                            "1234abcd1234abcd1234abcd",
-                        ]
-                    }
-                ]
-            };
-
-            return expect(nodeApiService._findEmpty(enclNodes, 'encloses')).to.equal(false);
-        });
-
-    });
-
     describe("removeNode", function() {
         before("removeNode before", function() {
         });
@@ -324,7 +267,7 @@ describe("Http.Services.Api.Nodes", function () {
             this.sandbox.stub(waterline.catalogs, 'destroy').resolves();
         });
 
-        it("removeNode should not delete downstream node when no constants defined", function() {
+        it("removeNode should not delete target node when no constants defined", function() {
             var noopNode = {
                 id: '1234abcd1234abcd1234abce',
                 type: 'noop',
@@ -356,21 +299,7 @@ describe("Http.Services.Api.Nodes", function () {
             });
         });
 
-        it("removeNode should delete compute node", function() {
-            var enclNodeAfter = _.cloneDeep(enclosureNode);
-            _.pull(enclNodeAfter.relations[0].targets, '1234abcd1234abcd1234abcd');
-
-            getActiveTaskGraph.resolves('');
-            needByIdentifier.resolves(enclosureNode);
-            updateByIdentifier.resolves(enclNodeAfter);
-            return nodeApiService.removeNode(computeNode)
-            .then(function (node){
-                expect(node).to.equal(computeNode);
-                expect(waterline.nodes.destroy).to.have.been.calledOnce;
-            });
-        });
-
-        it("removeNode should delete enclosure node when no compute node target", function() {
+        it("removeNode should only update enclosure node when no compute node target", function() {
             var enclNode = {
                 id: '1234abcd1234abcd1234abcf',
                 type: 'enclosure',
@@ -384,7 +313,7 @@ describe("Http.Services.Api.Nodes", function () {
                 ]
             };
             var enclNodeAfter = _.cloneDeep(enclNode);
-            delete enclNodeAfter.relations;
+            _.pull(enclNodeAfter.relations, enclNodeAfter.relations[0]);
 
             getActiveTaskGraph.resolves('');
             needByIdentifier.resolves(enclNode);
@@ -392,10 +321,12 @@ describe("Http.Services.Api.Nodes", function () {
 
             return nodeApiService.removeNode(computeNode)
             .then(function (node){
+                expect(updateByIdentifier).to.have.been
+                    .calledWith(enclNode.id,
+                                {relations: enclNodeAfter.relations});
                 expect(node).to.equal(computeNode);
-                expect(waterline.nodes.destroy).to.have.been.calledTwice;
+                expect(waterline.nodes.destroy).to.have.been.calledOnce;
                 expect(waterline.nodes.destroy).to.have.been.calledWith({id: computeNode.id});
-                expect(waterline.nodes.destroy).to.have.been.calledWith({id: enclNode.id});
             });
         });
 
@@ -433,37 +364,54 @@ describe("Http.Services.Api.Nodes", function () {
             });
         });
 
-        it("removeNode should not delete compute node when deleting cluster", function() {
-            var clusterNode = {
-                id: '1234abcd1234abcd1234abce',
-                type: 'cluster',
+        it("removeNode should update pdu node when deleting enclosure node", function() {
+            var pduNode = {
+                id: '1234abcd1234abcd1234abcg',
+                type: 'pdu',
                 relations: [
                     {
-                        "relationType": "cluster",
+                        "relationType": "powers",
                         "targets": [
-                            "1234abcd1234abcd1234abcd"
+                            "1234abcd1234abcd1234abcd",
+                            "aaa"
                         ]
                     }
                 ]
             };
+            var computeNode2 = {
+                id: '1234abcd1234abcd1234abce',
+                type: 'compute',
+                relations: [
+                    {
+                        "relationType": "enclosedBy",
+                        "targets": [
+                            "1234abcd1234abcd1234abf",
+                        ]
+                    }
+                ]
+            };
+
+            var pduNodeAfter = _.cloneDeep(pduNode);
+            _.pull(pduNodeAfter.relations[0].targets, pduNodeAfter.relations[0].targets[0]);
             var computeNodeBefore = _.cloneDeep(computeNode);
             computeNodeBefore.relations[1] = {
-                "relationType": "clusterBy",
-                "targets": ["1234abcd1234abcd1234abce"]
+                "relationType": "poweredBy",
+                "targets": ["1234abcd1234abcd1234abcg"]
             };
 
             getActiveTaskGraph.resolves('');
-            needByIdentifier.withArgs(computeNodeBefore.id).resolves(computeNodeBefore);
-            updateByIdentifier.withArgs(computeNodeBefore.id).resolves(computeNode);
+            needByIdentifier.withArgs(computeNode.id).resolves(computeNodeBefore);
+            needByIdentifier.withArgs(computeNode2.id).resolves(computeNode2);
+            needByIdentifier.withArgs(pduNode.id).resolves(pduNode);
+            updateByIdentifier.withArgs(pduNode.id).resolves(pduNodeAfter);
 
-            return nodeApiService.removeNode(clusterNode)
+            return nodeApiService.removeNode(enclosureNode)
             .then(function (node){
-                expect(node).to.equal(clusterNode);
-                expect(waterline.nodes.destroy).to.have.been.calledOnce;
-                expect(waterline.nodes.destroy).to.have.been.calledWith({id: clusterNode.id});
+                expect(node).to.equal(enclosureNode);
+                expect(waterline.nodes.destroy).to.have.been.calledTrice;
                 expect(updateByIdentifier).to.have.been
-                    .calledWith(computeNode.id,
-                                {relations: computeNode.relations});
+                    .calledWith(pduNode.id,
+                                {relations: pduNodeAfter.relations});
             });
         });
 
