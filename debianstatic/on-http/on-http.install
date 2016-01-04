@@ -3,6 +3,7 @@ lib /var/renasar/on-http
 static /var/renasar/on-http
 data /var/renasar/on-http
 build /var/renasar/on-http
+skupack.d /var/renasar/on-http
 index.js /var/renasar/on-http
 migrate.js /var/renasar/on-http
 app.js /var/renasar/on-http
