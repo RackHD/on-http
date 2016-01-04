@@ -7,7 +7,5 @@ Standards-Version: 3.9.4
 
 Package: python-on-http
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},
- python2.7 
-Description: python-on-http
- Python client library for RackHD on-http service.
+Depends: ${shlibs:Depends}, ${misc:Depends}, python2.7 
+Description: Python client library for RackHD on-http service.
