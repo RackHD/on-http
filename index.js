@@ -25,7 +25,7 @@ function onHttpContextFactory(di, directory) {
         helper: helper,
 
         initialize: function () {
-            var injector = new di.Injector(_.flatten([
+            var injector = new di.Injector(_.flattenDeep([
                 core.injectables,
                 this.prerequisiteInjectables,
                 this.expressApp(),
@@ -39,12 +39,12 @@ function onHttpContextFactory(di, directory) {
             return this;
         },
 
-        injectables: _.flatten([
+        injectables: _.flattenDeep([
             helper.requireGlob(__dirname + '/lib/**/*.js'),
             require('./app')
         ]),
 
-        prerequisiteInjectables: _.flatten([
+        prerequisiteInjectables: _.flattenDeep([
             onTasks.injectables,
             helper.simpleWrapper(ws, 'ws'),
             helper.simpleWrapper(ws.Server, 'WebSocketServer')

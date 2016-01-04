@@ -23,7 +23,7 @@ helper.startServer = function (overrides) {
         }, 'Protocol.Dhcp')
     ]);
 
-    helper.setupInjector(_.flatten([
+    helper.setupInjector(_.flattenDeep([
         onHttpContext.prerequisiteInjectables,
         onHttpContext.expressApp(),
         onHttpContext.injectables,

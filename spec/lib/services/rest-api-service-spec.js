@@ -63,7 +63,7 @@ describe('Http.Server', function () {
             );
         };
 
-        helper.setupInjector(_.flatten([
+        helper.setupInjector(_.flattenDeep([
             helper.require('/lib/services/rest-api-service.js'),
             helper.di.simpleWrapper(MockSerializable, 'MockSerializable'),
             helper.di.simpleWrapper(ThrowSerializable, 'ThrowSerializable')
@@ -489,4 +489,3 @@ describe('Http.Server', function () {
         });
     });
 });
-
