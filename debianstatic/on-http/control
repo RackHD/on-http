@@ -7,10 +7,5 @@ Standards-Version: 3.9.4
 
 Package: on-http
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},
- nodejs,
- nodejs-legacy,
- npm,
- mongodb
-Description: on-http
- monorail http engine
+Depends: ${shlibs:Depends}, ${misc:Depends}, nodejs, nodejs-legacy, npm, mongodb
+Description: RackHD HTTP engine service
