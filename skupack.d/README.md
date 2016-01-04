@@ -14,7 +14,7 @@ to potentially override the files and templates that are served for nodes with S
     |  \-- templates
     |      |-- esx-ks
     |      \-- renasar-ansible.pub
-    \-- 5661e0b5f0e1a18e6f18b98d.js
+    \-- 5661e0b5f0e1a18e6f18b98d.json
 
 ## :skuid.js Contents
 

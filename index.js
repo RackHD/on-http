@@ -41,7 +41,9 @@ function onHttpContextFactory(di, directory) {
 
         injectables: _.flattenDeep([
             helper.requireGlob(__dirname + '/lib/**/*.js'),
-            require('./app')
+            require('./app'),
+            helper.requireWrapper('rimraf', 'rimraf'),
+            helper.requireWrapper('os-tmpdir', 'osTmpdir')
         ]),
 
         prerequisiteInjectables: _.flattenDeep([
