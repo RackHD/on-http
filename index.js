@@ -72,7 +72,7 @@ function run() {
         });
 
     process.on('SIGINT', function() {
-        http.stop()
+        app.stop()
             .catch(function(error) {
                 logger.critical('Server Shutdown Error.', { error: error });
             })
