@@ -13,6 +13,7 @@ describe("Http.Services.Api.Nodes", function () {
     var getActiveTaskGraph;
     var computeNode;
     var enclosureNode;
+    var _;
 
     before("Http.Services.Api.Nodes before", function() {
         helper.setupInjector([
@@ -22,6 +23,7 @@ describe("Http.Services.Api.Nodes", function () {
         Errors = helper.injector.get("Errors");
         taskGraphProtocol = helper.injector.get("Protocol.TaskGraphRunner");
         waterline = helper.injector.get('Services.Waterline');
+        _ = helper.injector.get('_');
         waterline.nodes = {
             needByIdentifier: function() {},
             updateByIdentifier: function() {},
@@ -83,7 +85,7 @@ describe("Http.Services.Api.Nodes", function () {
         beforeEach(function() {
         });
 
-        it("_findTargetNodes should find related enclosure nodes", function() {
+        it("_findTargetNodes should find related target nodes", function() {
             needByIdentifier.resolves(enclosureNode);
 
             return nodeApiService._findTargetNodes(computeNode, 'enclosedBy')
@@ -93,7 +95,7 @@ describe("Http.Services.Api.Nodes", function () {
             });
         });
 
-        it("_findTargetNodes should return nothing if cannot find enclosure node", function() {
+        it("_findTargetNodes should return nothing if cannot find target node", function() {
             needByIdentifier.rejects(Errors.NotFoundError(''));
 
             return nodeApiService._findTargetNodes(computeNode, 'enclosedBy')
@@ -111,7 +113,7 @@ describe("Http.Services.Api.Nodes", function () {
 
             return nodeApiService._findTargetNodes(node, 'enclosedBy')
             .then(function (nodes) {
-                expect(nodes).to.equal(undefined);
+                expect(nodes).to.deep.equal([]);
             });
         });
 
@@ -119,7 +121,7 @@ describe("Http.Services.Api.Nodes", function () {
 
             return nodeApiService._findTargetNodes(null, 'enclosedBy')
             .then(function (nodes) {
-                expect(nodes).to.equal(undefined);
+                expect(nodes).to.deep.equal([]);
             });
         });
 
@@ -133,14 +135,14 @@ describe("Http.Services.Api.Nodes", function () {
             updateByIdentifier.resolves();
         });
 
-        it("_removeRelation should fail if enclosure node is null", function() {
+        it("_removeRelation should fail if target node is null", function() {
             return nodeApiService._removeRelation(null, 'encloses', computeNode.id)
             .then(function () {
                 expect(updateByIdentifier).to.not.have.been.called;
             });
         });
 
-        it("_removeRelation should fail if relation type of enclosure node is null", function() {
+        it("_removeRelation should fail if relation type of target node is null", function() {
             var enclNodes = [
                 {
                     id: '1234abcd1234abcd1234abcd',
@@ -299,6 +301,38 @@ describe("Http.Services.Api.Nodes", function () {
             });
         });
 
+        it("removeNode should only delete required node when cannot get target node", function() {
+            getActiveTaskGraph.resolves('');
+            needByIdentifier.rejects();
+
+            return nodeApiService.removeNode(computeNode)
+            .then(function (node){
+                expect(node).to.equal(computeNode);
+                expect(updateByIdentifier).to.not.have.been.called;
+                expect(waterline.nodes.destroy).to.have.been.calledOnce;
+            });
+        });
+
+        it("removeNode should only delete required node when no target node", function() {
+            var noopNode = {
+                id: '1234abcd1234abcd1234abcf',
+                type: 'enclosure',
+                relations: [
+                    {
+                        'relationType': 'encloses'
+                    }
+                ]
+            };
+
+            getActiveTaskGraph.resolves('');
+            return nodeApiService.removeNode(noopNode)
+            .then(function (node){
+                expect(node).to.equal(noopNode);
+                expect(updateByIdentifier).to.not.have.been.called;
+                expect(waterline.nodes.destroy).to.have.been.calledOnce;
+            });
+        });
+
         it("removeNode should only update enclosure node when no compute node target", function() {
             var enclNode = {
                 id: '1234abcd1234abcd1234abcf',
@@ -415,7 +449,7 @@ describe("Http.Services.Api.Nodes", function () {
             });
         });
 
-        it("removeNode should not delete enlosure when active workflow", function() {
+        it("removeNode should not delete enlosure when active workflow", function(done) {
             var computeNode2 = {
                 id: '1234abcd1234abcd1234abce',
                 type: 'compute',
@@ -441,10 +475,19 @@ describe("Http.Services.Api.Nodes", function () {
             updateByIdentifier.withArgs(computeNode2.id).resolves(computeNode2After);
 
             return nodeApiService.removeNode(enclosureNode)
-            .catch(function (err){
-                expect(err.name).to.equal('BadRequestError');
-                expect(waterline.nodes.destroy).to.not.have.been.called;
-                expect(updateByIdentifier).to.not.have.been.called;
+            .then(function() {
+                done(new Error("Expected job to fail"));
+            })
+            .catch(function(e) {
+                try {
+                    expect(e).to.equal('Could not remove node ' + computeNode2.id +
+                        ', active workflow is running');
+                    expect(waterline.nodes.destroy).to.not.have.been.called;
+                    expect(updateByIdentifier).to.not.have.been.called;
+                    done();
+                } catch (e) {
+                    done(e);
+                }
             });
         });
 
