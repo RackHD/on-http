@@ -43,7 +43,7 @@ describe("File Service", function() {
 
     before(function() {
         helper.setupInjector(
-            _.flatten([
+            _.flattenDeep([
                helper.require('/lib/services/file-service'),
                 helper.require('/lib/services/files/file-plugin'),
                 dihelper.simpleWrapper(MockBack, 'Files.Mock')
@@ -94,7 +94,7 @@ describe("File Service", function() {
     describe("fileService startup", function() {
         beforeEach(function() {
             injector = helper.setupInjector(
-                _.flatten([
+                _.flattenDeep([
                     helper.require('/lib/services/file-service'),
                     helper.require('/lib/services/files/file-plugin'),
                     dihelper.simpleWrapper(MockBack, 'Files.Mock')
@@ -168,7 +168,7 @@ describe("File Service", function() {
 
         beforeEach(function() {
             injector = helper.setupInjector(
-                _.flatten([
+                _.flattenDeep([
                     helper.require('/lib/services/file-service'),
                     helper.require('/lib/services/files/file-plugin'),
                     dihelper.simpleWrapper(MockBack, 'Files.Mock')

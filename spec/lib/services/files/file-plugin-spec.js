@@ -16,7 +16,7 @@ describe("fileService disk backend", function() {
 
     beforeEach(function(){
         helper.setupInjector(
-            _.flatten([
+            _.flattenDeep([
                 helper.require('/lib/services/files/file-plugin')
             ])
         );
@@ -82,7 +82,7 @@ describe("fileService disk backend", function() {
         execker = {};
 
         helper.setupInjector(
-            _.flatten([
+            _.flattenDeep([
                 helper.require('/lib/services/files/file-plugin')
             ])
         );

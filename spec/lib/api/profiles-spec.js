@@ -49,7 +49,7 @@ describe('Http.Api.Profiles', function () {
                 if (typeof obj[method].restore === 'function') {
                     obj[method].restore();
                 }
-            });
+            }).value();
         }
         resetMocks(lookupService);
         resetMocks(taskProtocol);

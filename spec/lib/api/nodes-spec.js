@@ -49,7 +49,7 @@ describe('Http.Api.Nodes', function () {
                 if (obj[method] && obj[method].reset) {
                   obj[method].reset();
                 }
-            });
+            }).value();
         }
 
         resetStubs(configuration);
