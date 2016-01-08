@@ -184,4 +184,3 @@ function prepareGrunt(grunt) {
     // By default, lint and run all tests.
     grunt.registerTask('default', ['jshint', 'coverage', 'swagger']);
 }
-
