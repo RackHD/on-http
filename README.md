@@ -16,6 +16,9 @@ Note: requires MongoDB and RabbitMQ to be running to start correctly.
 
     sudo node index.js
 
+ * http://127.0.0.1/ui -- RackHD Web UI
+ * http://127.0.0.1/docs -- RackHD Docs
+
 ## Config
 
 The `fileService` requires a "fileService" key which holds keys mapping backend

@@ -41,9 +41,11 @@ node_modules
 .idea
 
 # static images
+static/ansible/
 static/files/
 static/http/
-static/tftp/
 static/smb/
-static/ansible/
+static/tftp/
+static/web-ui/
+
 build/
