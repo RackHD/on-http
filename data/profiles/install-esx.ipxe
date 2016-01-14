@@ -2,7 +2,7 @@ iseq ${platform} efi && goto is_efi || goto not_efi
 
 :not_efi
 set 209:string http://<%=server%>:<%=port%>/api/common/templates/esx-pxelinux-cfg
-chain tftp://<%=server%>/undionly.kpxe
+chain tftp://<%=server%>/undionly.kkpxe
 boot
 
 :is_efi
