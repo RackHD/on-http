@@ -32,6 +32,7 @@
     "on-tasks": "git+https://github.com/RackHD/on-tasks.git",
     "pluralize": "~1.1.2",
     "ws": "^0.8.0",
+    "swagger-express-mw": "^0.6.0",
     "os-tmpdir": "~1.0.1",
     "rimraf": "~2.5.0",
     "tar": "~2.2.1"

@@ -8,3 +8,4 @@ index.js /var/renasar/on-http
 migrate.js /var/renasar/on-http
 app.js /var/renasar/on-http
 commitstring.txt /var/renasar/on-http
+swagger_config  /var/renasar/on-http

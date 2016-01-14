@@ -8,7 +8,7 @@ var ws = require('ws');
 
 var util = require('util');
 
-global.onHttpContext = require('../index')();
+global.onHttpContext = require('../index').onHttpContextFactory();
 
 // Legacy
 global.dihelper = onHttpContext.helper;
