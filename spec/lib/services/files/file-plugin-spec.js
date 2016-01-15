@@ -74,10 +74,10 @@ describe("fileService disk backend", function() {
         waterline.files.findOne = sinon.stub();
 
         fs = helper.injector.get('fs');
-        fs.unlink = sinon.stub();
-        fs.exists = sinon.stub();
-        fs.createReadStream = sinon.stub();
-        fs.createWriteStream = sinon.stub();
+        sinon.stub(fs, 'unlink');
+        sinon.stub(fs, 'exists');
+        sinon.stub(fs, 'createReadStream');
+        sinon.stub(fs, 'createWriteStream');
 
         execker = {};
 
@@ -86,6 +86,14 @@ describe("fileService disk backend", function() {
                 helper.require('/lib/services/files/file-plugin')
             ])
         );
+    });
+
+    afterEach(function() {
+        fs = helper.injector.get('fs');
+        fs.unlink.restore();
+        fs.exists.restore();
+        fs.createReadStream.restore();
+        fs.createWriteStream.restore();
     });
 
     it("should resolve a promise on successful get", function() {

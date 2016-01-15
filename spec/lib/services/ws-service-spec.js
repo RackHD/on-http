@@ -15,6 +15,8 @@ describe('Services.WebSocket', function () {
             onHttpContext.helper.simpleWrapper(WebSocket.Server, 'WebSocketServer'),
             onHttpContext.helper.simpleWrapper({}, 'Task.Services.OBM'),
             onHttpContext.helper.simpleWrapper({}, 'ipmi-obm-service'),
+            onHttpContext.helper.requireWrapper('rimraf', 'rimraf'),
+            onHttpContext.helper.requireWrapper('os-tmpdir', 'osTmpdir'),
             helper.requireGlob('/lib/**/*.js')
         ];
     });

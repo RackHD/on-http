@@ -10,6 +10,10 @@ describe('Http.Api.Skus', function () {
         taskGraphProtocol = {
             runTaskGraph: sinon.stub()
         };
+        helper.setupInjector([
+            helper.require("/lib/services/sku-pack-service"),
+            dihelper.simpleWrapper(function(string) { arguments[1](); }, 'rimraf')
+        ]);
         return helper.startServer([
             dihelper.simpleWrapper(taskGraphProtocol, 'Protocol.TaskGraphRunner')
         ]);
@@ -198,6 +202,127 @@ describe('Http.Api.Skus', function () {
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, []);
             });
+        });
+
+        describe('PUT /skus/pack', function () {
+            var skuService;
+            var _resolve, _reject;
+
+            beforeEach('setup', function () {
+                skuService = helper.injector.get('Http.Services.SkuPack'); 
+                sinon.stub(skuService, 'installPack');
+                sinon.stub(skuService, 'registerPack');
+                skuService.installPack.resolves(['filename', 'contents']);
+                skuService.registerPack.resolves();
+            });
+
+            beforeEach('reset runTaskGraph stub', function () {
+                taskGraphProtocol.runTaskGraph.resolves();
+            });
+
+            afterEach('teardown', function () {
+                skuService.installPack.restore();
+                skuService.registerPack.restore();                
+            });
+
+            it('should process a .tar.gz file', function () {
+                var skus = helper.injector.get('Http.Api.Skus');
+                var fs = helper.injector.get('fs');                
+                var req = fs.createReadStream('spec/lib/services/sku-static/pack.tar.gz');
+                var Promise = helper.injector.get('Promise');
+                var promise = new Promise(function(resolve, reject) {
+                    _resolve = resolve;
+                    _reject = reject;
+                });                
+                var res = {
+                    status: function(code) {
+                        if(code === 201) {
+                            _resolve(201);
+                        }
+                        _reject(code);
+                    },
+                    send: sinon.stub()
+                };
+                
+                req.on('open', function() {
+                    skus.skuPackHandler(req, res);
+                });
+
+                return promise.then(function(code) {
+                    expect(code).to.equal(201);
+                    expect(skuService.installPack.called).to.be.true;
+                    expect(skuService.registerPack.called).to.be.true;
+                });
+            });
+
+            it('should process a .tar.gz file with a sku', function() {
+                var skus = helper.injector.get('Http.Api.Skus');
+                var fs = helper.injector.get('fs');                
+                var req = fs.createReadStream('spec/lib/services/sku-static/pack.tar.gz');
+                var Promise = helper.injector.get('Promise');
+                var promise = new Promise(function(resolve, reject) {
+                    _resolve = resolve;
+                    _reject = reject;
+                });                
+                var res = {
+                    status: function(code) {
+                        if(code === 201) {
+                            _resolve(201);
+                        }
+                        _reject(code);
+                    },
+                    send: sinon.stub()
+                };
+                
+                skus.skuPackHandler(req, res, 'skuid');
+
+                return promise.then(function(code) {
+                    expect(code).to.equal(201);
+                    expect(skuService.installPack.called).to.be.true;
+                    expect(skuService.registerPack.called).to.be.true;
+                });
+            });
+        });
+
+        describe('DELETE /skus/:id/pack', function () {
+            beforeEach('create node', function () {
+                var waterline = helper.injector.get('Services.Waterline');
+                return waterline.nodes.create({ name: 'sku test node' }).then(function (node_) {
+                    node = node_;
+                });
+            });
+
+            beforeEach('reset runTaskGraph stub', function () {
+                taskGraphProtocol.runTaskGraph.reset();
+            });
+
+            beforeEach('POST /sku', function () {
+                input = {
+                    name: 'my test sku',
+                    rules: [
+                        {
+                            path: 'dmi.dmi.base_board.manufacturer',
+                            contains: 'Intel'
+                        },
+                        {
+                            path: 'dmi.memory.total',
+                            equals: '32946864kB'
+                        }
+                    ],
+                    discoveryGraphName: 'TestGraph.Dummy',
+                    discoveryGraphOptions: { test: 1 }
+                };
+
+                return helper.request().post('/api/1.1/skus')
+                .send(input)
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .then(function (req) {
+                    sku = req.body;
+                });
+            });
+
+
         });
 
     });

@@ -15,6 +15,8 @@ describe('Http.Server', function () {
             dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
             dihelper.simpleWrapper({}, 'ipmi-obm-service'),
+            dihelper.requireWrapper('rimraf', 'rimraf'),
+            dihelper.requireWrapper('os-tmpdir', 'osTmpdir'),
             helper.require('/lib/services/http-service'),
             helper.requireGlob('/lib/**/*.js')
         ];
