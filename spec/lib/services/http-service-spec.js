@@ -12,13 +12,16 @@ describe('Http.Server', function () {
     helper.before(function () {
         return [
             dihelper.simpleWrapper(require('express')(), 'express-app'),
+            dihelper.simpleWrapper(require('swagger-express-mw'), 'swagger'),
             dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
             dihelper.simpleWrapper({}, 'ipmi-obm-service'),
             dihelper.requireWrapper('rimraf', 'rimraf'),
             dihelper.requireWrapper('os-tmpdir', 'osTmpdir'),
             helper.require('/lib/services/http-service'),
-            helper.requireGlob('/lib/**/*.js')
+            helper.requireGlob('/lib/api/1.1/*.js'),
+            helper.requireGlob('/lib/services/**/*.js'),
+            helper.requireGlob('/lib/serializables/**/*.js')
         ];
     });
 

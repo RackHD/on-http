@@ -9,8 +9,10 @@ describe('common-api-router', function () {
 
     helper.before(function () {
         return [
-            helper.require('/lib/api/index.js'),
-            helper.requireGlob('/lib/**/*.js'),
+            helper.require('/lib/api/1.1/index.js'),
+            helper.requireGlob('/lib/api/1.1/*.js'),
+            helper.requireGlob('/lib/services/**/*.js'),
+            helper.requireGlob('/lib/serializables/**/*.js'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
             dihelper.simpleWrapper({}, 'ipmi-obm-service'),
             dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),

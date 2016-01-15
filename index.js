@@ -9,7 +9,10 @@ var _ = require('lodash'),
     onTasks = require('on-tasks'),
     ws = require('ws');
 
-module.exports = onHttpContextFactory;
+var self = module.exports = {
+    injector: null,
+    onHttpContextFactory: onHttpContextFactory
+};
 
 function onHttpContextFactory(di, directory) {
     di = di || _di;
@@ -33,14 +36,16 @@ function onHttpContextFactory(di, directory) {
             ]));
 
             this.app = injector.get('app'),
-            this.injector = injector;
             this.logger = injector.get('Logger').initialize('Http.Server');
+            self.injector = injector;
 
             return this;
         },
 
         injectables: _.flattenDeep([
-            helper.requireGlob(__dirname + '/lib/**/*.js'),
+            helper.requireGlob(__dirname + '/lib/api/1.1/*.js'),
+            helper.requireGlob(__dirname + '/lib/services/**/*.js'),
+            helper.requireGlob(__dirname + '/lib/serializables/**/*.js'),
             require('./app'),
             helper.requireWrapper('rimraf', 'rimraf'),
             helper.requireWrapper('os-tmpdir', 'osTmpdir')
@@ -49,7 +54,8 @@ function onHttpContextFactory(di, directory) {
         prerequisiteInjectables: _.flattenDeep([
             onTasks.injectables,
             helper.simpleWrapper(ws, 'ws'),
-            helper.simpleWrapper(ws.Server, 'WebSocketServer')
+            helper.simpleWrapper(ws.Server, 'WebSocketServer'),
+            helper.requireWrapper('swagger-express-mw', 'swagger')
         ])
     };
 }
