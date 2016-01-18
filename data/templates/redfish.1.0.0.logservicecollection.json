@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/LogServices/#entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#LogServiceCollection.LogServiceCollection",
+    "Oem" : {},
+    "Name": "Log Service Collection",
+    "Members@odata.count": <%= logSource.length %>,
+    "Members": [
+        <% logSource.forEach(function(type, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/LogServices/<%=type%>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}

@@ -35,7 +35,9 @@
     "swagger-express-mw": "^0.6.0",
     "os-tmpdir": "~1.0.1",
     "rimraf": "~2.5.0",
-    "tar": "~2.2.1"
+    "tar": "~2.2.1",
+    "tv4": "~1.2.7",
+    "swagger-tools": "~0.9.11"
   },
   "devDependencies": {
     "apidoc": "^0.12.1",

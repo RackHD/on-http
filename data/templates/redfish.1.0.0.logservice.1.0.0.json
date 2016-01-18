@@ -1,0 +1,24 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/LogServices/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#LogService.1.0.0.LogService",
+    "Oem" : {},
+    "Id": "<%=type%>",
+    "Description": "<%=description%>",
+    "Name": "<%=name%>",
+    "ServiceEnabled": true,
+    "MaxNumberOfRecords": <%= log.size %>,
+    "OverWritePolicy": "<%= log.policy || 'Unknown' %>",
+    "DateTime": "<%= log.lastWriteDate || 'Unknown' %>",
+    "DateTimeLocalOffset": "+00:00",
+    "Actions" : {
+        "Oem": {},
+        "#LogService.ClearLog": {
+            "target": "/api/common/node/<%=identifier%>/workflows?name=Graph.ClearSEL.Node"
+        }
+    },
+    "Status": {},
+    "Entries": {
+        "@odata.id": "<%=url%>/Entries"
+    }
+}

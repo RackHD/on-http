@@ -1,0 +1,34 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/LogServices/Members/<%=type%>/Entries",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#LogEntryCollection.LogEntryCollection",
+    "Oem" : {},
+    "Name": "Log Service Entry Collection",
+    "Members@odata.count": <%= logEntries.length %>,
+    "Members": [
+        <% logEntries.forEach(function(entry, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/LogServices/<%=type%>/Entries/<%= entry.logId %>",
+                "@odata.type": "#LogEntry.1.0.0.LogEntry",
+                "Oem": {},
+                "Id": "<%= entry.logId %>",
+                "Name": "name",
+                "Severity": "Warning",
+                "EntryType": "<%= type.toUpperCase() %>",
+                "Created": "2012-03-07T14:44",
+                "OemRecordFormat": "",
+                "EntryCode": "<%= entry.value %>",
+                "SensorType": "<%= entry.sensorType %>",
+                "SensorNumber": 0,
+                "Message": "<%= entry.event %>",
+                "MessageId": "",
+                "MessageArgs": [],
+                "Links": {
+                    "Oem": {},
+                    "OriginOfCondition": "/redfish/v1/Chassis/<%=identifier%>/Thermal"
+                }
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}

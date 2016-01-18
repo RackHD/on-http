@@ -1,0 +1,25 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/Processors/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Processor.1.0.0.Processor",
+    "Oem" : {},
+    "Id": "<%=socketId%>",
+    "Socket": "<%= dmi.data['Processor Information'][socketId]['Socket Designation'] %>",
+    "ProcessorType": "CPU",
+    "ProcessorArchitecture": "x86",
+    "InstructionSet": "<%= ohai.data.kernel.machine.replace('_', '-') %>",
+    "Manufacturer": "<%= dmi.data['Processor Information'][socketId].Manufacturer %>",
+    "Model": "<%= dmi.data['Processor Information'][socketId].Version %>",
+    "MaxSpeedMHz": <%= dmi.data['Processor Information'][socketId]['Max Speed'].split(' ')[0] %>,
+    "TotalCores": <%= dmi.data['Processor Information'][socketId]['Core Count'] %>,
+    "TotalThreads": <%= dmi.data['Processor Information'][socketId]['Thread Count'] %>,
+    "Status": {},
+    "ProcessorId" : {
+        "VendorId": "<%= ohai.data.cpu[socketId].vendor_id %>",
+        "IdentificationRegisters": "<%= dmi.data['Processor Information'][socketId].ID %>",
+        "EffectiveFamily": "<%= dmi.data['Processor Information'][socketId].Family %>",
+        "EffectiveModel": "<%= dmi.data['Processor Information'][socketId].Version %>",
+        "Step": "",
+        "MicrocodeInfo": ""
+    }
+}
