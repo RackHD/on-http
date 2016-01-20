@@ -4,9 +4,13 @@
 'use strict';
 
 var ws = require('ws');
+var express = require('express');
 
 describe('Http.Server', function () {
-    var app, server;
+    var HttpService;
+    var services = [];
+    var singleService;
+    var defaultRouter = express.Router();
 
     var nock = require('nock');
     helper.before(function () {
@@ -20,20 +24,18 @@ describe('Http.Server', function () {
             dihelper.requireWrapper('rimraf', 'rimraf', undefined, __dirname),
             dihelper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),
             helper.require('/lib/services/http-service'),
-            helper.requireGlob('/lib/api/1.1/*.js'),
+            helper.requireGlob('/lib/api/1.1/**/*.js'),
             helper.requireGlob('/lib/services/**/*.js'),
             helper.requireGlob('/lib/serializables/**/*.js')
         ];
     });
 
     before(function () {
-        app = helper.injector.get('express-app');
+        HttpService = helper.injector.get('Http.Server');
 
-        app.use('/test', function (req, res) {
+        defaultRouter.use('/test', function (req, res) {
             res.send('Hello World!');
         });
-
-        server = helper.injector.get('Http.Server');
     });
 
     helper.after();
@@ -47,13 +49,11 @@ describe('Http.Server', function () {
     });
 
     describe('http', function () {
-        before('listen', function () {
-            helper.injector.get('Services.Configuration')
-                .set('httpEnabled', true)
-                .set('httpsEnabled', false)
+        before('start', function () {
             // can't use port 80 because it requires setuid root
-                .set('httpBindPort', 8089);
-            server.listen();
+            singleService = new HttpService({ port: 8089 });
+            singleService.app.use(defaultRouter);
+            singleService.start();
         });
 
         it('should respond to requests', function () {
@@ -63,21 +63,24 @@ describe('Http.Server', function () {
             .expect('Hello World!');
         });
 
-        after('close', function () {
-            server.close();
+        after('stop', function () {
+            singleService.stop();
         });
     });
 
     describe('https', function () {
-        before('listen', function () {
-            helper.injector.get('Services.Configuration')
-                .set('httpEnabled', false)
-                .set('httpsEnabled', true)
-                .set('httpsCert', 'data/dev-cert.pem')
-                .set('httpsKey', 'data/dev-key.pem')
+        before('start', function () {
             // can't use port 443 because it requires setuid root
-                .set('httpsBindPort', 8443);
-            server.listen();
+            singleService = new HttpService(
+                {
+                    'port': 8443,
+                    'httpsEnabled': true,
+                    'httpsCert': 'data/dev-cert.pem',
+                    'httpsKey': 'data/dev-key.pem'
+                }
+            );
+            singleService.app.use(defaultRouter);
+            singleService.start();
         });
 
         it('should respond to requests', function () {
@@ -87,20 +90,23 @@ describe('Http.Server', function () {
             .expect('Hello World!');
         });
 
-        after('close', function () {
-            server.close();
+        after('stop', function () {
+            singleService.stop();
         });
     });
 
     describe('https with pfx', function () {
-        before('listen', function () {
-            helper.injector.get('Services.Configuration')
-                .set('httpEnabled', false)
-                .set('httpsEnabled', true)
-                .set('httpsPfx', 'data/dev.pfx')
+        before('start', function () {
             // can't use port 443 because it requires setuid root
-                .set('httpsBindPort', 8444);
-            server.listen();
+            singleService = new HttpService(
+                {
+                    'port': 8444,
+                    'httpsEnabled': true,
+                    'httpsPfx': 'data/dev.pfx'
+                }
+            );
+            singleService.app.use(defaultRouter);
+            singleService.start();
         });
 
         it('should respond to requests', function () {
@@ -110,23 +116,81 @@ describe('Http.Server', function () {
             .expect('Hello World!');
         });
 
-        after('close', function () {
-            server.close();
+        after('stop', function () {
+            singleService.stop();
         });
     });
 
-    it('should throw an error if http and https are both disabled', function () {
-        helper.injector.get('Services.Configuration')
-        .set('httpEnabled', false)
-        .set('httpsEnabled', false);
+    describe('http multi endpoints', function () {
+        before('start', function () {
+            var endpoints = [
+                {
+                    'address': '0.0.0.0',
+                    'port': 8443,
+                    'httpsEnabled': true,
+                    'httpsCert': 'data/dev-cert.pem',
+                    'httpsKey': 'data/dev-key.pem',
+                    'httpsPfx': null,
+                },
+                {
+                    'address': '0.0.0.0',
+                    'port': 9080,
+                    'httpsEnabled': false,
+                },
+                {
+                    'address': '0.0.0.0',
+                    'port': 8080,
+                    'httpsEnabled': false,
+                }
+            ];
 
-        expect(function () {
-            server.listen();
-        }).to.throw(Error);
+            var requestHandler = function (req, res) {
+                res.send('This is from endpoint path ' + req.baseUrl);
+            };
+            for (var i = 0; i < endpoints.length; i += 1) {
+                var service = new HttpService(endpoints[i]);
+                services.push(service);
+                service.app.use('/test/' + i, requestHandler);
+                service.start();
+            }
+        });
+
+        it('should respond to request to endpoint 1', function () {
+            return helper.request('https://localhost:8443')
+            .get('/test/0')
+            .expect(200)
+            .expect('This is from endpoint path /test/0');
+        });
+
+        it('should respond to request to endpoint 2', function () {
+            return helper.request('http://localhost:9080')
+            .get('/test/1')
+            .expect(200)
+            .expect('This is from endpoint path /test/1');
+        });
+
+        it('should respond to request to endpoint 3', function () {
+            return helper.request('http://localhost:8080')
+            .get('/test/2')
+            .expect(200)
+            .expect('This is from endpoint path /test/2');
+        });
+
+        it('should respond Not Found to incorrect router path', function () {
+            return helper.request('http://localhost:8080')
+            .get('/test/1')
+            .expect(404);
+        });
+
+        after('stop', function () {
+            services.forEach(function (service) {
+                service.stop();
+            });
+        });
     });
 
     describe('http proxy', function () {
-        before('listen', function () {
+        before('start', function () {
             var proxyConfig = [
                 {
                     "localPath": "/local/proxy1",
@@ -153,6 +217,24 @@ describe('Http.Server', function () {
                 }
             ];
 
+            helper.injector.get('Services.Configuration')
+                .set('httpProxies', proxyConfig);
+
+            singleService = new HttpService(
+                {
+                    'port': 8099,
+                    'httpsEnabled': false,
+                    'proxiesEnabled': true
+                }
+            );
+            defaultRouter.use('/local/proxy5/foo/bar', function (req, res) {
+                res.send('This is local Foo Bar5!');
+            });
+
+            singleService.app.use(defaultRouter);
+
+            singleService.start();
+
             nock('http://test.com')
                 .get('/').reply(200, 'Root Resource')
                 .get('/remote1/foo/bar').reply(200, 'This is Foo Bar1!')
@@ -160,17 +242,6 @@ describe('Http.Server', function () {
                 .get('/remote3/foo/bar').reply(200, 'This is Foo Bar3!')
                 .get('/remote4/foo/bar').reply(200, 'This is Foo Bar4!')
                 .get('/remote5/foo/bar').reply(200, 'This is Foo Bar5!');
-
-            app.use('/local/proxy5/foo/bar', function (req, res) {
-                res.send('This is local Foo Bar5!');
-            });
-
-            helper.injector.get('Services.Configuration')
-                .set('httpEnabled', true)
-                .set('httpsEnabled', false)
-                .set('httpBindPort', 8099)
-                .set('httpProxies', proxyConfig);
-            server.listen();
         });
 
         it('should respond to remote request via proxy', function () {
@@ -200,8 +271,8 @@ describe('Http.Server', function () {
                 .expect('This is local Foo Bar5!');
         });
 
-        after('close', function () {
-            server.close();
+        after('stop', function () {
+            singleService.stop();
             nock.restore();
             //Configuration is shared globaly
             //Should reset the configureation for other feature unit tests

@@ -14,23 +14,22 @@ di.annotate(Runner, new di.Inject(
         'Services.Configuration',
         'Profiles',
         'Templates',
-        'common-api-router',
         'fileService',
         'Promise',
         'Http.Services.SkuPack'
     )
 );
 function Runner(
-    app,
+    HttpService,
     core,
     configuration,
     profiles,
     templates,
-    router,
     fileService,
     Promise,
     skuPack
 ) {
+    var services = [];
 
     function start() {
         return core.start()
@@ -49,18 +48,22 @@ function Runner(
                 return skuPack.start(configuration.get('skuPackRoot', './skupack.d'));
             })
             .then(function() {
-                return app.listen();
+                var endpoints = configuration.get('httpEndpoints', [{}]);
+                return Promise.map(endpoints, function(endpoint) {
+                    var service = new HttpService(endpoint);
+                    services.push(service);
+                    return service.start();
+                });
             });
     }
 
     function stop() {
-        return Promise.resolve()
-            .then(function() {
-                return app.close();
-            })
-            .then(function() {
-                return core.stop();
-            });
+        return Promise.map(services, function(service) {
+             return service.stop();
+        })
+        .then(function() {
+            return core.stop();
+        });
     }
 
     return {

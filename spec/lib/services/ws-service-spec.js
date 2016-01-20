@@ -6,8 +6,7 @@
 var WebSocket = require('ws');
 
 describe('Services.WebSocket', function () {
-    var app,
-        server;
+    var service;
 
     helper.before(function () {
         return [
@@ -19,25 +18,21 @@ describe('Services.WebSocket', function () {
             onHttpContext.helper.simpleWrapper({}, 'ipmi-obm-service'),
             onHttpContext.helper.requireWrapper('rimraf', 'rimraf', undefined, __dirname),
             onHttpContext.helper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),
-            helper.requireGlob('/lib/api/1.1/*.js'),
+            helper.requireGlob('/lib/api/1.1/**/*.js'),
             helper.requireGlob('/lib/services/**/*.js'),
             helper.requireGlob('/lib/serializables/**/*.js')
         ];
     });
 
     before(function () {
-        app = helper.injector.get('express-app');
-        server = helper.injector.get('Http.Server');
-        helper.injector.get('Services.Configuration')
-                .set('httpEnabled', true)
-                .set('httpsEnabled', false)
-                // can't use port 80 because it requires setuid root
-                .set('httpBindPort', 8089);
-        server.listen();
+        var HttpService = helper.injector.get('Http.Server');
+        // can't use port 80 because it requires setuid root
+        service = new HttpService({ port: 8089 });
+        service.start();
     });
 
     after(function () {
-        server.close();
+        service.stop();
     });
 
     helper.after();

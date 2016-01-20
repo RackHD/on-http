@@ -4,8 +4,6 @@
 
 require('on-core/spec/helper');
 
-var ws = require('ws');
-
 var util = require('util');
 
 var index = require('../index');
@@ -27,7 +25,6 @@ helper.startServer = function (overrides) {
 
     helper.setupInjector(_.flattenDeep([
         onHttpContext.prerequisiteInjectables,
-        onHttpContext.expressApp(),
         onHttpContext.injectables,
         overrides
     ]));
@@ -35,10 +32,13 @@ helper.startServer = function (overrides) {
     helper.setupTestConfig();
 
     helper.injector.get('Services.Configuration')
-        .set('httpEnabled', true)
-        .set('httpsEnabled', false)
-        .set('httpBindPort', 8089)
-        .set('skuPackRoot', 'spec/lib/services/sku-static');
+        .set('skuPackRoot', 'spec/lib/services/sku-static')
+        .set('httpEndpoints', [
+            {
+                'port': 8089,
+                'httpsEnabled': false
+            }
+        ]);
 
     index.injector = helper.injector;
 
