@@ -54,11 +54,18 @@ perl
 libselinux-python
 net-tools
 <% if( typeof kvm !== 'undefined' ) { %>
-    kvm
-    virt-manager
-    libvirt
-    libvirt-python
-    python-virtinst
+    <% if (version === "6.5") { %>
+        kvm
+        virt-manager
+        libvirt
+        libvirt-python
+        python-virtinst
+    <% } else { %>
+        @virtualization-hypervisor
+        @virtualization-client
+        @virtualization-platform
+        @virtualization-tools
+    <% } %>
 <% } %>
 %end
 
