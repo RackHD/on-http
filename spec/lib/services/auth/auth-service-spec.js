@@ -52,11 +52,14 @@ describe('Auth.Service', function () {
     helper.before(function () {
         return [
             dihelper.simpleWrapper(require('express')(), 'express-app'),
+            dihelper.simpleWrapper(require('swagger-express-mw'), 'swagger'),
             dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
             dihelper.simpleWrapper({}, 'ipmi-obm-service'),
             helper.require('/lib/services/http-service'),
-            helper.requireGlob('/lib/**/*.js')
+            helper.requireGlob('/lib/api/1.1/*.js'),
+            helper.requireGlob('/lib/services/**/*.js'),
+            helper.requireGlob('/lib/serializables/**/*.js')
         ];
     });
 
@@ -84,7 +87,7 @@ describe('Auth.Service', function () {
                     expect(res.body.token).to.be.a('string');
                     token = res.body.token;
                     console.log(SUCCESS_STATUS, res.body)
-                })
+                });
         });
 
         it('should able to access with correct token in query string', function () {
@@ -95,7 +98,7 @@ describe('Auth.Service', function () {
                     expect(res.body).to.be.a('object');
                     expect(res.body.apiServerPort).to.equal(8080);
                     console.log(SUCCESS_STATUS);
-                })
+                });
         });
 
         it('should fail with wrong token in query string', function () {
@@ -106,7 +109,7 @@ describe('Auth.Service', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('invalid signature');
                     console.log(UNAUTHORIZED_STATUS, res.body)
-                })
+                });
         });
 
         it('should fail with empty token in query string', function () {
@@ -117,7 +120,7 @@ describe('Auth.Service', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
                     console.log(UNAUTHORIZED_STATUS, res.body)
-                })
+                });
         });
 
         it('should fail with wrong token key in query string', function () {
@@ -128,7 +131,7 @@ describe('Auth.Service', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
                     console.log(UNAUTHORIZED_STATUS, res.body)
-                })
+                });
         });
 
         it('should able to access with correct token in query header', function () {
@@ -141,7 +144,7 @@ describe('Auth.Service', function () {
                     expect(res.body).to.be.a('object');
                     expect(res.body.apiServerPort).to.equal(8080);
                     console.log(SUCCESS_STATUS);
-                })
+                });
         });
 
         it('should fail with wrong token in query header', function () {
@@ -154,7 +157,7 @@ describe('Auth.Service', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('invalid signature');
                     console.log(UNAUTHORIZED_STATUS, res.body)
-                })
+                });
         });
 
         it('should fail with empty token in query header', function () {
@@ -167,7 +170,7 @@ describe('Auth.Service', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
                     console.log(UNAUTHORIZED_STATUS, res.body)
-                })
+                });
         });
 
         it('should fail with wrong token key in query header', function () {
@@ -180,7 +183,7 @@ describe('Auth.Service', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
                     console.log(UNAUTHORIZED_STATUS, res.body)
-                })
+                });
         });
 
         it('should able to access with correct token in query body', function () {
@@ -192,7 +195,7 @@ describe('Auth.Service', function () {
                     expect(res.body).to.be.a('object');
                     expect(res.body.apiServerPort).to.equal(8080);
                     console.log(SUCCESS_STATUS);
-                })
+                });
         });
 
         it('should fail with wrong token in query body', function () {
@@ -204,7 +207,7 @@ describe('Auth.Service', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('invalid signature');
                     console.log(UNAUTHORIZED_STATUS, res.body)
-                })
+                });
         });
 
         it('should fail with empty token in query body', function () {
@@ -216,7 +219,7 @@ describe('Auth.Service', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
                     console.log(UNAUTHORIZED_STATUS, res.body)
-                })
+                });
         });
 
         it('should fail with wrong token key in query body', function () {
@@ -228,7 +231,7 @@ describe('Auth.Service', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
                     console.log(UNAUTHORIZED_STATUS, res.body)
-                })
+                });
         });
 
         it('should fail with no token at all', function () {
@@ -239,7 +242,7 @@ describe('Auth.Service', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
                     console.log(UNAUTHORIZED_STATUS, res.body)
-                })
+                });
         });
 
         after('Clean up', function () {
@@ -349,7 +352,7 @@ describe('Auth.Service', function () {
                     expect(res.body.token).to.be.a('string');
                     token = res.body.token;
                     console.log(SUCCESS_STATUS, res.body)
-                })
+                });
         });
 
         it('should able to access with correct token in query string', function () {
@@ -360,7 +363,7 @@ describe('Auth.Service', function () {
                     expect(res.body).to.be.a('object');
                     expect(res.body.apiServerPort).to.equal(8080);
                     console.log(SUCCESS_STATUS);
-                })
+                });
         });
 
         it('Should get token expire error', function() {
@@ -397,7 +400,7 @@ describe('Auth.Service', function () {
                 helper.injector.get('Services.Configuration')
                     .set('authTokenExpireIn', 0);
                 startServer(endpoint);
-            })
+            });
         });
 
         it('should return a token from /login', function () {
@@ -409,7 +412,7 @@ describe('Auth.Service', function () {
                     expect(res.body.token).to.be.a('string');
                     token = res.body.token;
                     console.log(SUCCESS_STATUS, res.body)
-                })
+                });
         });
 
         it('should able to access with correct token in query string', function () {
@@ -420,7 +423,7 @@ describe('Auth.Service', function () {
                     expect(res.body).to.be.a('object');
                     expect(res.body.apiServerPort).to.equal(8080);
                     console.log(SUCCESS_STATUS);
-                })
+                });
         });
 
         it('Should still able to access after certain time', function() {
@@ -435,7 +438,7 @@ describe('Auth.Service', function () {
                             expect(res.body).to.be.a('object');
                             expect(res.body.apiServerPort).to.equal(8080);
                             console.log(SUCCESS_STATUS);
-                        })
+                        });
                 });
         });
 
@@ -464,7 +467,7 @@ describe('Auth.Service', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Internal server error');
                     console.log(ERROR_STATUS, res.body);
-                })
+                });
         });
 
         after('stop server, restore mock and configure',function () {
@@ -498,7 +501,7 @@ describe('Auth.Service', function () {
                     expect(res.body.token).to.be.a('string');
                     token = res.body.token;
                     console.log(SUCCESS_STATUS, res.body)
-                })
+                });
         });
 
         it('Should get token expire error', function() {

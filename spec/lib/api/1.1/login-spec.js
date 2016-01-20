@@ -43,19 +43,24 @@ describe('Http.Api.Login', function () {
 
     function restoreConfig(){
         helper.injector.get('Services.Configuration')
-            .set('authPasswordHash', 'KcBN9YobNV0wdux8h0fKNqi4uoKCgGl/j8c6YGlG7iA0PB3P9ojbmANGhDlcSBE0iOTIsYsGbtSsbqP4wvsVcw==')
-            .set('authPasswordSalt', 'zlxkgxjvcFwm0M8sWaGojh25qNYO8tuNWUMN4xKPH93PidwkCAvaX2JItLA3p7BSCWIzkw4GwWuezoMvKf3UXg==')
+            .set('authPasswordHash', 'KcBN9YobNV0wdux8h0fKNqi4uoKCgGl/j8c6YGlG7iA' +
+                                     '0PB3P9ojbmANGhDlcSBE0iOTIsYsGbtSsbqP4wvsVcw==')
+            .set('authPasswordSalt', 'zlxkgxjvcFwm0M8sWaGojh25qNYO8tuNWUMN4xKPH93' +
+                                     'PidwkCAvaX2JItLA3p7BSCWIzkw4GwWuezoMvKf3UXg==')
             .set('authTokenExpireIn', 86400)
     }
 
     helper.before(function () {
         return [
             dihelper.simpleWrapper(require('express')(), 'express-app'),
+            dihelper.simpleWrapper(require('swagger-express-mw'), 'swagger'),
             dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
             dihelper.simpleWrapper({}, 'ipmi-obm-service'),
             helper.require('/lib/services/http-service'),
-            helper.requireGlob('/lib/**/*.js')
+            helper.requireGlob('/lib/api/1.1/*.js'),
+            helper.requireGlob('/lib/services/**/*.js'),
+            helper.requireGlob('/lib/serializables/**/*.js')
         ];
     });
 
@@ -83,7 +88,7 @@ describe('Http.Api.Login', function () {
                 .expect(function(res) {
                     expect(res.body.token).to.be.a('string');
                     console.log(SUCCESS_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail with wrong username in request body', function() {
@@ -95,7 +100,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Invalid username or password');
                     console.log(UNAUTHORIZED_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail with wrong password in request body', function() {
@@ -107,7 +112,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Invalid username or password');
                     console.log(UNAUTHORIZED_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail with empty username in request body', function() {
@@ -119,7 +124,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
                     console.log(BAD_REQUEST_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail with empty password in request body', function() {
@@ -131,7 +136,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
                     console.log(BAD_REQUEST_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail with no username key in request body', function() {
@@ -143,7 +148,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
                     console.log(BAD_REQUEST_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail with no password key in request body', function() {
@@ -155,7 +160,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
                     console.log(BAD_REQUEST_STATUS, res.body);
-                })
+                });
         });
 
         it('should return a token with correct credential in query string', function() {
@@ -166,7 +171,7 @@ describe('Http.Api.Login', function () {
                 .expect(function(res) {
                     expect(res.body.token).to.be.a('string');
                     console.log(SUCCESS_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail with wrong username in query string', function() {
@@ -178,7 +183,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Invalid username or password');
                     console.log(UNAUTHORIZED_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail with wrong password in query string', function() {
@@ -190,7 +195,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Invalid username or password');
                     console.log(UNAUTHORIZED_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail with empty username in query string', function() {
@@ -202,7 +207,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
                     console.log(BAD_REQUEST_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail with empty password in query string', function() {
@@ -214,7 +219,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
                     console.log(BAD_REQUEST_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail with no username parameter in query string', function() {
@@ -226,7 +231,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
                     console.log(BAD_REQUEST_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail with no password parameter in query string', function() {
@@ -238,7 +243,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
                     console.log(BAD_REQUEST_STATUS, res.body);
-                })
+                });
         });
 
         //passport-local middleware we choose does not support authentication
@@ -254,7 +259,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
                     console.log(BAD_REQUEST_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail no credential at all - https', function() {
@@ -265,7 +270,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
                     console.log(BAD_REQUEST_STATUS, res.body);
-                })
+                });
         });
 
         after('stop server, restore mock and configure',function () {
@@ -295,7 +300,7 @@ describe('Http.Api.Login', function () {
                 .expect(function(res) {
                     expect(res.body.token).to.be.a('string');
                     console.log(SUCCESS_STATUS, res.body);
-                })
+                });
         });
 
         it('should fail no credential at all - http', function() {
@@ -306,7 +311,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
                     console.log(BAD_REQUEST_STATUS, res.body);
-                })
+                });
         });
 
         after('stop server, restore mock and configure',function () {
@@ -330,7 +335,7 @@ describe('Http.Api.Login', function () {
                 .expect(NOT_FOUND_STATUS)
                 .expect(function(res) {
                     console.log(NOT_FOUND_STATUS, res.body);
-                })
+                });
         });
 
         after('stop server, restore mock and configure',function () {
@@ -356,7 +361,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Internal server error');
                     console.log(ERROR_STATUS, res.body);
-                })
+                });
         });
 
         after('stop server, restore mock and configure',function () {
@@ -382,7 +387,7 @@ describe('Http.Api.Login', function () {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Some other message');
                     console.log(UNAUTHORIZED_STATUS, res.body);
-                })
+                });
         });
 
         after('stop server, restore mock and configure',function () {
