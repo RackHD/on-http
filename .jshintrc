@@ -57,22 +57,20 @@
 
     // Environments
     "node": true,
+    "mocha": true,
 
     //Custom Globals
-    "globals" : {
-        "describe": false,
-        "it": false,
-        "before": false,
-        "beforeEach": false,
-        "after": false,
-        "afterEach": false,
-        "expect": false,
-        "should": false,
-        "request": false,
-        "helper": false,
-        "chai": false,
-        "sinon": false,
-        "dihelper": false,
-        "onHttpContext": false
-    }
+    "predef" : [
+        "_",
+        "chai",
+        "dihelper",
+        "expect",
+        "helper",
+        "onHttpContext",
+        "Promise",
+        "request",
+        "should",
+        "sinon",
+        "sinonPromise"
+    ]
 }
