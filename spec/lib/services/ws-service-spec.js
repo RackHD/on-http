@@ -12,12 +12,13 @@ describe('Services.WebSocket', function () {
     helper.before(function () {
         return [
             onHttpContext.helper.simpleWrapper(require('express')(), 'express-app'),
-            onHttpContext.helper.simpleWrapper(require('swagger-express-mw'), 'swagger'),
+            onHttpContext.helper.simpleWrapper(require('swagger-express-mw'),
+                'swagger', undefined, __dirname),
             onHttpContext.helper.simpleWrapper(WebSocket.Server, 'WebSocketServer'),
             onHttpContext.helper.simpleWrapper({}, 'Task.Services.OBM'),
             onHttpContext.helper.simpleWrapper({}, 'ipmi-obm-service'),
-            onHttpContext.helper.requireWrapper('rimraf', 'rimraf'),
-            onHttpContext.helper.requireWrapper('os-tmpdir', 'osTmpdir'),
+            onHttpContext.helper.requireWrapper('rimraf', 'rimraf', undefined, __dirname),
+            onHttpContext.helper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),
             helper.requireGlob('/lib/api/1.1/*.js'),
             helper.requireGlob('/lib/services/**/*.js'),
             helper.requireGlob('/lib/serializables/**/*.js')

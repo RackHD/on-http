@@ -12,12 +12,13 @@ describe('Http.Server', function () {
     helper.before(function () {
         return [
             dihelper.simpleWrapper(require('express')(), 'express-app'),
-            dihelper.simpleWrapper(require('swagger-express-mw'), 'swagger'),
+            dihelper.simpleWrapper(require('swagger-express-mw'),
+                'swagger', undefined, __dirname),
             dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
             dihelper.simpleWrapper({}, 'ipmi-obm-service'),
-            dihelper.requireWrapper('rimraf', 'rimraf'),
-            dihelper.requireWrapper('os-tmpdir', 'osTmpdir'),
+            dihelper.requireWrapper('rimraf', 'rimraf', undefined, __dirname),
+            dihelper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),
             helper.require('/lib/services/http-service'),
             helper.requireGlob('/lib/api/1.1/*.js'),
             helper.requireGlob('/lib/services/**/*.js'),

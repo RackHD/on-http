@@ -16,8 +16,8 @@ describe('common-api-router', function () {
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
             dihelper.simpleWrapper({}, 'ipmi-obm-service'),
             dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
-            dihelper.requireWrapper('rimraf', 'rimraf'),
-            dihelper.requireWrapper('os-tmpdir', 'osTmpdir')
+            dihelper.requireWrapper('rimraf', 'rimraf', undefined, __dirname),
+            dihelper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname)
         ];
     });
 
