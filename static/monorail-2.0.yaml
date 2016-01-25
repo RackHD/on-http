@@ -1610,9 +1610,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /config:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: config
     get:
-      operationId: unimplemented
+      operationId: getConfig
       summary: |
         get server configuration
       description: |
@@ -1630,7 +1630,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     patch:
-      operationId: unimplemented
+      operationId: patchConfig
       summary: |
         patch/update server configuration
       description: |
@@ -1638,6 +1638,15 @@ paths:
       tags:
         - config
         - patch
+      consumes:
+        - application/json
+      parameters:
+        - name: config
+          in: body
+          description: Updated config fields
+          required: true
+          schema:
+            type: object
       responses:
         200:
           description: An array of configuration objects
