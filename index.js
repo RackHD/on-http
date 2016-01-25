@@ -19,7 +19,6 @@ function onHttpContextFactory(di, directory) {
 
     var core = onCore(di, directory),
         helper = core.helper;
-
     return {
         expressApp: function () {
             return helper.simpleWrapper(express(), 'express-app', undefined, __dirname);
@@ -47,15 +46,15 @@ function onHttpContextFactory(di, directory) {
             helper.requireGlob(__dirname + '/lib/services/**/*.js'),
             helper.requireGlob(__dirname + '/lib/serializables/**/*.js'),
             require('./app'),
-            helper.requireWrapper('rimraf', 'rimraf'),
-            helper.requireWrapper('os-tmpdir', 'osTmpdir')
+            helper.requireWrapper('rimraf', 'rimraf', undefined, __dirname),
+            helper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname)
         ]),
 
         prerequisiteInjectables: _.flattenDeep([
             onTasks.injectables,
             helper.simpleWrapper(ws, 'ws'),
             helper.simpleWrapper(ws.Server, 'WebSocketServer'),
-            helper.requireWrapper('swagger-express-mw', 'swagger')
+            helper.requireWrapper('swagger-express-mw', 'swagger', undefined, __dirname)
         ])
     };
 }
