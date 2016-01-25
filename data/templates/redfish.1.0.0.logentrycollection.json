@@ -25,7 +25,9 @@
                 "MessageArgs": [],
                 "Links": {
                     "Oem": {},
-                    "OriginOfCondition": "/redfish/v1/Chassis/<%=identifier%>/Thermal"
+                    "OriginOfCondition": {
+                        "@odata.id": "/redfish/v1/Chassis/<%=identifier%>/Thermal"
+                    }
                 }
             }
             <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
