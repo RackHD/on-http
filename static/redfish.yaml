@@ -319,9 +319,72 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-
-
-
+  /TaskService:
+    x-swagger-router-controller: task-service
+    get:
+      description: This object represents the root Redfish service.
+      operationId: taskServiceRoot
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /TaskService/Tasks:
+    x-swagger-router-controller: task-service
+    get:
+      description: This object represents the root Redfish service.
+      operationId: listTasks
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /TaskService/Tasks/{identifier}:
+    x-swagger-router-controller: task-service
+    get:
+      description: This object represents the root Redfish service.
+      operationId: getTask
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /TaskService/Oem/Tasks/{identifier}:
+    x-swagger-router-controller: task-service
+    get:
+      description: This object represents the root Redfish service.
+      operationId: getSystemTasks
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 
