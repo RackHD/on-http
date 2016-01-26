@@ -8,7 +8,9 @@ var ws = require('ws');
 
 var util = require('util');
 
-global.onHttpContext = require('../index').onHttpContextFactory();
+var index = require('../index');
+
+global.onHttpContext = index.onHttpContextFactory();
 
 // Legacy
 global.dihelper = onHttpContext.helper;
@@ -37,6 +39,8 @@ helper.startServer = function (overrides) {
         .set('httpsEnabled', false)
         .set('httpBindPort', 8089)
         .set('skuPackRoot', 'spec/lib/services/sku-static');
+
+    index.injector = helper.injector;
 
     return helper.injector.get('app').start();
 };
