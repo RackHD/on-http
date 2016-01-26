@@ -37,7 +37,7 @@ function echo_progress() {
 }
 
 function get_config_value() {
-    cat /opt/onrack/etc/monorail.json | python -m json.tool | grep $1 | cut -f4 -d '"'
+    cat /opt/monorail/config.json | python -m json.tool | grep $1 | cut -f4 -d '"'
 }
 
 if [ -z "$backup_file" ];
@@ -73,7 +73,7 @@ add_file "./dump"
 # --------
 # Configuration
 # --------
-add_file "/opt/onrack/etc/monorail.json"
+add_file "/opt/monorail/config.json"
 
 # --------
 # Version/commit information. These won't get restored but provide useful debug information.

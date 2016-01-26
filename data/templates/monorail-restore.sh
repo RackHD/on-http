@@ -30,7 +30,7 @@ function echo_progress() {
 }
 
 function get_config_value() {
-    cat /opt/onrack/etc/monorail.json | python -m json.tool | grep $1 | cut -f4 -d '"'
+    cat /opt/monorail/config.json | python -m json.tool | grep $1 | cut -f4 -d '"'
 }
 
 if [ -z "$restore_file" ];
@@ -64,11 +64,11 @@ mongorestore ./dump
 # Configuration
 # --------
 echo_progress "Restoring configuration files..."
-if tar -tzf $restore_file | grep -q "opt\/onrack\/etc\/monorail.json";
+if tar -tzf $restore_file | grep -q "opt\/monorail\/config.json";
 then
     static_files=`httpStaticRoot
-    file_service_files=`cat /opt/onrack/etc/monorail.json | python -m json.tool | grep httpFileServiceRoot | cut -f4 -d '"'`
-    tar -xzvf $restore_file "opt/onrack/etc/monorail.json" -C /
+    file_service_files=`cat /opt/monorail/config.json | python -m json.tool | grep httpFileServiceRoot | cut -f4 -d '"'`
+    tar -xzvf $restore_file "opt/monorail/config.json" -C /
 fi
 
 # --------
