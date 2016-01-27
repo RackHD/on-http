@@ -48,7 +48,7 @@ function Runner(
                 return skuPack.start(configuration.get('skuPackRoot', './skupack.d'));
             })
             .then(function() {
-                var endpoints = configuration.get('httpEndpoints', [{}]);
+                var endpoints = configuration.get('httpEndpoints', [{port: 8080}]);
                 return Promise.map(endpoints, function(endpoint) {
                     var service = new HttpService(endpoint);
                     services.push(service);
