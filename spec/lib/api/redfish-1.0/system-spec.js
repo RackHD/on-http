@@ -4,7 +4,6 @@
 'use strict';
 
 describe('Redfish Service Root', function () {
-    var configuration;
     var tv4;
     var validator;
     var waterline;
@@ -114,7 +113,7 @@ describe('Redfish Service Root', function () {
         ]
     };
 
-    var catalog_data = {
+    var catalogData = {
         dmi: {
             chassis : {
                 asset_tag: 'test'
@@ -163,7 +162,7 @@ describe('Redfish Service Root', function () {
         ],
     };
 
-    var smart_catalog = [
+    var smartCatalog = [
         {
             SMART: {
                 Identity: {
@@ -198,7 +197,7 @@ describe('Redfish Service Root', function () {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
-            data: catalog_data
+            data: catalogData
         }));
 
         waterline.workitems.findPollers.resolves([{
@@ -228,7 +227,7 @@ describe('Redfish Service Root', function () {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
-            data: catalog_data
+            data: catalogData
         }));
         
         return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors')
@@ -250,7 +249,7 @@ describe('Redfish Service Root', function () {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
-            data: catalog_data
+            data: catalogData
         }));
         
         return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/0')
@@ -272,13 +271,13 @@ describe('Redfish Service Root', function () {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
-            data: smart_catalog
+            data: smartCatalog
         }));
 
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
-            data: catalog_data
+            data: catalogData
         }));
 
         return helper.request().get('/redfish/v1/Systems/' + node.id + '/SimpleStorage')
@@ -297,16 +296,17 @@ describe('Redfish Service Root', function () {
             name: '1234abcd1234abcd1234abcd'
         }));
 
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart')
+        .resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
-            data: smart_catalog
+            data: smartCatalog
         }));
 
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
-            data: catalog_data
+            data: catalogData
         }));
 
         return helper.request().get('/redfish/v1/Systems/' + node.id + 
@@ -349,7 +349,7 @@ describe('Redfish Service Root', function () {
 
         taskProtocol.requestPollerCache.resolves([{
             selInformation: { '# of Alloc Units': 10, uid: "Unknown"}
-        }])
+        }]);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id + 
                                     '/LogServices/sel')
@@ -379,7 +379,7 @@ describe('Redfish Service Root', function () {
                 sensorType: 'Thermal',
                 event: 'thermal event'
             }]
-        }])
+        }]);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id + 
                                     '/LogServices/sel/Entries')
@@ -409,7 +409,7 @@ describe('Redfish Service Root', function () {
                 sensorType: 'Temperature',
                 event: 'Thermal Event'
             }]
-        }])
+        }]);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id + 
                                     '/LogServices/sel/Entries/abcd')
