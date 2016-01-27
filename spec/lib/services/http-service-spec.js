@@ -24,6 +24,7 @@ describe('Http.Server', function () {
             dihelper.requireWrapper('rimraf', 'rimraf', undefined, __dirname),
             dihelper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),
             helper.require('/lib/services/http-service'),
+            helper.requireGlob('/lib/api/*.js'),
             helper.requireGlob('/lib/api/1.1/**/*.js'),
             helper.requireGlob('/lib/services/**/*.js'),
             helper.requireGlob('/lib/serializables/**/*.js')
@@ -139,7 +140,7 @@ describe('Http.Server', function () {
                 },
                 {
                     'address': '0.0.0.0',
-                    'port': 8080,
+                    'port': 8089,
                     'httpsEnabled': false,
                 }
             ];
@@ -170,14 +171,14 @@ describe('Http.Server', function () {
         });
 
         it('should respond to request to endpoint 3', function () {
-            return helper.request('http://localhost:8080')
+            return helper.request('http://localhost:8089')
             .get('/test/2')
             .expect(200)
             .expect('This is from endpoint path /test/2');
         });
 
         it('should respond Not Found to incorrect router path', function () {
-            return helper.request('http://localhost:8080')
+            return helper.request('http://localhost:8089')
             .get('/test/1')
             .expect(404);
         });

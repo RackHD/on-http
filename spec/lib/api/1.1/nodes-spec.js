@@ -5,7 +5,6 @@
 
 describe('Http.Api.Nodes', function () {
     var configuration;
-    var lookupService;
     var waterline;
     var ObmService;
     var taskGraphProtocol;

@@ -12,7 +12,7 @@ describe('Http.Api.Skus', function () {
         };
         helper.setupInjector([
             helper.require("/lib/services/sku-pack-service"),
-            dihelper.simpleWrapper(function(string) { arguments[1](); }, 'rimraf')
+            dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf')
         ]);
         return helper.startServer([
             dihelper.simpleWrapper(taskGraphProtocol, 'Protocol.TaskGraphRunner')

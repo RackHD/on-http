@@ -39,7 +39,7 @@ describe('Http.Api.Login', function () {
         sandbox.restore();
         restoreConfig();
 
-    };
+    }
 
     function restoreConfig(){
         helper.injector.get('Services.Configuration')
@@ -47,18 +47,20 @@ describe('Http.Api.Login', function () {
                                      '0PB3P9ojbmANGhDlcSBE0iOTIsYsGbtSsbqP4wvsVcw==')
             .set('authPasswordSalt', 'zlxkgxjvcFwm0M8sWaGojh25qNYO8tuNWUMN4xKPH93' +
                                      'PidwkCAvaX2JItLA3p7BSCWIzkw4GwWuezoMvKf3UXg==')
-            .set('authTokenExpireIn', 86400)
+            .set('authTokenExpireIn', 86400);
     }
 
     helper.before(function () {
         return [
-            dihelper.simpleWrapper(require('express')(), 'express-app'),
             dihelper.simpleWrapper(require('swagger-express-mw'), 'swagger'),
             dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
             dihelper.simpleWrapper({}, 'ipmi-obm-service'),
+            dihelper.requireWrapper('rimraf', 'rimraf'),
+            dihelper.requireWrapper('os-tmpdir', 'osTmpdir'),
             helper.require('/lib/services/http-service'),
-            helper.requireGlob('/lib/api/1.1/*.js'),
+            helper.requireGlob('/lib/api/*.js'),
+            helper.requireGlob('/lib/api/1.1/**/*.js'),
             helper.requireGlob('/lib/services/**/*.js'),
             helper.requireGlob('/lib/serializables/**/*.js')
         ];
@@ -82,167 +84,153 @@ describe('Http.Api.Login', function () {
 
         it('should return a token with correct credential in request body', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(SUCCESS_STATUS)
                 .expect(function(res) {
                     expect(res.body.token).to.be.a('string');
-                    console.log(SUCCESS_STATUS, res.body);
                 });
         });
 
         it('should fail with wrong username in request body', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "balabalabala", password: "admin123"})
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Invalid username or password');
-                    console.log(UNAUTHORIZED_STATUS, res.body);
                 });
         });
 
         it('should fail with wrong password in request body', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin", password: "balabalabala"})
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Invalid username or password');
-                    console.log(UNAUTHORIZED_STATUS, res.body);
                 });
         });
 
         it('should fail with empty username in request body', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "", password: "admin123"})
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
-                    console.log(BAD_REQUEST_STATUS, res.body);
                 });
         });
 
         it('should fail with empty password in request body', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin", password: ""})
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
-                    console.log(BAD_REQUEST_STATUS, res.body);
                 });
         });
 
         it('should fail with no username key in request body', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({password: "admin123"})
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
-                    console.log(BAD_REQUEST_STATUS, res.body);
                 });
         });
 
         it('should fail with no password key in request body', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin"})
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
-                    console.log(BAD_REQUEST_STATUS, res.body);
                 });
         });
 
         it('should return a token with correct credential in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login?username=admin&password=admin123')
+                .post('/login?username=admin&password=admin123')
                 .send()
                 .expect(SUCCESS_STATUS)
                 .expect(function(res) {
                     expect(res.body.token).to.be.a('string');
-                    console.log(SUCCESS_STATUS, res.body);
                 });
         });
 
         it('should fail with wrong username in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login?username=balabalabala&password=admin123')
+                .post('/login?username=balabalabala&password=admin123')
                 .send()
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Invalid username or password');
-                    console.log(UNAUTHORIZED_STATUS, res.body);
                 });
         });
 
         it('should fail with wrong password in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login?username=admin&password=balabalabala')
+                .post('/login?username=admin&password=balabalabala')
                 .send()
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Invalid username or password');
-                    console.log(UNAUTHORIZED_STATUS, res.body);
                 });
         });
 
         it('should fail with empty username in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login?username=&password=admin123')
+                .post('/login?username=&password=admin123')
                 .send()
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
-                    console.log(BAD_REQUEST_STATUS, res.body);
                 });
         });
 
         it('should fail with empty password in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login?username=admin&password=')
+                .post('/login?username=admin&password=')
                 .send()
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
-                    console.log(BAD_REQUEST_STATUS, res.body);
                 });
         });
 
         it('should fail with no username parameter in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login?password=admin123')
+                .post('/login?password=admin123')
                 .send()
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
-                    console.log(BAD_REQUEST_STATUS, res.body);
                 });
         });
 
         it('should fail with no password parameter in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login?username=admin')
+                .post('/login?username=admin')
                 .send()
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
-                    console.log(BAD_REQUEST_STATUS, res.body);
                 });
         });
 
@@ -251,25 +239,23 @@ describe('Http.Api.Login', function () {
         // is supported in the future, thus people will get alerted.
         it('should fail with credential in request header', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .set('username', 'admin')
                 .set('password', 'admin123')
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
-                    console.log(BAD_REQUEST_STATUS, res.body);
                 });
         });
 
         it('should fail no credential at all - https', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
-                    console.log(BAD_REQUEST_STATUS, res.body);
                 });
         });
 
@@ -281,36 +267,34 @@ describe('Http.Api.Login', function () {
     describe('test with authentication enabled', function () {
         before('start HTTPs server', function () {
             this.timeout(5000);
-            var endpoint_http = {
+            var endpointHttp = {
                 "address": "0.0.0.0",
                 "port": 8089,
                 "httpsEnabled": false,
                 "authEnabled": true,
                 "routers": "northbound-api-router"
             };
-            startServer(endpoint_http);
+            startServer(endpointHttp);
         });
 
         //give a shoot on http instead of https.
         it('should success auth with http instead of https', function() {
             return helper.request('http://localhost:8089')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(SUCCESS_STATUS)
                 .expect(function(res) {
                     expect(res.body.token).to.be.a('string');
-                    console.log(SUCCESS_STATUS, res.body);
                 });
         });
 
         it('should fail no credential at all - http', function() {
             return helper.request('http://localhost:8089')
-                .post('/api/1.1/login')
+                .post('/login')
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Missing credentials');
-                    console.log(BAD_REQUEST_STATUS, res.body);
                 });
         });
 
@@ -330,12 +314,9 @@ describe('Http.Api.Login', function () {
 
         it('should fail with auth disabled', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin", password: "admin123"})
-                .expect(NOT_FOUND_STATUS)
-                .expect(function(res) {
-                    console.log(NOT_FOUND_STATUS, res.body);
-                });
+                .expect(NOT_FOUND_STATUS);
         });
 
         after('stop server, restore mock and configure',function () {
@@ -346,7 +327,7 @@ describe('Http.Api.Login', function () {
     describe('Should return internal server error with auth error callback', function () {
         before('start HTTPs server', function () {
             this.timeout(5000);
-            sandbox.stub(localStrategy.prototype, 'authenticate', function(req, options) {
+            sandbox.stub(localStrategy.prototype, 'authenticate', function() {
                 return this.error('something');
             });
             startServer(endpoint);
@@ -354,13 +335,12 @@ describe('Http.Api.Login', function () {
 
         it('should fail with auth', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(ERROR_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Internal server error');
-                    console.log(ERROR_STATUS, res.body);
                 });
         });
 
@@ -372,7 +352,7 @@ describe('Http.Api.Login', function () {
     describe('Should fail with exceptional error message', function () {
         before('start HTTPs server', function () {
             this.timeout(5000);
-            sandbox.stub(localStrategy.prototype, 'authenticate', function(req, options) {
+            sandbox.stub(localStrategy.prototype, 'authenticate', function() {
                 return this.fail({message: 'Some other message'});
             });
             startServer(endpoint);
@@ -380,13 +360,12 @@ describe('Http.Api.Login', function () {
 
         it('should fail with auth', function() {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Some other message');
-                    console.log(UNAUTHORIZED_STATUS, res.body);
                 });
         });
 

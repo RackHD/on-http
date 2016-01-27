@@ -4,11 +4,11 @@
   "description": "OnRack Http Server",
   "main": "index.js",
   "scripts": {
-    "doc": "./node_modules/.bin/jsdoc lib -r -d docs",
+    "doc": "./node_modules/.bin/jsdoc lib/api/1.1/northbound -r -d docs",
     "test": "./node_modules/.bin/mocha $(find spec -name '*-spec.js') -R spec --require spec/helper.js",
     "install": "./install-web-ui.sh",
-    "apidoc": "./node_modules/.bin/apidoc -i lib -f '.*\\.js$' -o build/apidoc",
-    "apidoc-swagger": "./node_modules/.bin/apidoc-swagger --verbose -i lib -f '.*\\.js$' -o build/apidoc-swagger"
+    "apidoc": "./node_modules/.bin/apidoc -i lib/api/1.1/northbound -f '.*\\.js$' -o build/apidoc",
+    "apidoc-swagger": "./node_modules/.bin/apidoc-swagger --verbose -i lib/api/1.1/northbound -f '.*\\.js$' -o build/apidoc-swagger"
   },
   "repository": {
     "type": "git",
@@ -25,14 +25,12 @@
     "express": "^4.10.7",
     "express-http-proxy": "^0.6.0",
     "glob": "^4.3.2",
+    "jsonwebtoken": "^5.4.4",
     "lodash": "^3.10.1",
     "mongodb": "^1.4.28",
     "on-core": "git+https://github.com/RackHD/on-core.git",
     "on-finished": "^2.2.0",
     "on-tasks": "git+https://github.com/RackHD/on-tasks.git",
-    "pluralize": "~1.1.2",
-    "ws": "^0.8.0",
-    "swagger-express-mw": "^0.6.0",
     "os-tmpdir": "~1.0.1",
     "rimraf": "~2.5.0",
     "tar": "~2.2.1",
@@ -41,7 +39,12 @@
     "jsonwebtoken": "^5.4.4",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
-    "passport-jwt": "^1.2.1"
+    "passport-jwt": "^1.2.1",
+    "pluralize": "~1.1.2",
+    "rimraf": "~2.5.0",
+    "swagger-express-mw": "^0.6.0",
+    "tar": "~2.2.1",
+    "ws": "^0.8.0"
   },
   "devDependencies": {
     "apidoc": "^0.12.1",
@@ -62,13 +65,13 @@
     "jsdoc": "^3.3.0-alpha13",
     "jshint": "^2.5.11",
     "mocha": "^2.1.0",
+    "nock": "~3.5.0",
     "rewire": "^2.5.1",
     "sinon": "1.16.1",
     "sinon-as-promised": "^2.0.3",
     "sinon-chai": "^2.7.0",
     "supertest": "^0.15.0",
-    "xunit-file": "0.0.6",
-    "nock": "~3.5.0"
+    "xunit-file": "0.0.6"
   },
   "apidoc": {
     "name": "RackHD API Documentation",

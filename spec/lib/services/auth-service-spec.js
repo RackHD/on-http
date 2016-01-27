@@ -11,9 +11,7 @@ describe('Auth.Service', function () {
     var jwtStrategy = require('passport-jwt').Strategy;
 
     var SUCCESS_STATUS = 200;
-    var BAD_REQUEST_STATUS = 400;
     var UNAUTHORIZED_STATUS = 401;
-    var NOT_FOUND_STATUS = 404;
     var ERROR_STATUS = 500;
 
     var token = '';
@@ -39,25 +37,37 @@ describe('Auth.Service', function () {
         server.stop();
         sandbox.restore();
         restoreConfig();
+    }
 
-    };
+    function setConfig(){
+        helper.injector.get('Services.Configuration')
+            .set('authPasswordHash', 'KcBN9YobNV0wdux8h0fKNqi4uoKCgGl/j8c6Y' +
+            'GlG7iA0PB3P9ojbmANGhDlcSBE0iOTIsYsGbtSsbqP4wvsVcw==')
+            .set('authPasswordSalt', 'zlxkgxjvcFwm0M8sWaGojh25qNYO8tuNWUMN4' +
+            'xKPH93PidwkCAvaX2JItLA3p7BSCWIzkw4GwWuezoMvKf3UXg==')
+            .set('authTokenExpireIn', 86400);
+    }
 
     function restoreConfig(){
         helper.injector.get('Services.Configuration')
-            .set('authPasswordHash', 'KcBN9YobNV0wdux8h0fKNqi4uoKCgGl/j8c6YGlG7iA0PB3P9ojbmANGhDlcSBE0iOTIsYsGbtSsbqP4wvsVcw==')
-            .set('authPasswordSalt', 'zlxkgxjvcFwm0M8sWaGojh25qNYO8tuNWUMN4xKPH93PidwkCAvaX2JItLA3p7BSCWIzkw4GwWuezoMvKf3UXg==')
-            .set('authTokenExpireIn', 86400)
+            .set('authPasswordHash', 'KcBN9YobNV0wdux8h0fKNqi4uoKCgGl/j8c6' +
+            'YGlG7iA0PB3P9ojbmANGhDlcSBE0iOTIsYsGbtSsbqP4wvsVcw==')
+            .set('authPasswordSalt', 'zlxkgxjvcFwm0M8sWaGojh25qNYO8tuNWUMN' +
+            '4xKPH93PidwkCAvaX2JItLA3p7BSCWIzkw4GwWuezoMvKf3UXg==')
+            .set('authTokenExpireIn', 86400);
     }
 
     helper.before(function () {
         return [
-            dihelper.simpleWrapper(require('express')(), 'express-app'),
             dihelper.simpleWrapper(require('swagger-express-mw'), 'swagger'),
             dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
             dihelper.simpleWrapper({}, 'ipmi-obm-service'),
+            dihelper.requireWrapper('rimraf', 'rimraf'),
+            dihelper.requireWrapper('os-tmpdir', 'osTmpdir'),
             helper.require('/lib/services/http-service'),
-            helper.requireGlob('/lib/api/1.1/*.js'),
+            helper.requireGlob('/lib/api/*.js'),
+            helper.requireGlob('/lib/api/1.1/**/*.js'),
             helper.requireGlob('/lib/services/**/*.js'),
             helper.requireGlob('/lib/serializables/**/*.js')
         ];
@@ -75,30 +85,25 @@ describe('Auth.Service', function () {
 
     describe('Auth.Service', function () {
         before('start http and https server with auth enabled', function () {
+            setConfig();
             startServer(endpoint);
         });
 
         it('should return a token from /login', function () {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(SUCCESS_STATUS)
                 .expect(function (res) {
                     expect(res.body.token).to.be.a('string');
                     token = res.body.token;
-                    console.log(SUCCESS_STATUS, res.body)
                 });
         });
 
         it('should able to access with correct token in query string', function () {
             return helper.request('https://localhost:8443')
                 .get('/api/1.1/config?auth_token=' + token)
-                .expect(SUCCESS_STATUS)
-                .expect(function (res) {
-                    expect(res.body).to.be.a('object');
-                    expect(res.body.apiServerPort).to.equal(8080);
-                    console.log(SUCCESS_STATUS);
-                });
+                .expect(SUCCESS_STATUS);
         });
 
         it('should fail with wrong token in query string', function () {
@@ -108,7 +113,6 @@ describe('Auth.Service', function () {
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('invalid signature');
-                    console.log(UNAUTHORIZED_STATUS, res.body)
                 });
         });
 
@@ -119,7 +123,6 @@ describe('Auth.Service', function () {
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
-                    console.log(UNAUTHORIZED_STATUS, res.body)
                 });
         });
 
@@ -130,7 +133,6 @@ describe('Auth.Service', function () {
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
-                    console.log(UNAUTHORIZED_STATUS, res.body)
                 });
         });
 
@@ -139,12 +141,7 @@ describe('Auth.Service', function () {
                 .get('/api/1.1/config')
                 .set("authorization", 'JWT ' + token)
                 .send()
-                .expect(SUCCESS_STATUS)
-                .expect(function (res) {
-                    expect(res.body).to.be.a('object');
-                    expect(res.body.apiServerPort).to.equal(8080);
-                    console.log(SUCCESS_STATUS);
-                });
+                .expect(SUCCESS_STATUS);
         });
 
         it('should fail with wrong token in query header', function () {
@@ -156,7 +153,6 @@ describe('Auth.Service', function () {
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('invalid signature');
-                    console.log(UNAUTHORIZED_STATUS, res.body)
                 });
         });
 
@@ -169,7 +165,6 @@ describe('Auth.Service', function () {
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
-                    console.log(UNAUTHORIZED_STATUS, res.body)
                 });
         });
 
@@ -182,55 +177,46 @@ describe('Auth.Service', function () {
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
-                    console.log(UNAUTHORIZED_STATUS, res.body)
                 });
         });
 
         it('should able to access with correct token in query body', function () {
             return helper.request('https://localhost:8443')
                 .get('/api/1.1/config')
-                .send({auth_token: token})
-                .expect(SUCCESS_STATUS)
-                .expect(function (res) {
-                    expect(res.body).to.be.a('object');
-                    expect(res.body.apiServerPort).to.equal(8080);
-                    console.log(SUCCESS_STATUS);
-                });
+                .send({auth_token: token}) /* jshint ignore: line */
+                .expect(SUCCESS_STATUS);
         });
 
         it('should fail with wrong token in query body', function () {
             return helper.request('https://localhost:8443')
                 .get('/api/1.1/config')
-                .send({auth_token: token + 'balabalabala'})
+                .send({auth_token: token + 'balabalabala'}) /* jshint ignore: line */
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('invalid signature');
-                    console.log(UNAUTHORIZED_STATUS, res.body)
                 });
         });
 
         it('should fail with empty token in query body', function () {
             return helper.request('https://localhost:8443')
                 .get('/api/1.1/config')
-                .send({auth_token: ''})
+                .send({auth_token: ''}) /* jshint ignore: line */
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
-                    console.log(UNAUTHORIZED_STATUS, res.body)
                 });
         });
 
         it('should fail with wrong token key in query body', function () {
             return helper.request('https://localhost:8443')
                 .get('/api/1.1/config')
-                .send({auth_tokennnnnnnnn: token})
+                .send({auth_tokennnnnnnnn: token}) /* jshint ignore: line */
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
-                    console.log(UNAUTHORIZED_STATUS, res.body)
                 });
         });
 
@@ -241,7 +227,6 @@ describe('Auth.Service', function () {
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
-                    console.log(UNAUTHORIZED_STATUS, res.body)
                 });
         });
 
@@ -252,9 +237,10 @@ describe('Auth.Service', function () {
 
     describe('Should return internal server error with auth error callback', function () {
         before('start HTTPs server', function () {
-            sandbox.stub(jwtStrategy.prototype, 'authenticate', function(req, options) {
+            sandbox.stub(jwtStrategy.prototype, 'authenticate', function() {
                 return this.error('something');
             });
+            setConfig();
             startServer(endpoint);
         });
 
@@ -265,8 +251,7 @@ describe('Auth.Service', function () {
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Internal server error');
-                    console.log(ERROR_STATUS, res.body);
-                })
+                });
         });
 
         after('stop server, restore mock and configure',function () {
@@ -338,6 +323,7 @@ describe('Auth.Service', function () {
         before('start http and https server with auth enabled', function () {
             this.timeout(10000);
 
+            setConfig();
             helper.injector.get('Services.Configuration')
                 .set('authTokenExpireIn', 1);
             startServer(endpoint);
@@ -345,24 +331,12 @@ describe('Auth.Service', function () {
 
         it('should return a token from /login', function () {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(SUCCESS_STATUS)
                 .expect(function(res) {
                     expect(res.body.token).to.be.a('string');
                     token = res.body.token;
-                    console.log(SUCCESS_STATUS, res.body)
-                });
-        });
-
-        it('should able to access with correct token in query string', function () {
-            return helper.request('https://localhost:8443')
-                .get('/api/1.1/config?auth_token=' + token)
-                .expect(SUCCESS_STATUS)
-                .expect(function(res) {
-                    expect(res.body).to.be.a('object');
-                    expect(res.body.apiServerPort).to.equal(8080);
-                    console.log(SUCCESS_STATUS);
                 });
         });
 
@@ -378,7 +352,6 @@ describe('Auth.Service', function () {
                         .expect(function (res) {
                             expect(res.body.message).to.be.a('string');
                             expect(res.body.message).to.equal('jwt expired');
-                            console.log(UNAUTHORIZED_STATUS, res.body);
                         });
                 });
         });
@@ -391,6 +364,7 @@ describe('Auth.Service', function () {
     describe('Token should not expire as expected', function () {
         before('start https server expiration set to 1 second', function () {
             return Promise.resolve().then(function(){
+                setConfig();
                 helper.injector.get('Services.Configuration')
                     .set('authTokenExpireIn', 1);
                 startServer(endpoint);
@@ -405,25 +379,19 @@ describe('Auth.Service', function () {
 
         it('should return a token from /login', function () {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(SUCCESS_STATUS)
                 .expect(function(res) {
                     expect(res.body.token).to.be.a('string');
                     token = res.body.token;
-                    console.log(SUCCESS_STATUS, res.body)
                 });
         });
 
         it('should able to access with correct token in query string', function () {
             return helper.request('https://localhost:8443')
                 .get('/api/1.1/config?auth_token=' + token)
-                .expect(SUCCESS_STATUS)
-                .expect(function(res) {
-                    expect(res.body).to.be.a('object');
-                    expect(res.body.apiServerPort).to.equal(8080);
-                    console.log(SUCCESS_STATUS);
-                });
+                .expect(SUCCESS_STATUS);
         });
 
         it('Should still able to access after certain time', function() {
@@ -433,12 +401,7 @@ describe('Auth.Service', function () {
                 .then(function(){
                     return helper.request('https://localhost:8443')
                         .get('/api/1.1/config?auth_token=' + token)
-                        .expect(SUCCESS_STATUS)
-                        .expect(function(res) {
-                            expect(res.body).to.be.a('object');
-                            expect(res.body.apiServerPort).to.equal(8080);
-                            console.log(SUCCESS_STATUS);
-                        });
+                        .expect(SUCCESS_STATUS);
                 });
         });
 
@@ -450,23 +413,23 @@ describe('Auth.Service', function () {
     describe('Should fail with crypto errors', function () {
         before('start http and https server', function () {
             this.timeout(5000);
-            var crypto = helper.injector.get('crypto')
+            var crypto = helper.injector.get('crypto');
             sandbox.stub(crypto, 'pbkdf2',
                 function(password, salt, interation, bytes, callback) {
                 return callback('something');
             });
+            setConfig();
             startServer(endpoint);
         });
 
         it('should fail accessing /login with internal error', function () {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(ERROR_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Internal server error');
-                    console.log(ERROR_STATUS, res.body);
                 });
         });
 
@@ -480,7 +443,7 @@ describe('Auth.Service', function () {
             this.timeout(5000);
             var authService = helper.injector.get('Auth.Services');
             var jwt = require('jsonwebtoken');
-            sandbox.stub(authService, 'createJwtToken',function (user) {
+            sandbox.stub(authService, 'createJwtToken',function () {
                     var self = this;
                     return jwt.sign({
                             user: 'test_user'
@@ -489,18 +452,18 @@ describe('Auth.Service', function () {
                         self.jwtSignOptions
                     );
                 });
+            setConfig();
             startServer(endpoint);
         });
 
         it('should return a token from /login', function () {
             return helper.request('https://localhost:8443')
-                .post('/api/1.1/login')
+                .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(SUCCESS_STATUS)
                 .expect(function(res) {
                     expect(res.body.token).to.be.a('string');
                     token = res.body.token;
-                    console.log(SUCCESS_STATUS, res.body)
                 });
         });
 
@@ -513,7 +476,6 @@ describe('Auth.Service', function () {
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('Internal server error');
-                    console.log(ERROR_STATUS, res.body);
                 });
         });
 

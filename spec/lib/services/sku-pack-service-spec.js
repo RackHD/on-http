@@ -11,7 +11,7 @@ describe("SKU Pack Service", function() {
     before(function() {
         helper.setupInjector([
             helper.require("/lib/services/sku-pack-service"),
-            dihelper.simpleWrapper(function(string) { arguments[1](); }, 'rimraf')
+            dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf')
         ]);
 
         skuService = helper.injector.get('Http.Services.SkuPack');
@@ -75,7 +75,10 @@ describe("SKU Pack Service", function() {
             httpTemplateRoot: 'templates'
         };
         fs.readdirAsync.withArgs('./valid').resolves(['a.json']);
-        fs.statAsync.withArgs('./valid/a.json').resolves({ isDirectory: function() { return false; } });
+        fs.statAsync.withArgs('./valid/a.json').resolves({ isDirectory: function() {
+            return false;
+        }
+        });
         fs.readFileAsync.withArgs('./valid/a.json').resolves(JSON.stringify(data));
         fs.readdirAsync.withArgs('./valid/a/templates').resolves([]);
 
@@ -181,7 +184,7 @@ describe("SKU Pack Service", function() {
         fs.readdirAsync.withArgs('./root/skuid/templates').resolves([]);
         fs.readFileAsync.withArgs('./root/skuid.json').resolves(JSON.stringify(data));       
         return skuService.start('./root').then(function() {
-            skuService.skuHandlers['skuid'] = {};
+            skuService.skuHandlers.skuid = {};
             return skuService.deletePack('skuid');
         })
         .then(function(skuid) {
