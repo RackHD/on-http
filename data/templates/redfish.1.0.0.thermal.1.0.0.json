@@ -1,0 +1,44 @@
+{
+	"@odata.context" : "<%= basepath %>/$metadata#Chassis/Links/Members/<%= identifier %>/Thermal/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Thermal.1.0.0.Thermal",
+    "Oem": {},
+    "Id": "<%= identifier %>",
+    "Description": "",
+	"Name": "Thermal",
+	"Status": {},
+	"Temperatures@odata.count": <%= tempList.length %>,
+	"Temperatures": [
+		<% tempList.forEach(function(sdr, i, arr) { %>
+			{
+				"Oem": {},
+				"Name": "<%= sdr['Sensor Id'] %>",
+				"ReadingCelsius": <%= parseFloat(sdr['Sensor Reading']) || 'null' %>,
+				"UpperThresholdNonCritical": <%= parseFloat(sdr['Upper non-critical']) || 'null' %>,
+				"UpperThresholdCritical": <%= parseFloat(sdr['Upper critical']) || 'null' %>,
+				"UpperThresholdFatal": null,
+				"LowerThresholdNonCritical": <%= parseFloat(sdr['Lower non-critical']) || 'null' %>,
+				"LowerThresholdCritical": <%= parseFloat(sdr['Lower critical']) || 'null' %>,
+				"LowerThresholdFatal": null
+			}
+			<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+		<% }); %>
+	],
+	"Fans@odata.count": <%= fanList.length %>,
+	"Fans": [
+		<% fanList.forEach(function(sdr, i, arr) { %>
+			{
+				"Oem": {},
+				"FanName": "<%= sdr['Sensor Id'] %>",
+				"ReadingRPM": <%= parseFloat(sdr['Sensor Reading']) || 'null' %>,
+				"UpperThresholdNonCritical": <%= parseFloat(sdr['Upper non-critical']) || 'null' %>,
+				"UpperThresholdCritical": <%= parseFloat(sdr['Upper critical']) || 'null' %>,
+				"UpperThresholdFatal": null,
+				"LowerThresholdNonCritical": <%= parseFloat(sdr['Lower non-critical']) || 'null' %>,
+				"LowerThresholdCritical": <%= parseFloat(sdr['Lower critical']) || 'null' %>,
+				"LowerThresholdFatal": null
+			}
+			<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+		<% }); %>
+	]
+}

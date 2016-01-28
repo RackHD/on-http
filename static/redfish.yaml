@@ -3,7 +3,7 @@ info:
   version: "0.0.1"
   title: Redfish POC
 # during dev, should point to your local machine
-host: 10.240.19.38:8080
+host: localhost:8080
 # basePath prefixes all resource paths
 basePath: /redfish/v1
 #
@@ -23,6 +23,80 @@ paths:
     get:
       description: This object represents the root Redfish service.
       operationId: getServiceRoot
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Chassis:
+    x-swagger-router-controller: chassis
+    get:
+      description: This object represents the root Redfish service.
+      operationId: listChassis
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Chassis/{identifier}:
+    x-swagger-router-controller: chassis
+    get:
+      description: >
+        defines a chassis with it's respective properties
+      operationId: getChassis
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Chassis/{identifier}/Thermal:
+    x-swagger-router-controller: chassis
+    get:
+      description: >
+        defines a collection of thermal elements contained within a resource.
+      operationId: getThermal
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Chassis/{identifier}/Power:
+    x-swagger-router-controller: chassis
+    get:
+      description: >
+        defines a collection of power elements contained within a resource.
+      operationId: getPower
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
       responses:
         200:
           description: Success
@@ -245,6 +319,9 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+
+
+
   /swagger:
     x-swagger-pipe: swagger_raw
 

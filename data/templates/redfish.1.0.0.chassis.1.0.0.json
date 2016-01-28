@@ -1,0 +1,40 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Chassis/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Chassis.1.0.0.Chassis",
+    "Oem": {},
+    "Id": "<%= identifier %>",
+    "Description": "",
+	"Name": "Chassis",
+	"ChassisType": "<%= chassisType %>",
+	"AssetTag" : "<%= ohai.data.dmi.chassis.asset_tag %>",
+	"Manufacturer": "<%= ohai.data.dmi.chassis.manufacturer %>",
+    "Model": "<%= ohai.data.dmi.system.product_name %>",
+    "SKU": "<%= ohai.data.dmi.chassis.sku_number %>",
+    "SerialNumber": "<%= ohai.data.dmi.chassis.serial_number %>",
+    "Actions": {
+        "Oem": {},
+		"#Chassis.Reset": {}
+    },
+    "Status": {},
+    "Thermal": {
+		"@odata.id": "<%= basepath %>/Chassis/<%= identifier %>/Thermal"
+	},
+	"Power": {
+		"@odata.id": "<%= basepath %>/Chassis/<%= identifier %>/Power"
+	},
+    "LogServices": {},
+    "IndicatorLED": "<%= chassisData.uid %>",
+	"Links": {
+        "Oem": {},
+        "ComputerSystems@odata.count": <%= targetList.length %>,
+        "ComputerSystems": [
+            <% targetList.forEach(function(target, i, arr) { %>
+                {
+                    "@odata.id": "<%= basepath %>/Systems/<%= target %>"
+                }
+                <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+            <% }); %>
+        ]
+    }
+}
