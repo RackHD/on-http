@@ -1,0 +1,33 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/SimpleStorage/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#SimpleStorage.1.0.0.SimpleStorage",
+    "Oem" : {},
+    "Name": "Simple Storage Controller",
+    "Id": "<%= index %>",
+    "Description": "<%= controller.controller_name %>",
+    "Devices": [
+        <% devices.forEach(function(device, i, arr) { %>
+            {
+                "Oem": {
+                    "EMC" : {
+                        "Revision": "<%= device.Identity['Revision'] || device.Identity['Firmware Version'] || 'Unknown' %>",
+                        "Capacity": "<%= device.Identity['User Capacity'] || 'Unknown' %>",
+                        "SerialNumbers": "<%= device.Identity['Serial Number'] || device.Identity['Serial number'] || 'Unknown' %>",
+                        <% if (undefined != device.Identity['Rotation Rate']) { %>
+                        "Type": "<%= (device.Identity['Rotation Rate'].indexOf('rpm') >= 0) ? 'HDD' : 'SDD' %>"
+                        <% } else { %>
+                        "Type": "Unknown"
+                        <% } %>
+                    }
+                },
+                "Name": "",
+                "Status": {},
+                "Manufacturer": "<%= device.Identity['Vendor'] || 'Unknown' %>",
+                "Model": "<%= device.Identity['Device Model'] || device.Identity['Product'] || 'Unknown' %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ],
+    "Status": {}
+}

@@ -1,0 +1,257 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Redfish POC
+# during dev, should point to your local machine
+host: 10.240.19.38:8080
+# basePath prefixes all resource paths
+basePath: /redfish/v1
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /:
+    x-swagger-router-controller: service-root
+    get:
+      description: This object represents the root Redfish service.
+      operationId: getServiceRoot
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems:
+    x-swagger-router-controller: systems
+    get:
+      description: This object represents the root Redfish service.
+      operationId: listSystems
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}:
+    x-swagger-router-controller: systems
+    get:
+      description: >
+        defines a computer system and its respective properties.  A computer system represents a 
+        machine (physical or virtual) and the local resources such as memory, cpu and other 
+        devices that can be accessed from that machine.
+      operationId: getSystem
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Processors:
+    x-swagger-router-controller: systems
+    get:
+      description: >
+        defines a collection of processors contained within a resource.
+      operationId: listSystemProcessors
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Processors/{socket}:
+    x-swagger-router-controller: systems
+    get:
+      description: >
+        This is the schema definition for the Processor resource.  It 
+        represents the properties of a processor attached to a System.
+      operationId: getSystemProcessor
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+        - name: socket
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/SimpleStorage:
+    x-swagger-router-controller: systems
+    get:
+      description: >
+        defines a collection of processors contained within a resource.
+      operationId: listSimpleStorage
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/SimpleStorage/{index}:
+    x-swagger-router-controller: systems
+    get:
+      description: >
+        This is the schema definition for the Processor resource.  It 
+        represents the properties of a processor attached to a System.
+      operationId: getSimpleStorage
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+        - name: index
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/LogServices:
+    x-swagger-router-controller: systems
+    get:
+      description: >
+        defines a collection of processors contained within a resource.
+      operationId: listLogService
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/LogServices/sel:
+    x-swagger-router-controller: systems
+    get:
+      description: >
+        This is the schema definition for the Processor resource.  It 
+        represents the properties of a processor attached to a System.
+      operationId: getSelLogService
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/LogServices/sel/Entries:
+    x-swagger-router-controller: systems
+    get:
+      description: >
+        This is the schema definition for the Processor resource.  It 
+        represents the properties of a processor attached to a System.
+      operationId: listSelLogServiceEntries
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/LogServices/sel/Entries/{entryId}:
+    x-swagger-router-controller: systems
+    get:
+      description: >
+        This is the schema definition for the Processor resource.  It 
+        represents the properties of a processor attached to a System.
+      operationId: getSelLogServiceEntry
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+        - name: entryId
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+
+definitions:
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string

@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/Processors/#entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Procssors.1.0.0.ProcessorsCollection",
+    "Oem" : {},
+    "Name": "Processors Collection",
+    "Members@odata.count": <%= dmi.data['Processor Information'].length %>,
+    "Members": [
+        <% dmi.data['Processor Information'].forEach(function(chassis, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/Processors/<%=i%>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}
