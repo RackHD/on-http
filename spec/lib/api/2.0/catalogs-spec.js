@@ -109,7 +109,7 @@ describe('Http.Api.Catalogs', function () {
 
             stubFind.returns(Promise.reject(new Errors.NotFoundError('Not Found')));
 
-            return helper.request().get('/api/1.1/catalogs')
+            return helper.request().get('/api/2.0/catalogs')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });

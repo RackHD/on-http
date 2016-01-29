@@ -6,8 +6,6 @@
 describe("Http.Services.Api.Catalogs", function () {
     var catalogService;
     var waterline;
-    var needByIdentifier;
-    var find;
 
     before("Http.Services.Api.Catalogs before", function() {
         helper.setupInjector([
@@ -27,46 +25,40 @@ describe("Http.Services.Api.Catalogs", function () {
     describe("getCatalog", function() {
         it('should expose the appropriate methods', function() {
             catalogService.should.have.property('getCatalog')
-                        .that.is.a('function').with.length(1);
-                });
+                .that.is.a('function').with.length(1);
+        });
         it('Run getCatalog', function() {
-            var mock_catalog = [{ id: 'foobar' }];
-            waterline.catalogs.find.resolves([mock_catalog]);
+            var mockCatalog = [{ id: 'foobar' }];
+            waterline.catalogs.find.resolves([mockCatalog]);
             return catalogService.getCatalog().then(function (catalogs) {
-                  expect(catalogs).to.deep.equal([mock_catalog]);
+                expect(catalogs).to.deep.equal([mockCatalog]);
             });
-
         });
 
         it('should return empty array if no catalog informations are found', function () {
             waterline.catalogs.find.resolves([]);
-            var mock_catalog = [];
-
-            return catalogService.getCatalog().should.eventually.become(mock_catalog);
-            });
-
-
+            var mockCatalog = [];
+            return catalogService.getCatalog().should.eventually.become(mockCatalog);
+        });
     });
 
     describe("getCatalogById", function() {
         it('should expose the appropriate methods', function() {
             catalogService.should.have.property('getCatalogById')
-                .that.is.a('function').with.length(1);
+            .that.is.a('function').with.length(1);
         });
         it('Run getCatalogById', function() {
-            var mock_catalog = { id: 'foobar' };
-            waterline.catalogs.needByIdentifier.resolves([mock_catalog]);
+            var mockCatalog = { id: 'foobar' };
+            waterline.catalogs.needByIdentifier.resolves([mockCatalog]);
             return catalogService.getCatalogById().then(function (catalogs) {
-                expect(catalogs).to.deep.equal([mock_catalog]);
+                expect(catalogs).to.deep.equal([mockCatalog]);
             });
-
         });
 
         it('should return empty array if no specific catalog information are found', function () {
             waterline.catalogs.find.resolves({});
-            var mock_catalog = {};
-
-            return catalogService.getCatalog().should.eventually.become(mock_catalog);
+            var mockCatalog = {};
+            return catalogService.getCatalog().should.eventually.become(mockCatalog);
         });
 
     });
