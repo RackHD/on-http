@@ -1657,9 +1657,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /catalogs:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: catalogs
     get:
-      operationId: unimplemented
+      operationId: getCatalog
       summary: |
         get list of all catalogs
       description: |
@@ -1675,20 +1675,20 @@ paths:
         - catalog
         - get
       responses:
-        200:
-          description: An array of catalogs
+        "200":
+          description: Success
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/catalog'
+            # a pointer to a definition
+            $ref: "#/definitions/VersionsResponse"
+        # responses may fall through to errors
         default:
-          description: Unexpected error
+          description: Error
           schema:
-            $ref: '#/definitions/Error'
+            $ref: "#/definitions/ErrorResponse"
   /catalogs/{identifier}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: catalogs
     get:
-      operationId: unimplemented
+      operationId: getCatalogById
       summary: |
         get list of all catalogs
       description: |
@@ -1704,14 +1704,16 @@ paths:
         - catalog
         - get
       responses:
-        200:
-          description: A single catalog
+        "200":
+          description: Success
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/catalog'
+            # a pointer to a definition
+            $ref: "#/definitions/VersionsResponse"
+        # responses may fall through to errors
         default:
-          description: NotFound error
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /dhcp:
     x-swagger-router-controller: unimplemented
     get:
