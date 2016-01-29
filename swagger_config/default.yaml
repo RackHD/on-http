@@ -21,6 +21,16 @@ swagger:
       name: swagger_validator
       validateResponse: true
 
+    _swagger_serializer:
+      name: swagger_serdes
+      serdesDirs: [ lib/api/serdes ]
+      serdesNameKey: x-swagger-serializer
+
+    _swagger_deserializer:
+     name: swagger_serdes
+     serdesDirs: [ lib/api/serdes ]
+     serdesNameKey: x-swagger-deserializer
+
     # pipe for all swagger-node controllers
     swagger_controllers:
       - onError: json_error_handler
@@ -29,7 +39,10 @@ swagger:
       - swagger_security
       - _swagger_validate
       - express_compatibility
+      - _swagger_deserializer
       - _router
+      - _swagger_serializer
+      - swagger_render
 
     # pipe to serve swagger (endpoint is in swagger.yaml)
     swagger_raw:

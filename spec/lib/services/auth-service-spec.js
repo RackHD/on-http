@@ -66,7 +66,7 @@ describe('Auth.Service', function () {
             dihelper.requireWrapper('rimraf', 'rimraf'),
             dihelper.requireWrapper('os-tmpdir', 'osTmpdir'),
             helper.require('/lib/services/http-service'),
-            helper.requireGlob('/lib/api/*.js'),
+            helper.requireGlob('/lib/api/login/*.js'),
             helper.requireGlob('/lib/api/1.1/**/*.js'),
             helper.requireGlob('/lib/services/**/*.js'),
             helper.requireGlob('/lib/serializables/**/*.js')
