@@ -1,0 +1,40 @@
+{
+	"@odata.context" : "<%= basepath %>/$metadata#Chassis/Links/Members/<%= identifier %>/Power/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Power.1.0.0.Power",
+    "Oem": {},
+    "Id": "<%= identifier %>",
+    "Description": "",
+	"Name": "Power",
+	"PowerControl": [],
+	"Voltages@odata.count": <%= voltageList.length %>,
+	"Voltages": [
+		<% voltageList.forEach(function(sdr, i, arr) { %>
+			{
+				"Oem": {},
+				"Name": "<%= sdr['Sensor Id'] %>",
+				"ReadingVolts": <%= parseFloat(sdr['Sensor Reading']) || 'null' %>,
+				"UpperThresholdNonCritical": <%= parseFloat(sdr['Upper non-critical']) || 'null' %>,
+				"UpperThresholdCritical": <%= parseFloat(sdr['Upper critical']) || 'null' %>,
+				"UpperThresholdFatal": null,
+				"LowerThresholdNonCritical": <%= parseFloat(sdr['Lower non-critical']) || 'null' %>,
+				"LowerThresholdCritical": <%= parseFloat(sdr['Lower critical']) || 'null' %>,
+				"LowerThresholdFatal": null,
+				"MinReadingRange": <%= parseFloat(sdr['normalMinimum']) || 'null' %>,
+				"MaxReadingRange": <%= parseFloat(sdr['normalMaximum']) || 'null' %>
+			}
+			<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+		<% }); %>
+	],
+	"PowerSupplies@odata.count": <%= wattsList.length %>,
+	"PowerSupplies": [
+		<% wattsList.forEach(function(sdr, i, arr) { %>
+			{
+				"Oem": {},
+				"Name": "<%= sdr['Sensor Id'] %>",
+				"LastPowerOutputWatts": <%= parseFloat(sdr['Sensor Reading']) || 'null' %>
+			}
+			<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+		<% }); %>
+	]
+}
