@@ -32,7 +32,7 @@ describe('Services.Http.Swagger', function() {
         });
 
         it('should call controller callback', function() {
-            var req = {};
+            var req = { swagger: {} };
             var res = {
                 headersSent: false
             };
@@ -46,8 +46,26 @@ describe('Services.Http.Swagger', function() {
             });
         });
 
+        it('should process options', function() {
+            var req = { swagger: {} };
+            var res = {
+                headersSent: false
+            };
+            var mockData = {data: 'mock data'};
+            var optController = swaggerService.controller({success: 201}, mockController);
+
+            expect(optController).to.be.a('function');
+            mockController.resolves(mockData);
+            return optController(req, res, mockNext).then(function() {
+                expect(res.body).to.equal(mockData);
+                expect(mockNext).to.be.called.once;
+                expect(req.swagger.options).to.have.property('success')
+                    .and.to.equal(201);
+            });
+        });
+
         it('should not call next after sending headers', function() {
-            var req = {};
+            var req = { swagger: {} };
             var res = {
                 headersSent: true
             };
@@ -62,7 +80,7 @@ describe('Services.Http.Swagger', function() {
         });
 
         it('should call next if an error occurs', function() {
-            var req = {};
+            var req = { swagger: {} };
             var res = {
                 headersSent: false
             };
