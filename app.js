@@ -52,7 +52,11 @@ function Runner(
                 return Promise.map(endpoints, function(endpoint) {
                     var service = new HttpService(endpoint);
                     services.push(service);
-                    return service.start();
+                    return Promise.resolve().then(function () {
+                        return service.createSwagger();
+                    }).then(function () {
+                        return service.start();
+                    });
                 });
             });
     }

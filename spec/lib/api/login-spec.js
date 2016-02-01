@@ -160,7 +160,7 @@ describe('Http.Api.Login', function () {
 
         it('should return a token with correct credential in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/login?username=admin&password=admin123')
+                .get('/login?username=admin&password=admin123')
                 .send()
                 .expect(SUCCESS_STATUS)
                 .expect(function(res) {
@@ -170,7 +170,7 @@ describe('Http.Api.Login', function () {
 
         it('should fail with wrong username in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/login?username=balabalabala&password=admin123')
+                .get('/login?username=balabalabala&password=admin123')
                 .send()
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function(res) {
@@ -181,7 +181,7 @@ describe('Http.Api.Login', function () {
 
         it('should fail with wrong password in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/login?username=admin&password=balabalabala')
+                .get('/login?username=admin&password=balabalabala')
                 .send()
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function(res) {
@@ -192,7 +192,7 @@ describe('Http.Api.Login', function () {
 
         it('should fail with empty username in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/login?username=&password=admin123')
+                .get('/login?username=&password=admin123')
                 .send()
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
@@ -203,7 +203,7 @@ describe('Http.Api.Login', function () {
 
         it('should fail with empty password in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/login?username=admin&password=')
+                .get('/login?username=admin&password=')
                 .send()
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
@@ -214,7 +214,7 @@ describe('Http.Api.Login', function () {
 
         it('should fail with no username parameter in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/login?password=admin123')
+                .get('/login?password=admin123')
                 .send()
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
@@ -225,7 +225,7 @@ describe('Http.Api.Login', function () {
 
         it('should fail with no password parameter in query string', function() {
             return helper.request('https://localhost:8443')
-                .post('/login?username=admin')
+                .get('/login?username=admin')
                 .send()
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
