@@ -84,7 +84,7 @@ describe('Services.Http.Swagger', function() {
             var res = {
                 headersSent: false
             };
-            var mockError = {message: 'mock error'};
+            var mockError = new Error('mock error');
 
             expect(controller).to.be.a('function');
             mockController.rejects(mockError);
@@ -156,9 +156,7 @@ describe('Services.Http.Swagger', function() {
             var res = {
                 body: mockData
             };
-            var mockError = {
-                message: 'serialize error'
-            };
+            var mockError = new Error('serializer error');
             MockSerializable.prototype.serialize.rejects(mockError);
 
             expect(serializer).to.be.a('function');
@@ -175,9 +173,7 @@ describe('Services.Http.Swagger', function() {
             var res = {
                 body: mockData
             };
-            var mockError = {
-                message: 'serialize error'
-            };
+            var mockError = new Error('serializer error');
             MockSerializable.prototype.serialize.resolves(mockData);
             MockSerializable.prototype.validateAsModel.rejects(mockError);
 
@@ -252,10 +248,10 @@ describe('Services.Http.Swagger', function() {
                 body: mockData
             };
             var res = {};
+            var mockError = new Error('deserializer error');
 
             expect(deserializer).to.be.a('function');
             MockSerializable.prototype.validate.rejects(mockError);
-            //MockSerializable.prototype.deserialize.resolves(mockData);
             return deserializer(req, res, mockNext).then(function() {
                 expect(mockNext).to.be.calledWith(mockError);
             });
@@ -272,6 +268,7 @@ describe('Services.Http.Swagger', function() {
                 body: mockData
             };
             var res = {};
+            var mockError = new Error('deserializer error');
 
             expect(deserializer).to.be.a('function');
             MockSerializable.prototype.validate.resolves(mockData);

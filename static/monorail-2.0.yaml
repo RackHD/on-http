@@ -38,9 +38,9 @@ paths:
   /swagger:
     x-swagger-pipe: swagger_raw
   /pollers/library:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: pollers
     get:
-      operationId: unimplemented
+      operationId: pollersLibGet
       summary: |
         get list of possible library pollers
       description: |
@@ -59,9 +59,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /pollers/library/{identifier}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: pollers
     get:
-      operationId: unimplemented
+      operationId: pollersLibByIdGet
       summary: |
         get a single library poller
       description: |
@@ -92,9 +92,10 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /pollers:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: pollers
     get:
-      operationId: unimplemented
+      x-swagger-serializer: pollers
+      operationId: pollersGet
       summary: |
         get list of all pollers
       description: |
@@ -113,7 +114,8 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
-      operationId: getVersions
+      x-swagger-deserializer: pollers
+      operationId: pollersPost
       summary: |
         create a poller
       description: |
@@ -132,9 +134,10 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /pollers/{identifier}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: pollers
     get:
-      operationId: unimplemented
+      x-swagger-serializer: pollers
+      operationId: pollersIdGet
       summary: |
         Get specifics of the specified poller
       description: |
@@ -165,7 +168,8 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     patch:
-      operationId: unimplemented
+      x-swagger-deserializer: pollers
+      operationId: pollersPatch
       summary: |
         patch specifics of the specified poller
       description: |
@@ -196,7 +200,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      operationId: unimplemented
+      operationId: pollersDelete
       summary: |
         delete the specified poller
       description: |
@@ -224,14 +228,115 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /pollers/{identifier}/pause:
+    x-swagger-router-controller: pollers
+    patch:
+      x-swagger-serializer: pollers
+      operationId: pollersPausePatch
+      summary: |
+        pause the specified poller
+      description: |
+        pause the specified poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            poller identifier
+          required: true
+          type: string
+      tags:
+        - pollers
+        - patch
+      responses:
+        200:
+          description: |
+            Specifics of the paused poller
+          schema:
+            type: object
+        404:
+          description: |
+            There is no poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /pollers/{identifier}/resume:
+    x-swagger-router-controller: pollers
+    patch:
+      x-swagger-serializer: pollers
+      operationId: pollersResumePatch
+      summary: |
+        resume the specified poller
+      description: |
+        resume the specified poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            poller identifier
+          required: true
+          type: string
+      tags:
+        - pollers
+        - patch
+      responses:
+        200:
+          description: |
+            Specifics of the resumed poller
+          schema:
+            type: object
+        404:
+          description: |
+            There is no poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /pollers/{identifier}/data:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: pollers
     get:
-      operationId: unimplemented
+      operationId: pollersDataGet
       summary: |
         Get data for the specific poller
       description: |
         Get data for the specific poller
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            identifier (ip address or NodeId) for the data from a poller
+          required: true
+          type: string
+      tags:
+        - templates
+        - get
+      responses:
+        200:
+          description: |
+            data for poller
+          schema:
+            type: object
+        404:
+          description: |
+            There is no poller with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /pollers/{identifier}/data/current:
+    x-swagger-router-controller: pollers
+    get:
+      operationId: pollersCurrentDataGet
+      summary: |
+        Get latest data for the specific poller
+      description: |
+        Get latest data for the specific poller
       parameters:
         - name: identifier
           in: path
