@@ -684,34 +684,53 @@ paths:
   /TaskService:
     x-swagger-router-controller: task-service
     get:
+      summary: retrieve list of all tasks
       description: This object represents the root Redfish service.
       operationId: taskServiceRoot
       responses:
         200:
           description: Success
           schema:
-            type: object
-        default:
+            $ref: "#/definitions/TaskService.1.0.0_TaskService"
+        400:
+          $ref: "#/definitions/status_400"
+        401:
+          $ref: "#/definitions/status_401"
+        403:
+          $ref: "#/definitions/status_403"
+        404:
+          $ref: "#/definitions/status_404"
+        500:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
   /TaskService/Tasks:
     x-swagger-router-controller: task-service
     get:
+      summary: retrieve list of all tasks
       description: This object represents the root Redfish service.
       operationId: listTasks
       responses:
         200:
           description: Success
           schema:
-            type: object
-        default:
+            $ref: "#/definitions/TaskCollection_TaskCollection"
+        400:
+          $ref: "#/definitions/status_400"
+        401:
+          $ref: "#/definitions/status_401"
+        403:
+          $ref: "#/definitions/status_403"
+        404:
+          $ref: "#/definitions/status_404"
+        500:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
   /TaskService/Tasks/{identifier}:
     x-swagger-router-controller: task-service
     get:
+      summary: retrieve a task entry by task Id
       description: This object represents the root Redfish service.
       operationId: getTask
       parameters:
@@ -723,14 +742,23 @@ paths:
         200:
           description: Success
           schema:
-            type: object
-        default:
+            $ref: "#/definitions/Task.1.0.0_Task"
+        400:
+          $ref: "#/definitions/status_400"
+        401:
+          $ref: "#/definitions/status_401"
+        403:
+          $ref: "#/definitions/status_403"
+        404:
+          $ref: "#/definitions/status_404"
+        500:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
   /TaskService/Oem/Tasks/{identifier}:
     x-swagger-router-controller: task-service
     get:
+      summary: retrieve list of tasks per system Id
       description: This object represents the root Redfish service.
       operationId: getSystemTasks
       parameters:
@@ -742,8 +770,16 @@ paths:
         200:
           description: Success
           schema:
-            type: object
-        default:
+            $ref: "#/definitions/TaskCollection_TaskCollection"
+        400:
+          $ref: "#/definitions/status_400"
+        401:
+          $ref: "#/definitions/status_401"
+        403:
+          $ref: "#/definitions/status_403"
+        404:
+          $ref: "#/definitions/status_404"
+        500:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
@@ -1868,97 +1904,6 @@ definitions:
           - 'null'
           - object
           - string
-  Resource.1.0.0_ReferenceableMember:
-    additionalProperties: true
-    description: This is the base type for addressable members of an array.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      MemberId:
-        description: This is the identifier for the member within the collection.
-        type: string
-        x-longDescription: The value of this string shall uniquely identify the member within the collection.
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-    type: object
-    x-longDescription: Array members can be referenced using the value returned in the @odata.id property which may or may not be a dereferenceable URL. The @odata.id of this entity shall be the location of this element within an Item.
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  Resource.1.0.0_Resource:
-    additionalProperties: true
-    description: This is the base type for resources and referenceable members.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Description:
-        $ref: '#/definitions/Resource_Description'
-      Id:
-        $ref: '#/definitions/Resource_Id'
-      Name:
-        $ref: '#/definitions/Resource_Name'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  Resource.1.0.0_ResourceCollection:
-    additionalProperties: true
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Description:
-        $ref: '#/definitions/Resource_Description'
-      Name:
-        $ref: '#/definitions/Resource_Name'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  EventService_EventService:
-    $ref: '#/definitions/odata.4.0.0_idRef'
   SessionCollection_SessionCollection:
     additionalProperties: false
     properties:
@@ -1997,422 +1942,8 @@ definitions:
           - 'null'
           - object
           - string
-  ServiceRoot_ServiceRoot:
-    $ref: '#/definitions/ServiceRoot.1.0.0_ServiceRoot'
-  MessageRegistry.1.0.0_Message:
-    additionalProperties: false
-    properties:
-      Description:
-        description: This is a short description of how and when this message is to be used.
-        readOnly: true
-        type: string
-        x-longDescription: The value of this property shall indicate how and when this message is returned by the Redfish service.
-      Message:
-        description: The actual message.
-        readOnly: true
-        type: string
-        x-longDescription: 'The value of this property shall be the message to be displayed.  If a %integer is included in part of the string, it shall be used to represent a string substitution for any MessageArgs accompanying the message, in order.'
-      NumberOfArgs:
-        description: The number of arguments to be expected to be passed in as MessageArgs for this message.
-        minimum: 0
-        readOnly: true
-        type: number
-        x-longDescription: 'The value of this property shall be the number of MessageArgs that are expected to be substituted in the Message in the locations within the Message marked by %<integer>.'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: Oem extension object.
-        x-longDescription: This object represents the Oem property.  All values for resources described by this schema shall comply to the requirements as described in the Redfish specification.
-      ParamTypes:
-        description: 'The MessageArg types, in order, for the message.'
-        items:
-          $ref: '#/definitions/MessageRegistry.1.0.0_ParamType'
-        readOnly: true
-        type: array
-        x-longDescription: 'The value of this property shall be an ordered array of parameter types which match the types of the MessageArgs, in order.'
-      Resolution:
-        description: Used to provide suggestions on how to resolve the situation that caused the error.
-        readOnly: true
-        type: string
-        x-longDescription: 'This property shall contain an override of the Resolution of the message in message registry, if present.'
-      Severity:
-        description: This is the severity of the message.
-        readOnly: true
-        type: string
-        x-longDescription: 'The value of this property shall be the severity of the condition resulting in the message, as defined in the Status section of the Redfish specification.'
-    required:
-      - Description
-      - Message
-      - Severity
-      - NumberOfArgs
-      - Resolution
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  MessageRegistry.1.0.0_MessageProperty:
-    properties: {}
-    type: object
-    x-patternProperties:
-      '[A-Za-z0-9]+':
-        $ref: '#/definitions/MessageRegistry.1.0.0_Message'
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  MessageRegistry.1.0.0_MessageRegistry:
-    additionalProperties: false
-    description: This is the schema definition for all Message Registries.  It represents the properties for the registries themselves.  The MessageId is formed per the Redfish specification.  It consists of the RegistryPrefix concatenated with the version concatenated with the unique identifier for the message registry entry.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Description:
-        $ref: '#/definitions/Resource_Description'
-      Id:
-        $ref: '#/definitions/Resource_Id'
-      Language:
-        description: This is the RFC 5646 compliant language code for the registry.
-        readOnly: true
-        type: string
-        x-longDescription: The value of this property shall be a string consisting of an RFC 5646 language code
-      Messages:
-        $ref: '#/definitions/MessageRegistry.1.0.0_MessageProperty'
-        description: The pattern property indicates that a free-form string is the unique identifier for the message within the registry.
-        readOnly: true
-        x-longDescription: The pattern property shall represent the suffix to be used in the MessageId and shall be unique within this message registry.
-      Name:
-        $ref: '#/definitions/Resource_Name'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-      OwningEntity:
-        description: This is the organization or company that publishes this registry.
-        readOnly: true
-        type: string
-        x-longDescription: The value of this property shall be a string that represents the publisher of this registry.
-      RegistryPrefix:
-        description: This is the single word prefix used to form a messageID structure.
-        readOnly: true
-        type: string
-        x-longDescription: The value of this property shall be the prefix used in messageIDs which uniquely identifies all of the messages in this registry as belonging to this registry.
-      RegistryVersion:
-        description: This is the message registry version which is used in the middle portion of a messageID.
-        readOnly: true
-        type: string
-        x-longDescription: The value of this property shall be the version of this message registry.   The format of this string shall be of the format majorversion.minorversion.errata in compliance with Protocol Version section of the Redfish specification
-    required:
-      - Language
-      - RegistryPrefix
-      - RegistryVersion
-      - OwningEntity
-      - Messages
-    type: object
-    x-longDescription: This resource shall be used to represent a message registry for a Redfish implementation.
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  MessageRegistry.1.0.0_ParamType:
-    enum:
-      - string
-      - number
-    type: string
-  SerialInterface.1.0.0_BitRate:
-    enum:
-      - '1200'
-      - '2400'
-      - '4800'
-      - '9600'
-      - '19200'
-      - '38400'
-      - '57600'
-      - '115200'
-      - '230400'
-    type: string
-  SerialInterface.1.0.0_ConnectorType:
-    enum:
-      - RJ45
-      - RJ11
-      - DB9 Female
-      - DB9 Male
-      - DB25 Female
-      - DB25 Male
-      - USB
-      - mUSB
-      - uUSB
-    type: string
-  SerialInterface.1.0.0_DataBits:
-    enum:
-      - '5'
-      - '6'
-      - '7'
-      - '8'
-    type: string
-  SerialInterface.1.0.0_FlowControl:
-    enum:
-      - None
-      - Software
-      - Hardware
-    type: string
-    x-enumDescriptions:
-      Hardware: Out of band flow control imposed
-      None: No flow control imposed
-      Software: XON/XOFF in-band flow control imposed
-  SerialInterface.1.0.0_Parity:
-    enum:
-      - None
-      - Even
-      - Odd
-      - Mark
-      - Space
-    type: string
-  SerialInterface.1.0.0_PinOut:
-    enum:
-      - Cisco
-      - Cyclades
-      - Digi
-    type: string
-  SerialInterface.1.0.0_SerialInterface:
-    additionalProperties: false
-    description: This schema defines an asynchronous serial interface resource.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      BitRate:
-        $ref: '#/definitions/SerialInterface.1.0.0_BitRate'
-        description: 'The receive and transmit rate of data flow, typically in bits-per-second (bps), over the serial connection.'
-        x-longDescription: This property shall indicate the transmit and receive speed of the serial connection.
-      ConnectorType:
-        $ref: '#/definitions/SerialInterface.1.0.0_ConnectorType'
-        description: The type of connector used for this interface.
-        readOnly: true
-        x-longDescription: This property shall indicate the type of phyiscal connector used for this serial connection.
-      DataBits:
-        $ref: '#/definitions/SerialInterface.1.0.0_DataBits'
-        description: The number of data bits that will follow the start bit over the serial connection.
-        x-longDescription: This property shall indicate number of data bits for the serial connection.
-      Description:
-        $ref: '#/definitions/Resource_Description'
-      FlowControl:
-        $ref: '#/definitions/SerialInterface.1.0.0_FlowControl'
-        description: 'The type of flow control, if any, that will be imposed on the serial connection.'
-        x-longDescription: This property shall indicate the flow control mechanism for the serial connection.
-      Id:
-        $ref: '#/definitions/Resource_Id'
-      InterfaceEnabled:
-        description: This indicates whether this interface is enabled.
-        type:
-          - boolean
-          - 'null'
-        x-longDescription: The value of this property shall be a boolean indicating whether this interface is enabled.
-      Name:
-        $ref: '#/definitions/Resource_Name'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-      Parity:
-        $ref: '#/definitions/SerialInterface.1.0.0_Parity'
-        description: The type of parity used by the sender and receiver in order to detect errors over the serial connection.
-        x-longDescription: This property shall indicate parity information for a serial connection.
-      PinOut:
-        $ref: '#/definitions/SerialInterface.1.0.0_PinOut'
-        description: The physical pin configuration needed for a serial connector.
-        readOnly: true
-        x-longDescription: This property shall indicate the physical pin out for the serial connection.
-      SignalType:
-        $ref: '#/definitions/SerialInterface.1.0.0_SignalType'
-        description: The type of signal used for the communication connection - RS232 or RS485.
-        readOnly: true
-        x-longDescription: This property shall indicate the type of serial signalling that will be utilized for the serial connection.
-      StopBits:
-        $ref: '#/definitions/SerialInterface.1.0.0_StopBits'
-        description: The period of time before the next start bit is transmitted.
-        x-longDescription: This property shall indicate the stop bits for the serial connection.
-    type: object
-    x-longDescription: This resource shall be used to represent serial resources as part of the Redfish specification.
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  SerialInterface.1.0.0_SignalType:
-    enum:
-      - Rs232
-      - Rs485
-    type: string
-  SerialInterface.1.0.0_StopBits:
-    enum:
-      - '1'
-      - '2'
-    type: string
   MessageRegistry_MessageRegistry:
     $ref: '#/definitions/odata.4.0.0_idRef'
-  Event.1.0.0_Event:
-    additionalProperties: false
-    description: This is the schema definition for Events.  It represents the properties for the events themselves and not subscriptions or any other resource.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Description:
-        $ref: '#/definitions/Resource_Description'
-      Events:
-        description: 'Each event in this array has a set of properties that describe the event.  Since this is an array, more than one event can be sent simultaneously.'
-        items:
-          $ref: '#/definitions/Event.1.0.0_EventRecord'
-        type: array
-        x-longDescription: The value of this resource shall be an array of Event objects used to represent the occurrence of one or more events.
-      Events@odata.count:
-        $ref: '#/definitions/odata.4.0.0_count'
-      Events@odata.navigationLink:
-        $ref: '#/definitions/odata.4.0.0_idRef'
-      Id:
-        $ref: '#/definitions/Resource_Id'
-      Name:
-        $ref: '#/definitions/Resource_Name'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-    required:
-      - Events
-    type: object
-    x-longDescription: This resource shall be used to represent an event for a Redfish implementation.
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  Event.1.0.0_EventRecord:
-    additionalProperties: false
-    description: This is the base type for addressable members of an array.
-    properties:
-      Context:
-        description: A context can be supplied at subscription time.  This property is the context value supplied by the subscriber.
-        readOnly: true
-        type: string
-        x-longDescription: This property shall contain a client supplied context for the Event Destination to which this event is being sent.
-      EventId:
-        description: This is a unique instance identifier of an event.
-        readOnly: true
-        type: string
-        x-longDescription: 'The value of this property shall indicate a unique identifier for the event, the format of which is implementation dependent.'
-      EventTimestamp:
-        description: This is time the event occurred.
-        format: date-time
-        readOnly: true
-        type: string
-        x-longDescription: The value of this property shall indicate the time the event occurred where the value shall be consistent with the Redfish service time that is also used for the values of the Modified property.
-      EventType:
-        $ref: '#/definitions/Event.1.0.0_EventType'
-        description: 'This indicates the type of event sent, according to the definitions in the EventService.'
-        readOnly: true
-        x-longDescription: The value of this property shall indicate the type of event as defined in the EventService schema.
-      MemberId:
-        description: This is the identifier for the member within the collection.
-        type: string
-        x-longDescription: The value of this string shall uniquely identify the member within the collection.
-      Message:
-        description: 'This is the human readable message, if provided.'
-        readOnly: true
-        type: string
-        x-longDescription: This property shall contain an optional human readable message.
-      MessageArgs:
-        description: This array of message arguments are substituted for the arguments in the message when looked up in the message registry.
-        items:
-          type: string
-        readOnly: true
-        type: array
-        x-longDescription: This property has the same semantics as the MessageArgs property in the Event schema for Redfish.
-      MessageId:
-        description: This is the key for this message which can be used to look up the message in a message registry.
-        pattern: "^[A-Za-z0-9]+\\.\\d+\\.\\d+.[A-Za-z0-9.]+$"
-        readOnly: true
-        type: string
-        x-longDescription: This property shall be a key into message registry as described in the Redfish specification.
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-      OriginOfCondition:
-        $ref: '#/definitions/odata.4.0.0_idRef'
-        description: This indicates the resource that originated the condition that caused the event to be generated.
-        readOnly: true
-        x-longDescription: The value of this property shall contain a pointer consistent with JSON pointer syntax to the resource that caused the event to be generated.
-      Severity:
-        description: This is the severity of the event.
-        readOnly: true
-        type: string
-        x-longDescription: 'The value of this property shall be the severity of the event, as defined in the Status section of the Redfish specification.'
-    required:
-      - EventType
-      - MessageId
-    type: object
-    x-longDescription: Array members can be referenced using the value returned in the @odata.id property which may or may not be a dereferenceable URL. The @odata.id of this entity shall be the location of this element within an Item.
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  Event.1.0.0_EventType:
-    enum:
-      - StatusChange
-      - ResourceUpdated
-      - ResourceAdded
-      - ResourceRemoved
-      - Alert
-    type: string
-    x-enumDescriptions:
-      Alert: A condition exists which requires attention
-      ResourceAdded: A resource has been added
-      ResourceRemoved: A resource has been removed
-      ResourceUpdated: The value of this resource has been updated
-      StatusChange: The status of this resource has changed
   Role.1.0.0_Role:
     additionalProperties: false
     description: This schema defines a user role to be used in conjunction with a manager account.
@@ -2719,196 +2250,6 @@ definitions:
           - 'null'
           - object
           - string
-  EthernetInterface.1.0.0_EthernetInterface:
-    additionalProperties: false
-    description: This schema defines a simple ethernet NIC resource.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      AutoNeg:
-        description: This indicates if the speed and duplex are automatically negotiated and configured on this interface.
-        type:
-          - boolean
-          - 'null'
-        x-longDescription: The value of this property shall be true if auto negotiation of speed and duplex is enabled on this interface and false if it is disabled.
-      Description:
-        $ref: '#/definitions/Resource_Description'
-      FQDN:
-        description: 'This is the complete, fully qualified domain name obtained by DNS for this interface.'
-        type:
-          - string
-          - 'null'
-        x-longDescription: The value of this property shall be the fully qualified domain name for this interface.
-      FullDuplex:
-        description: This indicates if the interface is in Full Duplex mode or not.
-        type:
-          - boolean
-          - 'null'
-        x-longDescription: The value of this property shall represent the duplex status of the Ethernet connection on this interface.
-      HostName:
-        description: 'The DNS Host Name, without any domain information'
-        type:
-          - string
-          - 'null'
-        x-longDescription: The value of this property shall be host name for this interface.
-      IPv4Addresses:
-        description: The IPv4 addresses assigned to this interface
-        items:
-          $ref: '#/definitions/IPAddresses.1.0.0_IPv4Address'
-        readOnly: true
-        type: array
-        x-longDescription: The value of this property shall be an array of objects used to represent the IPv4 connection characteristics for this interface.
-      IPv6AddressPolicyTable:
-        description: An array representing the RFC3484 Address Selection Policy Table.
-        items:
-          $ref: '#/definitions/EthernetInterface.1.0.0_IPv6AddressPolicyEntry'
-        type: array
-        x-longDescription: The value of this property shall be an array of objects used to represent the Address Selection Policy Table as defined in RFC 6724.
-      IPv6Addresses:
-        description: This array of objects enumerates all of the currently assigned IPv6 addresses on this interface.
-        items:
-          $ref: '#/definitions/IPAddresses.1.0.0_IPv6Address'
-        readOnly: true
-        type: array
-        x-longDescription: The value of this property shall be an array of objects used to represent the IPv6 connection characteristics for this interface.
-      IPv6DefaultGateway:
-        description: This is the IPv6 default gateway address that is currently in use on this interface.
-        readOnly: true
-        type:
-          - string
-          - 'null'
-        x-longDescription: The value of this property shall be the current IPv6 default gateway address that is in use on this interface.
-      IPv6StaticAddresses:
-        description: This array of objects represents all of the IPv6 static addresses to be assigned on this interface.
-        items:
-          $ref: '#/definitions/IPAddresses.1.0.0_IPv6StaticAddress'
-        readOnly: true
-        type: array
-        x-longDescription: The value of this property shall be an array of objects used to represent the IPv6 static connection characteristics for this interface.
-      Id:
-        $ref: '#/definitions/Resource_Id'
-      InterfaceEnabled:
-        description: This indicates whether this interface is enabled.
-        type:
-          - boolean
-          - 'null'
-        x-longDescription: The value of this property shall be a boolean indicating whether this interface is enabled.
-      MACAddress:
-        $ref: '#/definitions/EthernetInterface.1.0.0_MACAddress'
-        description: This is the currently configured MAC address of the (logical port) interface.
-        x-longDescription: 'The value of this property shall be the effective current MAC Address of this interface. If an assignable MAC address is not supported, this is a read only alias of the PermanentMACAddress.'
-      MTUSize:
-        description: This is the currently configured Maximum Transmission Unit (MTU) in bytes on this interface.
-        type:
-          - number
-          - 'null'
-        x-longDescription: The value of this property shall be the size in bytes of largest Protocol Data Unit (PDU) that can be passed in an Ethernet (MAC) frame on this interface.
-      MaxIPv6StaticAddresses:
-        description: This indicates the maximum number of Static IPv6 addresses that can be configured on this interface.
-        readOnly: true
-        type:
-          - number
-          - 'null'
-        x-longDescription: The value of this property shall indicate the number of array items supported by IPv6StaticAddresses.
-      Name:
-        $ref: '#/definitions/Resource_Name'
-      NameServers:
-        description: This represents DNS name servers that are currently in use on this interface.
-        items:
-          type:
-            - string
-            - 'null'
-        readOnly: true
-        type: array
-        x-longDescription: The value of this property shall be the DNS name servers used on this interface.
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-      PermanentMACAddress:
-        $ref: '#/definitions/EthernetInterface.1.0.0_MACAddress'
-        description: This is the permanent MAC address assigned to this interface (port)
-        readOnly: true
-        x-longDescription: The value of this property shall be the Permanent MAC Address of this interface (port). This value is typically programmed during the manufacturing time. This address is not assignable.
-      SpeedMbps:
-        description: This is the current speed in Mbps of this interface.
-        type:
-          - number
-          - 'null'
-        x-longDescription: The value of this property shall be the link speed of the interface in Mbps.
-      Status:
-        $ref: '#/definitions/Resource_Status'
-      UefiDevicePath:
-        description: The UEFI device path for this interface
-        readOnly: true
-        type:
-          - string
-          - 'null'
-        x-longDescription: The value of this property shall be the UEFI device path to the device which implements this interface (port).
-      VLAN:
-        $ref: '#/definitions/VLanNetworkInterface.1.0.0_VLAN'
-        description: 'If this Network Interface supports more than one VLAN, this property will not be present and the client should look for VLANs collection in the link section of this resource.'
-        x-longDescription: 'The value of this property shall be the VLAN for this interface.  If this interface supports more than one VLAN, the VLAN property shall not be present and the VLANS collection link shall be present instead.'
-      VLANs:
-        $ref: '#/definitions/VLanNetworkInterfaceCollection_VLanNetworkInterfaceCollection'
-        description: This is a reference to a collection of VLANs and is only used if the interface supports more than one VLANs.
-        readOnly: true
-        x-longDescription: 'The value of this property shall reference a collection of VLAN resources. If this property is used, the VLANEnabled and VLANId property shall not be used.'
-    type: object
-    x-longDescription: This resource shall be used to represent NIC resources as part of the Redfish specification.
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  EthernetInterface.1.0.0_IPv6AddressPolicyEntry:
-    additionalProperties: false
-    properties:
-      Label:
-        description: The IPv6 Label (as defined in RFC 6724 section 2.1)
-        maximum: 100
-        minimum: 0
-        type:
-          - number
-          - 'null'
-        x-longDescription: This property shall contain the IPv6 Label value for this table entry as defined in RFC 6724 section 2.1.
-      Precedence:
-        description: The IPv6 Precedence (as defined in RFC 6724 section 2.1
-        maximum: 100
-        minimum: 1
-        type:
-          - number
-          - 'null'
-        x-longDescription: This property shall contain the IPv6 Precedence value for this table entry as defined in RFC 6724 section 2.1.
-      Prefix:
-        description: The IPv6 Address Prefix (as defined in RFC 3484 section 2.1)
-        type:
-          - string
-          - 'null'
-        x-longDescription: This property shall contain the IPv6 Address Prefix for this table entry as defined in RFC 6724 section 2.1.
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  EthernetInterface.1.0.0_MACAddress:
-    pattern: '^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'
-    type: string
   SimpleStorage.1.0.0_Device:
     additionalProperties: false
     properties:
@@ -3239,11 +2580,7 @@ definitions:
     type: string
   EthernetInterface_EthernetInterface:
     $ref: '#/definitions/odata.4.0.0_idRef'
-  VLanNetworkInterface_VLanNetworkInterface:
-    $ref: '#/definitions/odata.4.0.0_idRef'
   AccountService_AccountService:
-    $ref: '#/definitions/odata.4.0.0_idRef'
-  EventDestination_EventDestination:
     $ref: '#/definitions/odata.4.0.0_idRef'
   RoleCollection_RoleCollection:
     additionalProperties: false
@@ -3384,99 +2721,6 @@ definitions:
           - 'null'
           - object
           - string
-  JsonSchemaFile.1.0.0_JsonSchemaFile:
-    additionalProperties: false
-    description: This is the schema definition for the Schema File locator resource.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Description:
-        $ref: '#/definitions/Resource_Description'
-      Id:
-        $ref: '#/definitions/Resource_Id'
-      Languages:
-        description: Language codes for the schemas available.
-        items:
-          type: string
-        readOnly: true
-        type: array
-        x-longDescription: The value of this property shall be a string consisting of an RFC 5646 language code.
-      Location:
-        description: Location information for this schema file.
-        items:
-          $ref: '#/definitions/JsonSchemaFile.1.0.0_Location'
-        readOnly: true
-        type: array
-      Name:
-        $ref: '#/definitions/Resource_Name'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-      Schema:
-        description: The type name this schema describes.
-        readOnly: true
-        type: string
-        x-longDescription: The value of this property shall be the value of the Type property for that schema and shall conform to the syntax specified in the Redfish specification for the Type property.
-    required:
-      - Languages
-      - Schema
-      - Location
-    type: object
-    x-longDescription: This resource shall be used to represent the Schema File locator resource for a Redfish implementation.
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  JsonSchemaFile.1.0.0_Location:
-    additionalProperties: false
-    properties:
-      ArchiveFile:
-        description: 'If the schema is hosted on the service in an archive file, this is the name of the file within the archive.'
-        readOnly: true
-        type: string
-        x-longDescription: 'The value of this property shall be the file name of the individual schema file within the archive file specified by the ArchiveUri property.  The file name shall conform to the format [SchemaType].[MajorVersion].[MinorVersion].json and be in conformance with the Redfish specification.'
-      ArchiveUri:
-        description: 'If the schema is hosted on the service in an archive file, this is the link to the archive file.'
-        readOnly: true
-        type: string
-        x-longDescription: The value of this property shall be a URI co-located with the Redfish service that specifies the location of the schema file.  This property shall only be used for archive files (zip or other formats).  The value of ArchiveFile shall have the file name of the individual schema file within the archive file.
-      Language:
-        description: The language code for the file the schema is in.
-        readOnly: true
-        type: string
-        x-longDescription: "The value of this property shall be a string consisting of an RFC5646 language code or the string 'default'."
-      PublicationUri:
-        description: Link to publicly available (canonical) URI for schema.
-        readOnly: true
-        type: string
-        x-longDescription: The value of this property shall be a URI not co-located with the Redfish service that specifies the canonical location of the schema file.  This property shall only be used for individual schema files.
-      Uri:
-        description: Link to locally available URI for schema.
-        readOnly: true
-        type: string
-        x-longDescription: 'The value of this property shall be a URI co-located with the Redfish service that specifies the location of the schema file.  This property shall only be used for individual schema files.  The file name portion of the URI shall conform to the format [SchemaType].[MajorVersion].[MinorVersion].json and be in conformance with the Redfish specification.'
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
   TaskCollection_TaskCollection:
     additionalProperties: false
     properties:
@@ -3515,8 +2759,6 @@ definitions:
           - 'null'
           - object
           - string
-  TaskService_TaskService:
-    $ref: '#/definitions/TaskService.1.0.0_TaskService'
   VirtualMediaCollection_VirtualMediaCollection:
     additionalProperties: false
     properties:
@@ -3555,86 +2797,6 @@ definitions:
           - 'null'
           - object
           - string
-  Redundancy.1.0.0_Redundancy:
-    additionalProperties: false
-    description: This is the redundancy definition to be used in other resource schemas.
-    properties:
-      MaxNumSupported:
-        description: 'This is the maximum number of members allowable for this particular managers redundancy, including this manager.'
-        readOnly: true
-        type:
-          - number
-          - 'null'
-        x-longDescription: The value of this property shall contain the maximum number of members allowed in the redundancy group.
-      MemberId:
-        description: This is the identifier for the member within the collection.
-        type: string
-        x-longDescription: The value of this string shall uniquely identify the member within the collection.
-      MinNumNeeded:
-        description: This is the minumum number of managers needed for this manager to be redundant.
-        readOnly: true
-        type:
-          - number
-          - 'null'
-        x-longDescription: The value of this property shall contain the maximum number of members allowed in the redundancy group for the current redundancy mode to still be fault tolerant.
-      Mode:
-        $ref: '#/definitions/Redundancy.1.0.0_RedundancyMode'
-        description: This is the redundancy mode of the group.
-        readOnly: true
-        x-longDescription: 'The value of this property shall contain the information about the redundancy mode of this manager.  Failover shall indicate a master/slave type arrangement where status indicates the role of this manager.  N+1 indicates an arrangement where the redundancy set needs MaxNumSupported-1 number of resources in order to be redundant.  Load Balanced indicates all members are active. However, there functionality is not independent of each other. Their functioning is determined by some sort of load balancing algorithm. Sparing is implied (i.e. each member can be a spare for the other(s). Sparing indicates that all members are active and are aware of each others. However, their functionality is independent until failover. Each member can be a spare for the other(s). Limited Sparing indicates that all members are active, and they may or may not be aware of each and they are not spares for each other.'
-      Name:
-        description: The name of the resource or array element.
-        readOnly: true
-        type: string
-        x-longDescription: 'This object represents the Name property.  All values for resources described by this schema shall comply to the requirements as described in the Redfish specification. The value of this string shall be of the format for the reserved word *Name*.'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-      RedundancySet:
-        description: Contains any ids that represent components of this reduncancy set.
-        items:
-          $ref: '#/definitions/odata.4.0.0_idRef'
-        readOnly: true
-        type: array
-        x-longDescription: The value of this property shall contain the ids of components that are part of this redundancy set. The id values may or may not be dereferenceable.
-      RedundancySet@odata.count:
-        $ref: '#/definitions/odata.4.0.0_count'
-      RedundancySet@odata.navigationLink:
-        $ref: '#/definitions/odata.4.0.0_idRef'
-      Status:
-        $ref: '#/definitions/Resource_Status'
-    required:
-      - Name
-      - Mode
-      - MaxNumSupported
-      - MinNumNeeded
-      - Status
-      - RedundancySet
-    type: object
-    x-longDescription: 'This object represents the Redundancy element property.  All values for resources described by this schema shall comply to the requirements as described in the Redfish specification.  The value of this string shall be of the format for the reserved word *Redundancy*'
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  Redundancy.1.0.0_RedundancyMode:
-    enum:
-      - Failover
-      - N+m
-      - Sharing
-      - Sparing
-    type: string
-    x-enumDescriptions:
-      Failover: Failure of one unit will automatically cause its functions to be taken over by a standby or offline unit in the redundancy set
-      N+m: Multiple units are available and active such that normal operation will continue if one or more units fail
-      Sharing: 'Multiple units contribute or share such that operation will continue, but at a reduced capacity, if one or more units fail'
-      Sparing: 'One or more spare units are available to take over the function of a failed unit, but takeover is not automatic'
   VirtualMedia.1.0.0_ConnectedVia:
     enum:
       - NotConnected
@@ -3818,14 +2980,10 @@ definitions:
       Starting: Task is starting
       Stopping: Task is in the process of stopping
       Suspended: Task has been suspended
-  Settings_Settings:
-    $ref: '#/definitions/odata.4.0.0_idRef'
   LogService_LogService:
     $ref: '#/definitions/odata.4.0.0_idRef'
   Session_Session:
     $ref: '#/definitions/Session.1.0.0_Session'
-  Event_Event:
-    $ref: '#/definitions/Event.1.0.0_Event'
   SimpleStorageCollection_SimpleStorageCollection:
     additionalProperties: false
     properties:
@@ -3864,89 +3022,6 @@ definitions:
           - 'null'
           - object
           - string
-  EventDestination.1.0.0_EventDestination:
-    additionalProperties: false
-    description: This is the base type for resources and referenceable members.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Context:
-        description: A client-supplied string that is stored with the event destination subscription.
-        type: string
-        x-longDescription: This property shall contain a client supplied context that will remain with the connection through the connections lifetime.
-      Description:
-        $ref: '#/definitions/Resource_Description'
-      Destination:
-        description: The URI of the destination Event Service.
-        readOnly: true
-        type: string
-        x-longDescription: This property shall contain a URI to the destination where the events will be sent.
-      EventTypes:
-        description: This property shall contain the types of events that shall be sent to the desination.
-        items:
-          $ref: '#/definitions/Event.1.0.0_EventType'
-        readOnly: true
-        type: array
-      HttpHeaders:
-        description: 'This is for setting HTTP headers, such as authorization information.  This object will be null on a GET.'
-        items:
-          $ref: '#/definitions/EventDestination.1.0.0_HttpHeaderProperty'
-        type: array
-        x-longDescription: This property shall contain an object consisting of the names and values of of HTTP header to be included with every event POST to the Event Destination.  This property shall be null on a GET.
-      Id:
-        $ref: '#/definitions/Resource_Id'
-      Name:
-        $ref: '#/definitions/Resource_Name'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-      Protocol:
-        $ref: '#/definitions/EventDestination.1.0.0_EventDestinationProtocol'
-        description: The protocol type of the event connection.
-        readOnly: true
-        x-longDescription: This property shall contain the protocol type that the event will use for sending the event to the destination.  A value of Redfish shall be used to indicate that the event type shall adhere to that defined in the Redfish specification.
-    x-requiredOnCreate:
-      - Destination
-      - EventTypes
-      - Context
-      - Protocol
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  EventDestination.1.0.0_EventDestinationProtocol:
-    enum:
-      - Redfish
-    type: string
-  EventDestination.1.0.0_HttpHeaderProperty:
-    additionalProperties: false
-    description: The value of the HTTP header is the property value.  The header name is the property name.
-    properties: {}
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-      "^[^:\\s]+$":
-        type: string
   JsonSchemaFileCollection_JsonSchemaFileCollection:
     additionalProperties: false
     properties:
@@ -3987,44 +3062,6 @@ definitions:
           - string
   Chassis_Chassis:
     $ref: '#/definitions/odata.4.0.0_idRef'
-  EventDestinationCollection_EventDestinationCollection:
-    additionalProperties: false
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Description:
-        $ref: '#/definitions/Resource_Description'
-      Members:
-        description: Contains the members of this collection.
-        items:
-          $ref: '#/definitions/EventDestination_EventDestination'
-        readOnly: true
-        type: array
-      Members@odata.count:
-        $ref: '#/definitions/odata.4.0.0_count'
-      Members@odata.navigationLink:
-        $ref: '#/definitions/odata.4.0.0_idRef'
-      Name:
-        $ref: '#/definitions/Resource_Name'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
   PhysicalContext.1.0.0_PhysicalContext:
     enum:
       - Room
@@ -4401,140 +3438,8 @@ definitions:
           - string
   Power_Power:
     $ref: '#/definitions/Power.1.0.0_Power'
-  VLanNetworkInterface.1.0.0_VLAN:
-    additionalProperties: false
-    properties:
-      VLANEnable:
-        description: This indicates if this VLAN is enabled.
-        type:
-          - boolean
-          - 'null'
-        x-longDescription: The value of this property shall be used to indicate if this VLAN is enabled for this interface.
-      VLANId:
-        $ref: '#/definitions/VLanNetworkInterface.1.0.0_VLANId'
-        description: This indicates the VLAN identifier for this VLAN.
-        x-longDescription: The value of this property shall be used to indicate the VLAN identifier for this VLAN.
-    x-requiredOnCreate:
-      - VLANEnable
-      - VLANId
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  VLanNetworkInterface.1.0.0_VLANId:
-    maximum: 4095
-    minimum: 0
-    type: number
-  VLanNetworkInterface.1.0.0_VLanNetworkInterface:
-    additionalProperties: false
-    description: This is the base type for resources and referenceable members.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Description:
-        $ref: '#/definitions/Resource_Description'
-      Id:
-        $ref: '#/definitions/Resource_Id'
-      Name:
-        $ref: '#/definitions/Resource_Name'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-      VLANEnable:
-        description: This indicates if this VLAN is enabled.
-        type:
-          - boolean
-          - 'null'
-        x-longDescription: The value of this property shall be used to indicate if this VLAN is enabled for this interface.
-      VLANId:
-        $ref: '#/definitions/VLanNetworkInterface.1.0.0_VLANId'
-        description: This indicates the VLAN identifier for this VLAN.
-        x-longDescription: The value of this property shall be used to indicate the VLAN identifier for this VLAN.
-    x-requiredOnCreate:
-      - VLANEnable
-      - VLANId
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  redfish-schema.1.0.0_copyright:
-    description: This attribute shall contain the copyright notice for the schema.
-    type: string
-  redfish-schema.1.0.0_readOnly:
-    description: This property shall designate a property to be readonly when set to true.
-    type: boolean
-  redfish-schema.1.0.0_x-requiredOnCreate:
-    description: This property is required to be specified in the body of a POST request to create the resource.
-    items:
-      type: boolean
-    type: array
-  redfish-schema.1.0.0_x-enumDescriptions:
-    description: This attribute shall contain informative language related to the enumeration values of the property.
-    type: object
-  redfish-schema.1.0.0_x-longDescription:
-    description: This attribute shall contain normative language relating to the Redfish Sprecification and documentation.
-    type: string
-  ManagerNetworkProtocol_ManagerNetworkProtocol:
-    $ref: '#/definitions/ManagerNetworkProtocol.1.0.0_ManagerNetworkProtocol'
   Manager_Manager:
     $ref: '#/definitions/odata.4.0.0_idRef'
-  VLanNetworkInterfaceCollection_VLanNetworkInterfaceCollection:
-    additionalProperties: false
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Description:
-        $ref: '#/definitions/Resource_Description'
-      Members:
-        description: Contains the members of this collection.
-        items:
-          $ref: '#/definitions/VLanNetworkInterface_VLanNetworkInterface'
-        readOnly: true
-        type: array
-      Members@odata.count:
-        $ref: '#/definitions/odata.4.0.0_count'
-      Members@odata.navigationLink:
-        $ref: '#/definitions/odata.4.0.0_idRef'
-      Name:
-        $ref: '#/definitions/Resource_Name'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
   LogServiceCollection_LogServiceCollection:
     additionalProperties: false
     properties:
@@ -5169,162 +4074,6 @@ definitions:
           - 'null'
           - object
           - string
-  Settings.1.0.0_Settings:
-    additionalProperties: false
-    properties:
-      ETag:
-        description: 'The ETag of the resource to which the settings were applied, after the application.'
-        readOnly: true
-        type:
-          - string
-          - 'null'
-        x-longDescription: 'The value of this property shall be the ETag of the resource to which the settings were applied, after the application.  This is here so that the client can check it against the ETag of the current resource to see if any other changes have also happened to the resource.'
-      Messages:
-        description: This is an array of messages associated with the task.
-        items:
-          $ref: '#/definitions/Message.1.0.0_Message'
-        readOnly: true
-        type: array
-        x-longDescription: The value of this property shall be an array of messages associated with the task.
-      SettingsObject:
-        $ref: '#/definitions/odata.4.0.0_idRef'
-        description: Reference to the resource the client may PUT/PATCH to in order to change this resource.
-        x-longDescription: The value of this property shall be the URI of the resource to which a client must do a PUT or PATCh in order to modify this resource.
-      Time:
-        description: Indicates the time the settings were applied.
-        format: date-time
-        readOnly: true
-        type:
-          - string
-          - 'null'
-        x-longDescription: The value of this property shall indicate the time that the settings object was applied to the resource.
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  EventService.1.0.0_EventService:
-    additionalProperties: false
-    description: This is the schema definition for the Event Service. It represents the properties for the service itself and has links to the actual list of subscriptions.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Actions:
-        additionalProperties: false
-        description: The Actions object contains the available custom actions on this resource.
-        properties:
-          '#EventService.SubmitTestEvent':
-            $ref: '#/definitions/EventService.1.0.0_SubmitTestEvent'
-          Oem:
-            additionalProperties: true
-            properties: {}
-            type:
-              - object
-              - 'null'
-            x-patternProperties:
-              "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-                description: This property shall specify a valid odata or Redfish property.
-                type:
-                  - array
-                  - boolean
-                  - number
-                  - 'null'
-                  - object
-                  - string
-        readOnly: true
-        type: object
-        x-patternProperties:
-          "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-            description: This property shall specify a valid odata or Redfish property.
-            type:
-              - array
-              - boolean
-              - number
-              - 'null'
-              - object
-              - string
-      DeliveryRetryAttempts:
-        description: This is the number of attempts an event posting is retried before the subscription is terminated.
-        readOnly: true
-        type: number
-        x-longDescription: The value of this property shall be the number of retrys attempted for any given event to the subscription destination before the subscription is terminated.
-      DeliveryRetryIntervalSeconds:
-        description: This represents the number of seconds between retry attempts for sending any given Event
-        readOnly: true
-        type: number
-        x-longDescription: The value of this property shall be the interval in seconds between the retry attempts for any given event to the subscription destination.
-      Description:
-        $ref: '#/definitions/Resource_Description'
-      EventTypesForSubscription:
-        description: This is the types of Events that can be subscribed to.
-        items:
-          $ref: '#/definitions/Event.1.0.0_EventType'
-        readOnly: true
-        type: array
-        x-longDescription: The value of this property shall be the types of events that subscriptions can subscribe to.  The semantics associated with the enumerations values are defined in the Redfish specification.
-      Id:
-        $ref: '#/definitions/Resource_Id'
-      Name:
-        $ref: '#/definitions/Resource_Name'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-      ServiceEnabled:
-        description: This indicates whether this service is enabled.
-        type:
-          - boolean
-          - 'null'
-        x-longDescription: The value of this property shall be a boolean indicating whether this service is enabled.
-      Status:
-        $ref: '#/definitions/Resource_Status'
-      Subscriptions:
-        $ref: '#/definitions/EventDestinationCollection_EventDestinationCollection'
-        description: This is a reference to a collection of Event Destination resources.
-        readOnly: true
-        x-longDescription: The value of this property shall contain the link to a collection of type EventDestinationCollection.
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  EventService.1.0.0_SubmitTestEvent:
-    additionalProperties: false
-    properties:
-      target:
-        description: Link to invoke action
-        format: uri
-        type: string
-      title:
-        description: Friendly action name
-        type: string
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
   AccountService.1.0.0_AccountService:
     additionalProperties: false
     description: This is the schema definition for the Account Service.  It represents the properties for the service itself and has links to the actual list of accounts.
@@ -5551,8 +4300,6 @@ definitions:
       Unknown: The overwrite policy is not known or is undefined
       WrapsWhenFull: 'When full, new entries to the Log will overwrite previous entries'
   Processor_Processor:
-    $ref: '#/definitions/odata.4.0.0_idRef'
-  SessionService_SessionService:
     $ref: '#/definitions/odata.4.0.0_idRef'
   ComputerSystem.1.0.0_Boot:
     additionalProperties: false
@@ -6175,156 +4922,6 @@ definitions:
     $ref: '#/definitions/odata.4.0.0_idRef'
   Task_Task:
     $ref: '#/definitions/Task.1.0.0_Task'
-  IPAddresses.1.0.0_AddressState:
-    enum:
-      - Preferred
-      - Deprecated
-      - Tentative
-      - Failed
-    type: string
-    x-enumDescriptions:
-      Deprecated: "This address is currently within it's valid lifetime, but is now outside of it's preferred lifetime as defined in RFC 4862."
-      Failed: This address has failed Duplicate Address Detection testing as defined in RFC 4862 section 5.4 and is not currently in use.
-      Preferred: "This address is currently within both it's valid and preferred lifetimes as defined in RFC 4862."
-      Tentative: This address is currently undergoing Duplicate Address Detection testing as defined in RFC 4862 section 5.4.
-  IPAddresses.1.0.0_IPv4Address:
-    additionalProperties: false
-    properties:
-      Address:
-        description: This is the IPv4 Address.
-        pattern: "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"
-        type:
-          - string
-          - 'null'
-        x-longDescription: 'The value of this property shall be an IPv4 address assigned to this interface.  If DHCPv4 is enabled on the interface, this property becomes read-only.'
-      AddressOrigin:
-        $ref: '#/definitions/IPAddresses.1.0.0_IPv4AddressOrigin'
-        description: This indicates how the address was determined.
-        readOnly: true
-        x-longDescription: The value of this property shall be the IP address origin for this network interface.
-      Gateway:
-        description: This is the IPv4 gateway for this address.
-        type:
-          - string
-          - 'null'
-        x-longDescription: 'The value of this property shall be the IPv4 default gateway address for this interface. If DHCPv4 is enabled on the interface and is configured to set the IPv4 default gateway address, this property becomes read-only.'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-      SubnetMask:
-        $ref: '#/definitions/IPAddresses.1.0.0_SubnetMask'
-        description: This is the IPv4 Subnet mask.
-        pattern: "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"
-        x-longDescription: 'The value of this property shall be the IPv4 subnet mask for this address.  If DHCPv4 is enabled on the interface, this property becomes read-only.'
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  IPAddresses.1.0.0_IPv4AddressOrigin:
-    enum:
-      - Static
-      - DHCP
-      - BOOTP
-      - IPv4LinkLocal
-    type: string
-    x-enumDescriptions:
-      BOOTP: Address is provided by a BOOTP service
-      DHCP: Address is provided by a DHCPv4 service
-      IPv4LinkLocal: Address is valid only for this network segment (link)
-      Static: A static address as configured by the user
-  IPAddresses.1.0.0_IPv6Address:
-    additionalProperties: false
-    properties:
-      Address:
-        description: This is the IPv6 Address.
-        type:
-          - string
-          - 'null'
-        x-longDescription: This property lists an IPv6 address that is currently assigned on this interface.
-      AddressOrigin:
-        $ref: '#/definitions/IPAddresses.1.0.0_IPv6AddressOrigin'
-        description: This indicates how the address was determined.
-        readOnly: true
-        x-longDescription: The value of this property shall be the IPv6 address origin for this interface.
-      AddressState:
-        $ref: '#/definitions/IPAddresses.1.0.0_AddressState'
-        description: The current state of this address as defined in RFC 4862.
-        readOnly: true
-        x-longDescription: 'Preferred and Deprecated states follow the definitions given RFC4862 Section 5.5.4. An address is in the Tentative state while undergoing Duplicate Address Detection (DAD) per RFC4862 Section 5.4.  The Failed state indicates a Static addresses which did not pass DAD.  A Static address in the Failed state is not in use on the network stack, and corrective action will be needed to remedy this condition.'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-      PrefixLength:
-        $ref: '#/definitions/IPAddresses.1.0.0_PrefixLength'
-        description: This is the IPv6 Address Prefix Length.
-        readOnly: true
-        x-longDescription: The value of this property shall be the IPv6 address prefix length for this interface.
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  IPAddresses.1.0.0_IPv6AddressOrigin:
-    enum:
-      - Static
-      - DHCPv6
-      - LinkLocal
-      - SLAAC
-    type: string
-    x-enumDescriptions:
-      DHCPv6: Address is provided by a DHCPv6 service
-      LinkLocal: Address is valid only for this network segment (link)
-      SLAAC: Address is provided by a Stateless Address AutoConfiguration (SLAAC) service
-      Static: A static address as configured by the user
-  IPAddresses.1.0.0_IPv6StaticAddress:
-    additionalProperties: false
-    description: This object represents a single IPv6 static address to be assigned on a network interface.
-    properties:
-      Address:
-        description: A valid IPv6 address.
-        type:
-          - string
-          - 'null'
-        x-longDescription: This property provides access to a static IPv6 address that is currently assigned on a network interface.
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-      PrefixLength:
-        $ref: '#/definitions/IPAddresses.1.0.0_PrefixLength'
-        description: The Prefix Length of this IPv6 address.
-        readOnly: true
-        x-longDescription: Provides the IPv6 network prefix length in bits for this address.
-    required:
-      - Address
-      - PrefixLength
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  IPAddresses.1.0.0_PrefixLength:
-    maximum: 128
-    minimum: 1
-    type: number
-  IPAddresses.1.0.0_SubnetMask:
-    pattern: "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"
-    type: string
   Role_Role:
     $ref: '#/definitions/Role.1.0.0_Role'
   ChassisCollection_ChassisCollection:
@@ -6441,31 +5038,6 @@ definitions:
     readOnly: true
     type: string
     x-longDescription: This property represents an identifier for the resource.  All values for resources described by this schema shall comply to the requirements as described in the Redfish specification.
-  Resource_Item:
-    additionalProperties: true
-    description: This is the base type for resources and referenceable members.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
   Resource_Name:
     description: The name of the resource or array element.
     readOnly: true
@@ -6481,96 +5053,6 @@ definitions:
         additionalProperties: true
         description: This property shall specify a valid odata or Redfish property.
         type: object
-  Resource_ReferenceableMember:
-    additionalProperties: true
-    description: This is the base type for resources and referenceable members.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  Resource_ResetType:
-    enum:
-      - 'On'
-      - ForceOff
-      - GracefulShutdown
-      - GracefulRestart
-      - ForceRestart
-      - Nmi
-      - ForceOn
-      - PushPowerButton
-    type: string
-    x-enumDescriptions:
-      ForceOff: Turn the system off immediately (non-graceful) shutdown
-      ForceOn: Turn the system on immediately
-      ForceRestart: 'Perform an immediate (non-graceful) shutdown, followed by a restart of the system'
-      GracefulRestart: Perform a graceful system shutdown followed by a restart of the system
-      GracefulShutdown: Perform a graceful system shutdown and power off
-      Nmi: 'Generate a Diagnostic Interrupt (usually an NMI on x86 systems) to cease normal operations, perform diagnostic actions and typically halt the system.'
-      'On': Turn the system on
-      PushPowerButton: Simulate the pressing of the physical power button on this system
-  Resource_Resource:
-    additionalProperties: true
-    description: This is the base type for resources and referenceable members.
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-      Oem:
-        $ref: '#/definitions/Resource_Oem'
-        description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
-        x-longDescription: 'The value of this string shall be of the format for the reserved word *Oem*.'
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
-  Resource_ResourceCollection:
-    additionalProperties: true
-    properties:
-      '@odata.context':
-        $ref: '#/definitions/odata.4.0.0_context'
-      '@odata.id':
-        $ref: '#/definitions/odata.4.0.0_id'
-      '@odata.type':
-        $ref: '#/definitions/odata.4.0.0_type'
-    type: object
-    x-patternProperties:
-      "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$":
-        description: This property shall specify a valid odata or Redfish property.
-        type:
-          - array
-          - boolean
-          - number
-          - 'null'
-          - object
-          - string
   Resource_State:
     enum:
       - Enabled
@@ -6624,8 +5106,6 @@ definitions:
   Resource_UUID:
     pattern: '([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})'
     type: string
-  MessageRegistryFileCollection_MessageRegistryFileCollection:
-    type: object
   status_400:
     description: >
       The request could not be processed because it contains missing or invalid information 
