@@ -2,9 +2,8 @@
 
 "use strict";
 
-var _ = require('lodash'),
+var _ = require('lodash'),  /* jshint ignore: line */
     _di = require('di'),
-    express = require('express'),
     onCore = require('on-core'),
     onTasks = require('on-tasks'),
     ws = require('ws');
@@ -20,17 +19,12 @@ function onHttpContextFactory(di, directory) {
     var core = onCore(di, directory),
         helper = core.helper;
     return {
-        expressApp: function () {
-            return helper.simpleWrapper(express(), 'express-app', undefined, __dirname);
-        },
-
         helper: helper,
 
         initialize: function () {
             var injector = new di.Injector(_.flattenDeep([
                 core.injectables,
                 this.prerequisiteInjectables,
-                this.expressApp(),
                 this.injectables
             ]));
 
@@ -42,7 +36,8 @@ function onHttpContextFactory(di, directory) {
         },
 
         injectables: _.flattenDeep([
-            helper.requireGlob(__dirname + '/lib/api/1.1/*.js'),
+            helper.requireGlob(__dirname + '/lib/api/*.js'),
+            helper.requireGlob(__dirname + '/lib/api/1.1/**/*.js'),
             helper.requireGlob(__dirname + '/lib/services/**/*.js'),
             helper.requireGlob(__dirname + '/lib/serializables/**/*.js'),
             require('./app'),
