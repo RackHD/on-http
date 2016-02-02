@@ -25,7 +25,6 @@
     "express": "^4.10.7",
     "express-http-proxy": "^0.6.0",
     "glob": "^4.3.2",
-    "jsonwebtoken": "^5.4.4",
     "lodash": "^3.10.1",
     "mongodb": "^1.4.28",
     "on-core": "git+https://github.com/RackHD/on-core.git",

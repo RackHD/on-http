@@ -158,82 +158,6 @@ describe('Http.Api.Login', function () {
                 });
         });
 
-        it('should return a token with correct credential in query string', function() {
-            return helper.request('https://localhost:8443')
-                .get('/login?username=admin&password=admin123')
-                .send()
-                .expect(SUCCESS_STATUS)
-                .expect(function(res) {
-                    expect(res.body.token).to.be.a('string');
-                });
-        });
-
-        it('should fail with wrong username in query string', function() {
-            return helper.request('https://localhost:8443')
-                .get('/login?username=balabalabala&password=admin123')
-                .send()
-                .expect(UNAUTHORIZED_STATUS)
-                .expect(function(res) {
-                    expect(res.body.message).to.be.a('string');
-                    expect(res.body.message).to.equal('Invalid username or password');
-                });
-        });
-
-        it('should fail with wrong password in query string', function() {
-            return helper.request('https://localhost:8443')
-                .get('/login?username=admin&password=balabalabala')
-                .send()
-                .expect(UNAUTHORIZED_STATUS)
-                .expect(function(res) {
-                    expect(res.body.message).to.be.a('string');
-                    expect(res.body.message).to.equal('Invalid username or password');
-                });
-        });
-
-        it('should fail with empty username in query string', function() {
-            return helper.request('https://localhost:8443')
-                .get('/login?username=&password=admin123')
-                .send()
-                .expect(BAD_REQUEST_STATUS)
-                .expect(function(res) {
-                    expect(res.body.message).to.be.a('string');
-                    expect(res.body.message).to.equal('Missing credentials');
-                });
-        });
-
-        it('should fail with empty password in query string', function() {
-            return helper.request('https://localhost:8443')
-                .get('/login?username=admin&password=')
-                .send()
-                .expect(BAD_REQUEST_STATUS)
-                .expect(function(res) {
-                    expect(res.body.message).to.be.a('string');
-                    expect(res.body.message).to.equal('Missing credentials');
-                });
-        });
-
-        it('should fail with no username parameter in query string', function() {
-            return helper.request('https://localhost:8443')
-                .get('/login?password=admin123')
-                .send()
-                .expect(BAD_REQUEST_STATUS)
-                .expect(function(res) {
-                    expect(res.body.message).to.be.a('string');
-                    expect(res.body.message).to.equal('Missing credentials');
-                });
-        });
-
-        it('should fail with no password parameter in query string', function() {
-            return helper.request('https://localhost:8443')
-                .get('/login?username=admin')
-                .send()
-                .expect(BAD_REQUEST_STATUS)
-                .expect(function(res) {
-                    expect(res.body.message).to.be.a('string');
-                    expect(res.body.message).to.equal('Missing credentials');
-                });
-        });
-
         //passport-local middleware we choose does not support authentication
         // with credential in the header. Following test will fail if auth header
         // is supported in the future, thus people will get alerted.
@@ -308,8 +232,6 @@ describe('Http.Api.Login', function () {
             this.timeout(5000);
             endpoint.authEnabled = false;
             startServer(endpoint);
-            //restore endpoint
-            endpoint.authEnabled = true;
         });
 
         it('should fail with auth disabled', function() {
@@ -321,6 +243,8 @@ describe('Http.Api.Login', function () {
 
         after('stop server, restore mock and configure',function () {
             cleanUp();
+            //restore endpoint
+            endpoint.authEnabled = true;
         });
     });
 
