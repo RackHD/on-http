@@ -1,0 +1,18 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata/TaskService/Tasks/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Tasks.1.0.0.Task",
+    "Oem" : {},
+    "Name": "<%= graph.name %>",
+    "TaskState": "<%= graph.state %>",
+    "Messages": [],
+    "TaskStatus": "<%= graph.status %>",
+    "StartTime": "<%= graph.startTime %>",
+    "EndTime": "<%= graph.endTime %>",
+    "Id": "<%= graph.id %>",
+    "Oem" : {
+        "RackHD": {
+            "SystemId": "<%= graph.systemId %>"
+        }
+    }
+}
