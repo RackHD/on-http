@@ -138,7 +138,7 @@ function executeTasks(data, timeout) {
                         _task.stderr + "\n" +
                         _task.error.toString());
             console.log("ACCEPTED RESPONSES " + _task.acceptedResponseCodes);
-            if (_task.acceptedResponseCodes &&
+            if (checkValidAcceptCode(_task.acceptedResponseCodes) &&
                 _task.acceptedResponseCodes.indexOf(_task.error.code) >= 0) {
 
                 console.log("_task " + _task.cmd + " error code " + _task.error.code +
@@ -271,6 +271,24 @@ function getFile(downloadUrl, cb) {
     }).on('error', function (error) {
         cb(error);
     }).end();
+}
+
+/**
+ * Check valid accepted response code - check whether the code is an array of number
+ * @private
+ * @param code
+ */
+function checkValidAcceptCode(code) {
+    if (!(code instanceof Array)) {
+        return false;
+    }
+
+    return code.every(function(item) {
+        if (typeof item !== 'number') {
+            return false;
+        }
+        return true;
+    });
 }
 
 getTasks(5000);
