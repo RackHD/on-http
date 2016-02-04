@@ -17,7 +17,9 @@ describe("Http.Services.Api.Nodes", function () {
 
     before("Http.Services.Api.Nodes before", function() {
         helper.setupInjector([
-            helper.require("/lib/services/nodes-api-service")
+            helper.require("/lib/services/nodes-api-service"),
+            dihelper.simpleWrapper({}, 'Task.Services.OBM'),
+            dihelper.simpleWrapper({}, 'ipmi-obm-service')
         ]);
         nodeApiService = helper.injector.get("Http.Services.Api.Nodes");
         Errors = helper.injector.get("Errors");
