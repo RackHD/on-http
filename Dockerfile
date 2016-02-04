@@ -1,4 +1,4 @@
-FROM roland/on-core
+FROM rackhd/on-core
 
 RUN mkdir -p /RackHD/on-http
 WORKDIR /RackHD/on-http
