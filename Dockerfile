@@ -1,3 +1,5 @@
+# Copyright 2016, EMC, Inc.
+
 FROM rackhd/on-core
 
 RUN mkdir -p /RackHD/on-http
@@ -24,7 +26,9 @@ ADD https://bintray.com/artifact/download/rackhd/binary/builds/initrd.img-3.16.0
 ADD https://bintray.com/artifact/download/rackhd/binary/builds/vmlinuz-3.16.0-25-generic \
     /RackHD/on-http/static/http/common/vmlinuz-3.16.0-25-generic
 
-RUN apt-get update && apt-get install -y unzip && /RackHD/on-http/install-web-ui.sh
+RUN apt-get update \
+  && apt-get install -y unzip \
+  && /RackHD/on-http/install-web-ui.sh
 
 EXPOSE 80
 EXPOSE 443
