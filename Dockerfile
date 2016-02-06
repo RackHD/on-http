@@ -26,12 +26,11 @@ ADD https://bintray.com/artifact/download/rackhd/binary/builds/initrd.img-3.16.0
 ADD https://bintray.com/artifact/download/rackhd/binary/builds/vmlinuz-3.16.0-25-generic \
     /RackHD/on-http/static/http/common/vmlinuz-3.16.0-25-generic
 
-RUN apt-get update \
-  && apt-get install -y unzip \
-  && /RackHD/on-http/install-web-ui.sh
+RUN apk add --update unzip \
+  && /RackHD/on-http/install-web-ui.sh \
+  && /RackHD/on-http/install-swagger-ui.sh
 
 EXPOSE 80
 EXPOSE 443
 
-ENTRYPOINT [ "node" ]
-CMD [ "/RackHD/on-http/index.js" ]
+CMD [ "node", "/RackHD/on-http/index.js" ]
