@@ -466,6 +466,133 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Actions/ComputerSystem.Reset:
+    x-swagger-router-controller: systems
+    get:
+      summary: retrieve the list of reset types for the specified compute node
+      description: >
+        Retrieve  a list of valid reset types for the system described by identifier
+      operationId: listResetTypes
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/RackHD_ResetAction"
+        400:
+          $ref: "#/definitions/status_400"
+        401:
+          $ref: "#/definitions/status_401"
+        403:
+          $ref: "#/definitions/status_403"
+        404:
+          $ref: "#/definitions/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      summary: reset a node
+      description: >
+        Perform the reset specified in the post data arguments on the system
+        described by identifier
+      operationId: doReset
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/RackHD_ResetAction"
+      responses:
+        202:
+          description: Success
+          $ref: "#/definitions/status_202"
+        400:
+          $ref: "#/definitions/status_400"
+        401:
+          $ref: "#/definitions/status_401"
+        403:
+          $ref: "#/definitions/status_403"
+        404:
+          $ref: "#/definitions/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Actions/RackHD.BootImage:
+    x-swagger-router-controller: systems
+    get:
+      summary: retrieve the list of boot image types for the specified compute node
+      description: >
+        Retrieve  a list of valid boot image types for the system described by identifier
+      operationId: listBootImage
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/RackHD_BootImage_BootImageList"
+        400:
+          $ref: "#/definitions/status_400"
+        401:
+          $ref: "#/definitions/status_401"
+        403:
+          $ref: "#/definitions/status_403"
+        404:
+          $ref: "#/definitions/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      summary: install a boot image on a node
+      description: >
+        Perform the boot image installation specified in the post data arguments on 
+        the system described by identifier
+      operationId: doBootImage
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/RackHD_BootImage_BootImage"
+      responses:
+        202:
+          description: Success
+          $ref: "#/definitions/status_202"
+        400:
+          $ref: "#/definitions/status_400"
+        401:
+          $ref: "#/definitions/status_401"
+        403:
+          $ref: "#/definitions/status_403"
+        404:
+          $ref: "#/definitions/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
   /AccountService:
     x-swagger-router-controller: unimplemented
     get:
@@ -5086,6 +5213,26 @@ definitions:
         additionalProperties: true
         description: This property shall specify a valid odata or Redfish property.
         type: object
+  Resource_ResetType:
+    enum:
+      - On
+      - ForceOff
+      - GracefulShutdown
+      - GracefulRestart
+      - ForceRestart
+      - Nmi
+      - ForceOn
+      - PushPowerButton
+    type: string
+    x-enumDescriptions:
+      ForceOff: Turn the system off immediately (non-graceful) shutdown
+      ForceOn: Turn the system on immediately
+      ForceRestart: 'Perform an immediate (non-graceful) shutdown, followed by a restart of the system'
+      GracefulRestart: Perform a graceful system shutdown followed by a restart of the system
+      GracefulShutdown: Perform a graceful system shutdown and power off
+      Nmi: 'Generate a Diagnostic Interrupt (usually an NMI on x86 systems) to cease normal operations, perform diagnostic actions and typically halt the system.'
+      'On': Turn the system on
+      PushPowerButton: Simulate the pressing of the physical power button on this system
   Resource_State:
     enum:
       - Enabled
@@ -5139,6 +5286,12 @@ definitions:
   Resource_UUID:
     pattern: '([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})'
     type: string
+  status_202:
+    description: >
+      The request has been accepted for processing, but the processing has not been completed. 
+      The Location header shall be set to the URI of a Task resource that can later be queried 
+      to determine the status of the operation. A representation of the Task resource may be 
+      included in the response body.
   status_400:
     description: >
       The request could not be processed because it contains missing or invalid information 
@@ -5160,3 +5313,149 @@ definitions:
       The server does not (currently) support the functionality required to fulfill the request. 
       This is the appropriate response when the server does not recognize the request method 
       and is not capable of supporting the method for any resource.
+  
+  RackHD_ResetAction:
+    properties:
+      reset_type:
+        $ref: '#/definitions/Resource_ResetType'
+  RackHD_BootImage_BootImage:
+    type: object
+    required:
+    - domain
+    - hostname
+    - osName
+    - repo
+    - version
+    - rootPassword
+    - dnsServers
+    properties:
+      rootSshKey:
+        readOnly: false
+        type: string
+        description:  This is the SshKey for the OS root account.
+      domain:
+        readOnly: false
+        type: string
+        description:  This is the domain for the target OS
+      users:
+        items:
+          $ref: '#/definitions/RackHD_BootImage_Users'
+        type: array
+        description:  This is a list of user account information that will created after OS installation
+      hostname:
+        readOnly: false
+        type: string
+        description:  The hostname for target OS.
+      osName:
+        readOnly: false
+        enum:
+        - CentOS
+        - CentOS+KVM
+        - ESXi
+        - RHEL
+        - RHEL+KVM
+        type: string
+        description:  Name of the target OS to be installed
+      repo:
+        readOnly: false
+        type: string
+        description: The external OS repository address, currently only supports HTTP
+      version:
+        readOnly: false
+        type: string
+        description:  The version number of target OS that needs to install.
+      networkDevices:
+        items:
+          $ref: '#/definitions/RackHD_BootImage_NetworkDevice'
+        type: array
+        description:  List of device names and static IP settings for network devices after OS installation.
+      rootPassword:
+        readOnly: false
+        type: string
+        description:  The password for the OS root account.
+      dnsServers:
+        items:
+          readOnly: false
+          type: string
+          description:  This is a list of Domain Name Servers.
+        readOnly: false
+        type: array
+        description:  This is a list of Domain Name Servers.
+      installDisk:
+        type: string
+        readOnly: false
+  RackHD_BootImage_Users:
+    type: object
+    required:
+    - password
+    - uid
+    - name
+    properties:
+      password:
+        readOnly: false
+        type: string
+        description: This is the password of user, it should pass the clear text, OnRack will do encryption before storing it into a kickstart file.
+      uid:
+        readOnly: false
+        type: number
+        description:  The unique identifier of user
+      name:
+        readOnly: false
+        type: string
+        description:  This is the name of user
+      sshKey:
+        readOnly: false
+        type: string
+        description:  This is the SSH key that will be appended into the file ~/.ssh/authorized_keys
+  RackHD_BootImage_NetworkDevice:
+    type: object
+    required: 
+    - device
+    properties:
+      device:
+        readOnly: false
+        type: string
+        description:  The name of the network device.
+      ipv4:
+        description:  This the ipv4 parameter of the network device.
+        $ref: '#/definitions/RackHD_BootImage_NetworkAddress'
+      ipv6:
+        description:  This is the ipv6 parameter of the network device.
+        $ref: '#/definitions/RackHD_BootImage_NetworkAddress'
+  RackHD_BootImage_NetworkAddress:
+    type: object
+    required:
+    - netmask
+    - ipAddr
+    - gateway
+    properties:
+      netmask:
+        readOnly: false
+        type: string
+        description: This is the subnet mask
+      ipAddr:
+        readOnly: false
+        type: string
+        description: This is the assigned static IP address of the network device
+      gateway:
+        readOnly: false
+        type: string
+        description: This is the gateway address.
+      vlanId:
+        readOnly: false
+        type: string
+        description: This is the VLAN ID represented as a array of integers with values of 0 to 4096
+  RackHD_BootImage_BootImageList:
+    properties:
+      osName:
+        enum:
+        - CentOS
+        - CentOS+KVM
+        - ESXi
+        - RHEL
+        - RHEL+KVM
+        type: string
+      '@odata.type':
+        $ref: '#/definitions/odata.4.0.0_type'
+
+

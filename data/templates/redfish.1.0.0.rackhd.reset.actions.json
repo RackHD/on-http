@@ -1,0 +1,13 @@
+{
+    "@odata.type": "#RackHD.ResetAction",
+    "reset_type@Redfish.AllowableValues" : [
+        "On",
+        "ForceOff",
+        "GracefulShutdown",
+        "GracefulRestart",
+        "ForceRestart",
+        "Nmi",
+        "ForceOn",
+        "PushPowerButton"
+    ]
+}

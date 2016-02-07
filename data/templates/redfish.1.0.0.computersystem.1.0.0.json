@@ -34,8 +34,16 @@
         "Status": {}
     },
     "Actions": {
-        "Oem": {},
-        "#ComputerSystem.Reset": {}
+        "Oem": {
+            "RackHD": {
+                "#RackHD.BootImage": {
+                    "target": "<%=basepath%>/Systems/<%=identifier%>/Actions/RackHD.BootImage"
+                }
+            }
+        },
+        "#ComputerSystem.Reset": {
+            "target": "<%=basepath%>/Systems/<%=identifier%>/Actions/ComputerSystem.Reset"
+        }
     },
     "Status": {},
     "Processors": {

@@ -1,0 +1,30 @@
+{
+    "$schema": "http://redfish.dmtf.org/schemas/v1/redfish-schema.1.0.0.json",
+    "title": "#RackHD.ResetAction",
+    "$ref": "#/definitions/ResetAction",
+    "definitions": {
+        "ResetAction": {
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ],
+                    "description": "This property shall specify a valid odata or Redfish property."
+                }
+            },
+            "additionalProperties": false,
+            "properties": {
+                "reset_type": {
+                    "$ref": "http://redfish.dmtf.org/schemas/v1/Resource.json#/definitions/ResetType"
+                }
+            },
+            "description": "This is the base type for the reset action."
+        }
+    },
+    "copyright": "Copyright 2016 EMC, Inc."
+}

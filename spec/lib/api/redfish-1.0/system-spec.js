@@ -3,7 +3,7 @@
 
 'use strict';
 
-describe('Redfish Service Root', function () {
+describe('Redfish Systems Root', function () {
     var tv4;
     var validator;
     var waterline;
@@ -11,6 +11,7 @@ describe('Redfish Service Root', function () {
     var taskProtocol;
     var template;
     var fs;
+    var nodeApi;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -40,6 +41,9 @@ describe('Redfish Service Root', function () {
             taskProtocol = helper.injector.get('Protocol.Task');
             sinon.stub(taskProtocol);
 
+            nodeApi = helper.injector.get('Http.Services.Api.Nodes');
+            sinon.stub(nodeApi, "setNodeWorkflowById");
+
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
         });
@@ -52,6 +56,7 @@ describe('Redfish Service Root', function () {
 
         validator.validate.reset();
         validator.render.reset();
+        nodeApi.setNodeWorkflowById.reset();
 
         function resetStubs(obj) {
             _(obj).methods().forEach(function (method) {
@@ -65,6 +70,13 @@ describe('Redfish Service Root', function () {
         resetStubs(waterline.catalogs);
         resetStubs(waterline.workitems);
         resetStubs(taskProtocol);
+
+        waterline.nodes.needByIdentifier.resolves(Promise.resolve({
+            id: '1234abcd1234abcd1234abcd',
+            name: '1234abcd1234abcd1234abcd'
+        }));
+
+        nodeApi.setNodeWorkflowById.resolves({id: 'abcdef'});
     });
 
     afterEach('tear down mocks', function () {
@@ -75,6 +87,7 @@ describe('Redfish Service Root', function () {
         validator.validate.restore();
         validator.render.restore();
         template.get.restore();
+        nodeApi.setNodeWorkflowById.restore();
         
         function restoreStubs(obj) {
             _(obj).methods().forEach(function (method) {
@@ -189,11 +202,6 @@ describe('Redfish Service Root', function () {
     });
 
     it('should return a valid system', function() {
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve({
-            id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd'
-        }));
-
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
@@ -219,11 +227,6 @@ describe('Redfish Service Root', function () {
     });
 
     it('should return a valid processor list', function() {
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve({
-            id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd'
-        }));
-
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
@@ -241,11 +244,6 @@ describe('Redfish Service Root', function () {
     });
 
     it('should return a valid processor', function() {
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve({
-            id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd'
-        }));
-
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
@@ -263,11 +261,6 @@ describe('Redfish Service Root', function () {
     });
 
     it('should return a valid simple storage list', function() {
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve({
-            id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd'
-        }));
-
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
@@ -291,11 +284,6 @@ describe('Redfish Service Root', function () {
     });
 
     it('should return a valid simple storage device', function() {
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve({
-            id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd'
-        }));
-
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart')
         .resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
@@ -321,11 +309,6 @@ describe('Redfish Service Root', function () {
     });
 
     it('should return a valid log service', function() {
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve({
-            id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd'
-        }));
-
         return helper.request().get('/redfish/v1/Systems/' + node.id + 
                                     '/LogServices')
             .expect('Content-Type', /^application\/json/)
@@ -338,11 +321,6 @@ describe('Redfish Service Root', function () {
     });
 
     it('should return a valid sel log service', function() {
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve({
-            id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd'
-        }));
-
         waterline.workitems.findPollers.resolves([{
             config: { command: 'selInformation' }
         }]);
@@ -363,11 +341,6 @@ describe('Redfish Service Root', function () {
     });
 
     it('should return a valid sel log service entry collection', function() {
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve({
-            id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd'
-        }));
-
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
         }]);
@@ -393,11 +366,6 @@ describe('Redfish Service Root', function () {
     });
 
     it('should return a valid sel log service entry', function() {
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve({
-            id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd'
-        }));
-
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
         }]);
@@ -422,5 +390,89 @@ describe('Redfish Service Root', function () {
             });
     });
 
+    it('should return a valid reset type list', function() {
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/Actions/ComputerSystem.Reset')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(template.get.called).to.be.true;
+            });
+    });
+
+    it('should perform the specified valid reset', function() {
+        return helper.request().post('/redfish/v1/Systems/' + node.id +
+                                    '/Actions/ComputerSystem.Reset')
+            .send({ reset_type: "ForceRestart"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(202)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
+            });
+    });
+
+    it('should 400 an invalid reset type', function() {
+        return helper.request().post('/redfish/v1/Systems/' + node.id +
+                                    '/Actions/ComputerSystem.Reset')
+            .send({ reset_type: "HalfForceRestart"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(400);
+    });
+
+    it('should return a valid boot image list', function() {
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/Actions/RackHD.BootImage')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(template.get.called).to.be.true;
+            });
+    });
+
+    it('should perform the specified boot image installation', function() {
+        var minimumValidBody = {
+            domain: "rackhd.com",
+            hostname: "rackhd",
+            osName: "ESXi",
+            repo: "http://172.31.128.1:9080/esxi/5.5",
+            version: "6.0",
+            rootPassword: "passw0rd",
+            dnsServers: [ "172.31.128.1" ],
+            installDisk: "firstdisk"
+        };
+        return Promise.map(['CentOS', 'CentOS+KVM', 'ESXi', 'RHEL', 'RHEL+KVM'], function(osName) {
+            return helper.request().post('/redfish/v1/Systems/' + node.id +
+                                        '/Actions/RackHD.BootImage')
+                .send( _.merge(minimumValidBody, {osName: osName}) )
+                .expect('Content-Type', /^application\/json/)
+                .expect(202)
+                .expect(function(res) {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
+                });
+        });
+    });
+
+    it('should 400 an invalid boot image installation', function() {
+        var minimumInvalidBody = {
+            domain: "rackhd.com",
+            hostname: "rackhd",
+            osName: "notESXi",
+            repo: "http://172.31.128.1:9080/esxi/5.5",
+            version: "6.0",
+            rootPassword: "passw0rd",
+            dnsServers: [ "172.31.128.1" ],
+            installDisk: "firstdisk"
+        };
+
+        return helper.request().post('/redfish/v1/Systems/' + node.id +
+                                    '/Actions/RackHD.BootImage')
+            .send(minimumInvalidBody)
+            .expect('Content-Type', /^application\/json/)
+            .expect(400);
+    });
 });
 

@@ -1,0 +1,10 @@
+{
+    "@odata.type": "#RackHD.BootImage",
+    "osNames@Redfish.AllowableValues" : [
+        "CentOS",
+        "CentOS+KVM",
+        "ESXi",
+        "RHEL",
+        "RHEL+KVM"
+    ]
+}
