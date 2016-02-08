@@ -71,10 +71,12 @@ describe('Redfish Systems Root', function () {
         resetStubs(waterline.workitems);
         resetStubs(taskProtocol);
 
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve({
+        waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd')
+        .resolves(Promise.resolve({
             id: '1234abcd1234abcd1234abcd',
             name: '1234abcd1234abcd1234abcd'
         }));
+        waterline.nodes.needByIdentifier.rejects();
 
         nodeApi.setNodeWorkflowById.resolves({id: 'abcdef'});
     });
@@ -226,6 +228,12 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should 500 an invalid system', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id)
+            .expect('Content-Type', /^application\/json/)
+            .expect(500);
+    });
+
     it('should return a valid processor list', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
@@ -243,6 +251,12 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should 500 an invalid processor list', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Processors')
+            .expect('Content-Type', /^application\/json/)
+            .expect(500);
+    });
+
     it('should return a valid processor', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
@@ -258,6 +272,12 @@ describe('Redfish Systems Root', function () {
                 expect(validator.validate.called).to.be.true;
                 expect(validator.render.called).to.be.true;
             });
+    });
+
+    it('should 500 an invalid processor', function() {
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/bad')
+            .expect('Content-Type', /^application\/json/)
+            .expect(500);
     });
 
     it('should return a valid simple storage list', function() {
@@ -283,6 +303,12 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should 500 an invalid simple storage', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/SimpleStorage')
+            .expect('Content-Type', /^application\/json/)
+            .expect(500);
+    });
+
     it('should return a valid simple storage device', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart')
         .resolves(Promise.resolve({
@@ -306,6 +332,13 @@ describe('Redfish Systems Root', function () {
                 expect(validator.validate.called).to.be.true;
                 expect(validator.render.called).to.be.true;
             });
+    });
+
+    it('should 500 an invalid simple storage device', function() {
+        return helper.request().get('/redfish/v1/Systems/' + node.id + 
+                                    '/SimpleStorage/bad')
+            .expect('Content-Type', /^application\/json/)
+            .expect(500);
     });
 
     it('should return a valid log service', function() {
@@ -340,6 +373,13 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should 500 an invalid sel log service', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id + 
+                                    '/LogServices/sel')
+            .expect('Content-Type', /^application\/json/)
+            .expect(500);
+    });
+
     it('should return a valid sel log service entry collection', function() {
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
@@ -365,6 +405,13 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should 500 an invalid sel log service entry list', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id + 
+                                    '/LogServices/sel/Entries')
+            .expect('Content-Type', /^application\/json/)
+            .expect(500);
+    });
+
     it('should return a valid sel log service entry', function() {
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
@@ -388,6 +435,13 @@ describe('Redfish Systems Root', function () {
                 expect(validator.validate.called).to.be.true;
                 expect(validator.render.called).to.be.true;
             });
+    });
+
+    it('should 500 an invalid sel log service entry', function() {
+        return helper.request().get('/redfish/v1/Systems/' + node.id + 
+                                    '/LogServices/sel/Entries/abcdefg')
+            .expect('Content-Type', /^application\/json/)
+            .expect(500);
     });
 
     it('should return a valid reset type list', function() {
