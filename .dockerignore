@@ -1,0 +1,16 @@
+.bintray.json
+.dockerignore
+.git
+.gitignore
+.hound.yml
+.jshintrc
+.travis.yml
+build-package.bash
+debianstatic/
+Dockerfile
+Gruntfile.js
+HWIMO-*
+LICENSE
+migrate.js
+README.md
+spec/
