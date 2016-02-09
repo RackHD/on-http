@@ -12,7 +12,7 @@ swagger:
   bagpipes:
 
     _router:
-      name: on_swagger_router
+      name: swagger_router
       mockMode: false
       mockControllersDirs: [ lib/api/2.0/mocks lib/api/redfish-1.0/mocks ]
       controllersDirs: [ lib/api/2.0, lib/api/redfish-1.0 ]
