@@ -1,3 +1,0 @@
-#!/bin/sh
-echo "Installing python-on-http client library..."
-cd /var/renasar/python-client && python setup.py -q install sdist

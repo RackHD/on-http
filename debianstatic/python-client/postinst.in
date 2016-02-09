@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "Installing python-{{name}} client library..."
+cd /var/renasar/{{name}} && python setup.py -q install sdist

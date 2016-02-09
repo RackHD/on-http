@@ -2012,9 +2012,7 @@ definitions:
       OemPrivileges:
         description: The OEM privileges that this role includes.
         items:
-          type:
-            - string
-            - 'null'
+          type: string
         readOnly: false
         type: array
         x-longDescription: 'The value of this property shall be the OEM privileges that this role includes. For pre-defined roles, this property shall be readOnly. For custom roles some implementations may not allow writing this property.'
@@ -2433,16 +2431,12 @@ definitions:
       Message:
         description: 'This property decodes from EntryType:  If it is Event then it is a message string.  Otherwise, it is SEL or Oem specific.  In most cases, this will be the actual Log Entry.'
         readOnly: true
-        type:
-          - string
-          - 'null'
+        type: string
         x-longDescription: 'The value of this property shall be the Message property of the event if the EntryType is Event, the Description if EntryType is SEL and OEM Specific if the EntryType is OEM.'
       MessageArgs:
         description: The values of this property shall be any arguments for the message.
         items:
-          type:
-            - string
-            - 'null'
+          type: string
         readOnly: true
         type: array
         x-longDescription: This contains message arguments to be substituted into the message included or in the message looked up via a registry.
@@ -5007,9 +5001,7 @@ definitions:
       MessageArgs:
         description: This array of message arguments are substituted for the arguments in the message when looked up in the message registry.
         items:
-          type:
-            - string
-            - 'null'
+          type: string
         type: array
         x-longDescription: This property shall contain the message substitution arguments for the specific message referenced by the MessageId and shall only be included if the MessageId is present.
       MessageId:
@@ -5023,9 +5015,7 @@ definitions:
       RelatedProperties:
         description: This is an array of properties described by the message.
         items:
-          type:
-            - string
-            - 'null'
+          type: string
         type: array
         x-longDescription: 'This property shall contain an array of JSON Pointers indicating the properties described by the message, if appropriate for the message.'
       Resolution:
