@@ -77,10 +77,10 @@ describe('Redfish Chassis Root', function () {
         restoreStubs(taskProtocol);
         return helper.stopServer();
     });
-    
+
     var enclosure = {
         id: '4567efgh4567efgh4567efgh',
-        name: 'name',
+        name: 'Enclosure Node ABCDEFG',
         type: 'enclosure',
         relations: [
             {
@@ -117,13 +117,16 @@ describe('Redfish Chassis Root', function () {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(validator.render.called).to.be.true;
-                expect(res.body['Members@odata.count']).to.equal(1);
+                expect(res.body['Members@odata.count']).to.equal(2);
                 expect(res.body.Members[0]['@odata.id'])
                     .to.equal('/redfish/v1/Chassis/' + enclosure.id);
+                expect(res.body.Members[1]['@odata.id'])
+                    .to.equal('/redfish/v1/Chassis/ABCDEFG');
             });
     });
 
     it('should return valid chassis and related targets', function() {
+        waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
         waterline.nodes.needByIdentifier.resolves(Promise.resolve(enclosure));
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
@@ -148,13 +151,40 @@ describe('Redfish Chassis Root', function () {
                 expect(validator.render.called).to.be.true;
             });
     });
-    
-    it('should return a valid thermal object', function () {
+
+    it('should return valid chassis and related targets by serial number', function() {
+        waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
         waterline.nodes.needByIdentifier.resolves(Promise.resolve(enclosure));
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: catalogData
+        }));
+
+        waterline.workitems.findPollers.resolves([{
+            config: { command: 'chassis' }
+        }]);
+
+        taskProtocol.requestPollerCache.resolves([{
+            chassis: { power: "Unknown", uid: "Unknown"}
+        }]);
+
+        return helper.request().get('/redfish/v1/Chassis/ABCDEFG')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(validator.render.called).to.be.true;
+            });
+    });
+
+    it('should return a valid thermal object', function () {
+        waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sdr', inCondition: {} }
         }]);
-        
+
         taskProtocol.requestPollerCache.resolves([{
             sdr: [{
                 "Lower critical": "100.00",
@@ -167,7 +197,7 @@ describe('Redfish Chassis Root', function () {
                 "Sensor Reading Units": "% RPM",
                 "Sensor Type": "Fan",
                 "Upper critical": "",
-                "Upper non-critical": ""            
+                "Upper non-critical": ""
             },
             {
                 "Lower critical": "",
@@ -183,7 +213,7 @@ describe('Redfish Chassis Root', function () {
                 "Upper non-critical": "50.000"
             }]
         }]);
-        
+
         return helper.request().get('/redfish/v1/Chassis/' + enclosure.id + '/Thermal')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -193,13 +223,103 @@ describe('Redfish Chassis Root', function () {
                 expect(validator.render.called).to.be.true;
             });
     });
-    
+
     it('should return a valid power object', function () {
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve(enclosure));
+        waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sdr', inCondition: {} }
         }]);
-        
+
+        taskProtocol.requestPollerCache.resolves([{
+            sdr: [{
+                "Lower critical": "10.00",
+                "Lower non-critical": "",
+                "Nominal Reading": "",
+                "Normal Maximum": "",
+                "Normal Minimum": "",
+                "Sensor Id": "Volt12V",
+                "Sensor Reading": "12",
+                "Sensor Reading Units": "% Volts",
+                "Sensor Type": "Voltage",
+                "Upper critical": "12.600",
+                "Upper non-critical": ""
+            },
+            {
+                "Lower critical": "0.000",
+                "Lower non-critical": "",
+                "Nominal Reading": "",
+                "Normal Maximum": "",
+                "Normal Minimum": "",
+                "Sensor Id": "Input",
+                "Sensor Reading": "27",
+                "Sensor Reading Units": "Watts",
+                "Sensor Type": "Current",
+                "Upper critical": "",
+                "Upper non-critical": ""
+            }]
+        }]);
+
+        return helper.request().get('/redfish/v1/Chassis/' + enclosure.id + '/Power')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(validator.render.called).to.be.true;
+            });
+    });
+
+    it('should return a valid thermal object by serial number', function () {
+        waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
+        waterline.workitems.findPollers.resolves([{
+            config: { command: 'sdr', inCondition: {} }
+        }]);
+
+        taskProtocol.requestPollerCache.resolves([{
+            sdr: [{
+                "Lower critical": "100.00",
+                "Lower non-critical": "",
+                "Nominal Reading": "",
+                "Normal Maximum": "",
+                "Normal Minimum": "",
+                "Sensor Id": "Fan_1",
+                "Sensor Reading": "1000",
+                "Sensor Reading Units": "% RPM",
+                "Sensor Type": "Fan",
+                "Upper critical": "",
+                "Upper non-critical": ""
+            },
+            {
+                "Lower critical": "",
+                "Lower non-critical": "",
+                "Nominal Reading": "",
+                "Normal Maximum": "",
+                "Normal Minimum": "",
+                "Sensor Id": "Temp1",
+                "Sensor Reading": "24",
+                "Sensor Reading Units": "% degrees C",
+                "Sensor Type": "Temperature",
+                "Upper critical": "55.000",
+                "Upper non-critical": "50.000"
+            }]
+        }]);
+
+        return helper.request().get('/redfish/v1/Chassis/ABCDEFG/Thermal')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(validator.render.called).to.be.true;
+            });
+    });
+
+    it('should return a valid power object by serial number', function () {
+        waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
+        waterline.workitems.findPollers.resolves([{
+            config: { command: 'sdr', inCondition: {} }
+        }]);
+
         taskProtocol.requestPollerCache.resolves([{
             sdr: [{
                 "Lower critical": "10.00",
@@ -228,8 +348,8 @@ describe('Redfish Chassis Root', function () {
                 "Upper non-critical": ""
             }]
         }]);
-        
-        return helper.request().get('/redfish/v1/Chassis/' + enclosure.id + '/Power')
+
+        return helper.request().get('/redfish/v1/Chassis/ABCDEFG/Power')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function(res) {
@@ -238,5 +358,4 @@ describe('Redfish Chassis Root', function () {
                 expect(validator.render.called).to.be.true;
             });
     });
-    
 });
