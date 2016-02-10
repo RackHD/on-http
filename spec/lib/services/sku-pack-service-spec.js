@@ -7,13 +7,16 @@ require('../../helper');
 describe("SKU Pack Service", function() {
     var skuService;
     var fs;
+    var waterline;
+    var taskRunner;
 
     before(function() {
         helper.setupInjector([
             helper.require("/lib/services/sku-pack-service"),
             dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf')
         ]);
-
+        waterline = helper.injector.get('Services.Waterline');
+        taskRunner = helper.injector.get('Protocol.TaskGraphRunner');
         skuService = helper.injector.get('Http.Services.SkuPack');
 
         fs = helper.injector.get('fs');
@@ -24,6 +27,7 @@ describe("SKU Pack Service", function() {
         sinon.stub(fs, 'mkdirAsync');
         sinon.stub(fs, 'renameAsync');
         sinon.stub(fs, 'unlinkAsync');
+        sinon.stub(fs, 'statSync');
     });
 
     beforeEach(function() {
@@ -35,6 +39,7 @@ describe("SKU Pack Service", function() {
         fs.mkdirAsync.reset();
         fs.renameAsync.reset();
         fs.unlinkAsync.reset();
+        fs.statSync.reset();
     });
 
     helper.after(function () {
@@ -45,6 +50,7 @@ describe("SKU Pack Service", function() {
         fs.mkdirAsync.restore();
         fs.renameAsync.restore();
         fs.unlinkAsync.restore();
+        fs.statSync.restore();
     });
 
     it('should expose the appropriate methods', function() {
@@ -69,25 +75,114 @@ describe("SKU Pack Service", function() {
         return skuService.start('./valid').should.be.fulfilled;
     });
 
-    it('should load a valid configuration file', function() {
+    describe('configuration file', function() {
         var data = {
             httpStaticRoot: 'static',
-            httpTemplateRoot: 'templates'
+            httpTemplateRoot: 'templates',
+            workflowRoot: 'workflows',
+            taskRoot: 'tasks'
         };
-        fs.readdirAsync.withArgs('./valid').resolves(['a.json']);
-        fs.statAsync.withArgs('./valid/a.json').resolves({ isDirectory: function() {
-            return false;
-        }
-        });
-        fs.readFileAsync.withArgs('./valid/a.json').resolves(JSON.stringify(data));
-        fs.readdirAsync.withArgs('./valid/a/templates').resolves([]);
 
-        return skuService.start('./valid').then(function(vals) {
-            expect(vals.length).to.equal(1);
-            expect(('a' in skuService.skuHandlers)).to.equal(true);
-            expect(fs.readdirAsync.called).to.be.true;
-            expect(fs.statAsync.called).to.be.true;
-            expect(fs.readFileAsync.called).to.be.true;
+        before(function() {
+            fs.readdirAsync.withArgs('./valid').resolves(['a.json']);
+            fs.statAsync.withArgs('./valid/a.json')
+                .resolves({ isDirectory: function() { return false; } });
+            fs.readFileAsync.withArgs('./valid/a.json').resolves(JSON.stringify(data));
+            fs.readdirAsync.withArgs('./valid/a/templates').resolves([]);
+            fs.readdirAsync.withArgs('./valid/a/workflows').resolves(['graph.json']);
+            fs.readdirAsync.withArgs('./valid/a/tasks').resolves(['task.json']);
+            fs.readFileAsync.withArgs('./valid/a/tasks/task.json')
+                .resolves('{ "injectableName": "Task.ABC"}');
+            fs.readFileAsync.withArgs('./valid/a/workflows/graph.json')
+                .resolves('{ "injectableName": "Graph.ABC"}');
+            fs.statSync.returns({ isFile: function() { return true; }});
+
+            waterline.taskdefinitions = {
+                findOne: sinon.stub(),
+                destroy: sinon.stub()
+            };
+
+            waterline.graphdefinitions = {
+                findOne: sinon.stub(),
+                destroy: sinon.stub()
+            };
+
+            sinon.stub(taskRunner, "defineTask");
+            sinon.stub(taskRunner, "defineTaskGraph");
+        });
+
+        beforeEach(function() {
+            taskRunner.defineTask.reset();
+            taskRunner.defineTaskGraph.reset();
+        });
+
+        after(function() {
+            taskRunner.defineTask.restore();
+            taskRunner.defineTaskGraph.restore();
+        });
+        
+        it('should load a configuration file', function() {
+            waterline.taskdefinitions.findOne.resolves();
+            waterline.graphdefinitions.findOne.resolves();
+            taskRunner.defineTask.resolves();
+            taskRunner.defineTaskGraph.resolves();
+            return skuService.start('./valid').then(function() {
+                expect(('a' in skuService.skuHandlers)).to.equal(true);
+                expect(fs.readdirAsync.called).to.be.true;
+                expect(fs.statAsync.called).to.be.true;
+                expect(fs.readFileAsync.called).to.be.true;
+                taskRunner.defineTask.should.have.been.calledWith({
+                    injectableName: 'Task.ABC::a'
+                });
+                taskRunner.defineTaskGraph.should.have.been.calledWith({
+                    injectableName: 'Graph.ABC::a'
+                });
+            });
+        });
+
+        it('should not load a task if it is already loaded', function() {
+            waterline.taskdefinitions.findOne.resolves({injectableName: 'Task.ABC::a'});
+            waterline.graphdefinitions.findOne.resolves();
+            taskRunner.defineTask.resolves();
+            taskRunner.defineTaskGraph.resolves();
+            return skuService.start('./valid').then(function() {
+                expect(('a' in skuService.skuHandlers)).to.equal(true);
+                expect(fs.readdirAsync.called).to.be.true;
+                expect(fs.statAsync.called).to.be.true;
+                expect(fs.readFileAsync.called).to.be.true;
+                taskRunner.defineTask.should.not.have.been.called;
+                taskRunner.defineTaskGraph.should.have.been.calledWith({
+                    injectableName: 'Graph.ABC::a'
+                });
+            });
+        });
+
+        it('should not load a graph if it is already loaded', function() {
+            waterline.taskdefinitions.findOne.resolves();
+            waterline.graphdefinitions.findOne.resolves({injectableName: 'Graph.ABC::a'});
+            taskRunner.defineTask.resolves();
+            taskRunner.defineTaskGraph.resolves();
+            return skuService.start('./valid').then(function() {
+                expect(('a' in skuService.skuHandlers)).to.equal(true);
+                expect(fs.readdirAsync.called).to.be.true;
+                expect(fs.statAsync.called).to.be.true;
+                expect(fs.readFileAsync.called).to.be.true;
+                taskRunner.defineTask.should.have.been.calledWith({injectableName: 'Task.ABC::a'});
+                taskRunner.defineTaskGraph.should.not.have.been.called;
+            });
+        });
+
+        it('should unregister a pack', function() {
+            waterline.taskdefinitions.destroy.resolves();
+            waterline.graphdefinitions.destroy.resolves();
+            return skuService.start('./valid').then(function() {
+                return skuService.unregisterPack('a', JSON.stringify(data));
+            })
+            .then(function() {
+                expect(fs.readdirAsync.called).to.be.true;
+                expect(waterline.taskdefinitions.destroy).to.have.been.called;
+                expect(waterline.graphdefinitions.destroy).to.have.been.called;
+            });
         });
     });
 
@@ -104,7 +199,7 @@ describe("SKU Pack Service", function() {
         fs.readdirAsync.withArgs('./valid/b/templates').resolves([]);
 
         return skuService.start('./valid').then(function(vals) {
-            expect(vals.length).to.equal(1);
+            expect(vals.length).to.equal(2);
             expect(('a' in skuService.skuHandlers)).to.equal(false);
             expect(('b' in skuService.skuHandlers)).to.equal(true);
             expect(fs.readdirAsync.called).to.be.true;
@@ -116,9 +211,11 @@ describe("SKU Pack Service", function() {
     it('should accept a valid pack', function() {
         var data = {
             httpStaticRoot: 'static',
-            httpTemplateRoot: 'templates'
+            httpTemplateRoot: 'templates',
+            workflowRoot: 'workflows',
+            taskRoot: 'tasks'
         };
-        fs.readdirAsync.withArgs('./valid').resolves(['static', 'templates']);
+        fs.readdirAsync.withArgs('./valid').resolves(['static', 'templates', 'workflows', 'tasks']);
         return skuService.validatePack(JSON.stringify(data), './valid').then(function(res) {
             expect(res).to.be.true;
             expect(fs.readdirAsync.called).to.be.true;
@@ -128,7 +225,7 @@ describe("SKU Pack Service", function() {
     it('should reject an invalid pack', function() {
         var data = {
             httpStaticRoot: 'static',
-            httpTemplateRoot: 'templates'
+            httpTemplateRoot: 'templates',
         };
         fs.readdirAsync.withArgs('./valid').resolves(['static']);
         return skuService.validatePack(JSON.stringify(data), './valid').then(function(res) {
@@ -143,7 +240,7 @@ describe("SKU Pack Service", function() {
             httpTemplateRoot: 'templates'
         };
         fs.readFileAsync.withArgs('./valid/config.json').resolves(JSON.stringify(data));
-        fs.readdirAsync.withArgs('./valid').resolves(['static', 'templates']);
+        fs.readdirAsync.withArgs('./valid').resolves(['static', 'templates', 'config.json']);
         fs.readdirAsync.withArgs('./root').resolves([]);
         fs.statAsync.withArgs('./root/skuid').rejects();
         fs.mkdirAsync.resolves();
@@ -162,27 +259,13 @@ describe("SKU Pack Service", function() {
         });
     });
 
-    it('should unregister a pack', function() {
-        var data = {
-            httpStaticRoot: 'static',
-            httpTemplateRoot: 'templates'
-        };
-        fs.readdirAsync.withArgs('./root/skuid/templates').resolves([]);
-        return skuService.start('./root').then(function() {
-            return skuService.unregisterPack('skuid', JSON.stringify(data));
-        })
-        .then(function() {
-            expect(fs.readdirAsync.called).to.be.true;
-        });
-    });
-    
     it('should delete a pack', function() {
         var data = {
             httpStaticRoot: 'static',
             httpTemplateRoot: 'templates'
         };
         fs.readdirAsync.withArgs('./root/skuid/templates').resolves([]);
-        fs.readFileAsync.withArgs('./root/skuid.json').resolves(JSON.stringify(data));       
+        fs.readFileAsync.withArgs('./root/skuid.json').resolves(JSON.stringify(data));
         return skuService.start('./root').then(function() {
             skuService.skuHandlers.skuid = {};
             return skuService.deletePack('skuid');
@@ -192,6 +275,26 @@ describe("SKU Pack Service", function() {
             expect(('skuid' in skuService.skuHandlers)).to.be.false;
             expect(fs.readFileAsync.called).to.be.true;
             expect(fs.readdirAsync.called).to.be.true;
+        });
+    });
+
+    it('should skip the static handler if id is undefined', function(done) {
+        skuService.skuHandlers.skuid = {};
+        skuService.static(undefined, { locals: {} }, function() {
+            done();
+        });
+    });
+
+    it('should call the static handler if id is defined', function(done) {
+        skuService.skuHandlers.skuid = {
+            abc: function(req,res,next) { next(); }
+        };
+        waterline.nodes = {
+            needByIdentifier: sinon.stub()
+        };
+        waterline.nodes.needByIdentifier.resolves({id: 'abc', sku: 'sku'});
+        skuService.static(undefined, { locals: { identifier: 'abc'} }, function() {
+            done();
         });
     });
 });
