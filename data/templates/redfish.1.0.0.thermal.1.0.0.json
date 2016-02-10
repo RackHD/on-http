@@ -12,13 +12,13 @@
 		<% tempList.forEach(function(sdr, i, arr) { %>
 			{
 				"Oem": {},
-				"Name": "<%= sdr['Sensor Id'] %>",
-				"ReadingCelsius": <%= parseFloat(sdr['Sensor Reading']) || 'null' %>,
-				"UpperThresholdNonCritical": <%= parseFloat(sdr['Upper non-critical']) || 'null' %>,
-				"UpperThresholdCritical": <%= parseFloat(sdr['Upper critical']) || 'null' %>,
+				"Name": "<%= sdr['sensorId'] %>",
+				"ReadingCelsius": <%= parseFloat(sdr['sensorReading']) || 'null' %>,
+				"UpperThresholdNonCritical": <%= parseFloat(sdr['upperNonCritical']) || 'null' %>,
+				"UpperThresholdCritical": <%= parseFloat(sdr['upperCritical']) || 'null' %>,
 				"UpperThresholdFatal": null,
-				"LowerThresholdNonCritical": <%= parseFloat(sdr['Lower non-critical']) || 'null' %>,
-				"LowerThresholdCritical": <%= parseFloat(sdr['Lower critical']) || 'null' %>,
+				"LowerThresholdNonCritical": <%= parseFloat(sdr['lowerNonCritical']) || 'null' %>,
+				"LowerThresholdCritical": <%= parseFloat(sdr['lowerCritical']) || 'null' %>,
 				"LowerThresholdFatal": null
 			}
 			<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
@@ -29,13 +29,13 @@
 		<% fanList.forEach(function(sdr, i, arr) { %>
 			{
 				"Oem": {},
-				"FanName": "<%= sdr['Sensor Id'] %>",
-				"ReadingRPM": <%= parseFloat(sdr['Sensor Reading']) || 'null' %>,
-				"UpperThresholdNonCritical": <%= parseFloat(sdr['Upper non-critical']) || 'null' %>,
-				"UpperThresholdCritical": <%= parseFloat(sdr['Upper critical']) || 'null' %>,
+				"FanName": "<%= sdr['sensorId'] %>",
+				"ReadingRPM": <%= parseFloat(sdr['sensorReading']) || 'null' %>,
+				"UpperThresholdNonCritical": <%= parseFloat(sdr['upperNonCritical']) || 'null' %>,
+				"UpperThresholdCritical": <%= parseFloat(sdr['upperCritical']) || 'null' %>,
 				"UpperThresholdFatal": null,
-				"LowerThresholdNonCritical": <%= parseFloat(sdr['Lower non-critical']) || 'null' %>,
-				"LowerThresholdCritical": <%= parseFloat(sdr['Lower critical']) || 'null' %>,
+				"LowerThresholdNonCritical": <%= parseFloat(sdr['lowerNonCritical']) || 'null' %>,
+				"LowerThresholdCritical": <%= parseFloat(sdr['lowerCritical']) || 'null' %>,
 				"LowerThresholdFatal": null
 			}
 			<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>

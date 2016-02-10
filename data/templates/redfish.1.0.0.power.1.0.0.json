@@ -12,13 +12,13 @@
 		<% voltageList.forEach(function(sdr, i, arr) { %>
 			{
 				"Oem": {},
-				"Name": "<%= sdr['Sensor Id'] %>",
-				"ReadingVolts": <%= parseFloat(sdr['Sensor Reading']) || 'null' %>,
-				"UpperThresholdNonCritical": <%= parseFloat(sdr['Upper non-critical']) || 'null' %>,
-				"UpperThresholdCritical": <%= parseFloat(sdr['Upper critical']) || 'null' %>,
+				"Name": "<%= sdr['sensorId'] %>",
+				"ReadingVolts": <%= parseFloat(sdr['sensorReading']) || 'null' %>,
+				"UpperThresholdNonCritical": <%= parseFloat(sdr['upperNonCritical']) || 'null' %>,
+				"UpperThresholdCritical": <%= parseFloat(sdr['upperCritical']) || 'null' %>,
 				"UpperThresholdFatal": null,
-				"LowerThresholdNonCritical": <%= parseFloat(sdr['Lower non-critical']) || 'null' %>,
-				"LowerThresholdCritical": <%= parseFloat(sdr['Lower critical']) || 'null' %>,
+				"LowerThresholdNonCritical": <%= parseFloat(sdr['lowerNonCritical']) || 'null' %>,
+				"LowerThresholdCritical": <%= parseFloat(sdr['lowerCritical']) || 'null' %>,
 				"LowerThresholdFatal": null,
 				"MinReadingRange": <%= parseFloat(sdr['normalMinimum']) || 'null' %>,
 				"MaxReadingRange": <%= parseFloat(sdr['normalMaximum']) || 'null' %>
@@ -31,8 +31,8 @@
 		<% wattsList.forEach(function(sdr, i, arr) { %>
 			{
 				"Oem": {},
-				"Name": "<%= sdr['Sensor Id'] %>",
-				"LastPowerOutputWatts": <%= parseFloat(sdr['Sensor Reading']) || 'null' %>
+				"Name": "<%= sdr['sensorId'] %>",
+				"LastPowerOutputWatts": <%= parseFloat(sdr['sensorReading']) || 'null' %>
 			}
 			<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
 		<% }); %>
