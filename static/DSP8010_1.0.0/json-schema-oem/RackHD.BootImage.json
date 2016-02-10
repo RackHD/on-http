@@ -1,0 +1,184 @@
+{
+    "$schema": "http://redfish.dmtf.org/schemas/v1/redfish-schema.1.0.0.json",
+    "title": "#RackHD.BootImage",
+    "$ref": "#/definitions/BootImage",
+    "definitions": {
+        "BootImage": {
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ],
+                    "description": "This property shall specify a valid odata or Redfish property."
+                }
+            },
+            "additionalProperties": false,
+            "properties": {
+                "rootSshKey": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "http://redfish.dmtf.org/schemas/v1/RackHD.BootImage.json#/definitions/Users"
+                    }
+                },
+                "hostname": {
+                    "type": "string"
+                },
+                "osName": {
+                    "type": "string"
+                },
+                "repo": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                },
+                "networkDevices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "http://redfish.dmtf.org/schemas/v1/RackHD.BootImage.json#/definitions/NetworkDevice"
+                    }
+                },
+                "rootPassword": {
+                    "type": "string"
+                },
+                "dnsServers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "installDisk": {
+                    "type": "string"
+                }
+            },
+            "description": "This is the base type for the boot image installation action."
+        },
+        "Users": {
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ],
+                    "description": "This property shall specify a valid odata or Redfish property."
+                }
+            },
+            "additionalProperties": false,
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "uid": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sshKey": {
+                    "type": "string"
+                }
+            }
+        },
+        "NetworkDevice": {
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ],
+                    "description": "This property shall specify a valid odata or Redfish property."
+                }
+            },
+            "additionalProperties": false,
+            "properties": {
+                "device": {
+                    "type": "string"
+                },
+                "ipv4:": {
+                    "$ref": "http://redfish.dmtf.org/schemas/v1/RackHD.BootImage.json#/definitions/NetworkAddress"
+                },
+                "ipv6:": {
+                    "$ref": "http://redfish.dmtf.org/schemas/v1/RackHD.BootImage.json#/definitions/NetworkAddress"
+                }
+            }
+        },
+        "NetworkAddress": {
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ],
+                    "description": "This property shall specify a valid odata or Redfish property."
+                }
+            },
+            "additionalProperties": false,
+            "properties": {
+                "netmask": {
+                    "type": "string"
+                },
+                "ipAddr": {
+                    "type": "string"
+                },
+                "gateway": {
+                    "type": "string"
+                },
+                "vlanId": {
+                    "type": "string"
+                }
+            }
+        },
+        "BootImageList": {
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message|Privileges)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ],
+                    "description": "This property shall specify a valid odata or Redfish property."
+                }
+            },
+            "additionalProperties": false,
+            "properties": {
+                "osName" : {
+                    "type": "string",
+                    "enum": [
+                        "CentOS",
+                        "CentOS+KVM",
+                        "ESXi",
+                        "RHEL",
+                        "RHEL+KVM"
+                    ]
+                }
+            }
+        }
+    },
+    "copyright": "Copyright 2016 EMC, Inc."
+}
