@@ -1344,9 +1344,10 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /nodes:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: nodes
     get:
-      operationId: unimplemented
+      x-swagger-serializer: nodes
+      operationId: nodesGet
       summary: |
         List of all nodes or if there are none an empty object
       description: |
