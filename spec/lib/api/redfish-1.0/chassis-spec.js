@@ -277,30 +277,30 @@ describe('Redfish Chassis Root', function () {
 
         taskProtocol.requestPollerCache.resolves([{
             sdr: [{
-                "Lower critical": "100.00",
-                "Lower non-critical": "",
-                "Nominal Reading": "",
-                "Normal Maximum": "",
-                "Normal Minimum": "",
-                "Sensor Id": "Fan_1",
-                "Sensor Reading": "1000",
-                "Sensor Reading Units": "% RPM",
-                "Sensor Type": "Fan",
-                "Upper critical": "",
-                "Upper non-critical": ""
+                "lowerCritical": "100.00",
+                "lowerNonCritical": "",
+                "nominalReading": "",
+                "normalMaximum": "",
+                "normalMinimum": "",
+                "sensorId": "Fan_1",
+                "sensorReading": "1000",
+                "sensorReadingUnits": "% RPM",
+                "sensorType": "Fan",
+                "upperCritical": "",
+                "upperNonCritical": ""
             },
             {
-                "Lower critical": "",
-                "Lower non-critical": "",
-                "Nominal Reading": "",
-                "Normal Maximum": "",
-                "Normal Minimum": "",
-                "Sensor Id": "Temp1",
-                "Sensor Reading": "24",
-                "Sensor Reading Units": "% degrees C",
-                "Sensor Type": "Temperature",
-                "Upper critical": "55.000",
-                "Upper non-critical": "50.000"
+                "lowerCritical": "",
+                "lowerNonCritical": "",
+                "nominalReading": "",
+                "normalMaximum": "",
+                "normalMinimum": "",
+                "sensorId": "Temp1",
+                "sensorReading": "24",
+                "sensorReadingUnits": "% degrees C",
+                "sensorType": "Temperature",
+                "upperCritical": "55.000",
+                "upperNonCritical": "50.000"
             }]
         }]);
 
@@ -322,30 +322,30 @@ describe('Redfish Chassis Root', function () {
 
         taskProtocol.requestPollerCache.resolves([{
             sdr: [{
-                "Lower critical": "10.00",
-                "Lower non-critical": "",
-                "Nominal Reading": "",
-                "Normal Maximum": "",
-                "Normal Minimum": "",
-                "Sensor Id": "Volt12V",
-                "Sensor Reading": "12",
-                "Sensor Reading Units": "% Volts",
-                "Sensor Type": "Voltage",
-                "Upper critical": "12.600",
-                "Upper non-critical": ""       
+                "lowerCritical": "10.00",
+                "lowerNonCritical": "",
+                "nominalReading": "",
+                "normalMaximum": "",
+                "normalMinimum": "",
+                "sensorId": "Volt12V",
+                "sensorReading": "12",
+                "sensorReadingUnits": "% Volts",
+                "sensorType": "Voltage",
+                "upperCritical": "12.600",
+                "upperNonCritical": ""       
             },
             {
-                "Lower critical": "0.000",
-                "Lower non-critical": "",
-                "Nominal Reading": "",
-                "Normal Maximum": "",
-                "Normal Minimum": "",
-                "Sensor Id": "Input",
-                "Sensor Reading": "27",
-                "Sensor Reading Units": "Watts",
-                "Sensor Type": "Current",
-                "Upper critical": "",
-                "Upper non-critical": ""
+                "lowerCritical": "0.000",
+                "lowerNonCritical": "",
+                "nominalReading": "",
+                "normalMaximum": "",
+                "normalMinimum": "",
+                "sensorId": "Input",
+                "sensorReading": "27",
+                "sensorReadingUnits": "Watts",
+                "sensorType": "Current",
+                "upperCritical": "",
+                "upperNonCritical": ""
             }]
         }]);
 
