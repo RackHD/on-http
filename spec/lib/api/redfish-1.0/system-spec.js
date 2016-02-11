@@ -404,6 +404,28 @@ describe('Redfish Systems Root', function () {
                 expect(validator.render.called).to.be.true;
             });
     });
+    
+    it('should return an empty sel log service entry collection', function() {
+        waterline.workitems.findPollers.resolves([{
+            config: { command: 'sel' }
+        }]);
+
+        taskProtocol.requestPollerCache.resolves([{
+            sel: undefined
+        }]);
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id + 
+                                    '/LogServices/sel/Entries')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(validator.render.called).to.be.true;
+            });
+    });
+
+
 
     it('should 500 an invalid sel log service entry list', function() {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id + 
