@@ -31,6 +31,10 @@ swagger:
      serdesDirs: [ lib/api/serdes ]
      serdesNameKey: x-swagger-deserializer
 
+    _swagger_renderer:
+      name: swagger_render
+      templateNameKey: x-swagger-template
+
     # pipe for all swagger-node controllers
     swagger_controllers:
       - onError: json_error_handler
@@ -42,7 +46,7 @@ swagger:
       - _swagger_deserializer
       - _router
       - _swagger_serializer
-      - swagger_render
+      - _swagger_renderer
 
     # pipe to serve swagger (endpoint is in swagger.yaml)
     swagger_raw:
