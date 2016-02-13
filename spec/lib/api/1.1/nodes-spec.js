@@ -12,6 +12,7 @@ describe('Http.Api.Nodes', function () {
     var Promise;
     var Constants;
     var Errors;
+    var nodesApi;
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -38,6 +39,7 @@ describe('Http.Api.Nodes', function () {
             Promise = helper.injector.get('Promise');
             Constants = helper.injector.get('Constants');
             Errors = helper.injector.get('Errors');
+            nodesApi = helper.injector.get('Http.Services.Api.Nodes');
         });
 
     });
@@ -747,4 +749,47 @@ describe('Http.Api.Nodes', function () {
                 .expect(404);
         });
     });
+    describe('Tag support', function() {
+        before(function() {
+            sinon.stub(nodesApi, 'getTagsById').resolves([]);
+            sinon.stub(nodesApi, 'addTagsById').resolves([]);
+            sinon.stub(nodesApi, 'removeTagsById').resolves([]);
+        });
+
+        after(function() {
+            nodesApi.getTagsById.restore();
+            nodesApi.addTagsById.restore();
+            nodesApi.removeTagsById.restore();
+        });
+
+        it('should call getTagsById', function() {
+            return helper.request().get('/api/1.1/nodes/123/tags')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(nodesApi.getTagsById).to.have.been.calledWith('123');
+                });
+        });
+
+        it('should call addTagsById', function() {
+            return helper.request().patch('/api/1.1/nodes/123/tags')
+                .send({ tags: ['tag', 'name']})
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(nodesApi.addTagsById).to.have.been.calledWith('123', ['tag', 'name']);
+                });
+        });
+
+        it('should call removeTagsById', function() {
+            return helper.request().delete('/api/1.1/nodes/123/tags/name')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(nodesApi.removeTagsById).to.have.been.calledWith('123', 'name');
+                });
+        });
+
+    });
+
 });
