@@ -13,7 +13,7 @@ describe('Http.Api.Nodes', function () {
     var lookupService;
 
     before('start HTTP server', function () {
-        this.timeout(5000);
+        this.timeout(10000);
         return helper.startServer([
         ]).then(function () {
             configuration = helper.injector.get('Services.Configuration');
@@ -85,21 +85,21 @@ describe('Http.Api.Nodes', function () {
         ]
     };
 
-    describe('GET /nodes', function () {
+    describe('2.0 GET /nodes', function () {
         it('should return a list of nodes', function () {
             waterline.nodes.find.resolves([node]);
 
-            return helper.request().get('/api/1.1/nodes')
+            return helper.request().get('/api/2.0/nodes')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, [node]);
         });
     });
 
-    describe('POST /nodes', function () {
+    describe('2.0 POST /nodes', function () {
         it('should create a node', function () {
             waterline.nodes.create.resolves(node);
 
-            return helper.request().post('/api/1.1/nodes')
+            return helper.request().post('/api/2.0/nodes')
                 .send(node)
                 .expect('Content-Type', /^application\/json/)
                 .expect(201, node)
@@ -126,7 +126,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.create.resolves(switchNode);
             taskGraphProtocol.runTaskGraph.resolves({});
 
-            return helper.request().post('/api/1.1/nodes')
+            return helper.request().post('/api/2.0/nodes')
                 .send(switchNode)
                 .expect(function () {
                     expect(taskGraphProtocol.runTaskGraph)
@@ -168,7 +168,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.create.resolves(mgmtNode);
             taskGraphProtocol.runTaskGraph.resolves({});
 
-            return helper.request().post('/api/1.1/nodes')
+            return helper.request().post('/api/2.0/nodes')
                 .send(mgmtNode)
                 .expect(function () {
                     expect(taskGraphProtocol.runTaskGraph)
@@ -195,7 +195,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.create.resolves(pduNode);
             taskGraphProtocol.runTaskGraph.resolves({});
 
-            return helper.request().post('/api/1.1/nodes')
+            return helper.request().post('/api/2.0/nodes')
                 .send(pduNode)
                 .expect(function () {
                     expect(taskGraphProtocol.runTaskGraph)
@@ -212,7 +212,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a single node', function () {
             waterline.nodes.needByIdentifier.resolves(node);
 
-            return helper.request().get('/api/1.1/nodes/1234')
+            return helper.request().get('/api/2.0/nodes/1234')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, node)
                 .expect(function () {
@@ -223,7 +223,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().get('/api/1.1/nodes/1234')
+            return helper.request().get('/api/2.0/nodes/1234')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -233,7 +233,7 @@ describe('Http.Api.Nodes', function () {
         it('should update a node', function () {
             waterline.nodes.needByIdentifier.resolves(node);
             waterline.nodes.updateByIdentifier.resolves(node);
-            return helper.request().patch('/api/1.1/nodes/1234')
+            return helper.request().patch('/api/2.0/nodes/1234')
                 .send(node)
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, node)
@@ -249,7 +249,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().patch('/api/1.1/nodes/1234')
+            return helper.request().patch('/api/2.0/nodes/1234')
                 .send(node)
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
@@ -266,7 +266,7 @@ describe('Http.Api.Nodes', function () {
             };
 
             waterline.nodes.needByIdentifier.resolves(node);
-            return helper.request().patch('/api/1.1/nodes/1234')
+            return helper.request().patch('/api/2.0/nodes/1234')
                 .send(invalidNode)
                 .expect('Content-Type', /^application\/json/)
                 .expect(400)
@@ -285,7 +285,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves(node);
             nodeApiService.removeNode.resolves(node);
 
-            return helper.request().delete('/api/1.1/nodes/1234')
+            return helper.request().delete('/api/2.0/nodes/1234')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, node)
                 .expect(function () {
@@ -298,7 +298,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().delete('/api/1.1/nodes/1234')
+            return helper.request().delete('/api/2.0/nodes/1234')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -308,7 +308,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a list of the node\'s OBM settings', function () {
             waterline.nodes.needByIdentifier.resolves(node);
 
-            return helper.request().get('/api/1.1/nodes/1234/obm')
+            return helper.request().get('/api/2.0/nodes/1234/obm')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, node.obmSettings);
         });
@@ -316,7 +316,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().get('/api/1.1/nodes/1234/obm')
+            return helper.request().get('/api/2.0/nodes/1234/obm')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -324,7 +324,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node has no OBM settings', function () {
             waterline.nodes.needByIdentifier.resolves({ id: node.id });
 
-            return helper.request().get('/api/1.1/nodes/1234/obm')
+            return helper.request().get('/api/2.0/nodes/1234/obm')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -341,7 +341,7 @@ describe('Http.Api.Nodes', function () {
             updated.obmSettings.push(obmSetting);
             waterline.nodes.needByIdentifier.resolves(node);
             waterline.nodes.updateByIdentifier.resolves(updated);
-            return helper.request().post('/api/1.1/nodes/1234/obm')
+            return helper.request().post('/api/2.0/nodes/1234/obm')
                 .send(obmSetting)
                 .expect('Content-Type', /^application\/json/)
                 .expect(201, updated)
@@ -358,7 +358,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves({ id: node.id });
             var updated = { id: node.id, obmSettings: [ obmSetting ] };
             waterline.nodes.updateByIdentifier.resolves(updated);
-            return helper.request().post('/api/1.1/nodes/1234/obm')
+            return helper.request().post('/api/2.0/nodes/1234/obm')
                 .send(obmSetting)
                 .expect('Content-Type', /^application\/json/)
                 .expect(201, updated)
@@ -374,7 +374,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().post('/api/1.1/nodes/1234/obm')
+            return helper.request().post('/api/2.0/nodes/1234/obm')
                 .send(obmSetting)
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
@@ -388,7 +388,7 @@ describe('Http.Api.Nodes', function () {
 
             waterline.nodes.needByIdentifier.resolves(node);
 
-            return helper.request().post('/api/1.1/nodes/1234/obm')
+            return helper.request().post('/api/2.0/nodes/1234/obm')
                 .send(invalidSetting)
                 .expect('Content-Type', /^application\/json/)
                 .expect(400)
@@ -404,7 +404,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves(node);
             ObmService.prototype.identifyOn.resolves({});
 
-            return helper.request().post('/api/1.1/nodes/1234/obm/identify')
+            return helper.request().post('/api/2.0/nodes/1234/obm/identify')
                 .send({ value: true })
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
@@ -418,7 +418,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves(node);
             ObmService.prototype.identifyOff.resolves({});
 
-            return helper.request().post('/api/1.1/nodes/1234/obm/identify')
+            return helper.request().post('/api/2.0/nodes/1234/obm/identify')
                 .send({ value: false })
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
@@ -431,7 +431,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().post('/api/1.1/nodes/1234/obm/identify')
+            return helper.request().post('/api/2.0/nodes/1234/obm/identify')
                 .send({ value: true })
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
@@ -456,7 +456,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves(node);
             waterline.catalogs.find.resolves(node.catalogs);
 
-            return helper.request().get('/api/1.1/nodes/123/catalogs')
+            return helper.request().get('/api/2.0/nodes/123/catalogs')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, node.catalogs);
         });
@@ -464,7 +464,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().get('/api/1.1/nodes/123/catalogs')
+            return helper.request().get('/api/2.0/nodes/123/catalogs')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -487,7 +487,7 @@ describe('Http.Api.Nodes', function () {
                 }
             );
 
-            return helper.request().get('/api/1.1/nodes/123/catalogs/dummysource')
+            return helper.request().get('/api/2.0/nodes/123/catalogs/dummysource')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function (res) {
@@ -504,7 +504,7 @@ describe('Http.Api.Nodes', function () {
 
             waterline.catalogs.findLatestCatalogOfSource.resolves();
 
-            return helper.request().get('/api/1.1/nodes/123/catalogs/dummysource')
+            return helper.request().get('/api/2.0/nodes/123/catalogs/dummysource')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -513,7 +513,7 @@ describe('Http.Api.Nodes', function () {
 
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().get('/api/1.1/nodes/123/catalogs/dummysource')
+            return helper.request().get('/api/2.0/nodes/123/catalogs/dummysource')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -521,7 +521,7 @@ describe('Http.Api.Nodes', function () {
         it("should return a 404 if finding the node fails", function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().get('/api/1.1/nodes/123/catalogs/dummysource')
+            return helper.request().get('/api/2.0/nodes/123/catalogs/dummysource')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -540,7 +540,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves(node);
             waterline.workitems.findPollers.resolves([poller]);
 
-            return helper.request().get('/api/1.1/nodes/123/pollers')
+            return helper.request().get('/api/2.0/nodes/123/pollers')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, [poller])
                 .expect(function () {
@@ -553,78 +553,9 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().get('/api/1.1/nodes/123/pollers')
+            return helper.request().get('/api/2.0/nodes/123/pollers')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
-        });
-    });
-
-    describe('POST /nodes/:macaddress/dhcp/whitelist', function () {
-        it('should add a MAC to an empty DHCP whitelist', function () {
-            configuration.get.returns(undefined);
-
-            return helper.request().post('/api/1.1/nodes/00:11:22:33:44:55/dhcp/whitelist')
-                .expect(201)
-                .expect(function () {
-                    expect(configuration.get).to.have.been.calledWith('whitelist');
-                    expect(configuration.set).to.have.been.calledOnce
-                        .and.to.have.deep.property('firstCall.args')
-                        .that.deep.equals(['whitelist', ['00-11-22-33-44-55']]);
-                });
-        });
-
-        it('should append a MAC to an existing DHCP whitelist', function () {
-            var configuration = helper.injector.get('Services.Configuration');
-            configuration.get.returns(['00-00-00-00-00-00']);
-
-            return helper.request().post('/api/1.1/nodes/00:11:22:33:44:ab/dhcp/whitelist')
-                .expect(201)
-                .expect(function () {
-                    expect(configuration.get).to.have.been.calledWith('whitelist');
-                    expect(configuration.set).to.have.been.calledOnce
-                        .and.to.have.deep.property('firstCall.args')
-                        .that.deep.equals(['whitelist',
-                        ['00-00-00-00-00-00', '00-11-22-33-44-ab']]);
-                });
-        });
-    });
-
-    describe('DELETE /nodes/:macaddress/dhcp/whitelist', function () {
-        it('should remove a MAC from the DHCP whitelist', function () {
-            configuration.get.returns(['00-11-22-33-44-ab']);
-
-            return helper.request().delete('/api/1.1/nodes/00:11:22:33:44:ab/dhcp/whitelist')
-                .expect(204)
-                .expect(function () {
-                    expect(configuration.get).to.have.been.calledWith('whitelist');
-                    expect(configuration.set).to.have.been.calledOnce
-                        .and.to.have.deep.property('firstCall.args')
-                        .that.deep.equals(['whitelist', []]);
-                    expect(configuration.get('whitelist'))
-                        .to.deep.equal([]);
-                });
-        });
-
-        it('should do nothing if the DHCP whitelist is empty', function () {
-            configuration.get.returns([]);
-
-            return helper.request().delete('/api/1.1/nodes/00:11:22:33:44:55/dhcp/whitelist')
-                .expect(204)
-                .expect(function () {
-                    expect(configuration.get).to.have.been.calledWith('whitelist');
-                    expect(configuration.set).to.not.have.been.called;
-                });
-        });
-
-        it('should do nothing if the DHCP whitelist is undefined', function () {
-            configuration.get.returns(undefined);
-
-            return helper.request().delete('/api/1.1/nodes/00:11:22:33:44:55/dhcp/whitelist')
-                .expect(204)
-                .expect(function () {
-                    expect(configuration.get).to.have.been.calledWith('whitelist');
-                    expect(configuration.set).to.not.have.been.called;
-                });
         });
     });
 
@@ -642,7 +573,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves(node);
             waterline.graphobjects.find.resolves(node.workflows);
 
-            return helper.request().get('/api/1.1/nodes/123/workflows')
+            return helper.request().get('/api/2.0/nodes/123/workflows')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, node.workflows);
         });
@@ -650,7 +581,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().get('/api/1.1/nodes/123/workflows')
+            return helper.request().get('/api/2.0/nodes/123/workflows')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -661,7 +592,8 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves({ id: '123' });
             taskGraphProtocol.runTaskGraph.resolves({});
 
-            return helper.request().post('/api/1.1/nodes/123/workflows')
+            return helper.request().post('/api/2.0/nodes/123/workflows')
+                .set('Content-Type', 'application/json')
                 .query({ name: 'TestGraph.Dummy' })
                 .expect('Content-Type', /^application\/json/)
                 .expect(201)
@@ -680,7 +612,8 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves({ id: '123' });
             taskGraphProtocol.runTaskGraph.resolves({});
 
-            return helper.request().post('/api/1.1/nodes/123/workflows')
+            return helper.request().post('/api/2.0/nodes/123/workflows')
+                .set('Content-Type', 'application/json')
                 .query({ name: 'TestGraph.Dummy', options: { prop: 555 } })
                 .expect('Content-Type', /^application\/json/)
                 .expect(201)
@@ -699,7 +632,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves({ id: '123' });
             taskGraphProtocol.runTaskGraph.resolves({});
 
-            return helper.request().post('/api/1.1/nodes/123/workflows')
+            return helper.request().post('/api/2.0/nodes/123/workflows')
                 .send({ name: 'TestGraph.Dummy' })
                 .expect('Content-Type', /^application\/json/)
                 .expect(201)
@@ -718,7 +651,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves({ id: '123' });
             taskGraphProtocol.runTaskGraph.resolves({});
 
-            return helper.request().post('/api/1.1/nodes/123/workflows')
+            return helper.request().post('/api/2.0/nodes/123/workflows')
                 .send({ name: 'TestGraph.Dummy', options: { prop: 555 } })
                 .expect('Content-Type', /^application\/json/)
                 .expect(201)
@@ -736,7 +669,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().post('/api/1.1/nodes/123/workflows')
+            return helper.request().post('/api/2.0/nodes/123/workflows')
                 .send({})
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
@@ -746,7 +679,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves({ id: '123' });
             taskGraphProtocol.runTaskGraph.rejects(new Errors.BadRequestError('test'));
 
-            return helper.request().post('/api/1.1/nodes/123/workflows')
+            return helper.request().post('/api/2.0/nodes/123/workflows')
                 .send({})
                 .expect(400);
         });
@@ -764,7 +697,7 @@ describe('Http.Api.Nodes', function () {
             taskGraphProtocol.getActiveTaskGraph.resolves(graph);
             waterline.graphobjects.findOne.resolves({});
 
-            return helper.request().get('/api/1.1/nodes/123/workflows/active')
+            return helper.request().get('/api/2.0/nodes/123/workflows/active')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function () {
@@ -780,7 +713,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().get('/api/1.1/nodes/123/workflows/active')
+            return helper.request().get('/api/2.0/nodes/123/workflows/active')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -789,7 +722,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves({ id: '123' });
             taskGraphProtocol.getActiveTaskGraph.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().get('/api/1.1/nodes/123/workflows/active')
+            return helper.request().get('/api/2.0/nodes/123/workflows/active')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -803,7 +736,7 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves(node);
             taskGraphProtocol.cancelTaskGraph.resolves({});
 
-            return helper.request().delete('/api/1.1/nodes/123/workflows/active')
+            return helper.request().delete('/api/2.0/nodes/123/workflows/active')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function () {
@@ -816,7 +749,7 @@ describe('Http.Api.Nodes', function () {
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
-            return helper.request().delete('/api/1.1/nodes/123/workflows/active')
+            return helper.request().delete('/api/2.0/nodes/123/workflows/active')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
