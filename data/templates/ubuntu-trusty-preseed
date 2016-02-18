@@ -1,7 +1,6 @@
 #### Contents of the preconfiguration file (for squeeze)
 ### Localization
 d-i debian-installer/locale string en_US.UTF-8
-d-i live-installer/net-image string http://<%=server%>:<%=port%>/ubuntu_trusty/install/filesystem.squashfs
 
 # Keyboard selection.
 # Disable automatic (interactive) keymap detection.
@@ -24,15 +23,15 @@ d-i netcfg/wireless_wep string
 ### Mirror settings
 # If you select ftp, the mirror/country string does not need to be set.
 d-i mirror/country string manual
-d-i mirror/http/hostname string <%=server%>
-d-i mirror/http/directory string /ubuntu_trusty
+d-i mirror/http/hostname string <%=server%>:<%=port%>
+d-i mirror/http/directory string /ubuntu
 d-i apt-setup/restricted boolean false
 d-i mirror/http/proxy string
 d-i apt-setup/universe boolean false
 d-i apt-setup/backports boolean false
 d-i apt-setup/proposed boolean false
 d-i apt-setup/security_host string
-d-i apt-setup/local0/repository string deb http://<%=server%>:<%=port%>/ubuntu_trusty trusty main restricted universe multiverse
+d-i apt-setup/local0/repository string deb http://<%=server%>:<%=port%>/ubuntu trusty main restricted universe multiverse
 d-i apt-setup/local0/source boolean false
 d-i debian-installer/allow_unauthenticated boolean true
 
