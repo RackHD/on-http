@@ -388,8 +388,8 @@ describe('Redfish Systems Root', function () {
         taskProtocol.requestPollerCache.resolves([{
             sel: [{
                 logId: 'abcd',
-                value: '52',
-                sensorType: 'Thermal',
+                value: 'Assert',
+                sensorType: 'Temperature',
                 event: 'thermal event'
             }]
         }]);
