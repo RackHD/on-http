@@ -715,9 +715,9 @@ paths:
             $ref: '#/definitions/Error'
 
   /obms/library:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: obms
     get:
-      operationId: unimplemented
+      operationId: getObmLib
       summary: |
         get list of possible OBM services
       description: |
@@ -736,9 +736,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /obms/library/{identifier}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: obms
     get:
-      operationId: unimplemented
+      operationId: getObmLibById
       summary: |
         get a single OBM service
       description: |
