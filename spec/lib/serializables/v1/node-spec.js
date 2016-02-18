@@ -31,7 +31,7 @@ describe('Node Serializable V1', function () {
             ).and.equal('name');
         });
 
-        it('should decrypt obmSettings config password', function () {
+        it('should redact obmSettings config password', function () {
             return this.subject.serialize({
                 name: 'fake',
                 obmSettings: [
@@ -44,10 +44,10 @@ describe('Node Serializable V1', function () {
                 ]
             }).should.eventually.have.deep.property(
                 'obmSettings[0].config.password'
-            ).and.equal('password');
+            ).and.equal('REDACTED');
         });
 
-        it('should decrypt obmSettings config community', function () {
+        it('should redact obmSettings config community', function () {
             return this.subject.serialize({
                 name: 'fake',
                 obmSettings: [
@@ -60,10 +60,10 @@ describe('Node Serializable V1', function () {
                 ]
             }).should.eventually.have.deep.property(
                 'obmSettings[0].config.community'
-            ).and.equal('community');
+            ).and.equal('REDACTED');
         });
 
-        it('should decrypt snmpSettings community', function () {
+        it('should redact snmpSettings community', function () {
             return this.subject.serialize({
                 name: 'fake',
                 snmpSettings: {
@@ -71,7 +71,7 @@ describe('Node Serializable V1', function () {
                     community: encryption.encrypt('community')
                 }
             }).should.eventually.have.deep.property('snmpSettings.community')
-            .and.equal('community');
+            .and.equal('REDACTED');
         });
     });
 

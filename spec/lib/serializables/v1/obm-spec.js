@@ -23,7 +23,7 @@ describe('Obm Serializable V1', function () {
             this.subject = new Serializable();
         });
 
-        it('should decrypt password fields in config', function() {
+        it('should redact encrypted password fields in config', function() {
             return this.subject.serialize(
                 {
                     service: 'fake-service',
@@ -33,10 +33,10 @@ describe('Obm Serializable V1', function () {
                 }
             ).should.eventually.have.deep.property(
                 'config.password'
-            ).and.equal('foobar');
+            ).and.equal('REDACTED');
         });
 
-        it('should decrypt community fields in config', function() {
+        it('should redact community fields in config', function() {
             return this.subject.serialize(
                 {
                     service: 'fake-service',
@@ -46,7 +46,7 @@ describe('Obm Serializable V1', function () {
                 }
             ).should.eventually.have.deep.property(
                 'config.community'
-            ).and.equal('foobar');
+            ).and.equal('REDACTED');
         });
     });
 
