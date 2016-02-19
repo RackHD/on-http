@@ -717,6 +717,7 @@ paths:
   /obms/library:
     x-swagger-router-controller: obms
     get:
+      x-swagger-serializer: obms
       operationId: getObmLib
       summary: |
         get list of possible OBM services
@@ -738,6 +739,7 @@ paths:
   /obms/library/{identifier}:
     x-swagger-router-controller: obms
     get:
+      x-swagger-serializer: obms
       operationId: getObmLibById
       summary: |
         get a single OBM service
