@@ -9,6 +9,8 @@ describe("SKU Pack Service", function() {
     var fs;
     var waterline;
     var taskRunner;
+    var Templates;
+    var Profiles;
 
     before(function() {
         helper.setupInjector([
@@ -18,6 +20,8 @@ describe("SKU Pack Service", function() {
         waterline = helper.injector.get('Services.Waterline');
         taskRunner = helper.injector.get('Protocol.TaskGraphRunner');
         skuService = helper.injector.get('Http.Services.SkuPack');
+        Templates = helper.injector.get('Templates');
+        Profiles = helper.injector.get('Profiles');
 
         fs = helper.injector.get('fs');
         sinon.stub(fs, 'writeFileAsync');
@@ -80,7 +84,8 @@ describe("SKU Pack Service", function() {
             httpStaticRoot: 'static',
             httpTemplateRoot: 'templates',
             workflowRoot: 'workflows',
-            taskRoot: 'tasks'
+            taskRoot: 'tasks',
+            httpProfileRoot: 'profiles'
         };
 
         before(function() {
@@ -88,13 +93,18 @@ describe("SKU Pack Service", function() {
             fs.statAsync.withArgs('./valid/a.json')
                 .resolves({ isDirectory: function() { return false; } });
             fs.readFileAsync.withArgs('./valid/a.json').resolves(JSON.stringify(data));
-            fs.readdirAsync.withArgs('./valid/a/templates').resolves([]);
+            fs.readdirAsync.withArgs('./valid/a/templates').resolves(['template.file']);
+            fs.readdirAsync.withArgs('./valid/a/profiles').resolves(['profile.ipxe']);
             fs.readdirAsync.withArgs('./valid/a/workflows').resolves(['graph.json']);
             fs.readdirAsync.withArgs('./valid/a/tasks').resolves(['task.json']);
             fs.readFileAsync.withArgs('./valid/a/tasks/task.json')
                 .resolves('{ "injectableName": "Task.ABC"}');
             fs.readFileAsync.withArgs('./valid/a/workflows/graph.json')
                 .resolves('{ "injectableName": "Graph.ABC"}');
+            fs.readFileAsync.withArgs('./valid/a/profiles/profile.ipxe')
+                .resolves('content');
+            fs.readFileAsync.withArgs('./valid/a/templates/template.file')
+                .resolves('content');
             fs.statSync.returns({ isFile: function() { return true; }});
 
             waterline.taskdefinitions = {
@@ -107,8 +117,22 @@ describe("SKU Pack Service", function() {
                 destroy: sinon.stub()
             };
 
+            waterline.templates = {
+                findOne: sinon.stub(),
+                destroy: sinon.stub(),
+                create: sinon.stub()
+            };
+
+            waterline.profiles = {
+                findOne: sinon.stub(),
+                destroy: sinon.stub(),
+                create: sinon.stub()
+            };
+
             sinon.stub(taskRunner, "defineTask");
             sinon.stub(taskRunner, "defineTaskGraph");
+            sinon.stub(Templates, "put");
+            sinon.stub(Profiles, "put");
         });
 
         beforeEach(function() {
@@ -119,11 +143,18 @@ describe("SKU Pack Service", function() {
         after(function() {
             taskRunner.defineTask.restore();
             taskRunner.defineTaskGraph.restore();
+            Templates.put.restore();
+            Profiles.put.restore();
+            ['taskdefinitions','graphdefinitions','templates','profiles'].forEach(function(db) {
+                delete waterline[db];
+            });
         });
         
         it('should load a configuration file', function() {
             waterline.taskdefinitions.findOne.resolves();
             waterline.graphdefinitions.findOne.resolves();
+            waterline.templates.findOne.resolves();
+            waterline.profiles.findOne.resolves();
             taskRunner.defineTask.resolves();
             taskRunner.defineTaskGraph.resolves();
             return skuService.start('./valid').then(function() {
@@ -175,6 +206,8 @@ describe("SKU Pack Service", function() {
         it('should unregister a pack', function() {
             waterline.taskdefinitions.destroy.resolves();
             waterline.graphdefinitions.destroy.resolves();
+            waterline.templates.destroy.resolves();
+            waterline.profiles.destroy.resolves();
             return skuService.start('./valid').then(function() {
                 return skuService.unregisterPack('a', JSON.stringify(data));
             })
@@ -182,6 +215,8 @@ describe("SKU Pack Service", function() {
                 expect(fs.readdirAsync.called).to.be.true;
                 expect(waterline.taskdefinitions.destroy).to.have.been.called;
                 expect(waterline.graphdefinitions.destroy).to.have.been.called;
+                expect(waterline.profiles.destroy).to.have.been.called;
+                expect(waterline.templates.destroy).to.have.been.called;
             });
         });
     });
@@ -213,9 +248,10 @@ describe("SKU Pack Service", function() {
             httpStaticRoot: 'static',
             httpTemplateRoot: 'templates',
             workflowRoot: 'workflows',
-            taskRoot: 'tasks'
+            taskRoot: 'tasks',
+            httpProfileRoot: 'profiles'
         };
-        fs.readdirAsync.withArgs('./valid').resolves(['static', 'templates', 'workflows', 'tasks']);
+        fs.readdirAsync.withArgs('./valid').resolves(['static', 'templates', 'workflows', 'tasks', 'profiles']);
         return skuService.validatePack(JSON.stringify(data), './valid').then(function(res) {
             expect(res).to.be.true;
             expect(fs.readdirAsync.called).to.be.true;
