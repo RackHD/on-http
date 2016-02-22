@@ -43,8 +43,7 @@
     "tar": "~2.2.1",
     "tv4": "~1.2.7",
     "ws": "^0.8.0",
-    "debug": "^2.2.0",
-    "chai-string": "~1.1.6"
+    "debug": "^2.2.0"
   },
   "devDependencies": {
     "apidoc": "^0.12.1",
@@ -71,7 +70,8 @@
     "sinon-as-promised": "^2.0.3",
     "sinon-chai": "^2.7.0",
     "supertest": "^0.15.0",
-    "xunit-file": "0.0.6"
+    "xunit-file": "0.0.6",
+    "chai-string": "~1.1.6"
   },
   "apidoc": {
     "name": "RackHD API Documentation",
