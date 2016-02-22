@@ -11,6 +11,7 @@ describe("SKU Pack Service", function() {
     var taskRunner;
     var Templates;
     var Profiles;
+    var Env;
 
     before(function() {
         helper.setupInjector([
@@ -22,6 +23,7 @@ describe("SKU Pack Service", function() {
         skuService = helper.injector.get('Http.Services.SkuPack');
         Templates = helper.injector.get('Templates');
         Profiles = helper.injector.get('Profiles');
+        Env = helper.injector.get('Services.Environment');
 
         fs = helper.injector.get('fs');
         sinon.stub(fs, 'writeFileAsync');
@@ -85,7 +87,10 @@ describe("SKU Pack Service", function() {
             httpTemplateRoot: 'templates',
             workflowRoot: 'workflows',
             taskRoot: 'tasks',
-            httpProfileRoot: 'profiles'
+            httpProfileRoot: 'profiles',
+            skuConfig: {
+                key: 'value'
+            }
         };
 
         before(function() {
@@ -133,6 +138,7 @@ describe("SKU Pack Service", function() {
             sinon.stub(taskRunner, "defineTaskGraph");
             sinon.stub(Templates, "put");
             sinon.stub(Profiles, "put");
+            sinon.stub(Env, "set");
         });
 
         beforeEach(function() {
@@ -145,6 +151,7 @@ describe("SKU Pack Service", function() {
             taskRunner.defineTaskGraph.restore();
             Templates.put.restore();
             Profiles.put.restore();
+            Env.set.restore();
             ['taskdefinitions','graphdefinitions','templates','profiles'].forEach(function(db) {
                 delete waterline[db];
             });
@@ -168,6 +175,7 @@ describe("SKU Pack Service", function() {
                 taskRunner.defineTaskGraph.should.have.been.calledWith({
                     injectableName: 'Graph.ABC::a'
                 });
+                Env.set.should.have.been.calledWith('config', data.skuConfig, 'a');
             });
         });
 

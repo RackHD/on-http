@@ -10,6 +10,7 @@ describe('Http.Api.Templates', function () {
     var taskProtocol;
     var workflowApiService;
     var waterline;
+    var environment;
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -22,12 +23,18 @@ describe('Http.Api.Templates', function () {
             start: sinon.stub(),
             stop: sinon.stub()
         };
+        environment = {
+            start: sinon.stub(),
+            stop: sinon.stub(),
+            get: sinon.stub()
+        };
 
         return helper.startServer([
             dihelper.simpleWrapper(templates, 'Templates'),
             dihelper.simpleWrapper(taskProtocol, 'Protocol.Task'),
             dihelper.simpleWrapper(workflowApiService, 'Http.Services.Api.Workflows'),
             dihelper.simpleWrapper(waterline, 'Services.Waterline'),
+            dihelper.simpleWrapper(environment, 'Services.Environment')
         ]);
     });
 
@@ -49,6 +56,7 @@ describe('Http.Api.Templates', function () {
         waterline.nodes = {
             findByIdentifier: sinon.stub().resolves()
         };
+        environment.get.resolves({});
     });
 
     var template = {
