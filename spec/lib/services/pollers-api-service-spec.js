@@ -22,9 +22,8 @@ describe("Http.Services.Api.Pollers", function () {
             destroyByIdentifier: sinon.stub().resolves()
         };
 
-	    taskProtocol = helper.injector.get("Protocol.Task");
+	taskProtocol = helper.injector.get("Protocol.Task");
         taskProtocol.requestPollerCache = sinon.stub();
-
         pollerService = helper.injector.get("Http.Services.Api.Pollers");
 
     });
@@ -42,17 +41,17 @@ describe("Http.Services.Api.Pollers", function () {
                 config: {}
             }];
 
-            waterline.workitems.find.resolves([mockPoller]);
+            waterline.workitems.find.resolves(mockPoller);
             return pollerService.getPollers().then(function (pollers) {
-                expect(pollers).to.deep.equal([mockPoller]);
+                expect(pollers).to.deep.equal(mockPoller);
             });
         });
-       
         it('should return error message  if no poller informations are found', function () {
             var mockPoller = {"message":"NotFoundError: Could not find workitem with identifier"};
-            waterline.workitems.find.resolves(mockPoller);
-            return pollerService.getPollers().should.eventually.become(mockPoller);
+            waterline.workitems.find.rejects(mockPoller);
+            return pollerService.getPollers().should.eventually.be.rejectedWith(mockPoller);
         });
+
     });
 
     describe("getPollersById", function() {
@@ -63,20 +62,27 @@ describe("Http.Services.Api.Pollers", function () {
 
         it('Run getPollersById', function() {
             var mockPoller = [{
-                id: '4532',
+                id: '1234',
                 name: 'Pollers.IPMI',
                 config: {}
+            },
+            {
+                id: '4532',
+                name: 'Pollers.TEST',
+                config: {}
             }];
-            waterline.workitems.needByIdentifier.resolves([mockPoller]);
-            return pollerService.getPollersById().then(function (pollers) {
-                expect(pollers).to.deep.equal([mockPoller]);
-            });
-        });
+            waterline.workitems.needByIdentifier.withArgs({'id': '4532'}).resolves(mockPoller[0]);
+            waterline.workitems.needByIdentifier.withArgs({'id': '1234'}).resolves(mockPoller[1]);
+            Promise.all(['4532', '1234'].map(function(id, index) {
+                return pollerService.getPollersById(index)})).then(function (pollers) {
+                    expect(pollers).to.deep.equal(mockPoller[index]);
+                });
+         });
 
         it('should return error message if no specific poller information are found', function () {
             var mockPoller = {"message":"NotFoundError: Could not find workitem with identifier"};
-            waterline.workitems.needByIdentifier.resolves(mockPoller);
-            return pollerService.getPollersById().should.eventually.become(mockPoller);
+            waterline.workitems.needByIdentifier.rejects(mockPoller);
+            return pollerService.getPollersById().should.eventually.be.rejectedWith(mockPoller);
         });
 
     });
@@ -109,25 +115,19 @@ describe("Http.Services.Api.Pollers", function () {
                 name: 'Pollers.IPMI',
                 config: {}
             }];
-            waterline.workitems.create.resolves([mockPoller]);
+            waterline.workitems.create.resolves(mockPoller);
             return pollerService.postPollers().then(function (pollers) {
-                expect(pollers).to.deep.equal([mockPoller]);
+                expect(pollers).to.deep.equal(mockPoller);
             });
-
         });
 
         it('Throws error when  postPollers runs with invalid input', function() {
             var mockPoller = {
                 "message": "Validation errors"
             };
-            waterline.workitems.create.resolves(mockPoller);
-            return pollerService.postPollers().then(function (pollers) {
-                expect(pollers).to.deep.equal(mockPoller);
-            });
-
+            waterline.workitems.create.rejects(mockPoller);
+            return pollerService.postPollers().should.eventually.be.rejectedWith(mockPoller);
         });
-
-
     });
 
 
@@ -144,15 +144,13 @@ describe("Http.Services.Api.Pollers", function () {
                 config: {},
                 paused: 'true'
             }];
-            waterline.workitems.updateByIdentifier.resolves([mockPoller]);
+            waterline.workitems.updateByIdentifier.resolves(mockPoller);
             return pollerService.patchPollersById().then(function (pollers) {
-                expect(pollers).to.deep.equal([mockPoller]);
+                expect(pollers).to.deep.equal(mockPoller);
             });
-
         });
-
-
     });
+
     describe("patchPollersByIdPause", function() {
         it('should expose the appropriate methods', function() {
             pollerService.should.have.property('patchPollersByIdPause')
@@ -167,13 +165,11 @@ describe("Http.Services.Api.Pollers", function () {
                 config: {},
                 paused: 'true'
             }];
-            waterline.workitems.updateByIdentifier.resolves([mockPoller]);
+            waterline.workitems.updateByIdentifier.resolves(mockPoller);
             return pollerService.patchPollersByIdPause().then(function (pollers) {
-                expect(pollers).to.deep.equal([mockPoller]);
+                expect(pollers).to.deep.equal(mockPoller);
             });
-
         });
-
     });
 
     describe("patchPollersByIdResume", function() {
@@ -189,12 +185,11 @@ describe("Http.Services.Api.Pollers", function () {
                 config: {},
                 paused: 'false'
             }];
-            waterline.workitems.updateByIdentifier.resolves([mockPoller]);
+            waterline.workitems.updateByIdentifier.resolves(mockPoller);
             return pollerService.patchPollersByIdResume().then(function (pollers) {
-                expect(pollers).to.deep.equal([mockPoller]);
+                expect(pollers).to.deep.equal(mockPoller);
             });
         });
-
     });
 
     describe("deletePollersById", function() {
@@ -209,9 +204,8 @@ describe("Http.Services.Api.Pollers", function () {
                 expect(pollers).to.deep.equal(mockDeletedPoller);
             });
         });
-
-
     });
+
     describe("getPollersByIdData", function() {
         it('should expose the appropriate methods', function() {
             pollerService.should.have.property('getPollersByIdData')
@@ -220,10 +214,11 @@ describe("Http.Services.Api.Pollers", function () {
 
         it('Run getPollersByIdData', function() {
             var mockPoller = [{
-                id: '4532',
+                id: '1234',
                 name: 'Pollers.IPMI',
-                config: {},
+                config: {}
             }];
+
 
             taskProtocol.requestPollerCache.resolves(mockPoller);
 
@@ -231,7 +226,6 @@ describe("Http.Services.Api.Pollers", function () {
                 expect(pollers).to.deep.equal(mockPoller);
             });
         });
-
     });
 
 
@@ -243,13 +237,12 @@ describe("Http.Services.Api.Pollers", function () {
 
         it('Run getPollersByIdDataCurrent', function() {
             var mockPoller = [{
-                id: '4532',
+                id: '1234',
                 name: 'Pollers.IPMI',
-                config: {},
+                config: {}
             }];
 
             taskProtocol.requestPollerCache.resolves(mockPoller);
-
             return pollerService.getPollersByIdDataCurrent().then(function (pollers) {
                 expect(pollers).to.deep.equal(mockPoller);
             });
