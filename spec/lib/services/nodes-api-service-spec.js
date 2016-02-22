@@ -284,7 +284,7 @@ describe("Http.Services.Api.Nodes", function () {
             };
             waterline.nodes.needByIdentifier.resolves(node);
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(graph);
-            this.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves();
+            this.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves(graph.instanceId);
 
             return nodeApiService.delActiveWorkflowById('testnodeid')
             .then(function() {
@@ -295,6 +295,33 @@ describe("Http.Services.Api.Nodes", function () {
                 expect(workflowApiService.cancelTaskGraph)
                     .to.have.been.calledWith(graph.instanceId);
             });
+        });
+
+        it('should throw a NotFoundError if there is no active workflow', function () {
+            var node = {
+                id: '123'
+            };
+            waterline.nodes.needByIdentifier.resolves(node);
+            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(null);
+
+            return expect(nodeApiService.delActiveWorkflowById('testnodeid'))
+                .to.be.rejectedWith(Errors.NotFoundError);
+        });
+
+        it('should throw a NotFoundError if the workflow completes while processing the request',
+                function () {
+            var node = {
+                id: '123'
+            };
+            var graph = {
+                instanceId: 'testgraphid'
+            };
+            waterline.nodes.needByIdentifier.resolves(node);
+            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(graph);
+            this.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves(null);
+
+            return expect(nodeApiService.delActiveWorkflowById('testnodeid'))
+                .to.be.rejectedWith(Errors.NotFoundError);
         });
     });
 
