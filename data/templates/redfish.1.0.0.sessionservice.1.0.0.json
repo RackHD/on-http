@@ -1,0 +1,15 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#SessionService",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#SessionService.1.0.0.SessionService",
+    "Oem": {},
+    "Id": "SessionService",
+    "Description": "Session Service",
+    "Name": "Session Service",
+    "Status": {},
+    "ServiceEnabled": true,
+    "SessionTimeout": 86400,
+    "Sessions" : {
+        "@odata.id": "<%= basepath %>/SessionService/Sessions"
+    }
+}

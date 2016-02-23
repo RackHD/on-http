@@ -814,11 +814,11 @@ paths:
           $ref: "#/definitions/status_403"
         501:
           $ref: "#/definitions/status_501"
-  /Sessions:
-    x-swagger-router-controller: unimplemented
+  /SessionService:
+    x-swagger-router-controller: session-service
     get:
       summary: retrieve a list of sessions
-      operationId: unimplemented
+      operationId: getSessionService
       tags: [ "/redfish/v1" ]
       responses:
         200:
@@ -837,6 +837,111 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /SessionService/Sessions:
+    x-swagger-router-controller: session-service
+    get:
+      summary: retrieve a sessions description
+      operationId: getSessions
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/SessionCollection_SessionCollection"
+        400:
+          $ref: "#/definitions/status_400"
+        401:
+          $ref: "#/definitions/status_401"
+        403:
+          $ref: "#/definitions/status_403"
+        404:
+          $ref: "#/definitions/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      summary: create a new session
+      operationId: postSession
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Session.1.0.0_Session"
+      responses:
+        201:
+          description: Created
+          schema:
+            $ref: "#/definitions/Session.1.0.0_Session"
+        400:
+          $ref: "#/definitions/status_400"
+        401:
+          $ref: "#/definitions/status_401"
+        403:
+          $ref: "#/definitions/status_403"
+        404:
+          $ref: "#/definitions/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /SessionService/Sessions/{identifier}:
+    x-swagger-router-controller: session-service
+    get:
+      summary: retrieve session information
+      operationId: getSessionInfo
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Session.1.0.0_Session"
+        400:
+          $ref: "#/definitions/status_400"
+        401:
+          $ref: "#/definitions/status_401"
+        403:
+          $ref: "#/definitions/status_403"
+        404:
+          $ref: "#/definitions/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      summary: logout of the session
+      operationId: doLogoutSession
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Session.1.0.0_Session"
+        400:
+          $ref: "#/definitions/status_400"
+        401:
+          $ref: "#/definitions/status_401"
+        403:
+          $ref: "#/definitions/status_403"
+        404:
+          $ref: "#/definitions/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
   /TaskService:
     x-swagger-router-controller: task-service
     get:

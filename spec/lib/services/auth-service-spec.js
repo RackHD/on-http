@@ -86,9 +86,11 @@ describe('Auth.Service', function () {
     });
 
     describe('Auth.Service', function () {
+        var authServices;
         before('start http and https server with auth enabled', function () {
             setConfig();
             startServer(endpoint);
+            authServices = helper.injector.get('Auth.Services');
         });
 
         it('should return a token from /login', function () {
@@ -229,6 +231,41 @@ describe('Auth.Service', function () {
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
                     expect(res.body.message).to.equal('No auth token');
+                });
+        });
+
+        it('should support basic authentication on redfish', function() {
+            return helper.request('https://localhost:9443')
+                .get('/redfish/v1/url')
+                .auth('admin', 'admin123')
+                .expect(404);
+        });
+
+        it('should fail basic auth with no credentials', function() {
+            return helper.request('https://localhost:9443')
+                .get('/redfish/v1/url')
+                .expect(401);
+        });
+
+        it('should support token auth on redfish', function () {
+            var token = authServices.addRedfishSession('user', '1');
+            return helper.request('https://localhost:9443')
+                .get('/redfish/v1/url')
+                .set('x-auth-token', token)
+                .expect(404)
+                .expect(function() {
+                    authServices.delRedfishSession('1');
+                });
+        });
+
+        it('should fail bad token on redfish', function() {
+            var token = authServices.addRedfishSession('user', '1');
+            return helper.request('https://localhost:9443')
+                .get('/redfish/v1/url')
+                .set('x-auth-token', token + 'bad')
+                .expect(401)
+                .expect(function() {
+                    authServices.delRedfishSession('1');
                 });
         });
 
