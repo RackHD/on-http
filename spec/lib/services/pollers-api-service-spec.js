@@ -7,6 +7,7 @@ describe("Http.Services.Api.Pollers", function () {
     var pollerService;
     var waterline;
     var taskProtocol;
+    var Errors;
 
     before("Http.Services.Api.Pollers before", function() {
         helper.setupInjector([
@@ -21,10 +22,10 @@ describe("Http.Services.Api.Pollers", function () {
             updateByIdentifier: sinon.stub().resolves(),
             destroyByIdentifier: sinon.stub().resolves()
         };
-
-	taskProtocol = helper.injector.get("Protocol.Task");
+        taskProtocol = helper.injector.get("Protocol.Task");
         taskProtocol.requestPollerCache = sinon.stub();
         pollerService = helper.injector.get("Http.Services.Api.Pollers");
+        Errors = helper.injector.get("Errors");
 
     });
 
@@ -47,9 +48,9 @@ describe("Http.Services.Api.Pollers", function () {
             });
         });
         it('should return error if poller informations is not found', function () {
-            var mockPoller = {"message":"NotFoundError: Could not find workitem with identifier"};
-            waterline.workitems.find.rejects(mockPoller);
-            return pollerService.getPollers().should.eventually.be.rejectedWith(mockPoller);
+            var mockPollerError = new Errors.NotFoundError("Could not find workitem with identifier");
+            waterline.workitems.find.rejects(mockPollerError);
+            return pollerService.getPollers().should.eventually.be.rejectedWith(mockPollerError);
         });
 
     });
@@ -80,9 +81,9 @@ describe("Http.Services.Api.Pollers", function () {
          });
 
         it("should return error if specific poller info is not found", function () {
-            var mockPoller = {"message":"NotFoundError: Could not find workitem with identifier"};
-            waterline.workitems.needByIdentifier.rejects(mockPoller);
-            return pollerService.getPollersById().should.eventually.be.rejectedWith(mockPoller);
+            var mockPollerError = new Errors.NotFoundError("Could not find workitem with identifier");
+            waterline.workitems.needByIdentifier.rejects(mockPollerError);
+            return pollerService.getPollersById().should.eventually.be.rejectedWith(mockPollerError);
         });
 
     });
@@ -122,11 +123,9 @@ describe("Http.Services.Api.Pollers", function () {
         });
 
         it("Throws error when  postPollers runs with invalid input", function() {
-            var mockPoller = {
-                "message": "Validation errors"
-            };
-            waterline.workitems.create.rejects(mockPoller);
-            return pollerService.postPollers().should.eventually.be.rejectedWith(mockPoller);
+            var mockPollerError = new Errors.ValidationError("Validation errors");
+            waterline.workitems.create.rejects(mockPollerError);
+            return pollerService.postPollers().should.eventually.be.rejectedWith(mockPollerError);
         });
     });
 
