@@ -193,7 +193,7 @@ describe("Http.Services.Api.Obms", function () {
         },
         "service": "vmrun-obm-service"
     }
-    ]
+    ];
     describe("getObmLib", function() {
         it('should expose the appropriate methods', function() {
             obmService.should.have.property('getObmLib')
@@ -220,7 +220,7 @@ describe("Http.Services.Api.Obms", function () {
                               }
                           },
                           "service": "vmrun-obm-service"
-                          }
+                          };
             var temp = obmService.getObmLibById("vmrun-obm-service");
             expect(temp.toString()).to.equalIgnoreCase(mockObm.toString());
         });
