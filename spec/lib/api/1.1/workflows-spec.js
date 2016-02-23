@@ -5,19 +5,29 @@
 
 describe('Http.Api.Workflows', function () {
     var waterline;
-    var taskGraphRunner;
+    var workflowApiService;
+
     before('start HTTP server', function () {
+        var self = this;
         this.timeout(5000);
-        taskGraphRunner = {};
+
         waterline = {
             start: sinon.stub(),
             stop: sinon.stub()
         };
 
+        this.sandbox = sinon.sandbox.create();
+
         return helper.startServer([
-            dihelper.simpleWrapper(taskGraphRunner, 'Protocol.TaskGraphRunner'),
             dihelper.simpleWrapper(waterline, 'Services.Waterline'),
-        ]);
+        ])
+        .then(function() {
+            workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
+            self.sandbox.stub(workflowApiService, 'defineTask').resolves();
+            self.sandbox.stub(workflowApiService, 'defineTaskGraph').resolves();
+            self.sandbox.stub(workflowApiService, 'getGraphDefinitions').resolves();
+            self.sandbox.stub(workflowApiService, 'getTaskDefinitions').resolves();
+        });
     });
 
     after('stop HTTP server', function () {
@@ -25,10 +35,6 @@ describe('Http.Api.Workflows', function () {
     });
 
     beforeEach('set up mocks', function () {
-        taskGraphRunner.defineTask = sinon.stub().resolves();
-        taskGraphRunner.defineTaskGraph = sinon.stub().resolves();
-        taskGraphRunner.getTaskGraphLibrary = sinon.stub().resolves();
-        taskGraphRunner.getTaskLibrary = sinon.stub().resolves();
         waterline.nodes = {
             findByIdentifier: sinon.stub().resolves()
         };
@@ -44,6 +50,10 @@ describe('Http.Api.Workflows', function () {
             // to logging.
             findOneByTerm: sinon.stub().rejects()
         };
+    });
+
+    afterEach('clean up mocks', function () {
+        this.sandbox.reset();
     });
 
     describe('GET /workflows', function () {
@@ -85,7 +95,7 @@ describe('Http.Api.Workflows', function () {
     describe('PUT /workflows', function () {
         it('should persist a task graph', function () {
             var graph = { name: 'foobar' };
-            taskGraphRunner.defineTaskGraph.resolves(graph);
+            workflowApiService.defineTaskGraph.resolves(graph);
 
             return helper.request().put('/api/1.1/workflows')
             .send(graph)
@@ -97,7 +107,7 @@ describe('Http.Api.Workflows', function () {
     describe('PUT /workflows/tasks', function () {
         it('should persist a task', function () {
             var task = { name: 'foobar' };
-            taskGraphRunner.defineTask.resolves(task);
+            workflowApiService.defineTask.resolves(task);
 
             return helper.request().put('/api/1.1/workflows/tasks')
             .send(task)
@@ -109,7 +119,7 @@ describe('Http.Api.Workflows', function () {
     describe('GET /workflows/tasks/library', function () {
         it('should retrieve the task library', function () {
             var task = { name: 'foobar' };
-            taskGraphRunner.getTaskLibrary.resolves([task]);
+            workflowApiService.getTaskDefinitions.resolves([task]);
 
             return helper.request().get('/api/1.1/workflows/tasks/library')
             .expect('Content-Type', /^application\/json/)
@@ -120,7 +130,7 @@ describe('Http.Api.Workflows', function () {
     describe('GET /workflows/library', function () {
         it('should retrieve the graph library', function () {
             var graph = { name: 'foobar' };
-            taskGraphRunner.getTaskGraphLibrary.resolves([graph]);
+            workflowApiService.getGraphDefinitions.resolves([graph]);
 
             return helper.request().get('/api/1.1/workflows/library')
             .expect('Content-Type', /^application\/json/)
@@ -131,15 +141,14 @@ describe('Http.Api.Workflows', function () {
     describe('GET /workflows/library/:id', function () {
         it('should retrieve a graph from the graph library', function () {
             var graph = { friendlyName: 'foobar' };
-            taskGraphRunner.getTaskGraphLibrary.resolves([graph]);
+            workflowApiService.getGraphDefinitions.resolves([graph]);
 
             return helper.request().get('/api/1.1/workflows/library/1234')
             .expect('Content-Type', /^application\/json/)
-            .expect(200, [graph])
+            .expect(200, graph)
             .expect(function () {
-                expect(taskGraphRunner.getTaskGraphLibrary).to.have.been.calledOnce;
-                expect(taskGraphRunner.getTaskGraphLibrary.firstCall.args[0])
-                .to.have.property('injectableName').that.equals('1234');
+                expect(workflowApiService.getGraphDefinitions).to.have.been.calledOnce;
+                expect(workflowApiService.getGraphDefinitions).to.have.been.calledWith('1234');
             });
         });
     });

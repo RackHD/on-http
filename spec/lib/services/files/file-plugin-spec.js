@@ -76,6 +76,7 @@ describe("fileService disk backend", function() {
         fs = helper.injector.get('fs');
         sinon.stub(fs, 'unlink');
         sinon.stub(fs, 'exists');
+        sinon.stub(fs, 'rename');
         sinon.stub(fs, 'createReadStream');
         sinon.stub(fs, 'createWriteStream');
 
@@ -92,6 +93,7 @@ describe("fileService disk backend", function() {
         fs = helper.injector.get('fs');
         fs.unlink.restore();
         fs.exists.restore();
+        fs.rename.restore();
         fs.createReadStream.restore();
         fs.createWriteStream.restore();
     });

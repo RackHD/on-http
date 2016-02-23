@@ -46,6 +46,7 @@ function onHttpContextFactory(di, directory) {
         ]),
 
         prerequisiteInjectables: _.flattenDeep([
+            core.workflowInjectables,
             onTasks.injectables,
             helper.simpleWrapper(ws, 'ws'),
             helper.simpleWrapper(ws.Server, 'WebSocketServer'),
