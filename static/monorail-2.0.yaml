@@ -3,7 +3,7 @@ info:
   version: "0.0.1"
   title: RackHD 2.0
 # during dev, should point to your local machine
-host: localhost:10010
+#host: localhost:10010
 # basePath prefixes all resource paths
 basePath: /api/2.0
 #
@@ -17,6 +17,9 @@ consumes:
 # format of the responses to the client (Accepts)
 produces:
   - application/json
+tags:
+  - name: "/api/2.0"
+    description: RackHD 2.0 API
 paths:
   /versions:
     x-swagger-router-controller: versions
@@ -24,6 +27,7 @@ paths:
       description: Returns installed versions to the caller
       # used as the method name of the controller
       operationId: getVersions
+      tags: [ "/api/2.0" ]
       responses:
         "200":
           description: Success
@@ -35,8 +39,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /swagger:
-    x-swagger-pipe: swagger_raw
+
   /pollers/library:
     x-swagger-router-controller: pollers
     get:
@@ -45,9 +48,7 @@ paths:
         get list of possible library pollers
       description: |
         get list of possible library pollers
-      tags:
-        - pollers
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -73,9 +74,7 @@ paths:
             library poller identifier
           required: true
           type: string
-      tags:
-        - pollers
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -100,9 +99,7 @@ paths:
         get list of all pollers
       description: |
         get list of all pollers
-      tags:
-        - pollers
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -120,9 +117,7 @@ paths:
         create a poller
       description: |
         create a poller
-      tags:
-        - pollers
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -149,9 +144,7 @@ paths:
             poller identifier
           required: true
           type: string
-      tags:
-        - pollers
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -181,9 +174,7 @@ paths:
             poller identifier
           required: true
           type: string
-      tags:
-        - pollers
-        - patch
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -212,9 +203,7 @@ paths:
             poller identifier
           required: true
           type: string
-      tags:
-        - pollers
-        - delete
+      tags: [ "/api/2.0" ]
       responses:
         204:
           description: |
@@ -244,9 +233,7 @@ paths:
             poller identifier
           required: true
           type: string
-      tags:
-        - pollers
-        - patch
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -278,9 +265,7 @@ paths:
             poller identifier
           required: true
           type: string
-      tags:
-        - pollers
-        - patch
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -311,9 +296,7 @@ paths:
             identifier (ip address or NodeId) for the data from a poller
           required: true
           type: string
-      tags:
-        - templates
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -344,9 +327,7 @@ paths:
             identifier (ip address or NodeId) for the data from a poller
           required: true
           type: string
-      tags:
-        - templates
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -362,6 +343,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+
   /templates/library:
     x-swagger-router-controller: unimplemented
     get:
@@ -370,9 +352,7 @@ paths:
         get list of possible templates
       description: |
         get list of possible templates
-      tags:
-        - templates
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -398,9 +378,7 @@ paths:
             template identifier
           required: true
           type: string
-      tags:
-        - templates
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -429,9 +407,7 @@ paths:
             objectid of template
           required: true
           type: string
-      tags:
-        - templates
-        - put
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -456,9 +432,7 @@ paths:
         get list of skus
       description: |
         get list of skus
-      tags:
-        - skus
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -475,9 +449,7 @@ paths:
         create a sku
       description: |
         create a sku
-      tags:
-        - skus
-        - post
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -508,9 +480,7 @@ paths:
             objectid of sku
           required: true
           type: string
-      tags:
-        - skus
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -539,9 +509,7 @@ paths:
             The profile name.
           required: true
           type: string
-      tags:
-        - skus
-        - patch
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -575,9 +543,7 @@ paths:
             The sku objectid.
           required: true
           type: string
-      tags:
-        - profiles
-        - put
+      tags: [ "/api/2.0" ]
       responses:
         204:
           description: |
@@ -608,10 +574,7 @@ paths:
             The profile name.
           required: true
           type: string
-      tags:
-        - skus
-        - nodes
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -636,9 +599,7 @@ paths:
         get list of possible profiles
       description: |
         get list of possible profiles
-      tags:
-        - profiles
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -664,9 +625,7 @@ paths:
             The profile name.
           required: true
           type: string
-      tags:
-        - profiles
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -695,9 +654,7 @@ paths:
             The profile name.
           required: true
           type: string
-      tags:
-        - profiles
-        - put
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -723,9 +680,7 @@ paths:
         get list of possible OBM services
       description: |
         get list of possible OBM services
-      tags:
-        - obms
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -752,9 +707,7 @@ paths:
             The obm service name.
           required: true
           type: string
-      tags:
-        - obms
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -771,7 +724,6 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-
   /workflows/library:
     x-swagger-router-controller: unimplemented
     get:
@@ -780,9 +732,7 @@ paths:
         List all workflows available to run
       description: |
         List all workflows available to run
-      tags:
-        - workflow
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -802,10 +752,7 @@ paths:
         Fetch tasks from task library
       description: |
         Fetch tasks from task library
-      tags:
-        - workflow
-        - task
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -822,10 +769,7 @@ paths:
         Add tasks to task library
       description: |
         Add tasks to task library
-      tags:
-        - workflow
-        - task
-        - put
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -849,9 +793,7 @@ paths:
         Fetch workflows
       description: |
         Fetch workflows
-      tags:
-        - workflow
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -868,9 +810,7 @@ paths:
         define new workflow
       description: |
         define new workflow
-      tags:
-        - workflow
-        - put
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -903,10 +843,7 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
-      tags:
-        - nodes
-        - workflow
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -936,10 +873,7 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
-      tags:
-        - nodes
-        - workflow
-        - delete
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -955,6 +889,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+
   /nodes/{identifier}/workflows:
     x-swagger-router-controller: nodes
     get:
@@ -971,10 +906,7 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
-      tags:
-        - nodes
-        - workflow
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -1009,7 +941,7 @@ paths:
           description: Workflow name
           required: false
           schema:
-            type: object
+            $ref: '#/definitions/generic_obj'
         - name: name
           in: query
           description: Workflow name
@@ -1022,10 +954,7 @@ paths:
 #          required: false
 #          type: object
 
-      tags:
-        - nodes
-        - workflow
-        - post
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -1059,10 +988,7 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
-      tags:
-        - nodes
-        - pollers
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -1101,10 +1027,7 @@ paths:
             Source catalog name to fetch
           required: true
           type: string
-      tags:
-        - nodes
-        - catalogs
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -1138,10 +1061,7 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
-      tags:
-        - nodes
-        - catalogs
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -1174,11 +1094,7 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
-      tags:
-        - nodes
-        - obm
-        - identify
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: obm identity light settings
@@ -1207,11 +1123,7 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
-      tags:
-        - nodes
-        - obm
-        - identify
-        - post
+      tags: [ "/api/2.0" ]
       responses:
         201:
           description: obm settings accepted
@@ -1224,6 +1136,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+
   /nodes/{identifier}/obm:
     x-swagger-router-controller: nodes
     get:
@@ -1242,10 +1155,7 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
-      tags:
-        - nodes
-        - obm
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: obm settings
@@ -1282,11 +1192,8 @@ paths:
             obm settings to apply.
           required: true
           schema:
-            type: object
-      tags:
-        - nodes
-        - obm
-        - post
+            $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
       responses:
         201:
           description: obm settings accepted
@@ -1317,9 +1224,7 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
-      tags:
-        - nodes
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: array of all
@@ -1349,9 +1254,7 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
-      tags:
-        - nodes
-        - delete
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: Delete successful
@@ -1385,10 +1288,8 @@ paths:
             object patches to apply.
           required: true
           schema:
-            type: object
-      tags:
-        - nodes
-        - patch
+           $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: patch succeeded
@@ -1514,9 +1415,7 @@ paths:
         List of all nodes or if there are none an empty object
       description: |
         List of all nodes or if there are none an empty object
-      tags:
-        - nodes
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: array of all
@@ -1548,10 +1447,8 @@ paths:
           expect a string or an array of strings.
         required: true
         schema:
-          type: object
-      tags:
-        - nodes
-        - post
+         $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
       responses:
         201:
           description: waterline response
@@ -1561,7 +1458,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  
+
   /lookups:
     x-swagger-router-controller: unimplemented
     get:
@@ -1570,9 +1467,7 @@ paths:
         find all
       description: |
         find all
-      tags:
-        - lookups
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: array of all
@@ -1596,10 +1491,8 @@ paths:
         description: foo
         required: true
         schema:
-          type: object
-      tags:
-        - lookups
-        - post
+         $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: waterline response
@@ -1623,9 +1516,7 @@ paths:
           description: id of thing to lookup
           required: true
           type: string
-      tags:
-        - lookups
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: array of all
@@ -1654,10 +1545,8 @@ paths:
         description: foo
         required: true
         schema:
-          type: object
-      tags:
-        - lookups
-        - post
+         $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: waterline response
@@ -1681,9 +1570,7 @@ paths:
           description: uuid of a file as provided when you originally stored it.
           required: true
           type: string
-      tags:
-        - files
-        - get
+      tags: [ "/api/2.0" ]
       responses:
 # https://github.com/swagger-api/swagger-spec/issues/260 means we can't
 # describe the return of a file easily today until jsonspec and swagger
@@ -1725,9 +1612,7 @@ paths:
 #            type: file
 #      consumes:
 #        - application/octet-stream
-      tags:
-        - files
-        - post
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: The file was stored
@@ -1757,9 +1642,7 @@ paths:
           description: filename identifier of the file you wish to delete
           required: true
           type: string
-      tags:
-        - files
-        - delete
+      tags: [ "/api/2.0" ]
       responses:
         204:
           description: File successfully deleted.
@@ -1775,6 +1658,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+
   /config:
     x-swagger-router-controller: config
     get:
@@ -1783,9 +1667,7 @@ paths:
         get server configuration
       description: |
         Get server configuration.
-      tags:
-        - config
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: An array of configuration objects
@@ -1800,10 +1682,8 @@ paths:
       summary: |
         patch/update server configuration
       description: |
-        Patch/update server configurationm and then return the patched configuration.
-      tags:
-        - config
-        - patch
+        Patch/update server configuration and then return the patched configuration.
+      tags: [ "/api/2.0" ]
       consumes:
         - application/json
       parameters:
@@ -1812,7 +1692,7 @@ paths:
           description: Updated config fields
           required: true
           schema:
-            type: object
+            $ref: '#/definitions/generic_obj'
       responses:
         200:
           description: An array of configuration objects
@@ -1837,9 +1717,7 @@ paths:
           description: query object to pass through to waterline.
           required: false
           type: string
-      tags:
-        - catalog
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         "200":
           description: Success
@@ -1866,9 +1744,7 @@ paths:
           description: identifier of a catalog
           required: true
           type: string
-      tags:
-        - catalog
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         "200":
           description: Success
@@ -1888,9 +1764,7 @@ paths:
         get DHCP lease table
       description: |
         Fetch the dhcp leases.
-      tags:
-        - dhcp
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -1915,9 +1789,7 @@ paths:
           description: identifier of a mac address
           required: true
           type: string
-      tags:
-        - dhcp
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: A single lease
@@ -1938,9 +1810,7 @@ paths:
           description: identifier of a mac address
           required: true
           type: string
-      tags:
-        - dhcp
-        - delete
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: A single lease
@@ -2139,6 +2009,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+  /swagger:
+    x-swagger-pipe: swagger_raw
+
 definitions:
   ErrorResponse:
     required:
@@ -2146,6 +2019,7 @@ definitions:
     properties:
       message:
         type: string
+
   VersionsResponse:
     required:
       - message
@@ -2162,6 +2036,7 @@ definitions:
         type: string
       fields:
         type: string
+
   catalog:
     type: object
     properties:
@@ -2178,6 +2053,7 @@ definitions:
     - id
     - source
     - node
+
   node:
     type: object
     properties:
@@ -2204,6 +2080,7 @@ definitions:
     required:
     - profile
     - name
+
   graphobject:
     properties:
       id:
@@ -2218,6 +2095,7 @@ definitions:
         type: object
       node:
         $ref: '#/definitions/node'
+
   sku:
     properties:
       id:
@@ -2234,6 +2112,7 @@ definitions:
         type: string
       discoveryGraphOptions:
         type: object
+
   lease:
     properties:
       mac:
@@ -2271,6 +2150,7 @@ definitions:
       reserveTimer:
         type: string
         format: int64
+
     example:
       mac: 08:00:27:52:d2:a4
       ipAddress: 10.1.1.2
@@ -2283,6 +2163,10 @@ definitions:
       leaseExpiresAt: 1424213874811
       boundFlag: true
       reservedFlag: false
+
     required:
     - mac
     - ipAddress
+
+  generic_obj:
+   type: object
