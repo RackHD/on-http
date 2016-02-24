@@ -41,7 +41,7 @@ describe('Http.Api.Workflows', function () {
         waterline.graphobjects = {
             find: sinon.stub().resolves([]),
             findByIdentifier: sinon.stub().resolves(),
-            needByIdentifier: sinon.stub().resolves()
+            needOne: sinon.stub().resolves()
         };
         waterline.lookups = {
             // This method is for lookups only and it
@@ -70,21 +70,21 @@ describe('Http.Api.Workflows', function () {
     describe('GET /workflows/:id', function () {
         it('should return a single persisted graph', function () {
             var graph = { name: 'foobar' };
-            waterline.graphobjects.needByIdentifier.resolves(graph);
+            waterline.graphobjects.needOne.resolves(graph);
 
             return helper.request().get('/api/1.1/workflows/12345')
             .expect('Content-Type', /^application\/json/)
             .expect(200, graph)
             .expect(function () {
-                expect(waterline.graphobjects.needByIdentifier).to.have.been.calledOnce;
-                expect(waterline.graphobjects.needByIdentifier)
-                .to.have.been.calledWith('12345');
+                expect(waterline.graphobjects.needOne).to.have.been.calledOnce;
+                expect(waterline.graphobjects.needOne)
+                    .to.have.been.calledWith({ instanceId: '12345' });
             });
         });
 
         it('should return a 404 if not found', function () {
             var Errors = helper.injector.get('Errors');
-            waterline.graphobjects.needByIdentifier.rejects(new Errors.NotFoundError('test'));
+            waterline.graphobjects.needOne.rejects(new Errors.NotFoundError('test'));
 
             return helper.request().get('/api/1.1/workflows/12345')
             .expect('Content-Type', /^application\/json/)
@@ -127,12 +127,12 @@ describe('Http.Api.Workflows', function () {
         });
     });
 
-    describe('GET /workflows/library', function () {
+    describe('GET /workflows/library/*', function () {
         it('should retrieve the graph library', function () {
             var graph = { name: 'foobar' };
             workflowApiService.getGraphDefinitions.resolves([graph]);
 
-            return helper.request().get('/api/1.1/workflows/library')
+            return helper.request().get('/api/1.1/workflows/library/*')
             .expect('Content-Type', /^application\/json/)
             .expect(200, [graph]);
         });
