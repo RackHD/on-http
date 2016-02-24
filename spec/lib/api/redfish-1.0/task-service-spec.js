@@ -8,8 +8,10 @@ describe('Redfish TaskService', function () {
     var validator;
     var waterline;
     var Promise;
+    var Constants;
     var template;
     var fs;
+    var graph;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -22,6 +24,8 @@ describe('Redfish TaskService', function () {
     before('start HTTP server', function () {
         this.timeout(5000);
         return helper.startServer([]).then(function () {
+            Constants = helper.injector.get('Constants');
+
             template = helper.injector.get('Templates');
             sinon.stub(template, "get", redirectGet);
 
@@ -37,8 +41,17 @@ describe('Redfish TaskService', function () {
 
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
+        })
+        .then(function() {
+            graph = {
+                id: '566afe8a7e7b8f3751b951a5',
+                _status: Constants.Task.States.Pending,
+                createdAt: '2016-01-21T17:51:23.395Z',
+                updatedAt: '2016-01-21T17:52:23.395Z',
+                name: 'isc-dhcp leases poller',
+                node: 'abcdefg'
+            };
         });
-
     });
 
     beforeEach('set up mocks', function () {
@@ -68,7 +81,7 @@ describe('Redfish TaskService', function () {
         validator.validate.restore();
         validator.render.restore();
         template.get.restore();
-        
+
         function restoreStubs(obj) {
             _(obj).methods().forEach(function (method) {
                 if (obj[method] && obj[method].restore) {
@@ -81,15 +94,6 @@ describe('Redfish TaskService', function () {
         restoreStubs(waterline.nodes);
         return helper.stopServer();
     });
-
-    var graph = {
-        id: '566afe8a7e7b8f3751b951a5',
-        _status: 'valid',
-        createdAt: '2016-01-21T17:51:23.395Z',
-        updatedAt: '2016-01-21T17:52:23.395Z',
-        name: 'isc-dhcp leases poller',
-        node: 'abcdefg'
-    };
 
     it('should return a valid task service root', function () {
         waterline.graphobjects.find.resolves([graph]);
