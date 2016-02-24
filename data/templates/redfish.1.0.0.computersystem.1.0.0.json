@@ -27,7 +27,9 @@
     "MemorySummary": {
         <% var memsize = 0; %>
         <% dmi.data['Memory Device'].forEach(function(dev) { %>
-        <%     memsize = memsize + parseInt(dev.Size.split(' ')[0]); %>
+        <%     var size = dev.Size.split(' ')[0]; %>
+        <%     size = isNaN(size) ? 0 : size; %>
+        <%     memsize = memsize + parseInt(size); %>
         <% }); %>
         <% memsize = memsize / 1024; %>
         "TotalSystemMemoryGiB": <%= memsize %>,

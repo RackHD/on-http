@@ -6,12 +6,11 @@ describe("Http.Services.Api.Nodes", function () {
     var nodeApiService;
     var workflowApiService;
     var Errors;
-    var taskGraphProtocol;
     var waterline;
     var updateByIdentifier;
     var create;
     var needByIdentifier;
-    var getActiveTaskGraph;
+    var findActiveGraphForTarget;
     var computeNode;
     var enclosureNode;
     var _;
@@ -27,7 +26,6 @@ describe("Http.Services.Api.Nodes", function () {
         nodeApiService = helper.injector.get("Http.Services.Api.Nodes");
         workflowApiService = helper.injector.get("Http.Services.Api.Workflows");
         Errors = helper.injector.get("Errors");
-        taskGraphProtocol = helper.injector.get("Protocol.TaskGraphRunner");
         waterline = helper.injector.get('Services.Waterline');
         _ = helper.injector.get('_');
         waterline.nodes = {
@@ -78,7 +76,8 @@ describe("Http.Services.Api.Nodes", function () {
         create = this.sandbox.stub(waterline.nodes, 'create');
         needByIdentifier = this.sandbox.stub(waterline.nodes, 'needByIdentifier');
         updateByIdentifier = this.sandbox.stub(waterline.nodes, 'updateByIdentifier');
-        getActiveTaskGraph = this.sandbox.stub(taskGraphProtocol, 'getActiveTaskGraph');
+        findActiveGraphForTarget = this.sandbox.stub(
+                workflowApiService, 'findActiveGraphForTarget');
 
     });
 
@@ -256,19 +255,19 @@ describe("Http.Services.Api.Nodes", function () {
                 instanceId: '0987'
             };
             waterline.nodes.needByIdentifier.resolves(node);
-            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(graph);
+            findActiveGraphForTarget.resolves(graph);
 
             return nodeApiService.getActiveNodeWorkflowById(node.id)
             .then(function() {
-                expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
-                expect(workflowApiService.findActiveGraphForTarget)
+                expect(findActiveGraphForTarget).to.have.been.calledOnce;
+                expect(findActiveGraphForTarget)
                     .to.have.been.calledWith(node.id);
             });
         });
 
         it('should throw a NotFoundError if the node has no active graph', function () {
             waterline.nodes.needByIdentifier.resolves({ id: 'testid' });
-            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(null);
+            findActiveGraphForTarget.resolves(null);
             return expect(nodeApiService.getActiveNodeWorkflowById('test'))
                     .to.be.rejectedWith(Errors.NotFoundError);
         });
@@ -283,13 +282,13 @@ describe("Http.Services.Api.Nodes", function () {
                 instanceId: 'testgraphid'
             };
             waterline.nodes.needByIdentifier.resolves(node);
-            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(graph);
+            findActiveGraphForTarget.resolves(graph);
             this.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves(graph.instanceId);
 
             return nodeApiService.delActiveWorkflowById('testnodeid')
             .then(function() {
-                expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
-                expect(workflowApiService.findActiveGraphForTarget)
+                expect(findActiveGraphForTarget).to.have.been.calledOnce;
+                expect(findActiveGraphForTarget)
                     .to.have.been.calledWith(node.id);
                 expect(workflowApiService.cancelTaskGraph).to.have.been.calledOnce;
                 expect(workflowApiService.cancelTaskGraph)
@@ -302,7 +301,7 @@ describe("Http.Services.Api.Nodes", function () {
                 id: '123'
             };
             waterline.nodes.needByIdentifier.resolves(node);
-            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(null);
+            findActiveGraphForTarget.resolves(null);
 
             return expect(nodeApiService.delActiveWorkflowById('testnodeid'))
                 .to.be.rejectedWith(Errors.NotFoundError);
@@ -317,7 +316,7 @@ describe("Http.Services.Api.Nodes", function () {
                 instanceId: 'testgraphid'
             };
             waterline.nodes.needByIdentifier.resolves(node);
-            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(graph);
+            findActiveGraphForTarget.resolves(graph);
             this.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves(null);
 
             return expect(nodeApiService.delActiveWorkflowById('testnodeid'))
@@ -532,7 +531,7 @@ describe("Http.Services.Api.Nodes", function () {
                 "targets": ["1234abcd1234abcd1234abce"]
             };
 
-            getActiveTaskGraph.resolves('');
+            findActiveGraphForTarget.resolves('');
             needByIdentifier.resolves(noopNode);
 
             return nodeApiService.removeNode(computeNodeBefore)
@@ -546,7 +545,7 @@ describe("Http.Services.Api.Nodes", function () {
         });
 
         it("removeNode should only delete required node when cannot get target node", function() {
-            getActiveTaskGraph.resolves('');
+            findActiveGraphForTarget.resolves('');
             needByIdentifier.rejects();
 
             return nodeApiService.removeNode(computeNode)
@@ -568,7 +567,7 @@ describe("Http.Services.Api.Nodes", function () {
                 ]
             };
 
-            getActiveTaskGraph.resolves('');
+            findActiveGraphForTarget.resolves('');
             return nodeApiService.removeNode(noopNode)
             .then(function (node){
                 expect(node).to.equal(noopNode);
@@ -593,7 +592,7 @@ describe("Http.Services.Api.Nodes", function () {
             var enclNodeAfter = _.cloneDeep(enclNode);
             _.pull(enclNodeAfter.relations, enclNodeAfter.relations[0]);
 
-            getActiveTaskGraph.resolves('');
+            findActiveGraphForTarget.resolves('');
             needByIdentifier.resolves(enclNode);
             updateByIdentifier.resolves(enclNodeAfter);
 
@@ -626,7 +625,7 @@ describe("Http.Services.Api.Nodes", function () {
             delete computeNodeAfter.relations;
             delete computeNode2After.relations;
 
-            getActiveTaskGraph.resolves('');
+            findActiveGraphForTarget.resolves('');
             needByIdentifier.withArgs(computeNode.id).resolves(computeNode);
             needByIdentifier.withArgs(computeNode2.id).resolves(computeNode2);
             updateByIdentifier.withArgs(computeNode.id).resolves(computeNodeAfter);
@@ -677,7 +676,7 @@ describe("Http.Services.Api.Nodes", function () {
                 "targets": ["1234abcd1234abcd1234abcg"]
             };
 
-            getActiveTaskGraph.resolves('');
+            findActiveGraphForTarget.resolves('');
             needByIdentifier.withArgs(computeNode.id).resolves(computeNodeBefore);
             needByIdentifier.withArgs(computeNode2.id).resolves(computeNode2);
             needByIdentifier.withArgs(pduNode.id).resolves(pduNode);
@@ -711,8 +710,8 @@ describe("Http.Services.Api.Nodes", function () {
             delete computeNodeAfter.relations;
             delete computeNode2After.relations;
 
-            getActiveTaskGraph.resolves('');
-            getActiveTaskGraph.withArgs({target: computeNode2.id}).resolves('1');
+            findActiveGraphForTarget.resolves(null);
+            findActiveGraphForTarget.withArgs(computeNode2.id).resolves('1');
             needByIdentifier.withArgs(computeNode.id).resolves(computeNode);
             needByIdentifier.withArgs(computeNode2.id).resolves(computeNode2);
             updateByIdentifier.withArgs(computeNode.id).resolves(computeNodeAfter);
