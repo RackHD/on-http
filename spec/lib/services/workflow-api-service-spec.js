@@ -139,7 +139,7 @@ describe('Http.Services.Api.Workflows', function () {
     });
 
     it('should persist a graph definition', function () {
-        store.persistGraphDefinition.resolves();
+        store.persistGraphDefinition.resolves({ injectableName: 'test' });
         this.sandbox.stub(workflowApiService, 'createGraph').resolves();
         return workflowApiService.defineTaskGraph(graphDefinition)
         .then(function() {
