@@ -84,10 +84,24 @@ describe('Http.Api.Templates', function () {
     });
 
     describe('PUT /templates/library/:id', function () {
-        it('should save a template', function () {
+        it('should save a template (octet-stream)', function () {
             templates.put.resolves();
             return helper.request().put('/api/1.1/templates/library/123')
             .set('Content-Type', 'application/octet-stream')
+            .send('test_template_cmd\n')
+            .expect(200)
+            .then(function () {
+                expect(templates.put).to.have.been.calledOnce;
+                expect(templates.put).to.have.been.calledWith('123');
+                expect(templates.put.firstCall.args[1]).to.deep.equal('test_template_cmd\n');
+            });
+        });
+
+
+        it('should save a template (text/plain)', function () {
+            templates.put.resolves();
+            return helper.request().put('/api/1.1/templates/library/123')
+            .set('Content-Type', 'text/plain')
             .send('test_template_cmd\n')
             .expect(200)
             .then(function () {
