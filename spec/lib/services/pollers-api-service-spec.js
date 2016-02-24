@@ -8,6 +8,7 @@ describe("Http.Services.Api.Pollers", function () {
     var waterline;
     var taskProtocol;
     var Errors;
+    var Promise;
 
     before("Http.Services.Api.Pollers before", function() {
         helper.setupInjector([
@@ -26,6 +27,7 @@ describe("Http.Services.Api.Pollers", function () {
         taskProtocol.requestPollerCache = sinon.stub();
         pollerService = helper.injector.get("Http.Services.Api.Pollers");
         Errors = helper.injector.get("Errors");
+        Promise = helper.injector.get('Promise');
 
     });
 
@@ -72,12 +74,15 @@ describe("Http.Services.Api.Pollers", function () {
                 name: "Pollers.TEST",
                 config: {}
             }];
-            waterline.workitems.needByIdentifier.withArgs({"id": "4532"}).resolves(mockPoller[0]);
-            waterline.workitems.needByIdentifier.withArgs({"id": "1234"}).resolves(mockPoller[1]);
-            Promise.all(["4532", "1234"].map(function(id, index) {
-                return pollerService.getPollersById(index)})).then(function (pollers) {
-                    expect(pollers).to.deep.equal(mockPoller[index]);
+            waterline.workitems.needByIdentifier.withArgs("4532").resolves(mockPoller[0]);
+            waterline.workitems.needByIdentifier.withArgs("1234").resolves(mockPoller[1]);
+            Promise.map(["4532", "1234"], function(id) {
+                return pollerService.getPollersById(id);
+            }).then(function (pollers) {
+                _.forEach(pollers, function(poller, index) {
+                    expect(poller).to.deep.equal(mockPoller[index]);
                 });
+            });
          });
 
         it("should return error if specific poller info is not found", function () {
