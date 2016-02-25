@@ -76,7 +76,7 @@ describe("Http.Services.Api.Pollers", function () {
             }];
             waterline.workitems.needByIdentifier.withArgs("4532").resolves(mockPoller[0]);
             waterline.workitems.needByIdentifier.withArgs("1234").resolves(mockPoller[1]);
-            Promise.map(["4532", "1234"], function(id) {
+            return Promise.map(["4532", "1234"], function(id) {
                 return pollerService.getPollersById(id);
             }).then(function (pollers) {
                 _.forEach(pollers, function(poller, index) {
