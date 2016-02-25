@@ -627,7 +627,6 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   
-
   /workflows/library:
     get:
       summary: |
@@ -641,6 +640,50 @@ paths:
         200:
           description: |
             List all workflows available to run
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+  /workflows/library/{injectableName}:
+    get:
+      summary: |
+        List all workflows available to run
+      description: |
+        List all workflows available to run
+      parameters:
+        - name: injectableName
+          in: path
+          required: true
+          type: string
+      tags:
+        - workflow
+        - get
+      responses:
+        200:
+          description: |
+            List all workflows available to run
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+
+  /workflows/tasks/library:
+    get:
+      summary: |
+        List workflow tasks library
+      description: |
+        List workflow tasks library
+      tags:
+        - workflow
+        - get
+      responses:
+        200:
+          description: |
+            List workflow tasks library
           schema: 
             type: object
         default:
@@ -673,6 +716,11 @@ paths:
         Add tasks to task library
       description: |
         Add tasks to task library
+      parameters:
+        - name: body
+          in: body
+          required: false
+          type: object
       tags:
         - workflow
         - task
@@ -692,6 +740,32 @@ paths:
           description: Upload failed
           schema:
             $ref: '#/definitions/Error'
+
+  /workflows/{instanceId}:
+    get:
+      summary: |
+        Fetch workflow by instance ID
+      description: |
+        Fetch workflow by instance ID
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          type: string
+      tags:
+        - workflow
+        - get
+      responses:
+        200:
+          description: |
+            Fetch workflows
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /workflows:
     get:
       summary: |
@@ -716,6 +790,11 @@ paths:
         define new workflow
       description: |
         define new workflow
+      parameters:
+        - name: body
+          in: body
+          required: false
+          type: object
       tags:
         - workflow
         - put
@@ -842,10 +921,19 @@ paths:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+            The node unique identifier
           required: true
           type: string
+        - name: name
+          in: query
+          description: |
+            The injectable Graph name
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: false
+          type: object
       tags:
         - nodes
         - workflow
@@ -879,6 +967,10 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
+        - name: body
+          in: body
+          required: false
+          type: object
       tags:
         - nodes
         - dhcp
@@ -1326,9 +1418,15 @@ paths:
   /lookups:
     get:
       summary: |
-        find all
+        find all or by query parameter
       description: |
-        find all
+        find all or by query parameter
+      parameters:
+        - name: q
+          in: query
+          description: query object to pass through to waterline.
+          required: false
+          type: string
       tags:
         - lookups
         - get
@@ -1379,6 +1477,62 @@ paths:
           description: id of thing to lookup
           required: true
           type: string
+      tags:
+        - lookups
+        - get
+      responses:
+        200:
+          description: array of all
+          schema:
+            type: array
+            items: 
+              type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: |
+        delete lookup id
+      description: |
+        delete lookup id
+      parameters:
+        - name: id
+          in: path
+          description: id to delete
+          required: true
+          type: string
+      tags:
+        - lookups
+        - get
+      responses:
+        200:
+          description: array of all
+          schema:
+            type: array
+            items: 
+              type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: |
+        patch lookup id
+      description: |
+        patch lookup id
+      parameters:
+        - name: id
+          in: path
+          description: id to patch
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            object patches to apply.
+          required: true
+          type: object
       tags:
         - lookups
         - get
@@ -1549,6 +1703,11 @@ paths:
         patch/update server configuration
       description: |
         Patch/update server configurationm and then return the patched configuration.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          type: object
       tags:
         - config
         - patch
