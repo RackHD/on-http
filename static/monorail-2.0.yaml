@@ -1318,9 +1318,7 @@ paths:
             Mac addresses or unique aliases to identify the node by
           required: true
           type: string
-      tags:
-        - nodes
-        - get
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: array of all
@@ -1355,10 +1353,8 @@ paths:
             object patches to apply.
           required: true
           schema:
-            type: object
-      tags:
-        - nodes
-        - patch
+            $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: patch succeeded
@@ -1392,9 +1388,7 @@ paths:
           description: The name of the tag
           required: true
           type: string
-      tags:
-        - nodes
-        - delete
+      tags: [ "/api/2.0" ]
       responses:
         204:
           description: Delete successful
@@ -1827,7 +1821,7 @@ paths:
       summary: Retrieve information about all tags
       description: |
         Retrieve information about all tags
-      tags: [ "/monorail/v2.0" ]
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -1856,8 +1850,8 @@ paths:
           description: tag creation options
           required: true
           schema:
-            type: object
-      tags: [ "/monorail/v2.0" ]
+            $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -1886,7 +1880,7 @@ paths:
           description: The tag identifier
           required: true
           type: string
-      tags: [ "/monorail/v2.0" ]
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -1913,7 +1907,7 @@ paths:
           description: The tag identifier
           required: true
           type: string
-      tags: [ "/monorail/v2.0" ]
+      tags: [ "/api/2.0" ]
       responses:
         204:
           description: |
@@ -1942,7 +1936,7 @@ paths:
           description: The tag identifier
           required: true
           type: string
-      tags: [ "/monorail/v2.0" ]
+      tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
@@ -1980,7 +1974,7 @@ paths:
           description: Workflow options
           required: false
           schema:
-            type: object
+            $ref: '#/definitions/generic_obj'
         - name: name
           in: query
           description: Workflow name
@@ -1992,7 +1986,7 @@ paths:
 #          description: options
 #          required: false
 #          type: object
-      tags: [ "/monorail/v2.0" ]
+      tags: [ "/api/2.0" ]
       responses:
         202:
           description: |
