@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   version: "0.0.1"
-  title: Hello World App
+  title: RackHD 2.0
 # during dev, should point to your local machine
 host: localhost:10010
 # basePath prefixes all resource paths
@@ -1402,6 +1402,109 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /nodes/{identifier}/tags:
+    x-swagger-router-controller: nodes
+    get:
+      operationId: nodesGetTagsById
+      summary: |
+        List of all tags on the node or an empty object if there are none
+      description: |
+        List of all tags on the node or an empty object if there are none
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses or unique aliases to identify the node by
+          required: true
+          type: string
+      tags:
+        - nodes
+        - get
+      responses:
+        200:
+          description: array of all
+          schema:
+            type: array
+            items:
+              type: object
+        404:
+          description: The node with the identifier was not found.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      operationId: nodesPatchTagById
+      summary: |
+        Patch tags onto specified node
+      description: |
+        Patch tags onto specified node
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses or unique aliases to identify the node by
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            object patches to apply.
+          required: true
+          schema:
+            type: object
+      tags:
+        - nodes
+        - patch
+      responses:
+        200:
+          description: patch succeeded
+          schema:
+            type: object
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /nodes/{identifier}/tags/{tagName}:
+    x-swagger-router-controller: nodes
+    delete:
+      operationId: nodesDelTagById
+      summary: |
+        Delete a tag from the specified node.
+      description: |
+        Delete a tag from the specified node.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses or unique aliases to identify the node by
+          required: true
+          type: string
+        - name: tagName
+          in: path
+          description: The name of the tag
+          required: true
+          type: string
+      tags:
+        - nodes
+        - delete
+      responses:
+        204:
+          description: Delete successful
+        404:
+          description: The node with the identifier was not found.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /nodes:
     x-swagger-router-controller: nodes
     get:
@@ -1458,6 +1561,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  
   /lookups:
     x-swagger-router-controller: unimplemented
     get:
@@ -1846,6 +1950,194 @@ paths:
               $ref: '#/definitions/lease'
         default:
           description: NotFound error
+  /tags:
+    x-swagger-router-controller: tags
+    get:
+      operationId: getAllTags
+      summary: Retrieve information about all tags
+      description: |
+        Retrieve information about all tags
+      tags: [ "/monorail/v2.0" ]
+      responses:
+        200:
+          description: |
+            An array of all tags
+          schema:
+            type: array
+            items: 
+              type: object
+        404:
+          description: |
+            The tag name identifier was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      operationId: createTag
+      summary: Create a new tag
+      description: |
+        Create a new tag
+      parameters:
+        - name: body
+          in: body
+          description: tag creation options
+          required: true
+          schema:
+            type: object
+      tags: [ "/monorail/v2.0" ]
+      responses:
+        200:
+          description: |
+            The created tag
+          schema:
+            type: object
+        500:
+          description: |
+            The tag could not be created
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /tags/{tagName}:
+    x-swagger-router-controller: tags
+    get:
+      operationId: getTag
+      summary: Retrieve information about the tag
+      description: |
+        Retrieve information about the tag
+      parameters:
+        - name: tagName
+          in: path
+          description: The tag identifier
+          required: true
+          type: string
+      tags: [ "/monorail/v2.0" ]
+      responses:
+        200:
+          description: |
+            The information about the specified tag
+          schema:
+            type: object
+        404:
+          description: |
+            The tag name identifier was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      operationId: deleteTag
+      summary: Delete the specified tag
+      description: |
+        Delete the specified tag
+      parameters:
+        - name: tagName
+          in: path
+          description: The tag identifier
+          required: true
+          type: string
+      tags: [ "/monorail/v2.0" ]
+      responses:
+        204:
+          description: |
+            No content
+          schema:
+            type: object
+        404:
+          description: |
+            The tag name identifier was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /tags/{tagName}/nodes:
+    x-swagger-router-controller: tags
+    get:
+      operationId: getNodesByTag
+      summary: Retrieve nodes with the specified tag
+      description: |
+        Retrieve nodes with the specified tag
+      parameters:
+        - name: tagName
+          in: path
+          description: The tag identifier
+          required: true
+          type: string
+      tags: [ "/monorail/v2.0" ]
+      responses:
+        200:
+          description: |
+            The list of nodes with the specified tag
+          schema:
+            type: array
+            items:
+              type: object
+        404:
+          description: |
+            The node with the identifier was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /tags/{tagName}/nodes/workflows:
+    x-swagger-router-controller: tags
+    post:
+      operationId: postWorkflowById
+      summary: |
+        create workflow for nodes with the specified tag
+      description: |
+        create workflow for nodes with the specified tag
+      parameters:
+        - name: tagName
+          in: path
+          description: The tag identifier
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: Workflow options
+          required: false
+          schema:
+            type: object
+        - name: name
+          in: query
+          description: Workflow name
+          required: false
+          type: string
+# The OpenAPI Specification 2.0 does not allow type:object for a parameter in a query.  We will use the express req.query to decode
+#        - name: options
+#          in: query
+#          description: options
+#          required: false
+#          type: object
+      tags: [ "/monorail/v2.0" ]
+      responses:
+        202:
+          description: |
+            the workflow has been accepted
+          schema:
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
 definitions:
   ErrorResponse:

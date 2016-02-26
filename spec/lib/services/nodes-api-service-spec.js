@@ -736,4 +736,88 @@ describe("Http.Services.Api.Nodes", function () {
 
     });
 
+    describe('Tagging', function() {
+        var node = {
+            id: '1234abcd1234abcd1234abce'
+        };
+
+        before(function() {
+            waterline.nodes.addTags = sinon.stub().resolves();
+            waterline.nodes.remTags = sinon.stub().resolves();
+            waterline.nodes.findByTag = sinon.stub().resolves();
+        });
+
+        beforeEach(function() {
+            waterline.nodes.addTags.reset();
+            waterline.nodes.remTags.reset();
+            waterline.nodes.findByTag.reset();
+        });
+
+        after(function() {
+            delete waterline.nodes.addTags;
+            delete waterline.nodes.remTags;
+            delete waterline.nodes.findByTag;
+        });
+
+        it('should call waterline to add a tag array', function() {
+            var tags = ['tag'];
+            needByIdentifier.withArgs(node.id).resolves(node);
+            return nodeApiService.addTagsById(node.id, tags)
+                .then(function() {
+                    expect(waterline.nodes.addTags).to.have.been.calledWith(node.id, tags);
+                    expect(needByIdentifier).to.have.been.calledWith(node.id);
+                });
+        });
+
+        it('should reject an invalid tag array', function() {
+            return nodeApiService.addTagsById(node.id, 'tag')
+                .catch(function(e) {
+                    expect(e).to.have.property('name').that.equals('AssertionError');
+                    expect(waterline.nodes.addTags).to.not.be.called;
+                    expect(needByIdentifier).to.not.be.called;
+                });
+        });
+
+        it('should call waterline to remove a tag', function() {
+            needByIdentifier.withArgs(node.id).resolves(node);
+            return nodeApiService.removeTagsById(node.id, 'tag')
+                .then(function() {
+                    expect(waterline.nodes.remTags).to.have.been.calledWith(node.id, 'tag');
+                    expect(needByIdentifier).to.have.been.calledWith(node.id);
+                });
+        });
+
+        it('should reject an invalid tag', function() {
+            return nodeApiService.removeTagsById(node.id, 1)
+                .catch(function(e) {
+                    expect(e).to.have.property('name').that.equals('AssertionError');
+                    expect(waterline.nodes.remTags).to.not.be.called;
+                    expect(needByIdentifier).to.not.be.called;
+                });
+        });
+
+        it('should call waterline to get tags on a node', function() {
+            needByIdentifier.withArgs(node.id).resolves(node);
+            return nodeApiService.getTagsById(node.id)
+                .then(function() {
+                    expect(needByIdentifier).to.have.been.calledWith(node.id);
+                });
+        });
+
+        it('should call waterline to get nodes with the tag', function() {
+            return nodeApiService.getNodesByTag('tag')
+                .then(function() {
+                    expect(waterline.nodes.findByTag).to.have.been.calledWith('tag');
+                });
+        });
+
+        it('should reject an invalid tag', function() {
+            return nodeApiService.getNodesByTag(1)
+                .catch(function(e) {
+                    expect(e).to.have.property('name').that.equals('AssertionError');
+                    expect(waterline.nodes.findByTag).to.not.be.called;
+                    expect(needByIdentifier).to.not.be.called;
+                });
+        });
+    });
 });
