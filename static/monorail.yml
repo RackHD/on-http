@@ -12,6 +12,13 @@ produces:
   # x-gzip explicitly for files once the bugs listed 
   #   in comments below are fixed by swagger team.
   - application/x-gzip
+securityDefinitions:
+  auth_token:
+    type: apiKey
+    name: authorization
+    in: header
+security:
+  - auth_token: []
 paths:
   /pollers/library:
     get:
