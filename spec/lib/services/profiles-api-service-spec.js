@@ -9,6 +9,7 @@ describe("Http.Services.Api.Profiles", function () {
     var workflowApiService;
     var eventsProtocol;
     var waterline;
+    var lookupService;
 
     before("Http.Services.Api.Profiles before", function() {
         helper.setupInjector([
@@ -26,6 +27,7 @@ describe("Http.Services.Api.Profiles", function () {
         taskProtocol = helper.injector.get("Protocol.Task");
         workflowApiService = helper.injector.get("Http.Services.Api.Workflows");
         eventsProtocol = helper.injector.get("Protocol.Events");
+        lookupService = helper.injector.get("Services.Lookup");
     });
 
     beforeEach("Http.Services.Api.Profiles beforeEach", function() {
@@ -45,6 +47,35 @@ describe("Http.Services.Api.Profiles", function () {
         return profileApiService.waitForDiscoveryStart("testnodeid")
         .then(function() {
             expect(taskProtocol.requestProperties).to.have.been.calledThrice;
+        });
+    });
+    
+    describe("setNode", function() {
+        var node;
+        var query = {
+            'ip':'ip',
+            'mac':'mac'
+        };
+        
+        it("setNode should add IP lookup entry for new node", function() {
+            this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
+            this.sandbox.stub(lookupService, 'setIpAddress').resolves();
+            return profileApiService.setNode(query)
+            .then(function() {
+                expect(lookupService.setIpAddress).to.be.called;
+            });
+        });
+        
+        it("setNode not add IP lookup entry for existing node", function() {
+            node = {
+                discovered: true
+            };
+            this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
+            this.sandbox.stub(lookupService, 'setIpAddress').resolves();
+            return profileApiService.setNode(query)
+            .then(function() {
+                expect(lookupService.setIpAddress).to.not.be.called;
+            });
         });
     });
 

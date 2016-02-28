@@ -75,7 +75,7 @@ describe('Http.Server', function () {
             // can't use port 443 because it requires setuid root
             singleService = new HttpService(
                 {
-                    'port': 8443,
+                    'port': 9443,
                     'httpsEnabled': true,
                     'httpsCert': 'data/dev-cert.pem',
                     'httpsKey': 'data/dev-key.pem'
@@ -86,7 +86,7 @@ describe('Http.Server', function () {
         });
 
         it('should respond to requests', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
             .get('/test')
             .expect(200)
             .expect('Hello World!');
@@ -128,7 +128,7 @@ describe('Http.Server', function () {
             var endpoints = [
                 {
                     'address': '0.0.0.0',
-                    'port': 8443,
+                    'port': 9443,
                     'httpsEnabled': true,
                     'httpsCert': 'data/dev-cert.pem',
                     'httpsKey': 'data/dev-key.pem',
@@ -136,7 +136,7 @@ describe('Http.Server', function () {
                 },
                 {
                     'address': '0.0.0.0',
-                    'port': 9080,
+                    'port': 9880,
                     'httpsEnabled': false,
                 },
                 {
@@ -158,14 +158,14 @@ describe('Http.Server', function () {
         });
 
         it('should respond to request to endpoint 1', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
             .get('/test/0')
             .expect(200)
             .expect('This is from endpoint path /test/0');
         });
 
         it('should respond to request to endpoint 2', function () {
-            return helper.request('http://localhost:9080')
+            return helper.request('http://localhost:9880')
             .get('/test/1')
             .expect(200)
             .expect('This is from endpoint path /test/1');

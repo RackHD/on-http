@@ -17,7 +17,7 @@ describe('Auth.Service', function () {
     var token = '';
     var endpoint = {
         "address": "0.0.0.0",
-        "port": 8443,
+        "port": 9443,
         "httpsEnabled": true,
         "httpsCert": "data/dev-cert.pem",
         "httpsKey": "data/dev-key.pem",
@@ -92,7 +92,7 @@ describe('Auth.Service', function () {
         });
 
         it('should return a token from /login', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(SUCCESS_STATUS)
@@ -103,13 +103,13 @@ describe('Auth.Service', function () {
         });
 
         it('should able to access with correct token in query string', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config?auth_token=' + token)
                 .expect(SUCCESS_STATUS);
         });
 
         it('should fail with wrong token in query string', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config?auth_token=' + token + 'balabalabala')
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function (res) {
@@ -119,7 +119,7 @@ describe('Auth.Service', function () {
         });
 
         it('should fail with empty token in query string', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config?auth_token=')
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function (res) {
@@ -129,7 +129,7 @@ describe('Auth.Service', function () {
         });
 
         it('should fail with wrong token key in query string', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config?auth_tokennnnnnnn=')
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function (res) {
@@ -139,7 +139,7 @@ describe('Auth.Service', function () {
         });
 
         it('should able to access with correct token in query header', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config')
                 .set("authorization", 'JWT ' + token)
                 .send()
@@ -147,7 +147,7 @@ describe('Auth.Service', function () {
         });
 
         it('should fail with wrong token in query header', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config')
                 .set("authorization", 'JWT ' + token + 'balabalabala')
                 .send()
@@ -159,7 +159,7 @@ describe('Auth.Service', function () {
         });
 
         it('should fail with empty token in query header', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config')
                 .set("authorization", '')
                 .send()
@@ -171,7 +171,7 @@ describe('Auth.Service', function () {
         });
 
         it('should fail with wrong token key in query header', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config')
                 .set("authorization_balabalabala", '')
                 .send()
@@ -183,14 +183,14 @@ describe('Auth.Service', function () {
         });
 
         it('should able to access with correct token in query body', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config')
                 .send({auth_token: token}) /* jshint ignore: line */
                 .expect(SUCCESS_STATUS);
         });
 
         it('should fail with wrong token in query body', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config')
                 .send({auth_token: token + 'balabalabala'}) /* jshint ignore: line */
                 .expect(UNAUTHORIZED_STATUS)
@@ -201,7 +201,7 @@ describe('Auth.Service', function () {
         });
 
         it('should fail with empty token in query body', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config')
                 .send({auth_token: ''}) /* jshint ignore: line */
                 .expect(UNAUTHORIZED_STATUS)
@@ -212,7 +212,7 @@ describe('Auth.Service', function () {
         });
 
         it('should fail with wrong token key in query body', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config')
                 .send({auth_tokennnnnnnnn: token}) /* jshint ignore: line */
                 .expect(UNAUTHORIZED_STATUS)
@@ -223,7 +223,7 @@ describe('Auth.Service', function () {
         });
 
         it('should fail with no token at all', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config')
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function (res) {
@@ -247,7 +247,7 @@ describe('Auth.Service', function () {
         });
 
         it('should fail with auth', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config?auth_token=' + token)
                 .expect(ERROR_STATUS)
                 .expect(function(res) {
@@ -332,7 +332,7 @@ describe('Auth.Service', function () {
         });
 
         it('should return a token from /login', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(SUCCESS_STATUS)
@@ -348,7 +348,7 @@ describe('Auth.Service', function () {
             var Promise = helper.injector.get('Promise');
             return Promise.delay(1000)
                 .then(function(){
-                    return helper.request('https://localhost:8443')
+                    return helper.request('https://localhost:9443')
                         .get('/api/1.1/config?auth_token=' + token)
                         .expect(UNAUTHORIZED_STATUS)
                         .expect(function (res) {
@@ -380,7 +380,7 @@ describe('Auth.Service', function () {
         });
 
         it('should return a token from /login', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(SUCCESS_STATUS)
@@ -391,7 +391,7 @@ describe('Auth.Service', function () {
         });
 
         it('should able to access with correct token in query string', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config?auth_token=' + token)
                 .expect(SUCCESS_STATUS);
         });
@@ -401,7 +401,7 @@ describe('Auth.Service', function () {
             var Promise = helper.injector.get('Promise');
             return Promise.delay(1000)
                 .then(function(){
-                    return helper.request('https://localhost:8443')
+                    return helper.request('https://localhost:9443')
                         .get('/api/1.1/config?auth_token=' + token)
                         .expect(SUCCESS_STATUS);
                 });
@@ -425,7 +425,7 @@ describe('Auth.Service', function () {
         });
 
         it('should fail accessing /login with internal error', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(ERROR_STATUS)
@@ -459,7 +459,7 @@ describe('Auth.Service', function () {
         });
 
         it('should return a token from /login', function () {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(SUCCESS_STATUS)
@@ -472,7 +472,7 @@ describe('Auth.Service', function () {
         it('Should get token expire error', function() {
             this.timeout(5000);
 
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .get('/api/1.1/config?auth_token=' + token)
                 .expect(ERROR_STATUS)
                 .expect(function (res) {

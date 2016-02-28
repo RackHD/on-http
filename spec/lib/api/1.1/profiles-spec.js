@@ -40,6 +40,7 @@ describe('Http.Api.Profiles', function () {
         sinon.stub(profileApiService, 'getNode').resolves({});
         sinon.stub(profileApiService, 'createNodeAndRunDiscovery').resolves({});
         sinon.stub(profileApiService, 'runDiscovery').resolves({});
+        sinon.stub(profileApiService, 'setNode').resolves();
     });
 
     afterEach('teardown mocks', function () {
@@ -117,6 +118,15 @@ describe('Http.Api.Profiles', function () {
     });
 
     describe("GET /profiles", function() {
+        it("should receive both mac and ip query", function() {
+            return helper.request().get('/api/1.1/profiles?mac=00:01:02:03:04:05&&ip=1.1.1.1')
+                .expect(200)
+                .expect(function() {
+                    expect(profileApiService.setNode).to.have.been.called;
+                });
+        });
+        
+        
         it("should send down redirect.ipxe if 'macs' are not in req.query", function() {
             profileApiService.getNode.restore();
             return helper.request().get('/api/1.1/profiles')
