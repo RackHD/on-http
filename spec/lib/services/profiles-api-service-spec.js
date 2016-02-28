@@ -50,29 +50,29 @@ describe("Http.Services.Api.Profiles", function () {
         });
     });
     
-    describe("setNode", function() {
+    describe("setLookup", function() {
         var node;
         var query = {
             'ip':'ip',
             'mac':'mac'
         };
         
-        it("setNode should add IP lookup entry for new node", function() {
+        it("setLookup should add IP lookup entry for new node", function() {
             this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
-            return profileApiService.setNode(query)
+            return profileApiService.setLookup(query)
             .then(function() {
-                expect(lookupService.setIpAddress).to.be.called;
+                expect(lookupService.setIpAddress).to.be.calledOnce;
             });
         });
         
-        it("setNode not add IP lookup entry for existing node", function() {
+        it("setLookup not add IP lookup entry for existing node", function() {
             node = {
                 discovered: true
             };
             this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
-            return profileApiService.setNode(query)
+            return profileApiService.setLookup(query)
             .then(function() {
                 expect(lookupService.setIpAddress).to.not.be.called;
             });
