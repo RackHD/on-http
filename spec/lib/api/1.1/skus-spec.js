@@ -4,18 +4,18 @@
 'use strict';
 
 describe('Http.Api.Skus', function () {
-    var taskGraphProtocol;
+    var workflowApiService;
     before('start HTTP server', function () {
         this.timeout(5000);
-        taskGraphProtocol = {
-            runTaskGraph: sinon.stub()
+        workflowApiService = {
+            createAndRunGraph: sinon.stub()
         };
         helper.setupInjector([
             helper.require("/lib/services/sku-pack-service"),
             dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf')
         ]);
         return helper.startServer([
-            dihelper.simpleWrapper(taskGraphProtocol, 'Protocol.TaskGraphRunner')
+            dihelper.simpleWrapper(workflowApiService, 'Http.Services.Api.Workflows')
         ]);
     });
 
@@ -45,8 +45,8 @@ describe('Http.Api.Skus', function () {
             });
         });
 
-        beforeEach('reset runTaskGraph stub', function () {
-            taskGraphProtocol.runTaskGraph.reset();
+        beforeEach('reset createAndRunGraph stub', function () {
+            workflowApiService.createAndRunGraph.reset();
         });
 
         beforeEach('POST /sku', function () {
@@ -94,10 +94,16 @@ describe('Http.Api.Skus', function () {
         });
 
         it('should have regenerated SKUs', function () {
-            expect(taskGraphProtocol.runTaskGraph).to.have.been.calledOnce;
-            expect(taskGraphProtocol.runTaskGraph).to.have.been.calledWith('Graph.GenerateSku');
-            expect(taskGraphProtocol.runTaskGraph.firstCall.args[1])
-                .to.have.deep.property('defaults.nodeId', node.id);
+            expect(workflowApiService.createAndRunGraph).to.have.been.calledOnce;
+            expect(workflowApiService.createAndRunGraph)
+                .to.have.been.calledWith({
+                    name: 'Graph.GenerateSku',
+                    options: {
+                        defaults: {
+                            nodeId: node.id
+                        }
+                    }
+                });
         });
 
         it('should contain the new sku in GET /skus', function () {
@@ -115,8 +121,8 @@ describe('Http.Api.Skus', function () {
         describe('PATCH /skus/:id', function () {
             var updated;
 
-            beforeEach('reset runTaskGraph stub', function () {
-                taskGraphProtocol.runTaskGraph.reset();
+            beforeEach('reset createAndRunGraph stub', function () {
+                workflowApiService.createAndRunGraph.reset();
             });
 
             beforeEach('PATCH /skus/:id', function () {
@@ -139,10 +145,16 @@ describe('Http.Api.Skus', function () {
             });
 
             it('should have regenerated SKUs', function () {
-                expect(taskGraphProtocol.runTaskGraph).to.have.been.calledOnce;
-                expect(taskGraphProtocol.runTaskGraph).to.have.been.calledWith('Graph.GenerateSku');
-                expect(taskGraphProtocol.runTaskGraph.firstCall.args[1])
-                .to.have.deep.property('defaults.nodeId', node.id);
+                expect(workflowApiService.createAndRunGraph).to.have.been.calledOnce;
+                expect(workflowApiService.createAndRunGraph)
+                    .to.have.been.calledWith({
+                        name: 'Graph.GenerateSku',
+                        options: {
+                            defaults: {
+                                nodeId: node.id
+                            }
+                        }
+                    });
             });
         });
 
@@ -165,8 +177,8 @@ describe('Http.Api.Skus', function () {
         });
 
         describe('DELETE /skus/:id', function () {
-            beforeEach('reset runTaskGraph stub', function () {
-                taskGraphProtocol.runTaskGraph.reset();
+            beforeEach('reset createAndRunGraph stub', function () {
+                workflowApiService.createAndRunGraph.reset();
             });
 
             beforeEach('DELETE /skus/:id', function () {
@@ -175,10 +187,16 @@ describe('Http.Api.Skus', function () {
             });
 
             it('should have regenerated SKUs', function () {
-                expect(taskGraphProtocol.runTaskGraph).to.have.been.calledOnce;
-                expect(taskGraphProtocol.runTaskGraph).to.have.been.calledWith('Graph.GenerateSku');
-                expect(taskGraphProtocol.runTaskGraph.firstCall.args[1])
-                .to.have.deep.property('defaults.nodeId', node.id);
+                expect(workflowApiService.createAndRunGraph).to.have.been.calledOnce;
+                expect(workflowApiService.createAndRunGraph)
+                    .to.have.been.calledWith({
+                        name: 'Graph.GenerateSku',
+                        options: {
+                            defaults: {
+                                nodeId: node.id
+                            }
+                        }
+                    });
             });
 
             it('should 404 with GET /skus/:id ', function () {
@@ -209,31 +227,31 @@ describe('Http.Api.Skus', function () {
             var _resolve, _reject;
 
             beforeEach('setup', function () {
-                skuService = helper.injector.get('Http.Services.SkuPack'); 
+                skuService = helper.injector.get('Http.Services.SkuPack');
                 sinon.stub(skuService, 'installPack');
                 sinon.stub(skuService, 'registerPack');
                 skuService.installPack.resolves(['filename', 'contents']);
                 skuService.registerPack.resolves();
             });
 
-            beforeEach('reset runTaskGraph stub', function () {
-                taskGraphProtocol.runTaskGraph.resolves();
+            beforeEach('reset createAndRunGraph stub', function () {
+                workflowApiService.createAndRunGraph.resolves();
             });
 
             afterEach('teardown', function () {
                 skuService.installPack.restore();
-                skuService.registerPack.restore();                
+                skuService.registerPack.restore();
             });
 
             it('should process a .tar.gz file', function () {
                 var skus = helper.injector.get('Http.Api.Skus');
-                var fs = helper.injector.get('fs');                
+                var fs = helper.injector.get('fs');
                 var req = fs.createReadStream('spec/lib/services/sku-static/pack.tar.gz');
                 var Promise = helper.injector.get('Promise');
                 var promise = new Promise(function(resolve, reject) {
                     _resolve = resolve;
                     _reject = reject;
-                });                
+                });
                 var res = {
                     status: function(code) {
                         if(code === 201) {
@@ -243,7 +261,7 @@ describe('Http.Api.Skus', function () {
                     },
                     send: sinon.stub()
                 };
-                
+
                 req.on('open', function() {
                     skus.skuPackHandler(req, res);
                 });
@@ -257,13 +275,13 @@ describe('Http.Api.Skus', function () {
 
             it('should process a .tar.gz file with a sku', function() {
                 var skus = helper.injector.get('Http.Api.Skus');
-                var fs = helper.injector.get('fs');                
+                var fs = helper.injector.get('fs');
                 var req = fs.createReadStream('spec/lib/services/sku-static/pack.tar.gz');
                 var Promise = helper.injector.get('Promise');
                 var promise = new Promise(function(resolve, reject) {
                     _resolve = resolve;
                     _reject = reject;
-                });                
+                });
                 var res = {
                     status: function(code) {
                         if(code === 201) {
@@ -273,7 +291,7 @@ describe('Http.Api.Skus', function () {
                     },
                     send: sinon.stub()
                 };
-                
+
                 skus.skuPackHandler(req, res, 'skuid');
 
                 return promise.then(function(code) {
@@ -292,8 +310,8 @@ describe('Http.Api.Skus', function () {
                 });
             });
 
-            beforeEach('reset runTaskGraph stub', function () {
-                taskGraphProtocol.runTaskGraph.reset();
+            beforeEach('reset createAndRunGraph stub', function () {
+                workflowApiService.createAndRunGraph.reset();
             });
 
             beforeEach('POST /sku', function () {
