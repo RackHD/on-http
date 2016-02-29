@@ -6,7 +6,7 @@
 describe('Http.Api.Tags', function () {
     var configuration;
     var lookupService;
-    var taskGraphProtocol;
+    var workflowApiService;
     var Promise;
     var Errors;
     var nodesApi;
@@ -22,8 +22,8 @@ describe('Http.Api.Tags', function () {
             lookupService.ipAddressToNodeId = sinon.stub().resolves();
             sinon.stub(configuration);
 
-            taskGraphProtocol = helper.injector.get('Protocol.TaskGraphRunner');
-            sinon.stub(taskGraphProtocol);
+            workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
+            sinon.stub(workflowApiService);
 
             Promise = helper.injector.get('Promise');
             Errors = helper.injector.get('Errors');
@@ -44,7 +44,7 @@ describe('Http.Api.Tags', function () {
 
         resetStubs(configuration);
         resetStubs(lookupService);
-        resetStubs(taskGraphProtocol);
+        resetStubs(workflowApiService);
 
         lookupService = helper.injector.get('Services.Lookup');
         lookupService.ipAddressToMacAddress = sinon.stub().resolves();

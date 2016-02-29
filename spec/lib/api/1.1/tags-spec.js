@@ -4,7 +4,7 @@
 'use strict';
 
 describe('Http.Api.Tags', function () {
-    var taskGraphProtocol;
+    var workflowApiService;
     var waterline;
     var input = {
             name: 'tag-name',
@@ -26,15 +26,15 @@ describe('Http.Api.Tags', function () {
 
     before('start HTTP server', function () {
         this.timeout(5000);
-        taskGraphProtocol = {
-            runTaskGraph: sinon.stub()
+        workflowApiService = {
+            createAndRunGraph: sinon.stub()
         };
         helper.setupInjector([
             helper.require("/lib/services/sku-pack-service"),
             dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf')
         ]);
         return helper.startServer([
-            dihelper.simpleWrapper(taskGraphProtocol, 'Protocol.TaskGraphRunner')
+            dihelper.simpleWrapper(workflowApiService, 'Http.Services.Api.Workflows')
         ]).then(function() {
             waterline = helper.injector.get('Services.Waterline');
             sinon.stub(waterline.nodes, "find");
@@ -53,7 +53,7 @@ describe('Http.Api.Tags', function () {
         waterline.tags.find.resolves([input]);
         waterline.tags.findOne.resolves(input);
         waterline.tags.destroy.resolves();
-        taskGraphProtocol.runTaskGraph.reset();
+        workflowApiService.createAndRunGraph.reset();
     });
 
     after('stop HTTP server', function () {
@@ -83,10 +83,16 @@ describe('Http.Api.Tags', function () {
             var tag = req.body;
             expect(tag).to.have.property('name').that.equals(input.name);
             expect(tag).to.have.property('rules').that.deep.equals(input.rules);
-            expect(taskGraphProtocol.runTaskGraph).to.have.been.calledOnce;
-            expect(taskGraphProtocol.runTaskGraph).to.have.been.calledWith('Graph.GenerateTags');
-            expect(taskGraphProtocol.runTaskGraph.firstCall.args[1])
-                .to.have.deep.property('defaults.nodeId', node.id);
+            expect(workflowApiService.createAndRunGraph).to.have.been.calledOnce;
+            expect(workflowApiService.createAndRunGraph)
+                .to.have.been.calledWith({
+                    name: 'Graph.GenerateTags',
+                    options: {
+                        defaults: {
+                            nodeId: node.id
+                        }
+                    }
+                });
         });
     });
 
