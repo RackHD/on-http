@@ -94,7 +94,7 @@ describe('Http.Api.Profiles', function () {
     });
 
     describe('PUT /profiles/library/:id', function () {
-        it('should save a profile', function () {
+        it('should save a profile (octet-stream)', function () {
             profiles.put.resolves();
             return helper.request().put('/api/1.1/profiles/library/123')
             .set('Content-Type', 'application/octet-stream')
@@ -103,6 +103,20 @@ describe('Http.Api.Profiles', function () {
             .then(function () {
                 expect(profiles.put).to.have.been.calledOnce;
                 expect(profiles.put).to.have.been.calledWith('123');
+                expect(profiles.put.firstCall.args[1]).to.deep.equal('echo\n');
+            });
+        });
+
+        it('should save a profile (text/plain)', function () {
+            profiles.put.resolves();
+            return helper.request().put('/api/1.1/profiles/library/123')
+            .set('Content-Type', 'text/plain')
+            .send('echo\n')
+            .expect(200)
+            .then(function () {
+                expect(profiles.put).to.have.been.calledOnce;
+                expect(profiles.put).to.have.been.calledWith('123');
+                //console.log(profiles.put.firstCall.args[1]);
                 expect(profiles.put.firstCall.args[1]).to.deep.equal('echo\n');
             });
         });
