@@ -18,7 +18,7 @@ describe('Http.Api.Login', function () {
 
     var endpoint = {
         "address": "0.0.0.0",
-        "port": 8443,
+        "port": 9443,
         "httpsEnabled": true,
         "httpsCert": "data/dev-cert.pem",
         "httpsKey": "data/dev-key.pem",
@@ -85,7 +85,7 @@ describe('Http.Api.Login', function () {
         });
 
         it('should return a token with correct credential in request body', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(SUCCESS_STATUS)
@@ -95,7 +95,7 @@ describe('Http.Api.Login', function () {
         });
 
         it('should fail with wrong username in request body', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "balabalabala", password: "admin123"})
                 .expect(UNAUTHORIZED_STATUS)
@@ -106,7 +106,7 @@ describe('Http.Api.Login', function () {
         });
 
         it('should fail with wrong password in request body', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "admin", password: "balabalabala"})
                 .expect(UNAUTHORIZED_STATUS)
@@ -117,7 +117,7 @@ describe('Http.Api.Login', function () {
         });
 
         it('should fail with empty username in request body', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "", password: "admin123"})
                 .expect(BAD_REQUEST_STATUS)
@@ -128,7 +128,7 @@ describe('Http.Api.Login', function () {
         });
 
         it('should fail with empty password in request body', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "admin", password: ""})
                 .expect(BAD_REQUEST_STATUS)
@@ -139,7 +139,7 @@ describe('Http.Api.Login', function () {
         });
 
         it('should fail with no username key in request body', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({password: "admin123"})
                 .expect(BAD_REQUEST_STATUS)
@@ -150,7 +150,7 @@ describe('Http.Api.Login', function () {
         });
 
         it('should fail with no password key in request body', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "admin"})
                 .expect(BAD_REQUEST_STATUS)
@@ -164,7 +164,7 @@ describe('Http.Api.Login', function () {
         // with credential in the header. Following test will fail if auth header
         // is supported in the future, thus people will get alerted.
         it('should fail with credential in request header', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .set('username', 'admin')
                 .set('password', 'admin123')
@@ -176,7 +176,7 @@ describe('Http.Api.Login', function () {
         });
 
         it('should fail no credential at all - https', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .expect(BAD_REQUEST_STATUS)
                 .expect(function(res) {
@@ -237,7 +237,7 @@ describe('Http.Api.Login', function () {
         });
 
         it('should fail with auth disabled', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(NOT_FOUND_STATUS);
@@ -260,7 +260,7 @@ describe('Http.Api.Login', function () {
         });
 
         it('should fail with auth', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(ERROR_STATUS)
@@ -285,7 +285,7 @@ describe('Http.Api.Login', function () {
         });
 
         it('should fail with auth', function() {
-            return helper.request('https://localhost:8443')
+            return helper.request('https://localhost:9443')
                 .post('/login')
                 .send({username: "admin", password: "admin123"})
                 .expect(UNAUTHORIZED_STATUS)
