@@ -197,10 +197,10 @@ describe('Http.Server', function () {
                 {
                     "localPath": "/local/proxy1",
                     "server": "http://test.com",
-                    "remotePath": '/remote1'
+                    "remotePath": '/remote1/'
                 },
                 {
-                    "localPath": "/local/proxy2",
+                    "localPath": "local/proxy2",
                     "server": "http://test.com"
                 },
                 {
@@ -214,8 +214,8 @@ describe('Http.Server', function () {
                 },
                 {
                     'server': 'http://test.com',
-                    'remotePath': '/remote5',
-                    'localPath': '/local/proxy5'
+                    'remotePath': 'remote5',
+                    'localPath': '/local/proxy5/'
                 }
             ];
 

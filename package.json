@@ -18,12 +18,13 @@
   "dependencies": {
     "body-parser": "^1.10.1",
     "cors": "^2.5.2",
+    "debug": "^2.2.0",
     "di": "git+https://github.com/RackHD/di.js.git",
     "ejs": "^2.0.8",
     "es6-shim": "^0.22.2",
     "express": "^4.10.7",
-    "express-http-proxy": "^0.6.0",
     "glob": "^4.3.2",
+    "http-proxy-middleware": "~0.11.0",
     "jsonwebtoken": "^5.4.4",
     "lodash": "^3.10.1",
     "moment": "~2.11.1",
@@ -41,8 +42,7 @@
     "swagger-tools": "~0.9.11",
     "tar": "~2.2.1",
     "tv4": "~1.2.7",
-    "ws": "^0.8.0",
-    "debug": "^2.2.0"
+    "ws": "^0.8.0"
   },
   "devDependencies": {
     "apidoc": "^0.12.1",
