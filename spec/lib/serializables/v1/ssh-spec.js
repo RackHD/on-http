@@ -22,7 +22,7 @@ describe('Ssh Serializable V1', function () {
             this.subject = new Serializable();
         });
 
-        it('should redact encrypted password fields in config', function() {
+        it('should redact encrypted password fields', function() {
             return this.subject.serialize(
                 {
                     host: 'fake-host',
@@ -32,7 +32,7 @@ describe('Ssh Serializable V1', function () {
             ).should.eventually.have.property('password').that.equals('REDACTED');
         });
 
-        it('should redact encrypted privateKey fields in config', function() {
+        it('should redact encrypted privateKey fields', function() {
             return this.subject.serialize(
                 {
                     host: 'fake-host',
@@ -49,7 +49,60 @@ describe('Ssh Serializable V1', function () {
             this.subject = new Serializable();
         });
 
-        it('should encrypt password fields in config', function() {
+        it('should conform to a host/user/password schema', function() {
+            return this.subject.deserialize(
+                {
+                    host: 'fake-host',
+                    user: 'fake-user',
+                    password: 'fake-password'
+                }
+            ).should.be.fulfilled;
+        });
+
+        it('should conform to a host/user/publicKey/privateKey schema', function() {
+            return this.subject.deserialize(
+                {
+                    host: 'fake-host',
+                    user: 'fake-user',
+                    publicKey: 'fake-public-key',
+                    privateKey: 'fake-private-key'
+                }
+            ).should.be.fulfilled;
+        });
+
+        it('should optionally support both schemas', function() {
+            return this.subject.deserialize(
+                {
+                    host: 'fake-host',
+                    user: 'fake-user',
+                    password: 'fake-password',
+                    publicKey: 'fake-public-key',
+                    privateKey: 'fake-private-key'
+                }
+            ).should.be.fulfilled;
+        });
+
+        it('should fail on a bad host/user/password key schema', function() {
+            return this.subject.deserialize(
+                {
+                    host: 'fake-host',
+                    user: 'fake-user',
+                    publicKey: 'fake-public-key'
+                }
+            ).should.be.rejectedWith(/SchemaError/);
+        });
+
+        it('should fail on a bad host/user/public/private key schema', function() {
+            return this.subject.deserialize(
+                {
+                    host: 'fake-host',
+                    user: 'fake-user',
+                    publicKey: 'fake-public-key'
+                }
+            ).should.be.rejectedWith(/SchemaError/);
+        });
+
+        it('should encrypt password fields', function() {
             return this.subject.deserialize(
                 {
                     host: 'fake-host',
@@ -61,7 +114,7 @@ describe('Ssh Serializable V1', function () {
             ).and.not.equal('fake-password');
         });
 
-        it('should encrypt community fields in config', function() {
+        it('should encrypt privateKey fields', function() {
             return this.subject.deserialize(
                 {
                     host: 'fake-host',
