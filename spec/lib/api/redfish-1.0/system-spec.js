@@ -6,12 +6,14 @@
 describe('Redfish Systems Root', function () {
     var tv4;
     var validator;
+    var redfish;
     var waterline;
     var Promise;
     var taskProtocol;
     var template;
     var fs;
     var nodeApi;
+    var Errors;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -27,9 +29,11 @@ describe('Redfish Systems Root', function () {
             template = helper.injector.get('Templates');
             sinon.stub(template, "get", redirectGet);
 
-            validator = helper.injector.get('Http.Api.Services.Redfish');
+            redfish = helper.injector.get('Http.Api.Services.Redfish');
+            sinon.spy(redfish, 'render');
+
+            validator = helper.injector.get('Http.Api.Services.Schema');
             sinon.spy(validator, 'validate');
-            sinon.spy(validator, 'render');
 
             waterline = helper.injector.get('Services.Waterline');
             sinon.stub(waterline.nodes);
@@ -37,6 +41,7 @@ describe('Redfish Systems Root', function () {
             sinon.stub(waterline.workitems);
 
             Promise = helper.injector.get('Promise');
+            Errors = helper.injector.get('Errors');
 
             taskProtocol = helper.injector.get('Protocol.Task');
             sinon.stub(taskProtocol);
@@ -55,7 +60,7 @@ describe('Redfish Systems Root', function () {
         sinon.spy(tv4, "validate");
 
         validator.validate.reset();
-        validator.render.reset();
+        redfish.render.reset();
         nodeApi.setNodeWorkflowById.reset();
 
         function resetStubs(obj) {
@@ -76,8 +81,8 @@ describe('Redfish Systems Root', function () {
             id: '1234abcd1234abcd1234abcd',
             name: '1234abcd1234abcd1234abcd'
         }));
-        waterline.nodes.needByIdentifier.rejects();
-
+        waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
         nodeApi.setNodeWorkflowById.resolves({instanceId: 'abcdef'});
     });
 
@@ -87,7 +92,7 @@ describe('Redfish Systems Root', function () {
 
     after('stop HTTP server', function () {
         validator.validate.restore();
-        validator.render.restore();
+        redfish.render.restore();
         template.get.restore();
         nodeApi.setNodeWorkflowById.restore();
         
@@ -197,7 +202,7 @@ describe('Redfish Systems Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
                 expect(res.body['Members@odata.count']).to.equal(1);
                 expect(res.body.Members[0]['@odata.id']).to.equal('/redfish/v1/Systems/' + node.id);
             });
@@ -224,14 +229,14 @@ describe('Redfish Systems Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
-    it('should 500 an invalid system', function() {
+    it('should 404 an invalid system', function() {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id)
             .expect('Content-Type', /^application\/json/)
-            .expect(500);
+            .expect(404);
     });
 
     it('should return a valid processor list', function() {
@@ -247,14 +252,14 @@ describe('Redfish Systems Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
-    it('should 500 an invalid processor list', function() {
+    it('should 404 an invalid processor list', function() {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Processors')
             .expect('Content-Type', /^application\/json/)
-            .expect(500);
+            .expect(404);
     });
 
     it('should return a valid processor', function() {
@@ -270,14 +275,14 @@ describe('Redfish Systems Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
-    it('should 500 an invalid processor', function() {
+    it('should 404 an invalid processor', function() {
         return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/bad')
             .expect('Content-Type', /^application\/json/)
-            .expect(500);
+            .expect(404);
     });
 
     it('should return a valid simple storage list', function() {
@@ -299,14 +304,14 @@ describe('Redfish Systems Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
-    it('should 500 an invalid simple storage', function() {
+    it('should 404 an invalid simple storage', function() {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/SimpleStorage')
             .expect('Content-Type', /^application\/json/)
-            .expect(500);
+            .expect(404);
     });
 
     it('should return a valid simple storage device', function() {
@@ -330,15 +335,15 @@ describe('Redfish Systems Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
-    it('should 500 an invalid simple storage device', function() {
+    it('should 404 an invalid simple storage device', function() {
         return helper.request().get('/redfish/v1/Systems/' + node.id + 
                                     '/SimpleStorage/bad')
             .expect('Content-Type', /^application\/json/)
-            .expect(500);
+            .expect(404);
     });
 
     it('should return a valid log service', function() {
@@ -349,7 +354,7 @@ describe('Redfish Systems Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
@@ -369,15 +374,15 @@ describe('Redfish Systems Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
-    it('should 500 an invalid sel log service', function() {
+    it('should 404 an invalid sel log service', function() {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id + 
                                     '/LogServices/sel')
             .expect('Content-Type', /^application\/json/)
-            .expect(500);
+            .expect(404);
     });
 
     it('should return a valid sel log service entry collection', function() {
@@ -401,7 +406,7 @@ describe('Redfish Systems Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
     
@@ -421,17 +426,17 @@ describe('Redfish Systems Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
 
 
-    it('should 500 an invalid sel log service entry list', function() {
+    it('should 404 an invalid sel log service entry list', function() {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id + 
                                     '/LogServices/sel/Entries')
             .expect('Content-Type', /^application\/json/)
-            .expect(500);
+            .expect(404);
     });
 
     it('should return a valid sel log service entry', function() {
@@ -455,15 +460,15 @@ describe('Redfish Systems Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
-    it('should 500 an invalid sel log service entry', function() {
+    it('should 404 an invalid sel log service entry', function() {
         return helper.request().get('/redfish/v1/Systems/' + node.id + 
                                     '/LogServices/sel/Entries/abcdefg')
             .expect('Content-Type', /^application\/json/)
-            .expect(500);
+            .expect(404);
     });
 
     it('should return a valid reset type list', function() {
@@ -481,7 +486,7 @@ describe('Redfish Systems Root', function () {
                                     '/Actions/ComputerSystem.Reset')
             .send({ reset_type: "ForceRestart"})
             .expect('Content-Type', /^application\/json/)
-            .expect(202)
+            .expect(201)
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
@@ -523,7 +528,7 @@ describe('Redfish Systems Root', function () {
                                         '/Actions/RackHD.BootImage')
                 .send( _.merge(minimumValidBody, {osName: osName}) )
                 .expect('Content-Type', /^application\/json/)
-                .expect(202)
+                .expect(201)
                 .expect(function(res) {
                     expect(tv4.validate.called).to.be.true;
                     expect(validator.validate.called).to.be.true;
@@ -550,5 +555,6 @@ describe('Redfish Systems Root', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(400);
     });
+
 });
 
