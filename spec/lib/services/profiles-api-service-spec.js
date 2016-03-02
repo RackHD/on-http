@@ -66,7 +66,7 @@ describe("Http.Services.Api.Profiles", function () {
             });
         });
         
-        it("setLookup not add IP lookup entry for existing node", function() {
+        it("setLookup does not add IP lookup entry for existing node", function() {
             node = {
                 discovered: true
             };
@@ -77,6 +77,15 @@ describe("Http.Services.Api.Profiles", function () {
                 expect(lookupService.setIpAddress).to.not.be.called;
             });
         });
+        
+        it("setLookup does not lookup node on missing required query string", function() {
+            this.sandbox.stub(lookupService, 'setIpAddress').resolves();
+            return profileApiService.setLookup({macs:'macs'})
+            .then(function() {
+                expect(lookupService.setIpAddress).to.not.be.called;
+            });
+        });
+        
     });
 
     describe("getNode", function() {

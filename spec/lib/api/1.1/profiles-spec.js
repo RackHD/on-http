@@ -141,7 +141,7 @@ describe('Http.Api.Profiles', function () {
         });
         
         it("should send 500 set mac and ip fails", function() {
-            profileApiService.setLookup.rejects();
+            profileApiService.setLookup.rejects(new Error('error'));
             return helper.request().get('/api/1.1/profiles?mac=00:01:02:03:04:05&&ip=1.1.1.1')
                 .expect(500);
         });
