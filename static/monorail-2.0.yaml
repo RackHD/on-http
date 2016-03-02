@@ -1726,7 +1726,7 @@ paths:
       summary: |
         set the obm settings associated with a node.
       description: |
-        set he obm settings associated with a node.
+        set the obm settings associated with a node.
       parameters:
         - name: identifier
           in: path
@@ -1756,6 +1756,71 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+  /nodes/{identifier}/ssh:
+    x-swagger-router-controller: nodes
+    get:
+      x-swagger-serializer: nodes
+      # swagger template and schema names (not sure how to get schema in fitting)...
+      operationId: nodesGetSshById
+      summary: |
+        get the ssh settings associated with a node.
+      description: |
+        get the ssh settings associated with a node.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          description: ssh settings
+          schema:
+            type: object
+        404:
+          description: |
+            The node with the identifier was not found or has no ssh settings.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      x-swagger-deserializer: nodes
+      # swagger template and schema names (not sure how to get schema in fitting)...
+      operationId: nodesPostSshById
+      summary: |
+        set the ssh settings associated with a node.
+      description: |
+        set the ssh settings associated with a node.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by, |
+            expect a string or an array of strings.
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            ssh settings to apply.
+          required: true
+          schema:
+            $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        201:
+          description: ssh settings accepted
+        404:
+          description: |
+            The node with the identifier was not found or has no ssh settings.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /nodes/tags/{tagName}:
     x-swagger-router-controller: nodes
     delete:
@@ -1778,12 +1843,6 @@ paths:
           description: Delete successful
         404:
           description: The tag name identifier was not found.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
 
   /nodes/{identifier}:
     x-swagger-router-controller: nodes
