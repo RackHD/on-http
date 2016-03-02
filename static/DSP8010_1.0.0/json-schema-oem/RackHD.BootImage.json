@@ -35,7 +35,14 @@
                     "type": "string"
                 },
                 "osName": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "CentOS",
+                        "CentOS+KVM",
+                        "ESXi",
+                        "RHEL",
+                        "RHEL+KVM"
+                    ]
                 },
                 "repo": {
                     "type": "string"
@@ -62,6 +69,13 @@
                     "type": "string"
                 }
             },
+            "required": [
+                "domain",
+                "hostname",
+                "osName",
+                "rootPassword",
+                "dnsServers"
+            ],
             "description": "This is the base type for the boot image installation action."
         },
         "Users": {
@@ -113,10 +127,10 @@
                 "device": {
                     "type": "string"
                 },
-                "ipv4:": {
+                "ipv4": {
                     "$ref": "http://redfish.dmtf.org/schemas/v1/RackHD.BootImage.json#/definitions/NetworkAddress"
                 },
-                "ipv6:": {
+                "ipv6": {
                     "$ref": "http://redfish.dmtf.org/schemas/v1/RackHD.BootImage.json#/definitions/NetworkAddress"
                 }
             }

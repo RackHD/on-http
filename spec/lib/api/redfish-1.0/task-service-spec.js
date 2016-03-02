@@ -45,6 +45,7 @@ describe('Redfish TaskService', function () {
         .then(function() {
             graph = {
                 id: '566afe8a7e7b8f3751b951a5',
+                instanceId: '566afe8a7e7b8f3751b951a5',
                 _status: Constants.Task.States.Pending,
                 createdAt: '2016-01-21T17:51:23.395Z',
                 updatedAt: '2016-01-21T17:52:23.395Z',
