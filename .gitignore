@@ -49,3 +49,12 @@ static/tftp/
 static/web-ui/
 
 build/
+
+# HWIMO-BUILD artifacts
+on-http_*.dsc
+on-http_*.tar.gz
+on-http_*.build
+on-http_*.changes
+on-http_*.deb
+packagebuild
+
