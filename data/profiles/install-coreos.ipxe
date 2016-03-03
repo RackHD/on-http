@@ -1,5 +1,5 @@
 echo Starting CoreOS Stable installer
-set base-url http://<%=server%>:<%=port%>/coreos
+set base-url <%=repo%>
 # coreos.autologin <-- enable as kernel param to autologin for easier debugging
 # reference: https://coreos.com/os/docs/latest/booting-with-ipxe.html
 # JUST BOOT AND RUN COREOS
