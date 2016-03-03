@@ -195,17 +195,17 @@ describe('Http.Server', function () {
         before('start', function () {
             var proxyConfig = [
                 {
-                    "localPath": "/local/proxy1",
-                    "server": "http://test.com",
-                    "remotePath": '/remote1'
+                    'localPath': '/local/proxy1',
+                    'server': 'http://test.com',
+                    'remotePath': '/remote1/'
                 },
                 {
-                    "localPath": "/local/proxy2",
-                    "server": "http://test.com"
+                    'localPath': 'local/proxy2',
+                    'server': 'http://test.com'
                 },
                 {
-                    "server": "http://test.com",
-                    "remotePath": "/remote3"
+                    'server': 'http://test.com',
+                    'remotePath': '/remote3'
                 },
                 {
                     //this is to test whether server.listen can still run without speicfy server
@@ -214,8 +214,8 @@ describe('Http.Server', function () {
                 },
                 {
                     'server': 'http://test.com',
-                    'remotePath': '/remote5',
-                    'localPath': '/local/proxy5'
+                    'remotePath': 'remote5',
+                    'localPath': '/local/proxy5/'
                 }
             ];
 

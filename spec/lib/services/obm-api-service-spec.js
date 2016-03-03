@@ -6,7 +6,6 @@
 describe("Http.Services.Api.Obms", function () {
     var obmService;
     var Promise;
-    var chai = require('chai');
     chai.use(require('chai-string'));
     before("Http.Services.Api.Obms before", function() {
         helper.setupInjector([
