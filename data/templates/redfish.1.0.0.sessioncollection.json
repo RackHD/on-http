@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#SessionService/Sessions/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#SessionCollection.SessionCollection",
+    "Oem": {},
+    "Name": "Session Collection",
+    "Members@odata.count": <%= sessions.length %>,
+    "Members": [
+        <% sessions.forEach(function(session, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/SessionService/Sessions/<%= session.id %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}
