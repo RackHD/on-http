@@ -6,7 +6,6 @@
 describe("Http.Services.Api.Obms", function () {
     var obmService;
     var Promise;
-    chai.use(require('chai-string'));
     before("Http.Services.Api.Obms before", function() {
         helper.setupInjector([
             helper.require("/lib/services/obm-api-service.js")
@@ -201,10 +200,10 @@ describe("Http.Services.Api.Obms", function () {
 
         it('Run getObm', function() {
             var temp = obmService.getObmLib();
-            expect(temp.toString()).to.equalIgnoreCase(mockObms.toString());
+            expect(temp).to.deep.equal(mockObms);
         });
     });
-    
+
     describe("getObmLibById", function() {
         it('should expose the appropriate methods', function() {
             obmService.should.have.property('getObmLibById')
@@ -221,7 +220,7 @@ describe("Http.Services.Api.Obms", function () {
                           "service": "vmrun-obm-service"
                           };
             var temp = obmService.getObmLibById("vmrun-obm-service");
-            expect(temp.toString()).to.equalIgnoreCase(mockObm.toString());
+            expect(temp).to.deep.equal(mockObm);
         });
 
         it('should return undefined, when invalid id  is passed', function () {
