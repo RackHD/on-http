@@ -78,7 +78,7 @@ describe('Redfish Systems Root', function () {
         }));
         waterline.nodes.needByIdentifier.rejects();
 
-        nodeApi.setNodeWorkflowById.resolves({id: 'abcdef'});
+        nodeApi.setNodeWorkflowById.resolves({instanceId: 'abcdef'});
     });
 
     afterEach('tear down mocks', function () {

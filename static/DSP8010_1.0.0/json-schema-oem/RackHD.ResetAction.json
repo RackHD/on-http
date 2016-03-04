@@ -23,6 +23,9 @@
                     "$ref": "http://redfish.dmtf.org/schemas/v1/Resource.json#/definitions/ResetType"
                 }
             },
+            "required": [
+                "reset_type"
+            ],
             "description": "This is the base type for the reset action."
         }
     },
