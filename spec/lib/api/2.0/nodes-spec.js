@@ -364,6 +364,120 @@ describe('Http.Api.Nodes', function () {
         });
     });
 
+    describe('GET /nodes/:identifier/ssh', function () {
+        var sshNode = _.cloneDeep(node);
+        sshNode.sshSettings = {
+            host: '1.2.3.4',
+            user: 'myuser',
+            password: 'mypass'
+        };
+        var serializedSshSettings = {
+            host: '1.2.3.4',
+            user: 'myuser',
+            password: 'REDACTED'
+        };
+
+        it('should return a list of the node\'s ssh settings', function () {
+            waterline.nodes.needByIdentifier.resolves(sshNode);
+
+            return helper.request().get('/api/2.0/nodes/1234/ssh')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200, serializedSshSettings);
+        });
+
+        it('should return a 404 if the node was not found', function () {
+            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+
+            return helper.request().get('/api/2.0/nodes/1234/ssh')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+
+        it('should return a 404 if the node has no ssh settings', function () {
+            waterline.nodes.needByIdentifier.resolves({ id: node.id });
+
+            return helper.request().get('/api/2.0/nodes/1234/ssh')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+    });
+
+    describe('POST /nodes/:identifier/ssh', function () {
+        var sshNode = _.cloneDeep(node);
+        sshNode.sshSettings = {
+            host: '1.2.3.4',
+            user: 'myuser',
+            password: 'mypass'
+        };
+        var updatedSshSettings = {
+            'host': '5.5.5.5',
+            'user': 'myuser2',
+            'password': 'mypassword2'
+        };
+
+        it('should replace existing settings with a new set of ssh settings', function () {
+            var updated = _.cloneDeep(node);
+            updated.sshSettings = updatedSshSettings;
+            waterline.nodes.needByIdentifier.resolves(node);
+            waterline.nodes.updateByIdentifier.resolves(updated);
+            return helper.request().post('/api/2.0/nodes/1234/ssh')
+                .send(updatedSshSettings)
+                .expect('Content-Type', /^application\/json/)
+                .expect(201)
+                .expect(function (data) {
+                    expect(data.body.sshSettings).to.deep.equal(updatedSshSettings);
+                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledOnce;
+                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledWith(node.id);
+                    expect(waterline.nodes.updateByIdentifier.firstCall.args[1].sshSettings.host)
+                        .to.equal(updatedSshSettings.host);
+                });
+        });
+
+        it('should add a new set of ssh settings if none exist', function () {
+            waterline.nodes.needByIdentifier.resolves({ id: node.id });
+            var updated = _.cloneDeep(node);
+            updated.sshSettings = updatedSshSettings;
+            waterline.nodes.updateByIdentifier.resolves(updated);
+            return helper.request().post('/api/2.0/nodes/1234/ssh')
+                .send(updatedSshSettings)
+                .expect('Content-Type', /^application\/json/)
+                .expect(201)
+                .expect(function (data) {
+                    expect(data.body.sshSettings).to.deep.equal(updatedSshSettings);
+                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledOnce;
+                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledWith(node.id);
+                    expect(waterline.nodes.updateByIdentifier.firstCall.args[1].sshSettings.host)
+                        .to.equal(updatedSshSettings.host);
+                });
+        });
+
+        it('should not add a new unsupported ssh settings', function () {
+            waterline.nodes.needByIdentifier.resolves(node);
+            var invalidSetting = {
+                'host': '5.5.5.5'
+            };
+
+            waterline.nodes.needByIdentifier.resolves(node);
+
+            return helper.request().post('/api/2.0/nodes/1234/ssh')
+                .send(invalidSetting)
+                .expect('Content-Type', /^application\/json/)
+                .expect(400)
+                .expect(function () {
+                    expect(waterline.nodes.updateByIdentifier).to.not.have.been.called;
+                });
+        });
+
+        it('should return a 404 if the node was not found', function () {
+            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+
+            return helper.request().post('/api/2.0/nodes/1234/ssh')
+                .send(updatedSshSettings)
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+    });
+
     describe('GET /nodes/:identifier/catalogs', function() {
         it('should get a list of catalogs', function () {
             var node = {
