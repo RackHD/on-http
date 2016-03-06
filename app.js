@@ -16,7 +16,8 @@ di.annotate(Runner, new di.Inject(
         'Templates',
         'fileService',
         'Promise',
-        'Http.Services.SkuPack'
+        'Http.Services.SkuPack',
+        'Acl.Services'
     )
 );
 function Runner(
@@ -27,7 +28,8 @@ function Runner(
     templates,
     fileService,
     Promise,
-    skuPack
+    skuPack,
+    aclService
 ) {
     var services = [];
 
@@ -48,16 +50,18 @@ function Runner(
                 return skuPack.start(configuration.get('skuPackRoot', './skupack.d'));
             })
             .then(function() {
+                return aclService.start();
+            })
+            .then(function() {
                 var endpoints = configuration.get('httpEndpoints', [{port: 8080}]);
-                return Promise.map(endpoints, function(endpoint) {
-                    var service = new HttpService(endpoint);
-                    services.push(service);
-                    return Promise.resolve().then(function () {
-                        return service.createSwagger();
-                    }).then(function () {
+                services = Promise.map(endpoints, function(endpoint) {
+                    return new HttpService(endpoint);
+                }).each(function(service) {
+                    return service.createSwagger().then(function() {
                         return service.start();
                     });
                 });
+                return services;
             });
     }
 

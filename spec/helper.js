@@ -13,7 +13,7 @@ global.onHttpContext = index.onHttpContextFactory();
 // Legacy
 global.dihelper = onHttpContext.helper;
 
-helper.startServer = function (overrides) {
+helper.startServer = function (overrides, endpointOpt) {
     overrides = (overrides || []).concat([
         onHttpContext.helper.simpleWrapper({
             publishLog: sinon.stub().resolves()
@@ -33,11 +33,12 @@ helper.startServer = function (overrides) {
 
     helper.injector.get('Services.Configuration')
         .set('skuPackRoot', 'spec/lib/services/sku-static')
-        .set('httpEndpoints', [
+        .set('httpEndpoints', [ _.merge( {}, 
             {
                 'port': 8089,
                 'httpsEnabled': false
-            }
+            },
+            endpointOpt )
         ]);
 
     index.injector = helper.injector;

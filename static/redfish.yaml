@@ -24,6 +24,8 @@ paths:
   /:
     x-swagger-router-controller: service-root
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic', 'anonymous' ]
       summary: retrieve list of root-level resources 
       description: >
         This object represents the root Redfish service.  All values for resources described 
@@ -49,6 +51,8 @@ paths:
   /Chassis:
     x-swagger-router-controller: chassis
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of physical components
       description: >
         Defines a collection of physical components managed by the service
@@ -72,6 +76,8 @@ paths:
   /Chassis/{identifier}:
     x-swagger-router-controller: chassis
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve specific information for a physical component
       description: >
         Retrieves a detailed information catalog for the physical component 
@@ -101,6 +107,8 @@ paths:
   /Chassis/{identifier}/Thermal:
     x-swagger-router-controller: chassis
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: Retrieve thermal characteristics of a chassis
       description: >
         defines a collection of thermal elements contained within a resource.
@@ -129,6 +137,8 @@ paths:
   /Chassis/{identifier}/Power:
     x-swagger-router-controller: chassis
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: Retrieve power characteristics of a chassis
       description: >
         defines a collection of power elements contained within a resource.
@@ -157,6 +167,8 @@ paths:
   /Systems:
     x-swagger-router-controller: systems
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of computer systems
       description: retrieve list of computer systems
       operationId: listSystems
@@ -179,6 +191,8 @@ paths:
   /Systems/{identifier}:
     x-swagger-router-controller: systems
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve information for a specific computer systems (physical and/or virtual)
       description: >
         defines a computer system and its respective properties.  A computer system represents a 
@@ -212,6 +226,8 @@ paths:
   /Systems/{identifier}/Processors:
     x-swagger-router-controller: systems
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve the processor collection for the specified system identifier
       description: >
         defines a collection of processors contained within a resource.
@@ -242,6 +258,8 @@ paths:
   /Systems/{identifier}/Processors/{socket}:
     x-swagger-router-controller: systems
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve a specified processor for the specified system identifier
       description: >
         This represents the properties of a processor attached to a System.
@@ -276,6 +294,8 @@ paths:
   /Systems/{identifier}/SimpleStorage:
     x-swagger-router-controller: systems
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve the simple storage collection
       description: >
         Defines a collection of simple storage collections that are
@@ -307,6 +327,8 @@ paths:
   /Systems/{identifier}/SimpleStorage/{index}:
     x-swagger-router-controller: systems
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: Retrieve the simple storage collection by device identifier
       description: >
         Defines a collection of storage devices on the device specified by
@@ -342,6 +364,8 @@ paths:
   /Systems/{identifier}/LogServices:
     x-swagger-router-controller: systems
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of the logs for a computer system
       description: >
         Defines a collection of log services that are available for the system
@@ -373,6 +397,8 @@ paths:
   /Systems/{identifier}/LogServices/sel:
     x-swagger-router-controller: systems
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of the logs for a computer system
       description: >
         Defines a collection of SEL entries for the system described by
@@ -404,6 +430,8 @@ paths:
   /Systems/{identifier}/LogServices/sel/Entries:
     x-swagger-router-controller: systems
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of the logs entries for associated for log service
       description: >
         Defines a collection of entries for the system described by identifier
@@ -434,6 +462,8 @@ paths:
   /Systems/{identifier}/LogServices/sel/Entries/{entryId}:
     x-swagger-router-controller: systems
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve log entry by logId associated for log service
       description: >
         Defines a log entry specified by entryId within the LogService of the
@@ -469,6 +499,8 @@ paths:
   /Systems/{identifier}/Actions/ComputerSystem.Reset:
     x-swagger-router-controller: systems
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve the list of reset types for the specified compute node
       description: >
         Retrieve  a list of valid reset types for the system described by identifier
@@ -497,6 +529,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     post:
+      x-privileges: [ 'ConfigureComponents' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: reset a node
       description: >
         Perform the reset specified in the post data arguments on the system
@@ -532,6 +566,8 @@ paths:
   /Systems/{identifier}/Actions/RackHD.BootImage:
     x-swagger-router-controller: systems
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve the list of boot image types for the specified compute node
       description: >
         Retrieve  a list of valid boot image types for the system described by identifier
@@ -560,6 +596,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     post:
+      x-privileges: [ 'ConfigureComponents' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: install a boot image on a node
       description: >
         Perform the boot image installation specified in the post data arguments on 
@@ -596,6 +634,8 @@ paths:
   /AccountService:
     x-swagger-router-controller: unimplemented
     get:
+      x-privileges: [ 'ConfigureUsers' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve account service information
       operationId: unimplemented
       tags: [ "/redfish/v1" ]
@@ -613,6 +653,8 @@ paths:
   /EventService:
     x-swagger-router-controller: unimplemented
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of policies used by event service listeners
       operationId: unimplemented
       tags: [ "/redfish/v1" ]
@@ -630,6 +672,8 @@ paths:
   /ManagerAccounts:
     x-swagger-router-controller: unimplemented
     get:
+      x-privileges: [ 'ConfigureManager' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of manager accounts
       operationId: unimplemented
       tags: [ "/redfish/v1" ]
@@ -653,6 +697,8 @@ paths:
   /ManagerAccounts/{identifier}:
     x-swagger-router-controller: unimplemented
     get:
+      x-privileges: [ 'ConfigureManager' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve a manager account by name
       operationId: unimplemented
       tags: [ "/redfish/v1" ]
@@ -681,6 +727,8 @@ paths:
   /Managers:
     x-swagger-router-controller: unimplemented
     get:
+      x-privileges: [ 'ConfigureManager' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of management servers
       operationId: unimplemented
       tags: [ "/redfish/v1" ]
@@ -704,6 +752,8 @@ paths:
   /Managers/{identifier}:
     x-swagger-router-controller: unimplemented
     get:
+      x-privileges: [ 'ConfigureManager' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of management servers
       operationId: unimplemented
       tags: [ "/redfish/v1" ]
@@ -732,6 +782,8 @@ paths:
   /Registries:
     x-swagger-router-controller: unimplemented
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: Unspecified
       operationId: unimplemented
       tags: [ "/redfish/v1" ]
@@ -749,6 +801,8 @@ paths:
   /Roles:
     x-swagger-router-controller: unimplemented
     get:
+      x-privileges: [ 'ConfigureUsers' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of roles for use in ManagerAccounts
       operationId: unimplemented
       tags: [ "/redfish/v1" ]
@@ -772,6 +826,8 @@ paths:
   /Roles/{identifier}:
     x-swagger-router-controller: unimplemented
     get:
+      x-privileges: [ 'ConfigureUsers' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve a manager account role by name
       operationId: unimplemented
       tags: [ "/redfish/v1" ]
@@ -800,6 +856,7 @@ paths:
   /Schemas:
     x-swagger-router-controller: unimplemented
     get:
+      x-privileges: [ 'Login' ]
       summary: Unspecified
       operationId: unimplemented
       tags: [ "/redfish/v1" ]
@@ -817,6 +874,8 @@ paths:
   /SessionService:
     x-swagger-router-controller: session-service
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve a list of sessions
       operationId: getSessionService
       tags: [ "/redfish/v1" ]
@@ -840,6 +899,8 @@ paths:
   /SessionService/Sessions:
     x-swagger-router-controller: session-service
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve a sessions description
       operationId: getSessions
       tags: [ "/redfish/v1" ]
@@ -861,6 +922,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     post:
+      x-privileges: [ 'Login' ]
       summary: create a new session
       operationId: postSession
       tags: [ "/redfish/v1" ]
@@ -890,6 +952,8 @@ paths:
   /SessionService/Sessions/{identifier}:
     x-swagger-router-controller: session-service
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve session information
       operationId: getSessionInfo
       tags: [ "/redfish/v1" ]
@@ -916,6 +980,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     delete:
+      x-privileges: [ 'ConfigureSelf' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: logout of the session
       operationId: doLogoutSession
       tags: [ "/redfish/v1" ]
@@ -945,6 +1011,8 @@ paths:
   /TaskService:
     x-swagger-router-controller: task-service
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of all tasks
       description: This object represents the root Redfish service.
       operationId: taskServiceRoot
@@ -969,6 +1037,8 @@ paths:
   /TaskService/Tasks:
     x-swagger-router-controller: task-service
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of all tasks
       description: This object represents the root Redfish service.
       operationId: listTasks
@@ -993,6 +1063,8 @@ paths:
   /TaskService/Tasks/{identifier}:
     x-swagger-router-controller: task-service
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve a task entry by task Id
       description: This object represents the root Redfish service.
       operationId: getTask
@@ -1022,6 +1094,8 @@ paths:
   /TaskService/Oem/Tasks/{identifier}:
     x-swagger-router-controller: task-service
     get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of tasks per system Id
       description: This object represents the root Redfish service.
       operationId: getSystemTasks

@@ -39,6 +39,12 @@ describe('Redfish Session Service', function () {
             waterline = helper.injector.get('Services.Waterline');
             sinon.stub(waterline.graphobjects);
             sinon.stub(waterline.nodes);
+            sinon.stub(waterline.localusers, 'findOne');
+            waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
+                username: 'admin',
+                comparePassword: function(password) { return password === 'admin123' }
+            });
+            waterline.localusers.findOne.resolves();
 
             Promise = helper.injector.get('Promise');
 
@@ -87,6 +93,7 @@ describe('Redfish Session Service', function () {
 
         restoreStubs(waterline.graphobjects);
         restoreStubs(waterline.nodes);
+        waterline.localusers.findOne.restore();
         return helper.stopServer();
     });
 

@@ -85,6 +85,23 @@ describe('Auth.Service', function () {
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
     });
 
+    var waterline;
+    before('setup default admin user', function() {
+        waterline = helper.injector.get('Services.Waterline');
+        waterline.localusers = {
+            findOne: sinon.stub()
+        }
+        waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
+                username: 'admin',
+                comparePassword: function(password) { return password === 'admin123' }
+            });
+        waterline.localusers.findOne.resolves();
+    });
+
+    after('remove waterline definition', function() {
+        delete waterline.localusers;
+    });
+
     describe('Auth.Service', function () {
         var authServices;
         before('start http and https server with auth enabled', function () {
@@ -234,41 +251,6 @@ describe('Auth.Service', function () {
                 });
         });
 
-        it('should support basic authentication on redfish', function() {
-            return helper.request('https://localhost:9443')
-                .get('/redfish/v1/url')
-                .auth('admin', 'admin123')
-                .expect(404);
-        });
-
-        it('should fail basic auth with no credentials', function() {
-            return helper.request('https://localhost:9443')
-                .get('/redfish/v1/url')
-                .expect(401);
-        });
-
-        it('should support token auth on redfish', function () {
-            var token = authServices.addRedfishSession('user', '1');
-            return helper.request('https://localhost:9443')
-                .get('/redfish/v1/url')
-                .set('x-auth-token', token)
-                .expect(404)
-                .expect(function() {
-                    authServices.delRedfishSession('1');
-                });
-        });
-
-        it('should fail bad token on redfish', function() {
-            var token = authServices.addRedfishSession('user', '1');
-            return helper.request('https://localhost:9443')
-                .get('/redfish/v1/url')
-                .set('x-auth-token', token + 'bad')
-                .expect(401)
-                .expect(function() {
-                    authServices.delRedfishSession('1');
-                });
-        });
-
         after('Clean up', function () {
             cleanUp();
         });
@@ -296,45 +278,6 @@ describe('Auth.Service', function () {
         after('stop server, restore mock and configure',function () {
             sandbox.restore();
             cleanUp();
-        });
-    });
-
-    describe('Corrupted hash from config', function () {
-        before('Mock configure settings', function () {
-            this.timeout(5000);
-            helper.injector.get('Services.Configuration')
-                .set('authPasswordHash', 'aaa');
-        });
-
-        it('Should throw exception with wrong length of hash from config', function() {
-            var authService = helper.injector.get('Auth.Services');
-            expect(function () {
-                authService.init();
-            }).to.throw(Error);
-        });
-
-        after('stop server, restore mock and configure',function () {
-            restoreConfig();
-        });
-    });
-
-    describe('Corrupted salt from config', function () {
-        before('Mock configure settings', function () {
-            this.timeout(5000);
-
-            helper.injector.get('Services.Configuration')
-                .set('authPasswordSalt', 'aaa');
-        });
-
-        it('Should throw exception with wrong length of salt from config', function() {
-            var authService = helper.injector.get('Auth.Services');
-            expect(function () {
-                authService.init();
-            }).to.throw(Error);
-        });
-
-        after('stop server, restore mock and configure',function () {
-            restoreConfig();
         });
     });
 
@@ -449,34 +392,6 @@ describe('Auth.Service', function () {
         });
     });
 
-    describe('Should fail with crypto errors', function () {
-        before('start http and https server', function () {
-            this.timeout(5000);
-            var crypto = helper.injector.get('crypto');
-            sandbox.stub(crypto, 'pbkdf2',
-                function(password, salt, interation, bytes, callback) {
-                return callback('something');
-            });
-            setConfig();
-            startServer(endpoint);
-        });
-
-        it('should fail accessing /login with internal error', function () {
-            return helper.request('https://localhost:9443')
-                .post('/login')
-                .send({username: "admin", password: "admin123"})
-                .expect(ERROR_STATUS)
-                .expect(function(res) {
-                    expect(res.body.message).to.be.a('string');
-                    expect(res.body.message).to.equal('Internal server error');
-                });
-        });
-
-        after('stop server, restore mock and configure',function () {
-            cleanUp();
-        });
-    });
-
     describe('Should fail with token signature errors', function () {
         before('start http and https server', function () {
             this.timeout(5000);
@@ -511,10 +426,10 @@ describe('Auth.Service', function () {
 
             return helper.request('https://localhost:9443')
                 .get('/api/1.1/config?auth_token=' + token)
-                .expect(ERROR_STATUS)
+                .expect(401)
                 .expect(function (res) {
                     expect(res.body.message).to.be.a('string');
-                    expect(res.body.message).to.equal('Internal server error');
+                    expect(res.body.message).to.equal('Unauthorized');
                 });
         });
 

@@ -44,6 +44,8 @@ paths:
     x-swagger-router-controller: pollers
     get:
       operationId: pollersLibGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get list of possible library pollers
       description: |
@@ -63,6 +65,8 @@ paths:
     x-swagger-router-controller: pollers
     get:
       operationId: pollersLibByIdGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get a single library poller
       description: |
@@ -95,6 +99,8 @@ paths:
     get:
       x-swagger-serializer: pollers
       operationId: pollersGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get list of all pollers
       description: |
@@ -113,6 +119,8 @@ paths:
     post:
       x-swagger-deserializer: pollers
       operationId: pollersPost
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         create a poller
       description: |
@@ -140,6 +148,8 @@ paths:
     get:
       x-swagger-serializer: pollers
       operationId: pollersIdGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Get specifics of the specified poller
       description: |
@@ -170,6 +180,8 @@ paths:
     patch:
       x-swagger-deserializer: pollers
       operationId: pollersPatch
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         patch specifics of the specified poller
       description: |
@@ -205,6 +217,8 @@ paths:
             $ref: '#/definitions/Error'
     delete:
       operationId: pollersDelete
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         delete the specified poller
       description: |
@@ -234,6 +248,8 @@ paths:
     x-swagger-router-controller: pollers
     get:
       operationId: pollersDataGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Get data for the specific poller
       description: |
@@ -265,6 +281,8 @@ paths:
     x-swagger-router-controller: pollers
     get:
       operationId: pollersCurrentDataGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Get latest data for the specific poller
       description: |
@@ -297,6 +315,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get list of possible templates
       description: |
@@ -316,6 +336,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get a single template
       description: |
@@ -345,6 +367,8 @@ paths:
             $ref: '#/definitions/Error'
     put:
       operationId: unimplemented
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         put a single template
       description: |
@@ -377,6 +401,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get list of skus
       description: |
@@ -394,6 +420,8 @@ paths:
             $ref: '#/definitions/Error'
     post:
       operationId: unimplemented
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         create a sku
       description: |
@@ -418,6 +446,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get a single sku
       description: |
@@ -447,6 +477,8 @@ paths:
             $ref: '#/definitions/Error'
     patch:
       operationId: unimplemented
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         patch a single sku
       description: |
@@ -481,6 +513,8 @@ paths:
             $ref: '#/definitions/Error'
     delete:
       operationId: unimplemented
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Delete specific sku.
       description: |
@@ -512,6 +546,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get nodes for specific sku
       description: |
@@ -544,6 +580,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get list of possible profiles
       description: |
@@ -563,6 +601,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get a single profile
       description: |
@@ -592,6 +632,8 @@ paths:
             $ref: '#/definitions/Error'
     put:
       operationId: unimplemented
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         put a single profile
       description: |
@@ -625,6 +667,8 @@ paths:
     get:
       x-swagger-serializer: obms
       operationId: getObmLib
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get list of possible OBM services
       description: |
@@ -645,6 +689,8 @@ paths:
     get:
       x-swagger-serializer: obms
       operationId: getObmLibById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get a single OBM service
       description: |
@@ -677,6 +723,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         List all workflows available to run
       description: |
@@ -697,6 +745,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Fetch tasks from task library
       description: |
@@ -714,6 +764,8 @@ paths:
             $ref: '#/definitions/Error'
     put:
       operationId: unimplemented
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Add tasks to task library
       description: |
@@ -738,6 +790,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Fetch workflows
       description: |
@@ -755,6 +809,8 @@ paths:
             $ref: '#/definitions/Error'
     put:
       operationId: unimplemented
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         define new workflow
       description: |
@@ -780,6 +836,8 @@ paths:
     x-swagger-router-controller: nodes
     get:
       operationId: nodesGetActiveWorkflowById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Fetch currently running workflows for specified node
       description: |
@@ -810,6 +868,8 @@ paths:
             $ref: '#/definitions/Error'
     delete:
       operationId: nodesDelActiveWorkflowById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Cancel currently running workflows for specified node
       description: |
@@ -843,6 +903,8 @@ paths:
     x-swagger-router-controller: nodes
     get:
       operationId: nodesGetWorkflowById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Fetch all workflows for specified node
       description: |
@@ -873,6 +935,8 @@ paths:
             $ref: '#/definitions/Error'
     post:
       operationId: nodesPostWorkflowById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         create workflow for specified node
       description: |
@@ -925,6 +989,8 @@ paths:
     x-swagger-router-controller: nodes
     get:
       operationId: nodesGetPollersById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Fetch all pollers for specified node
       description: |
@@ -958,6 +1024,8 @@ paths:
     x-swagger-router-controller: nodes
     get:
       operationId: nodesGetCatalogSourceById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Fetch catalog of specified node for given source
       description: |
@@ -998,6 +1066,8 @@ paths:
     x-swagger-router-controller: nodes
     get:
       operationId: nodesGetCatalogById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Fetch catalog of specified node
       description: |
@@ -1031,6 +1101,8 @@ paths:
     x-swagger-router-controller: nodes
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Fetch status of identify light on node through OBM (if supported)
       description: |
@@ -1060,6 +1132,8 @@ paths:
             $ref: '#/definitions/Error'
     post:
       operationId: nodesPostObmIdById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Enable or disable identify light on node through OBM (if supported)
       description: |
@@ -1098,6 +1172,8 @@ paths:
       x-swagger-serializer: nodes
       # swagger template and schema names (not sure how to get schema in fitting)...
       operationId: nodesGetObmById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get the obm settings associated with a node.
       description: |
@@ -1129,6 +1205,8 @@ paths:
       x-swagger-deserializer: nodes
       # swagger template and schema names (not sure how to get schema in fitting)...
       operationId: nodesPostObmById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         set the obm settings associated with a node.
       description: |
@@ -1167,6 +1245,8 @@ paths:
       x-swagger-serializer: nodes
       # swagger template and schema names (not sure how to get schema in fitting)...
       operationId: nodesGetById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         List of all nodes or if there are none an empty object
       description: |
@@ -1197,6 +1277,8 @@ paths:
             $ref: '#/definitions/Error'
     delete:
       operationId: nodesDelById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Delete specified node.
       description: |
@@ -1225,6 +1307,8 @@ paths:
       x-swagger-deserializer: nodes
       # swagger template and schema names (not sure how to get schema in fitting)...
       operationId: nodesPatchById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Patch specified node
       description: |
@@ -1262,6 +1346,8 @@ paths:
     x-swagger-router-controller: nodes
     get:
       operationId: nodesGetTagsById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         List of all tags on the node or an empty object if there are none
       description: |
@@ -1291,6 +1377,8 @@ paths:
             $ref: '#/definitions/Error'
     patch:
       operationId: nodesPatchTagById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Patch tags onto specified node
       description: |
@@ -1327,6 +1415,8 @@ paths:
     x-swagger-router-controller: nodes
     delete:
       operationId: nodesDelTagById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         Delete a tag from the specified node.
       description: |
@@ -1360,6 +1450,8 @@ paths:
     get:
       x-swagger-serializer: nodes
       operationId: nodesGetAll
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         List of all nodes or if there are none an empty object
       description: |
@@ -1384,6 +1476,8 @@ paths:
       x-swagger-deserializer: nodes
       # swagger template and schema names (not sure how to get schema in fitting)...
       operationId: nodesPost
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         post
       description: |
@@ -1412,6 +1506,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         find all
       description: |
@@ -1430,6 +1526,8 @@ paths:
             $ref: '#/definitions/Error'
     post:
       operationId: unimplemented
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         find all
       description: |
@@ -1455,6 +1553,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         lookup id
       description: |
@@ -1479,6 +1579,8 @@ paths:
             $ref: '#/definitions/Error'
     post:
       operationId: unimplemented
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         post id
       description: |
@@ -1509,6 +1611,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get file based on uuid
       description: |
@@ -1542,6 +1646,8 @@ paths:
             $ref: '#/definitions/Error'
     put:
       operationId: unimplemented
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         put file based on filename
       description: |
@@ -1581,6 +1687,8 @@ paths:
             $ref: '#/definitions/Error'
     delete:
       operationId: unimplemented
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         delete file based on uuid
       description: |
@@ -1612,6 +1720,8 @@ paths:
     x-swagger-router-controller: config
     get:
       operationId: getConfig
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get server configuration
       description: |
@@ -1628,6 +1738,8 @@ paths:
             $ref: '#/definitions/Error'
     patch:
       operationId: patchConfig
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         patch/update server configuration
       description: |
@@ -1655,6 +1767,8 @@ paths:
     x-swagger-router-controller: catalogs
     get:
       operationId: getCatalog
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get list of all catalogs
       description: |
@@ -1682,6 +1796,8 @@ paths:
     x-swagger-router-controller: catalogs
     get:
       operationId: getCatalogById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get list of all catalogs
       description: |
@@ -1709,6 +1825,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get DHCP lease table
       description: |
@@ -1728,6 +1846,8 @@ paths:
     x-swagger-router-controller: unimplemented
     get:
       operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         fetch lease information for the mac specified
       description: |
@@ -1750,6 +1870,8 @@ paths:
           description: NotFound error
     delete:
       operationId: unimplemented
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: get list of all catalogs
       description: |
         Delete the lease for the mac specified and return information about deleted lease.
@@ -1773,6 +1895,8 @@ paths:
     x-swagger-router-controller: tags
     get:
       operationId: getAllTags
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: Retrieve information about all tags
       description: |
         Retrieve information about all tags
@@ -1796,6 +1920,8 @@ paths:
             $ref: '#/definitions/Error'
     post:
       operationId: createTag
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: Create a new tag
       description: |
         Create a new tag
@@ -1826,6 +1952,8 @@ paths:
     x-swagger-router-controller: tags
     get:
       operationId: getTag
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: Retrieve information about the tag
       description: |
         Retrieve information about the tag
@@ -1853,6 +1981,8 @@ paths:
             $ref: '#/definitions/Error'
     delete:
       operationId: deleteTag
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: Delete the specified tag
       description: |
         Delete the specified tag
@@ -1882,6 +2012,8 @@ paths:
     x-swagger-router-controller: tags
     get:
       operationId: getNodesByTag
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: Retrieve nodes with the specified tag
       description: |
         Retrieve nodes with the specified tag
@@ -1914,6 +2046,8 @@ paths:
     x-swagger-router-controller: tags
     post:
       operationId: postWorkflowById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         create workflow for nodes with the specified tag
       description: |
@@ -1957,7 +2091,60 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
+  /users:
+    x-swagger-router-controller: users
+    post:
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt', 'anonymous' ]
+      operationId: addUser
+      summary: |
+        Add a new user
+      description: |
+        Add a new user
+      parameters:
+        - name: body
+          in: body
+          description: User information
+          required: true
+          schema:
+            $ref: '#/definitions/user_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        201:
+          description: |
+            the user has been created
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      x-privileges: [ 'ConfigureUsers', 'ConfigureSelf' ]
+      x-authentication-type: [ 'jwt' ]
+      operationId: modifyUser
+      summary: |
+        Update properties on a user
+      description: |
+        Update properties on a user
+      parameters:
+        - name: body
+          in: body
+          description: User information
+          required: true
+          schema:
+            $ref: '#/definitions/user_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        201:
+          description: |
+            the user has been created
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /swagger:
     x-swagger-pipe: swagger_raw
 
@@ -2119,3 +2306,15 @@ definitions:
 
   generic_obj:
    type: object
+
+  user_obj:
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+    required:
+      - username
+      - password
