@@ -258,8 +258,12 @@ describe('Http.Api.Skus', function () {
                             _resolve(201);
                         }
                         _reject(code);
+                        return res;
                     },
-                    send: sinon.stub()
+                    send: sinon.stub(),
+                    json: function(obj) {
+                        return JSON.stringify(obj);
+                    }
                 };
 
                 req.on('open', function() {
@@ -288,8 +292,12 @@ describe('Http.Api.Skus', function () {
                             _resolve(201);
                         }
                         _reject(code);
+                        return res;
                     },
-                    send: sinon.stub()
+                    send: sinon.stub(),
+                    json: function(obj) {
+                        return JSON.stringify(obj);
+                    }
                 };
 
                 skus.skuPackHandler(req, res, 'skuid');

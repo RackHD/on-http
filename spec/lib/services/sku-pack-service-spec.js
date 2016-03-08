@@ -8,18 +8,21 @@ describe("SKU Pack Service", function() {
     var skuService;
     var fs;
     var waterline;
-    var taskRunner;
+    var workflowApiService;
     var Templates;
     var Profiles;
     var Env;
 
     before(function() {
         helper.setupInjector([
+            dihelper.simpleWrapper({}, 'TaskGraph.Store'),
+            dihelper.simpleWrapper({}, 'TaskGraph.TaskGraph'),
+            helper.require("/lib/services/workflow-api-service"),
             helper.require("/lib/services/sku-pack-service"),
             dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf')
         ]);
         waterline = helper.injector.get('Services.Waterline');
-        taskRunner = helper.injector.get('Protocol.TaskGraphRunner');
+        workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
         skuService = helper.injector.get('Http.Services.SkuPack');
         Templates = helper.injector.get('Templates');
         Profiles = helper.injector.get('Profiles');
@@ -134,21 +137,21 @@ describe("SKU Pack Service", function() {
                 create: sinon.stub()
             };
 
-            sinon.stub(taskRunner, "defineTask");
-            sinon.stub(taskRunner, "defineTaskGraph");
+            sinon.stub(workflowApiService, "defineTask");
+            sinon.stub(workflowApiService, "defineTaskGraph");
             sinon.stub(Templates, "put");
             sinon.stub(Profiles, "put");
             sinon.stub(Env, "set");
         });
 
         beforeEach(function() {
-            taskRunner.defineTask.reset();
-            taskRunner.defineTaskGraph.reset();
+            workflowApiService.defineTask.reset();
+            workflowApiService.defineTaskGraph.reset();
         });
 
         after(function() {
-            taskRunner.defineTask.restore();
-            taskRunner.defineTaskGraph.restore();
+            workflowApiService.defineTask.restore();
+            workflowApiService.defineTaskGraph.restore();
             Templates.put.restore();
             Profiles.put.restore();
             Env.set.restore();
@@ -162,17 +165,17 @@ describe("SKU Pack Service", function() {
             waterline.graphdefinitions.findOne.resolves();
             waterline.templates.findOne.resolves();
             waterline.profiles.findOne.resolves();
-            taskRunner.defineTask.resolves();
-            taskRunner.defineTaskGraph.resolves();
+            workflowApiService.defineTask.resolves();
+            workflowApiService.defineTaskGraph.resolves();
             return skuService.start('./valid').then(function() {
                 expect(('a' in skuService.skuHandlers)).to.equal(true);
                 expect(fs.readdirAsync.called).to.be.true;
                 expect(fs.statAsync.called).to.be.true;
                 expect(fs.readFileAsync.called).to.be.true;
-                taskRunner.defineTask.should.have.been.calledWith({
+                workflowApiService.defineTask.should.have.been.calledWith({
                     injectableName: 'Task.ABC::a'
                 });
-                taskRunner.defineTaskGraph.should.have.been.calledWith({
+                workflowApiService.defineTaskGraph.should.have.been.calledWith({
                     injectableName: 'Graph.ABC::a'
                 });
                 Env.set.should.have.been.calledWith('config', data.skuConfig, 'a');
@@ -182,15 +185,15 @@ describe("SKU Pack Service", function() {
         it('should not load a task if it is already loaded', function() {
             waterline.taskdefinitions.findOne.resolves({injectableName: 'Task.ABC::a'});
             waterline.graphdefinitions.findOne.resolves();
-            taskRunner.defineTask.resolves();
-            taskRunner.defineTaskGraph.resolves();
+            workflowApiService.defineTask.resolves();
+            workflowApiService.defineTaskGraph.resolves();
             return skuService.start('./valid').then(function() {
                 expect(('a' in skuService.skuHandlers)).to.equal(true);
                 expect(fs.readdirAsync.called).to.be.true;
                 expect(fs.statAsync.called).to.be.true;
                 expect(fs.readFileAsync.called).to.be.true;
-                taskRunner.defineTask.should.not.have.been.called;
-                taskRunner.defineTaskGraph.should.have.been.calledWith({
+                workflowApiService.defineTask.should.not.have.been.called;
+                workflowApiService.defineTaskGraph.should.have.been.calledWith({
                     injectableName: 'Graph.ABC::a'
                 });
             });
@@ -199,15 +202,19 @@ describe("SKU Pack Service", function() {
         it('should not load a graph if it is already loaded', function() {
             waterline.taskdefinitions.findOne.resolves();
             waterline.graphdefinitions.findOne.resolves({injectableName: 'Graph.ABC::a'});
-            taskRunner.defineTask.resolves();
-            taskRunner.defineTaskGraph.resolves();
+            workflowApiService.defineTask.resolves();
+            workflowApiService.defineTaskGraph.resolves();
             return skuService.start('./valid').then(function() {
                 expect(('a' in skuService.skuHandlers)).to.equal(true);
                 expect(fs.readdirAsync.called).to.be.true;
                 expect(fs.statAsync.called).to.be.true;
                 expect(fs.readFileAsync.called).to.be.true;
-                taskRunner.defineTask.should.have.been.calledWith({injectableName: 'Task.ABC::a'});
-                taskRunner.defineTaskGraph.should.not.have.been.called;
+                workflowApiService.defineTask.should.have.been.calledWith(
+                    {
+                        injectableName: 'Task.ABC::a'
+                    }
+                );
+                workflowApiService.defineTaskGraph.should.not.have.been.called;
             });
         });
 
@@ -259,7 +266,8 @@ describe("SKU Pack Service", function() {
             taskRoot: 'tasks',
             httpProfileRoot: 'profiles'
         };
-        fs.readdirAsync.withArgs('./valid').resolves(['static', 'templates', 'workflows', 'tasks', 'profiles']);
+        fs.readdirAsync.withArgs('./valid').resolves(
+            ['static', 'templates', 'workflows', 'tasks', 'profiles']);
         return skuService.validatePack(JSON.stringify(data), './valid').then(function(res) {
             expect(res).to.be.true;
             expect(fs.readdirAsync.called).to.be.true;
