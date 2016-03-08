@@ -1,0 +1,8 @@
+echo Starting SUSE <%=version%> installer >
+set base-url <%=repo%>
+set params linux install=${base-url} autoyast=http://<%=server%>:<%=port%>/api/common/templates/suse-autoinst.xml
+kernel ${base-url}/boot/x86_64/loader/linux
+initrd ${base-url}/boot/x86_64/loader/initrd
+imgargs linux ${params}
+boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell
+
