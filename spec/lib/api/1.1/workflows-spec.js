@@ -13,9 +13,11 @@ describe('Http.Api.Workflows', function () {
 
         waterline = {
             start: sinon.stub(),
-            stop: sinon.stub()
+            stop: sinon.stub(),
+            lookups: {
+                setIndexes: sinon.stub()
+            }
         };
-
         this.sandbox = sinon.sandbox.create();
 
         return helper.startServer([

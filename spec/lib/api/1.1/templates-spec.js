@@ -21,7 +21,10 @@ describe('Http.Api.Templates', function () {
         workflowApiService = {};
         waterline = {
             start: sinon.stub(),
-            stop: sinon.stub()
+            stop: sinon.stub(),
+            lookups: {
+                setIndexes: sinon.stub()
+            }
         };
         environment = {
             start: sinon.stub(),
