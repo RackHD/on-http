@@ -4,6 +4,7 @@
 
   <partitioning config:type="list">
     <drive>
+      <device><%=installDisk%></device>
       <use>all</use>
     </drive>
   </partitioning>
@@ -29,6 +30,7 @@
     <user>
       <encrypted config:type="boolean">true</encrypted>
       <fullname><%=user.name%></fullname>
+      <uid><%=user.uid%></uid>
       <user_password><%=user.encryptedPassword%></user_password>
       <username><%=user.name%></username>
     </user>
@@ -43,12 +45,90 @@
       <domain><%=domain%></domain>
       <hostname><%=hostname%></hostname>
       <write_hostname config:type="boolean">true</write_hostname>
+<% if( undefined !== dnsServers ) { %>
+      <nameservers config:type="list">
+  <% dnsServers.forEach(function(dns) { %>
+        <nameserver><%=dns%></nameserver>
+  <% }) %>
+      </nameservers>
+<% } %>
     </dns>
+
+  <interfaces config:type="list">
+<% if( undefined !== networkDevices ) { %>
+  <% ipv6 = 0 %>
+  <% networkDevices.forEach(function(n) { %>
+    <% if( undefined != n.ipv4 ) { %>
+      <% if( undefined != n.ipv4.vlanId ) { %>
+        <% n.ipv4.vlanId.forEach(function(vid) { %>
+        <interface>
+          <bootproto>none</bootproto>
+          <startmode>auto</startmode>
+          <device><%=n.device%>.<%=vid%></device>
+          <ipaddr><%=n.ipv4.ipAddr%></ipaddr>
+          <netmask><%=n.ipv4.netmask%></netmask>
+          <gateway><%=n.ipv4.gateway%></gateway>
+          <vlan>yes</vlan>
+        </interface>
+        <% }); %>
+      <% } else { %>
+        <interface>
+          <bootproto>none</bootproto>
+          <startmode>auto</startmode>
+          <device><%=n.device%></device>
+          <ipaddr><%=n.ipv4.ipAddr%></ipaddr>
+          <netmask><%=n.ipv4.netmask%></netmask>
+          <gateway><%=n.ipv4.gateway%></gateway>
+        </interface>
+      <% } %>
+    <% } %>
+    <% if( undefined != n.ipv6 ) { %>
+      <% if( undefined != n.ipv6.vlanId ) { %>
+        <% n.ipv6.vlanId.forEach(function(vid) { %>
+        <interface>
+          <bootproto>none</bootproto>
+          <startmode>auto</startmode>
+          <device><%=n.device%>.<%=vid%></device>
+          <ipaddr><%=n.ipv6.ipAddr%></ipaddr>
+          <netmask><%=n.ipv6.netmask%></netmask>
+          <gateway><%=n.ipv6.gateway%></gateway>
+          <vlan>yes</vlan>
+        </interface>
+          <% ipv6 = 1 %>
+        <% }); %>
+      <% } else { %>
+        <interface>
+          <bootproto>none</bootproto>
+          <startmode>auto</startmode>
+          <device><%=n.device%></device>
+          <ipaddr><%=n.ipv6.ipAddr%></ipaddr>
+          <netmask><%=n.ipv6.netmask%></netmask>
+          <gateway><%=n.ipv6.gateway%></gateway>
+        </interface>
+        <% ipv6 = 1 %>
+      <% } %>
+    <% } %>
+  <% }); %>
+<% } %>
+  </interfaces>
+
+  <!-- enable or disable ipv6 -->
+<% if( ipv6 ) { %>
+  <ipv6 config:type="boolean">true</ipv6>
+<% } %>
+
   </networking>
 
   <software>
     <packages config:type="list">
       <package>openssh</package>
+<% if( typeof kvm !== 'undefined' ) { %>
+      <package>qemu-kvm</package>
+      <package>virt-manager</package>
+      <package>libvirt</package>
+      <package>libvirt-python</package>
+      <package>bridge-utils</package>
+<% } %>
     </packages>
   </software>
   <services-manager>
@@ -68,7 +148,7 @@
         <!-- scripts for workflow completion -->
         <source> <![CDATA[
           #!/bin/sh
-          curl http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub
+          curl http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>
           ]]>
         </source>
       </script>
