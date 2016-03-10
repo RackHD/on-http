@@ -30,7 +30,9 @@
     <user>
       <encrypted config:type="boolean">true</encrypted>
       <fullname><%=user.name%></fullname>
+  <% if( undefined !== user.uid ) { %>
       <uid><%=user.uid%></uid>
+  <% } %>
       <user_password><%=user.encryptedPassword%></user_password>
       <username><%=user.name%></username>
     </user>
@@ -123,7 +125,11 @@
     <packages config:type="list">
       <package>openssh</package>
 <% if( typeof kvm !== 'undefined' ) { %>
+  <% if (version === "11") { %>
+      <package>kvm</package>
+  <% } else { %>
       <package>qemu-kvm</package>
+  <% } %>
       <package>virt-manager</package>
       <package>libvirt</package>
       <package>libvirt-python</package>
