@@ -29,12 +29,12 @@ describe('Http.Api.Users', function () {
             sinon.stub(waterline.localusers, 'update');
             waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
                 username: userObj.username,
-                comparePassword: function(password) { return password === 'admin123' },
+                comparePassword: function(password) { return password === 'admin123'; },
                 role: userObj.role
             });
             waterline.localusers.findOne.withArgs({username: 'readonly'}).resolves({
                 username: readOnlyObj.username,
-                comparePassword: function(password) { return password === 'read123' },
+                comparePassword: function(password) { return password === 'read123'; },
                 role: readOnlyObj.role
             });
             waterline.localusers.findOne.resolves();
@@ -75,7 +75,7 @@ describe('Http.Api.Users', function () {
             });
     });
 
-    it('should 200 a user post attempt with auth tokens', function() {
+    it('should 201 a user post attempt with auth tokens', function() {
         waterline.localusers.create.resolves(readOnlyObj);
         waterline.localusers.find.resolves([ userObj ]);
         return helper.request().post('/login')

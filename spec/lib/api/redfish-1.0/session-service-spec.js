@@ -42,7 +42,7 @@ describe('Redfish Session Service', function () {
             sinon.stub(waterline.localusers, 'findOne');
             waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
                 username: 'admin',
-                comparePassword: function(password) { return password === 'admin123' }
+                comparePassword: function(password) { return password === 'admin123'; }
             });
             waterline.localusers.findOne.resolves();
 

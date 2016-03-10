@@ -2115,6 +2115,14 @@ paths:
             the user has been created
           schema:
             type: object
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+        403:
+          description: Forbidden
+          schema:
+            type: object
         default:
           description: Unexpected error
           schema:
@@ -2136,9 +2144,17 @@ paths:
             $ref: '#/definitions/user_obj'
       tags: [ "/api/2.0" ]
       responses:
-        201:
+        200:
           description: |
-            the user has been created
+            the user has been updated
+          schema:
+            type: object
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+        403:
+          description: Forbidden
           schema:
             type: object
         default:

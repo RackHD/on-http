@@ -90,11 +90,11 @@ describe('Auth.Service', function () {
         waterline = helper.injector.get('Services.Waterline');
         waterline.localusers = {
             findOne: sinon.stub()
-        }
+        };
         waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
-                username: 'admin',
-                comparePassword: function(password) { return password === 'admin123' }
-            });
+            username: 'admin',
+            comparePassword: function(password) { return password === 'admin123'; }
+        });
         waterline.localusers.findOne.resolves();
     });
 
