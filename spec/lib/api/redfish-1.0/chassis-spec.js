@@ -5,18 +5,21 @@
 
 describe('Redfish Chassis Root', function () {
     var tv4;
-    var validator;
+    var redfish;
     var waterline;
     var Promise;
     var taskProtocol;
     var fs;
+    var validator;
 
     before('start HTTP server', function () {
         this.timeout(5000);
         return helper.startServer([]).then(function () {
-            validator = helper.injector.get('Http.Api.Services.Redfish');
+            redfish = helper.injector.get('Http.Api.Services.Redfish');
+            sinon.spy(redfish, 'render');
+
+            validator = helper.injector.get('Http.Api.Services.Schema');
             sinon.spy(validator, 'validate');
-            sinon.spy(validator, 'render');
 
             waterline = helper.injector.get('Services.Waterline');
             sinon.stub(waterline.nodes);
@@ -39,7 +42,7 @@ describe('Redfish Chassis Root', function () {
         sinon.spy(tv4, "validate");
 
         validator.validate.reset();
-        validator.render.reset();
+        redfish.render.reset();
 
         function resetStubs(obj) {
             _(obj).methods().forEach(function (method) {
@@ -61,7 +64,7 @@ describe('Redfish Chassis Root', function () {
 
     after('stop HTTP server', function () {
         validator.validate.restore();
-        validator.render.restore();
+        redfish.render.restore();
         
         function restoreStubs(obj) {
             _(obj).methods().forEach(function (method) {
@@ -116,7 +119,7 @@ describe('Redfish Chassis Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
                 expect(res.body['Members@odata.count']).to.equal(2);
                 expect(res.body.Members[0]['@odata.id'])
                     .to.equal('/redfish/v1/Chassis/' + enclosure.id);
@@ -148,7 +151,7 @@ describe('Redfish Chassis Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
@@ -175,7 +178,7 @@ describe('Redfish Chassis Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
@@ -220,7 +223,7 @@ describe('Redfish Chassis Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
@@ -265,7 +268,7 @@ describe('Redfish Chassis Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
@@ -310,7 +313,7 @@ describe('Redfish Chassis Root', function () {
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
@@ -352,10 +355,41 @@ describe('Redfish Chassis Root', function () {
         return helper.request().get('/redfish/v1/Chassis/ABCDEFG/Power')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
+
+    it('should 404 an invalid chassis object', function() {
+        waterline.nodes.findOne.resolves();
+        return helper.request().get('/redfish/v1/Chassis/ABCDEFG')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404)
+            .expect(function() {
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid chassis thermal object', function() {
+        waterline.nodes.findOne.resolves();
+        return helper.request().get('/redfish/v1/Chassis/ABCDEFG/Thermal')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404)
+            .expect(function() {
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid chassis power object', function() {
+        waterline.nodes.findOne.resolves();
+        return helper.request().get('/redfish/v1/Chassis/ABCDEFG/Power')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404)
+            .expect(function() {
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
 });

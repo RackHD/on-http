@@ -6,12 +6,14 @@
 describe('Redfish TaskService', function () {
     var tv4;
     var validator;
+    var redfish;
     var waterline;
     var Promise;
     var Constants;
     var template;
     var fs;
     var graph;
+    var Errors;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -29,15 +31,17 @@ describe('Redfish TaskService', function () {
             template = helper.injector.get('Templates');
             sinon.stub(template, "get", redirectGet);
 
-            validator = helper.injector.get('Http.Api.Services.Redfish');
+            validator = helper.injector.get('Http.Api.Services.Schema');
             sinon.spy(validator, 'validate');
-            sinon.spy(validator, 'render');
+            redfish = helper.injector.get('Http.Api.Services.Redfish');
+            sinon.spy(redfish, 'render');
 
             waterline = helper.injector.get('Services.Waterline');
             sinon.stub(waterline.graphobjects);
             sinon.stub(waterline.nodes);
 
             Promise = helper.injector.get('Promise');
+            Errors = helper.injector.get('Errors');
 
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
@@ -60,7 +64,7 @@ describe('Redfish TaskService', function () {
         sinon.spy(tv4, "validate");
 
         validator.validate.reset();
-        validator.render.reset();
+        redfish.render.reset();
 
         function resetStubs(obj) {
             _(obj).methods().forEach(function (method) {
@@ -80,7 +84,7 @@ describe('Redfish TaskService', function () {
 
     after('stop HTTP server', function () {
         validator.validate.restore();
-        validator.render.restore();
+        redfish.render.restore();
         template.get.restore();
 
         function restoreStubs(obj) {
@@ -104,7 +108,7 @@ describe('Redfish TaskService', function () {
             .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
@@ -116,7 +120,7 @@ describe('Redfish TaskService', function () {
             .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
@@ -128,7 +132,7 @@ describe('Redfish TaskService', function () {
             .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
@@ -147,15 +151,15 @@ describe('Redfish TaskService', function () {
             .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
-    it('should 500 an invalid system', function () {
+    it('should 404 an invalid system', function () {
         waterline.graphobjects.find.resolves([graph]);
-        waterline.nodes.needByIdentifier.rejects();
+        waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError());
         return helper.request().get('/redfish/v1/TaskService/Oem/Tasks/' + graph.node + 'invalid')
-            .expect(500);
+            .expect(404);
     });
 });
 

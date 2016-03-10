@@ -5,7 +5,7 @@
 require('../../helper');
 
 describe("Redfish Validator Service", function() {
-    var validator;
+    var redfish;
     var template;
     var _;
     var testObj = {
@@ -24,10 +24,11 @@ describe("Redfish Validator Service", function() {
 
     before(function() {
         helper.setupInjector([
+            helper.require("/lib/services/schema-api-service"),
             helper.require("/lib/services/redfish-validator-service"),
             dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf')
         ]);
-        validator = helper.injector.get('Http.Api.Services.Redfish');
+        redfish = helper.injector.get('Http.Api.Services.Redfish');
         template = helper.injector.get('Templates');
         _ = helper.injector.get('_');
 
@@ -42,60 +43,15 @@ describe("Redfish Validator Service", function() {
         template.get.restore();
     });
 
-    it('should have an empty missing', function(done) {
-        expect(validator.missing()).to.be.empty;
-        done();
-    });
-
-    it('should validate an object against a valid schema', function() {
-        var schemaName = 'ComputerSystemCollection.json#/definitions/ComputerSystemCollection';
-        return validator.validate(testObj, schemaName)
-            .then(function(result) {
-                expect(result.error).to.be.empty;
-                expect(result.missing).to.be.empty;
-                expect(result.valid).to.be.true;
-            });
-    });
-
-    it('should fail an invalid object with a valid schema', function() {
-        var obj = _.merge({}, testObj, { extraParam: 'bad' });
-        var schemaName = 'ComputerSystemCollection.json#/definitions/ComputerSystemCollection';
-        return validator.validate(obj, schemaName)
-            .then(function(result) {
-                expect(result.error).have.length(2);
-                expect(result.missing).to.be.empty;
-                expect(result.valid).to.be.false;
-            });
-    });
-
-    it('should validate an object', function() {
-        return validator.validate(testObj)
-            .then(function(result) {
-                expect(result.error).to.be.empty;
-                expect(result.missing).to.be.empty;
-                expect(result.valid).to.be.true;
-            });
-    });
-
-    it('should fail an invalid object with a valid schema', function() {
-        var obj = _.merge({}, testObj, { extraParam: 'bad' });
-        return validator.validate(obj)
-            .then(function(result) {
-                expect(result.error).to.have.length(1);
-                expect(result.missing).to.be.empty;
-                expect(result.valid).to.be.false;
-            });
-    });
-
     it('should get and render without validation', function() {
-        return validator.get('templateName', {})
+        return redfish.get('templateName', {})
             .then(function(result) {
                 expect(result).to.deep.equal(testObj);
             });
     });
 
     it('should get and render with validation', function() {
-        return validator.render('templateName', null, {})
+        return redfish.render('templateName', null, {})
             .then(function(result) {
                 expect(result).to.deep.equal(testObj);
             });

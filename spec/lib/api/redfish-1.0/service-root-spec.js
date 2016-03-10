@@ -6,6 +6,7 @@
 describe('Redfish Endpoint', function () {
     var configuration;
     var tv4;
+    var redfish;
     var validator;
     var fs;
     var Promise;
@@ -22,9 +23,10 @@ describe('Redfish Endpoint', function () {
     before('start HTTP server', function () {
         this.timeout(5000);
         return helper.startServer([]).then(function () {
-            validator = helper.injector.get('Http.Api.Services.Redfish');
+            redfish = helper.injector.get('Http.Api.Services.Redfish');
+            sinon.spy(redfish, 'render');
+            validator = helper.injector.get('Http.Api.Services.Schema');
             sinon.spy(validator, 'validate');
-            sinon.spy(validator, 'render');
             template = helper.injector.get('Templates');
             sinon.stub(template, "get", redirectGet);
             Promise = helper.injector.get('Promise');
@@ -38,7 +40,7 @@ describe('Redfish Endpoint', function () {
         sinon.spy(tv4, "validate");
 
         validator.validate.reset();
-        validator.render.reset();
+        redfish.render.reset();
     });
 
     afterEach('tear down mocks', function () {
@@ -47,7 +49,7 @@ describe('Redfish Endpoint', function () {
 
     after('stop HTTP server', function () {
         validator.validate.restore();
-        validator.render.restore();
+        redfish.render.restore();
         template.get.restore();
         return helper.stopServer();
     });
@@ -59,7 +61,7 @@ describe('Redfish Endpoint', function () {
             .expect(function(resp) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
                 expect(resp.body.Systems).to.be.an('object');
                 expect(resp.body.Chassis).to.be.an('object');
                 expect(resp.body.Managers).to.be.an('object');

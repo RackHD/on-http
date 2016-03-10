@@ -6,6 +6,7 @@
 describe('Redfish Session Service', function () {
     var tv4;
     var validator;
+    var redfish;
     var waterline;
     var Promise;
     var Constants;
@@ -29,9 +30,11 @@ describe('Redfish Session Service', function () {
             template = helper.injector.get('Templates');
             sinon.stub(template, "get", redirectGet);
 
-            validator = helper.injector.get('Http.Api.Services.Redfish');
+            redfish = helper.injector.get('Http.Api.Services.Redfish');
+            sinon.spy(redfish, 'render');
+
+            validator = helper.injector.get('Http.Api.Services.Schema');
             sinon.spy(validator, 'validate');
-            sinon.spy(validator, 'render');
 
             waterline = helper.injector.get('Services.Waterline');
             sinon.stub(waterline.graphobjects);
@@ -51,7 +54,7 @@ describe('Redfish Session Service', function () {
         sinon.spy(tv4, "validate");
 
         validator.validate.reset();
-        validator.render.reset();
+        redfish.render.reset();
 
         function resetStubs(obj) {
             _(obj).methods().forEach(function (method) {
@@ -71,7 +74,7 @@ describe('Redfish Session Service', function () {
 
     after('stop HTTP server', function () {
         validator.validate.restore();
-        validator.render.restore();
+        redfish.render.restore();
         template.get.restore();
 
         function restoreStubs(obj) {
@@ -94,7 +97,7 @@ describe('Redfish Session Service', function () {
             .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
@@ -105,7 +108,7 @@ describe('Redfish Session Service', function () {
             .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
-                expect(validator.render.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
             });
     });
 
@@ -135,7 +138,7 @@ describe('Redfish Session Service', function () {
                 .expect(function() {
                     expect(tv4.validate.called).to.be.true;
                     expect(validator.validate.called).to.be.true;
-                    expect(validator.render.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
                 });
         });
 
@@ -151,7 +154,7 @@ describe('Redfish Session Service', function () {
                 .expect(function(res) {
                     expect(tv4.validate.called).to.be.true;
                     expect(validator.validate.called).to.be.true;
-                    expect(validator.render.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
                     expect(res.body['Members@odata.count']).to.equal(1);
                     expect(res.body.Members[0]['@odata.id'])
                         .to.equal('/redfish/v1/SessionService/Sessions/' + id);

@@ -1,0 +1,12 @@
+{
+    "error": {
+        "code": "<%= code %>",
+        "message": "<%= message %>",
+        "@Message.ExtendedInfo": [
+        <% messages.forEach(function(message, i, arr) { %>
+            <%- JSON.stringify(message) %>
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+        ]
+    }
+}
