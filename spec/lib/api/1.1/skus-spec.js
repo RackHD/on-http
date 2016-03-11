@@ -5,6 +5,7 @@
 
 describe('Http.Api.Skus', function () {
     var workflowApiService;
+    var _;
     before('start HTTP server', function () {
         this.timeout(5000);
         workflowApiService = {
@@ -16,7 +17,9 @@ describe('Http.Api.Skus', function () {
         ]);
         return helper.startServer([
             dihelper.simpleWrapper(workflowApiService, 'Http.Services.Api.Workflows')
-        ]);
+        ]).then(function() {
+            _ = helper.injector.get('_');
+        });
     });
 
     beforeEach('reset test DB', function () {
@@ -115,7 +118,7 @@ describe('Http.Api.Skus', function () {
         it('should return the same sku from GET /skus/:id', function () {
             return helper.request().get('/api/1.1/skus/' + sku.id)
             .expect('Content-Type', /^application\/json/)
-            .expect(200, sku);
+            .expect(200, _.merge({}, sku, { packInfo: null }) );
         });
 
         describe('PATCH /skus/:id', function () {

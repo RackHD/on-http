@@ -93,7 +93,9 @@ describe("SKU Pack Service", function() {
             httpProfileRoot: 'profiles',
             skuConfig: {
                 key: 'value'
-            }
+            },
+            description: 'sku package',
+            version: '1.0.0'
         };
 
         before(function() {
@@ -232,6 +234,29 @@ describe("SKU Pack Service", function() {
                 expect(waterline.graphdefinitions.destroy).to.have.been.called;
                 expect(waterline.profiles.destroy).to.have.been.called;
                 expect(waterline.templates.destroy).to.have.been.called;
+            });
+        });
+
+        it('should get details on a pack', function() {
+            var newdata = _.omit(data, ['description', 'version']);
+            fs.readFileAsync.withArgs('./valid/a.json').resolves(JSON.stringify(newdata));
+            return skuService.start('./valid').then(function() {
+                return skuService.getPackInfo('a');
+            }).then(function(obj) {
+                expect(obj.description).to.be.null;
+                expect(obj.version).to.be.null;
+            });
+        });
+        
+        it('should get details on a pack', function() {
+            fs.readFileAsync.withArgs('./valid/a.json').resolves(JSON.stringify(data));
+            return skuService.start('./valid').then(function() {
+                return skuService.getPackInfo('a');
+            }).then(function(obj) {
+                expect(obj.description).to.be.a.string;
+                expect(obj.description).to.equal(data.description);
+                expect(obj.version).to.be.a.string;
+                expect(obj.version).to.equal(data.version);
             });
         });
     });
