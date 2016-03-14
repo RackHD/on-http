@@ -17,29 +17,18 @@ addons:
       - debhelper
       - git
       - default-jdk
+      - maven
 
 services:
  - mongodb
  - rabbitmq
 
 after_success:
- - ./node_modules/.bin/istanbul cover -x "**/spec/**" ./node_modules/.bin/_mocha --report lcovonly -- $(find spec -name '*-spec.js') -R spec --require spec/helper.js
- - cat ./coverage/lcov.info | node_modules/.bin/coveralls
+ - ./extra/make-testcoveralls.sh
 
 before_deploy:
- - npm run apidoc
- - npm prune --production
- - sudo apt-get install -y maven
- - git clone --branch v2.1.5 https://github.com/swagger-api/swagger-codegen.git
- - pushd ./swagger-codegen && mvn package && popd
- - java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar generate -i static/monorail.yml -o on-http-api1.1 -l python --additional-properties packageName=on_http_api1_1
- - java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar generate -i static/monorail-2.0.yaml -o on-http-api2.0 -l python --additional-properties packageName=on_http_api2_0
- - java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar generate -i static/redfish.yaml -o on-http-redfish-1.0 -l python --additional-properties packageName=on_http_redfish_1_0
- - ./build-package.bash python-client "${TRAVIS_BRANCH}" "on-http-api1.1"
- - ./build-package.bash python-client "${TRAVIS_BRANCH}" "on-http-api2.0"
- - ./build-package.bash python-client "${TRAVIS_BRANCH}" "on-http-redfish-1.0"
- - ./build-package.bash on-http "${TRAVIS_BRANCH}"
- - mkdir deb && cp -a *.deb deb/
+ - ./extra/make-docs.sh
+ - ./extra/make-deb.sh
 
 deploy:
   provider: bintray
