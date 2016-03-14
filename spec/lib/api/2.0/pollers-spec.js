@@ -151,6 +151,26 @@ describe('Http.Api.Pollers', function () {
             type: 'string[]'
         }
         ]
+    },
+    {
+        name: 'redfish',
+        config: [
+            {
+            key: 'uri',
+            type: 'string',
+            required: true
+        },
+        {
+            key: 'user',
+            type: 'string',
+            defaultsTo: 'admin'
+        },
+        {
+            key: 'password',
+            type: 'string',
+            defaultsTo: 'admin'
+        }
+        ]
     }
     ];
 
