@@ -77,7 +77,23 @@ describe('Http.Api.Login', function () {
     after('disallow self signed certs', function () {
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
     });
+    
+    var waterline;
+    before('setup default admin user', function() {
+        waterline = helper.injector.get('Services.Waterline');
+        waterline.localusers = {
+            findOne: sinon.stub()
+        };
+        waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
+            username: 'admin',
+            comparePassword: function(password) { return password === 'admin123'; }
+        });
+        waterline.localusers.findOne.resolves();
+    });
 
+    after('remove waterline definition', function() {
+        delete waterline.localusers;
+    });
     describe('test with authentication enabled', function () {
         before('start HTTPs server', function () {
             this.timeout(5000);
@@ -101,7 +117,7 @@ describe('Http.Api.Login', function () {
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
-                    expect(res.body.message).to.equal('Invalid username or password');
+                    expect(res.body.message).to.equal('Unauthorized');
                 });
         });
 
@@ -112,7 +128,7 @@ describe('Http.Api.Login', function () {
                 .expect(UNAUTHORIZED_STATUS)
                 .expect(function(res) {
                     expect(res.body.message).to.be.a('string');
-                    expect(res.body.message).to.equal('Invalid username or password');
+                    expect(res.body.message).to.equal('Unauthorized');
                 });
         });
 

@@ -40,6 +40,8 @@ swagger:
       - onError: json_error_handler
       - cors
       - swagger_params_parser
+      - swagger_authn
+      - swagger_authz
       - swagger_security
       - _swagger_validate
       - express_compatibility
