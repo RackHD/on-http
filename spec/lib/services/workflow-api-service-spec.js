@@ -9,6 +9,7 @@ describe('Http.Services.Api.Workflows', function () {
     var graphDefinition;
     var store;
     var waterline;
+    var env;
 
     before('Http.Services.Api.Workflows before', function() {
         helper.setupInjector([
@@ -19,6 +20,7 @@ describe('Http.Services.Api.Workflows', function () {
         workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
         waterline = helper.injector.get('Services.Waterline');
         store = helper.injector.get('TaskGraph.Store');
+        env = helper.injector.get('Services.Environment');
     });
 
     beforeEach(function() {
@@ -34,6 +36,7 @@ describe('Http.Services.Api.Workflows', function () {
         this.sandbox.stub(workflowApiService, 'findGraphDefinitionByName');
         this.sandbox.stub(workflowApiService, 'createActiveGraph');
         this.sandbox.stub(workflowApiService, 'runTaskGraph');
+        this.sandbox.stub(env, 'get');
     });
 
     afterEach('Http.Services.Api.Profiles afterEach', function() {
@@ -95,6 +98,69 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
                 .to.have.been.calledWith(graph.instanceId, 'test');
+            expect(env.get).to.not.be.called;
+        });
+    });
+
+    it('should create and run a graph against a node with a sku', function () {
+        workflowApiService.findGraphDefinitionByName.resolves(graphDefinition);
+        workflowApiService.createActiveGraph.resolves(graph);
+        workflowApiService.runTaskGraph.resolves();
+        store.findActiveGraphForTarget.resolves();
+        waterline.nodes.needByIdentifier.resolves({ id: 'testnodeid', sku: 'skuid' });
+        env.get.withArgs('Graph.Test').resolves('Graph.Test');
+
+        return workflowApiService.createAndRunGraph({
+            name: 'Graph.Test',
+            options: { test: 1 },
+            context: { test: 2 },
+            domain: 'test'
+        }, 'testnodeid')
+        .then(function() {
+            expect(workflowApiService.findGraphDefinitionByName).to.have.been.calledOnce;
+            expect(workflowApiService.findGraphDefinitionByName)
+                .to.have.been.calledWith('Graph.Test');
+            expect(store.findActiveGraphForTarget).to.have.been.calledOnce;
+            expect(store.findActiveGraphForTarget).to.have.been.calledWith('testnodeid');
+            expect(workflowApiService.createActiveGraph).to.have.been.calledOnce;
+            expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
+                graphDefinition, { test: 1 }, { target: 'testnodeid', test: 2 }, 'test'
+            );
+            expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
+            expect(workflowApiService.runTaskGraph)
+                .to.have.been.calledWith(graph.instanceId, 'test');
+            expect(env.get).to.have.been.calledWith('Graph.Test', 'Graph.Test', ['skuid']);
+        });
+    });
+
+    it('should create and run a graph against a node with a sku', function () {
+        workflowApiService.findGraphDefinitionByName.resolves(graphDefinition);
+        workflowApiService.createActiveGraph.resolves(graph);
+        workflowApiService.runTaskGraph.resolves();
+        store.findActiveGraphForTarget.resolves();
+        waterline.nodes.needByIdentifier.resolves({ id: 'testnodeid', sku: 'skuid' });
+        env.get.withArgs('Graph.Test').resolves('Graph.Test.skuid');
+
+        return workflowApiService.createAndRunGraph({
+            name: 'Graph.Test',
+            options: { test: 1 },
+            context: { test: 2 },
+            domain: 'test'
+        }, 'testnodeid')
+        .then(function() {
+            expect(workflowApiService.findGraphDefinitionByName).to.have.been.calledOnce;
+            expect(workflowApiService.findGraphDefinitionByName)
+                .to.have.been.calledWith('Graph.Test.skuid');
+            expect(store.findActiveGraphForTarget).to.have.been.calledOnce;
+            expect(store.findActiveGraphForTarget).to.have.been.calledWith('testnodeid');
+            expect(workflowApiService.createActiveGraph).to.have.been.calledOnce;
+            expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
+                graphDefinition, { test: 1 }, { target: 'testnodeid', test: 2 }, 'test'
+            );
+            expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
+            expect(workflowApiService.runTaskGraph)
+                .to.have.been.calledWith(graph.instanceId, 'test');
+            expect(env.get).to.have.been.calledWith('Graph.Test', 'Graph.Test', ['skuid']);
         });
     });
 
