@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Registries",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#MessageRegistryFileCollection.MessageRegistryFileCollection",
+    "Oem": {},
+    "Name": "Message File Registry",
+    "Members@odata.count": <%= files.length %>,
+    "Members": [
+        <% files.forEach(function(file, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Registries/<%= file.id %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}

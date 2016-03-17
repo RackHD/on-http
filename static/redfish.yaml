@@ -916,12 +916,12 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /Registries:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: registry
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
-      summary: Unspecified
-      operationId: unimplemented
+      summary: This is a link to a collection of Registries.
+      operationId: listRegistry
       tags: [ "/redfish/v1" ]
       responses:
         200:
@@ -932,15 +932,17 @@ paths:
           $ref: "#/responses/status_401"
         403:
           $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /Registries/{identifier}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: registry
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: Unspecified
-      operationId: unimplemented
+      operationId: getRegistryFile
       tags: [ "/redfish/v1" ]
       parameters:
         - name: identifier
@@ -957,6 +959,28 @@ paths:
         403:
           $ref: "#/responses/status_403"
         501:
+          $ref: "#/responses/status_501"
+  /Registries/{identifier}/contents:
+    x-swagger-router-controller: registry
+    get:
+      summary: Unspecified
+      operationId: getRegistryFileContents
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
           $ref: "#/responses/status_501"
   /Roles:
     x-swagger-router-controller: unimplemented
