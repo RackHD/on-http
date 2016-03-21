@@ -236,14 +236,14 @@ describe("Http.Services.Api.Profiles", function () {
 
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(true);
             this.sandbox.stub(taskProtocol, 'requestProfile').resolves('profile');
-            this.sandbox.stub(taskProtocol, 'requestProperties').resolves('properties');
+            this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
 
             return profileApiService.renderProfileFromTaskOrNode(node)
             .then(function(result) {
                 expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
                 expect(taskProtocol.requestProfile).to.have.been.calledOnce;
                 expect(taskProtocol.requestProperties).to.have.been.calledOnce;
-                expect(result).to.deep.equal({ profile: 'profile', options: 'properties'});
+                expect(result).to.deep.equal({ profile: 'profile', options: { kargs: null }});
             });
         });
 
