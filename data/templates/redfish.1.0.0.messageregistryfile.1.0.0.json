@@ -1,0 +1,14 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Registries/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#MessageRegistryFile.1.0.0.MessageRegistryFile",
+    "Oem": {},
+    "Id": "<%= identifier %>",
+    "Description": "",
+    "Name": "Message file Registry ",
+    "Languages": [
+       "en"
+    ],
+    "Registry":"DSP8010_1.0.0",
+    "Location":[{"Language": "en", "Uri": "<%= basepath %>/Registries/en/<%= identifier %>"}]
+}

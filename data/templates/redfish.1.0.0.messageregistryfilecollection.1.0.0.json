@@ -3,7 +3,7 @@
     "@odata.id": "<%= url %>",
     "@odata.type": "#MessageRegistryFileCollection.MessageRegistryFileCollection",
     "Oem": {},
-    "Name": "Message File Registry",
+    "Name": "Message File Registry Collection",
     "Members@odata.count": <%= files.length %>,
     "Members": [
         <% files.forEach(function(file, i, arr) { %>

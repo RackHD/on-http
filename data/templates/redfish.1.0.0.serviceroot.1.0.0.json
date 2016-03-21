@@ -32,5 +32,8 @@
     },
     "EventService": {
         "@odata.id": "<%=basepath%>/EventService"
+    },
+    "Registries": {
+        "@odata.id": "<%=basepath%>/Registries"
     }
 }
