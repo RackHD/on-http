@@ -199,7 +199,7 @@ describe("Http.Services.Api.Profiles", function () {
         });
 
         it("render profile pass when no active graphs and node has bootSettings", function() {
-            var node = { id: 'test' , bootSettings: { profile: 'profile', options: "options" } };
+            var node = { id: 'test' , bootSettings: { profile: 'profile', options: {} } };
 
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
             this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
