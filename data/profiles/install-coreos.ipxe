@@ -5,6 +5,6 @@ set base-url <%=repo%>
 # JUST BOOT AND RUN COREOS
 # kernel ${base-url}/coreos_production_pxe.vmlinuz coreos.autologin cloud-config-url=http://<%=server%>:<%=port%>/api/common/templates/pxe-cloud-config.yml
 #
-kernel ${base-url}/coreos_production_pxe.vmlinuz console=tty0 console=<%=comport%>,115200n8 coreos.autologin cloud-config-url=http://<%=server%>:<%=port%>/api/common/templates/install-coreos.sh
-initrd ${base-url}/coreos_production_pxe_image.cpio.gz
+kernel ${base-url}/current/coreos_production_pxe.vmlinuz console=tty0 console=<%=comport%>,115200n8 coreos.autologin cloud-config-url=http://<%=server%>:<%=port%>/api/common/templates/install-coreos.sh
+initrd ${base-url}/current/coreos_production_pxe_image.cpio.gz
 boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell
