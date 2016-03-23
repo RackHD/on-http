@@ -175,4 +175,99 @@ describe("Http.Services.Api.Profiles", function () {
             expect(profileApiService.waitForDiscoveryStart).to.have.been.calledWith(node.id);
         });
     });
+
+    describe("renderProfile", function() {
+
+        it("render profile fail when no active graph and cannot get node bootSettings", function() {
+            var node = { id: 'test' , bootSettings: {} };
+
+            var bootSettingsFailure = {
+                profile: 'error.ipxe',
+                options: {
+                    error: 'Unable to retrieve node bootSettings.'
+                }
+            };
+            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
+            this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
+
+            return profileApiService.renderProfileFromTaskOrNode(node)
+            .then(function(result) {
+                expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
+                expect(taskProtocol.requestProperties).to.not.be.called;
+                expect(result).to.deep.equal(bootSettingsFailure);
+            });
+        });
+
+        it("render profile pass when no active graphs and node has bootSettings", function() {
+            var node = { id: 'test' , bootSettings: { profile: 'profile', options: {} } };
+
+            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
+            this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
+
+            return profileApiService.renderProfileFromTaskOrNode(node)
+            .then(function(result) {
+                expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
+                expect(taskProtocol.requestProperties).to.not.be.called;
+                expect(result).to.deep.equal(node.bootSettings);
+            });
+        });
+
+        it("render profile fail due to no active graph or there is not bootSettings", function() {
+            var node = { id: 'test' };
+            var activeGraphFailure = {
+                profile: 'error.ipxe',
+                options: {
+                    error: 'Unable to locate active workflow or there is no bootSettings.'
+                }
+            };
+            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
+            this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
+
+            return profileApiService.renderProfileFromTaskOrNode(node)
+            .then(function(result) {
+                expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
+                expect(taskProtocol.requestProperties).to.not.be.called;
+                expect(result).to.deep.equal(activeGraphFailure);
+            });
+        });
+
+        it("render profile pass when having active graph and render succeed", function() {
+            var node = { id: 'test' };
+
+            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(true);
+            this.sandbox.stub(taskProtocol, 'requestProfile').resolves('profile');
+            this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
+
+            return profileApiService.renderProfileFromTaskOrNode(node)
+            .then(function(result) {
+                expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
+                expect(taskProtocol.requestProfile).to.have.been.calledOnce;
+                expect(taskProtocol.requestProperties).to.have.been.calledOnce;
+                expect(result).to.deep.equal({ profile: 'profile', options: { kargs: null }});
+            });
+        });
+
+        it("render profile fail when retrieve workflow properties fail", function() {
+            var node = { id: 'test' };
+            var retrieveProperitesFailure = {
+                profile: 'error.ipxe',
+                options: {
+                    error: 'Unable to retrieve workflow properties.'
+                }
+            };
+
+            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(true);
+            this.sandbox.stub(taskProtocol, 'requestProfile').resolves('profile');
+            this.sandbox.stub(taskProtocol, 'requestProperties').rejects(new Error(''));
+
+            return profileApiService.renderProfileFromTaskOrNode(node)
+            .then(function(result) {
+                expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
+                expect(taskProtocol.requestProfile).to.have.been.calledOnce;
+                expect(taskProtocol.requestProperties).to.have.been.calledOnce;
+                expect(result).to.deep.equal(retrieveProperitesFailure);
+            });
+        });
+
+    });
 });
