@@ -1014,12 +1014,12 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /Schemas:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: schemas
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
-      summary: Unspecified
-      operationId: unimplemented
+      summary: retrieve list of schemas
+      operationId: listSchemas
       tags: [ "/redfish/v1" ]
       responses:
         200:
@@ -1033,12 +1033,12 @@ paths:
         501:
           $ref: "#/responses/status_501"
   /Schemas/{identifier}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: schemas
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
-      summary: Unspecified
-      operationId: unimplemented
+      summary: retrieve information for a specific schema
+      operationId: getSchema
       tags: [ "/redfish/v1" ]
       parameters:
         - name: identifier
@@ -1054,8 +1054,36 @@ paths:
           $ref: "#/responses/status_401"
         403:
           $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /SchemaStore/en/{identifier}:
+      x-swagger-router-controller: schemas
+      get:
+        x-privileges: [ 'Login' ]
+        x-authentication-type: [ 'redfish', 'basic' ]
+        summary: display the content of a schema json
+        operationId: getSchemaContent
+        tags: [ "/redfish/v1" ]
+        parameters:
+          - name: identifier
+            in: path
+            required: true
+            type: string
+        responses:
+          200:
+            description: Success
+            schema:
+              $ref: "#/definitions/JsonSchemaFile.1.0.0_JsonSchemaFile"
+          401:
+            $ref: "#/responses/status_401"
+          403:
+            $ref: "#/responses/status_403"
+          500:
+            description: Error
+            schema:
+              $ref: "#/definitions/ErrorResponse"
   /SessionService:
     x-swagger-router-controller: session-service
     get:
@@ -4899,7 +4927,6 @@ definitions:
         description: Provides a description of this resource and is used for commonality  in
           the schema definitions.
         readOnly: true
-        type: string
       Members:
         description: Contains the members of this collection.
         items:
