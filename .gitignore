@@ -58,3 +58,5 @@ on-http_*.changes
 on-http_*.deb
 packagebuild
 
+# Vagrant
+.vagrant/
