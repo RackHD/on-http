@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 curl -O http://<%=server%>:<%=port%>/api/common/templates/pxe-cloud-config.yml
 sudo coreos-install -d <%=installDisk%> -c pxe-cloud-config.yml -b <%=repo%>
 sudo reboot
