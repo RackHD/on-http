@@ -8,6 +8,7 @@ describe("Redfish Validator Service", function() {
     var redfish;
     var template;
     var _;
+    var env;
     var testObj = {
         '@odata.context': '/redfish/v1/$metadata#Systems',
         '@odata.id': '/redfish/v1/Systems/',
@@ -32,6 +33,9 @@ describe("Redfish Validator Service", function() {
         template = helper.injector.get('Templates');
         _ = helper.injector.get('_');
 
+        env = helper.injector.get('Services.Environment');
+        sinon.stub(env, "get").resolves();
+
         sinon.stub(template, "get").resolves({contents: JSON.stringify(testObj)});
     });
 
@@ -41,6 +45,7 @@ describe("Redfish Validator Service", function() {
 
     helper.after(function () {
         template.get.restore();
+        env.get.restore();
     });
 
     it('should get and render without validation', function() {

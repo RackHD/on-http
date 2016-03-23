@@ -9,6 +9,7 @@ describe('Redfish Registries', function () {
     var fs;
     var Promise;
     var template;
+    var env;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -30,6 +31,8 @@ describe('Redfish Registries', function () {
             Promise = helper.injector.get('Promise');
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
+            env = helper.injector.get('Services.Environment');
+            sinon.stub(env, "get").resolves();
         });
     });
     beforeEach('set up mocks', function () {
@@ -48,6 +51,7 @@ describe('Redfish Registries', function () {
         validator.validate.restore();
         redfish.render.restore();
         template.get.restore();
+        env.get.restore();
         return helper.stopServer();
     });
 

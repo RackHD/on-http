@@ -12,6 +12,7 @@ describe('Redfish Session Service', function () {
     var Constants;
     var template;
     var fs;
+    var env;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -48,6 +49,9 @@ describe('Redfish Session Service', function () {
 
             Promise = helper.injector.get('Promise');
 
+            env = helper.injector.get('Services.Environment');
+            sinon.stub(env, "get").resolves();
+
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
 
@@ -82,6 +86,7 @@ describe('Redfish Session Service', function () {
         validator.validate.restore();
         redfish.render.restore();
         template.get.restore();
+        env.get.restore();
 
         function restoreStubs(obj) {
             _(obj).methods().forEach(function (method) {
