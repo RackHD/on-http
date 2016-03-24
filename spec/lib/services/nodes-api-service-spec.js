@@ -268,8 +268,7 @@ describe("Http.Services.Api.Nodes", function () {
         it('should throw a NotFoundError if the node has no active graph', function () {
             waterline.nodes.needByIdentifier.resolves({ id: 'testid' });
             findActiveGraphForTarget.resolves(null);
-            return expect(nodeApiService.getActiveNodeWorkflowById('test'))
-                    .to.be.rejectedWith(Errors.NotFoundError);
+            return expect(nodeApiService.getActiveNodeWorkflowById('test')).to.become(null);
         });
     });
 
