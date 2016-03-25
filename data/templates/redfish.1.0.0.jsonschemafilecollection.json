@@ -1,0 +1,16 @@
+{
+"@odata.context" : "<%= basepath %>/$metadata#Schemas",
+"@odata.id": "<%= url %>",
+"@odata.type": "#JsonSchemaFileCollection.JsonSchemaFileCollection",
+"Oem": {},
+"Name": "JsonSchema File ",
+"Members@odata.count": <%= schemas.length %>,
+"Members": [
+<% schemas.forEach(function(schema, i, arr) { %>
+{
+"@odata.id": "<%= basepath %>/Schemas/<%= schema %>"
+}
+<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+<% }); %>
+]
+}
