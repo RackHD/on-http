@@ -916,12 +916,12 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /Registries:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: registry
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
-      summary: Unspecified
-      operationId: unimplemented
+      summary: Retrieve list of registries
+      operationId: listRegistry
       tags: [ "/redfish/v1" ]
       responses:
         200:
@@ -932,15 +932,17 @@ paths:
           $ref: "#/responses/status_401"
         403:
           $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /Registries/{identifier}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: registry
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
-      summary: Unspecified
-      operationId: unimplemented
+      summary: Retrieve information on a specific registry
+      operationId: getRegistryFile
       tags: [ "/redfish/v1" ]
       parameters:
         - name: identifier
@@ -956,8 +958,36 @@ paths:
           $ref: "#/responses/status_401"
         403:
           $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Registries/en/{identifier}:
+      x-swagger-router-controller: registry
+      get:
+        x-privileges: [ 'Login' ]
+        x-authentication-type: [ 'redfish', 'basic' ]
+        summary: retrieve the content of a specific registry
+        operationId: getRegistryFileContents
+        tags: [ "/redfish/v1" ]
+        parameters:
+          - name: identifier
+            in: path
+            required: true
+            type: string
+        responses:
+          200:
+            description: Success
+            schema:
+              $ref: "#/definitions/MessageRegistryFile.1.0.0_MessageRegistryFile"
+          401:
+            $ref: "#/responses/status_401"
+          403:
+            $ref: "#/responses/status_403"
+          500:
+            description: Error
+            schema:
+              $ref: "#/definitions/ErrorResponse"
   /Roles:
     x-swagger-router-controller: unimplemented
     get:
@@ -1030,8 +1060,10 @@ paths:
           $ref: "#/responses/status_401"
         403:
           $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /Schemas/{identifier}:
     x-swagger-router-controller: schemas
     get:
