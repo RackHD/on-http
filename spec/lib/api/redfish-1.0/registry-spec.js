@@ -3,7 +3,6 @@
 'use strict';
 
 describe('Redfish Registries', function () {
-    var configuration;
     var tv4;
     var redfish;
     var validator;
@@ -85,7 +84,8 @@ describe('Redfish Registries', function () {
             .expect(404)
             .expect(function(res) {
                 expect(res.body.error).to.be.an('object');
-                expect(res.body.error).to.be.an('object').with.property('code', 'Base.1.0.GeneralError');
+                expect(res.body.error).to.be.an('object').with.property('code','Base.1.0.' +
+                    'GeneralError');
             });
     });
 
@@ -100,4 +100,4 @@ describe('Redfish Registries', function () {
             });
     });
 
-})
+});
