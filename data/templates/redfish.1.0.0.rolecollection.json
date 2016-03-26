@@ -1,0 +1,19 @@
+{
+  "@odata.context" : "<%= basepath %>/$metadata#Roles",
+  "@odata.type": "#RoleCollection.RoleCollection",
+  "Oem": {},
+  "Members@odata.navigationLink": {
+    "@odata.id": "<%= basepath %>/Roles"
+  },
+  "Members@odata.count": <%= (roles.length) %>,
+  "Members":[
+    <% roles.forEach(function(role, i, arr) { %>
+{
+  "@odata.id": "<%= basepath %>/Roles/<%= roles[i][0] %>"
+}
+<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+<% }); %>
+],
+  "Name": "RoleCollection",
+  "Description": "RoleCollection"
+}

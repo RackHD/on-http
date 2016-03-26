@@ -989,12 +989,12 @@ paths:
             schema:
               $ref: "#/definitions/ErrorResponse"
   /Roles:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: roles
     get:
       x-privileges: [ 'ConfigureUsers' ]
       x-authentication-type: [ 'redfish', 'basic' ]
-      summary: retrieve list of roles for use in ManagerAccounts
-      operationId: unimplemented
+      summary: retrieve list of roles
+      operationId: listRoles
       tags: [ "/redfish/v1" ]
       responses:
         200:
@@ -1014,12 +1014,12 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /Roles/{identifier}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: roles
     get:
       x-privileges: [ 'ConfigureUsers' ]
       x-authentication-type: [ 'redfish', 'basic' ]
-      summary: retrieve a manager account role by name
-      operationId: unimplemented
+      summary: retrieve privileges for a role
+      operationId: getRole
       tags: [ "/redfish/v1" ]
       parameters:
         - name: identifier
