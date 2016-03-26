@@ -48,8 +48,8 @@ describe('Http.Api.Views', function () {
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function(res) {
-                    _(res.body).forEach(function(view, i) {
-                        expect(view).to.deepEqual(views[i])
+                    res.body.forEach(function(view, i) {
+                        expect(view).to.deep.equal(views[i]);
                     });
                     expect(viewsProtocol.getAll).to.have.been.calledOnce;
                 });
@@ -74,7 +74,7 @@ describe('Http.Api.Views', function () {
             return helper.request().get('/api/2.0/views/foo')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404)
-                .expect(function(res) {
+                .expect(function() {
                     expect(viewsProtocol.get).to.have.been.calledOnce;
                     expect(viewsProtocol.get).to.have.been.calledWith('foo');
                 });
@@ -101,7 +101,7 @@ describe('Http.Api.Views', function () {
 
             viewsProtocol.put.resolves(view);
             req.set('Content-Type', 'application/octet-stream');
-            req.write(Buffer('{ "message": "hello" }', 'ascii'));
+            req.write(new Buffer('{ "message": "hello" }', 'ascii'));
             req.end(function(err, res) {
                 expect(res.get('Content-Type')).to.match(/^application\/json/);
                 expect(res.status).to.equal(200);
@@ -116,7 +116,7 @@ describe('Http.Api.Views', function () {
                 .send('{ "message": "hello" }')
                 .expect('Content-Type', /^application\/json/)
                 .expect(400)
-                .expect(function(res) {
+                .expect(function() {
                     expect(viewsProtocol.put).not.to.have.been.called;
                 });
         });
@@ -127,7 +127,7 @@ describe('Http.Api.Views', function () {
             viewsProtocol.unlink.resolves(view);
             return helper.request().delete('/api/2.0/views/foo')
                 .expect(204)
-                .expect(function(res) {
+                .expect(function() {
                     expect(viewsProtocol.unlink).to.have.been.calledOnce;
                     expect(viewsProtocol.unlink).to.have.been.calledWith('foo');
                 });
@@ -138,7 +138,7 @@ describe('Http.Api.Views', function () {
             return helper.request().delete('/api/2.0/views/foo')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404)
-                .expect(function(res) {
+                .expect(function() {
                     expect(viewsProtocol.unlink).to.have.been.calledOnce;
                     expect(viewsProtocol.unlink).to.have.been.calledWith('foo');
                 });
