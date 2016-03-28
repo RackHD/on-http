@@ -1,0 +1,152 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: RackHD 2.0 Southbound
+# during dev, should point to your local machine
+#host: localhost:10010
+# basePath prefixes all resource paths
+basePath: /api/2.0
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+tags:
+  - name: "/api/2.0"
+    description: RackHD 2.0 Southbound API
+paths:
+  /tasks/bootstrap.js:
+    x-swagger-router-controller: tasks
+    get:
+#      disable for now until we are using redfish renderer
+#      x-swagger-template: 'bootstrap.js'
+      operationId: getBootstrap
+      summary: |
+        get tasks bootstrap.js
+      description: |
+        used internally by the system - get tasks bootstrap.js
+      parameters:
+        - name: macAddress
+          in: query
+          description: query object to pass through to waterline.
+          required: false
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/VersionsResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /tasks/{identifier}:
+    x-swagger-router-controller: tasks
+    get:
+    #do I need a serializer?
+      operationId: getTasksById
+      summary: |
+        get specific task
+      description: |
+        get specific task
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            task identifier
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            single task
+          schema:
+            type: object
+        404:
+          description: |
+            There is no task with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+#do I need a serializer      x-swagger-serializer: pollers
+      operationId: postTaskById
+      summary: |
+        post specific task
+      description: |
+        post specific task
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            poller identifier
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            obm settings to apply.
+          required: true
+          schema:
+            $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            Specifics of the specified task
+          schema:
+            type: object
+        404:
+          description: |
+            There is no  task with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /swagger:
+    x-swagger-pipe: swagger_raw
+
+definitions:
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+
+  VersionsResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+
+  Error:
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
+
+  generic_obj:
+   type: object
