@@ -7,9 +7,13 @@ describe('Http.Services.Api.Workflows', function () {
     var workflowApiService;
     var graph;
     var graphDefinition;
+    var task;
+    var taskDefinition;
     var store;
     var waterline;
     var env;
+    var workflowDefinition;
+    var workflow;
 
     before('Http.Services.Api.Workflows before', function() {
         helper.setupInjector([
@@ -27,12 +31,36 @@ describe('Http.Services.Api.Workflows', function () {
         waterline.nodes = {
             needByIdentifier: sinon.stub().resolves({ id: 'testnodeid' })
         };
+        waterline.graphobjects = {
+            needByIdentifier: sinon.stub().resolves({ id: 'testgraphid', _status: 'pending' }),
+            find: sinon.stub().resolves()
+        };
+        waterline.graphdefinitions = {
+            destroy: sinon.stub().resolves({ injectableName: 'test' })
+        };
+        waterline.taskdefinitions = {
+            destroy: sinon.stub().resolves({ injectableName: 'test' })
+        };
         graph = { instanceId: 'testgraphid' };
+        task = { instanceId: 'testtaskid' };
+        workflow = { id: 'testid', _status: 'cancelled' };
         graphDefinition = { injectableName: 'Graph.Test' };
+        taskDefinition = { injectableName: 'Task.Test' };
+        workflowDefinition = { injectableName: 'Task.Test',
+                               instanceId: 'testId',
+                               id: 'testid',
+                               _status: 'cancelled',
+                               active: sinon.spy()
+                              };
         this.sandbox = sinon.sandbox.create();
         this.sandbox.stub(store, 'findActiveGraphForTarget');
         this.sandbox.stub(store, 'getGraphDefinitions');
         this.sandbox.stub(store, 'persistGraphDefinition');
+        this.sandbox.stub(store, 'deleteGraph');
+        this.sandbox.stub(store, 'destroyGraphDefinition');
+        this.sandbox.stub(store, 'persistTaskDefinition');
+        this.sandbox.stub(store, 'getTaskDefinitions');
+        this.sandbox.stub(store, 'deleteTaskByName');
         this.sandbox.stub(workflowApiService, 'findGraphDefinitionByName');
         this.sandbox.stub(workflowApiService, 'createActiveGraph');
         this.sandbox.stub(workflowApiService, 'runTaskGraph');
@@ -250,4 +278,85 @@ describe('Http.Services.Api.Workflows', function () {
             expect(persistStub).to.have.been.calledOnce;
         });
     });
+
+    it('should get workflows tasks by name', function () {
+        store.getTaskDefinitions.resolves({ injectableName: 'test' });
+        return workflowApiService.getWorkflowsTasksByName(taskDefinition)
+        .then(function() {
+            expect(store.getTaskDefinitions).to.have.been.calledOnce;
+            expect(store.getTaskDefinitions).to.have.been.calledWith(taskDefinition);
+        });
+    });
+
+
+    it('should delete/destroy graph', function () {
+        waterline.graphdefinitions.destroy.resolves(graph);
+        store.destroyGraphDefinition.resolves({ injectableName: 'test' });
+        return workflowApiService.destroyGraphDefinition(taskDefinition)
+        .then(function() {
+            expect(store.destroyGraphDefinition).to.have.been.calledOnce;
+            expect(store.destroyGraphDefinition).to.have.been.calledWith(taskDefinition);
+        });
+    });
+
+
+    it('should put workflows tasks by name', function () {
+        store.getTaskDefinitions.resolves(task);
+        return workflowApiService.putWorkflowsTasksByName(taskDefinition, task)
+        .then(function() {
+            expect(store.getTaskDefinitions).to.have.been.calledOnce;
+            expect(store.getTaskDefinitions).to.have.been.calledWith(task);
+            expect(store.persistTaskDefinition).to.have.been.calledOnce;
+            expect(store.persistTaskDefinition).to.have.been.calledWith(taskDefinition);
+        });
+    });
+
+    it('should throw error, when cancelling an non-active workflow ', function () {
+        var mockWorkflowError = new Errors.TaskCancellationError(
+            "testid is not an active workflow"
+        );
+        waterline.graphobjects.needByIdentifier.rejects(mockWorkflowError);
+        return workflowApiService.cancelTaskGraph()
+            .should.eventually.be.rejectedWith(mockWorkflowError);
+    });
+
+
+    it('should delete workflows tasks by name', function () {
+        store.getTaskDefinitions.resolves(task);
+        return workflowApiService.deleteWorkflowsTasksByName(task)
+        .then(function() {
+            expect(store.getTaskDefinitions).to.have.been.calledOnce;
+            expect(store.getTaskDefinitions).to.have.been.calledWith(task);
+            expect(store.deleteTaskByName).to.have.been.calledOnce;
+            expect(store.deleteTaskByName).to.have.been.calledWith(task);
+        });
+    });
+
+    it('should return workflow by id ', function() {
+        waterline.graphobjects.needByIdentifier.resolves(workflow);
+        return workflowApiService.getWorkflowById().then(function (workflows) {
+            expect(workflows).to.deep.equal(workflow);
+        });
+    });
+
+    it('should return Not Found Error when invalid id is passed', function() {
+        waterline.graphobjects.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+        return expect(workflowApiService.getWorkflowById())
+               .to.be.rejectedWith(Errors.NotFoundError);
+    });
+
+    it('should return active workflows ', function() {
+        var activeWorkflow = {
+                               id      : 'testgraphid',
+                               _status :"pending"
+
+                           };
+        waterline.graphobjects.find.resolves(activeWorkflow);
+        return workflowApiService.getWorkflowById().then(function (workflows) {
+            expect(workflows).to.deep.equal(activeWorkflow);
+        });
+    });
+
+
+
 });

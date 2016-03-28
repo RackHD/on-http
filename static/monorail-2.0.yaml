@@ -719,43 +719,21 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /workflows/library:
-    x-swagger-router-controller: unimplemented
-    get:
-      operationId: unimplemented
-      x-privileges: [ 'Read' ]
-      x-authentication-type: [ 'jwt' ]
-      summary: |
-        List all workflows available to run
-      description: |
-        List all workflows available to run
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: |
-            List all workflows available to run
-          schema:
-            type: object
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
   /workflows/tasks:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: workflowTasks
     get:
-      operationId: unimplemented
+      operationId: workflowsGetAllTasks
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Fetch tasks from task library
+        Get list of tasks possible to run in workflows
       description: |
-        Fetch tasks from task library
+        Get list of tasks possible to run in workflows
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            Fetch tasks from task library
+            List of tasks possible to run in workflows
           schema:
             type: object
         default:
@@ -763,18 +741,25 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     put:
-      operationId: unimplemented
+      operationId: workflowsPutTask
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
         Add tasks to task library
       description: |
         Add tasks to task library
+      parameters:
+        - name: body
+          in: body
+          description: Workflow name
+          required: false
+          schema:
+            $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            Add tasks to task library
+            Task created
           schema:
             type: object
         500:
@@ -786,17 +771,197 @@ paths:
           description: Upload failed
           schema:
             $ref: '#/definitions/Error'
-  /workflows:
-    x-swagger-router-controller: unimplemented
+
+  /workflows/tasks/{injectableName}:
+    x-swagger-router-controller: workflowTasks
     get:
-      operationId: unimplemented
+      operationId: workflowsGetTasksByName
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Fetch workflows
+        Get the task with the specified injectable name
       description: |
-        Fetch workflows
+        Get the task with the specified injectable name
+      parameters:
+        - name: injectableName
+          in: path
+          description: |
+            Task injectable name
+          required: true
+          type: string
       tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            Task with the specified injectable name
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      operationId: workflowsDeleteTasksByName
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Delete the task with the specified injectable name
+      description: |
+        Delete the task with the specified injectable name
+      parameters:
+        - name: injectableName
+          in: path
+          description: |
+            Task injectable name
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            Task deleted
+          schema:
+            type: object
+        404:
+          description: |
+            The task with the specified injectable name was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /workflows/graphs:
+    x-swagger-router-controller: workflowGraphs
+    get:
+      operationId: workflowsGetGraphs
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Get list of all graphs
+      description: |
+        Get list of all graphs
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            List of graphs
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      operationId: workflowsPutGraphs
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Add a graph to the graph library
+      description: |
+        Add a graph to the graph library
+      parameters:
+        - name: body
+          in: body
+          description: Workflow name
+          required: false
+          schema:
+            $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            Graph created
+          schema:
+            type: object
+        500:
+          description: |
+            Error problem was encountered, graph was not written.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Upload failed
+          schema:
+            $ref: '#/definitions/Error'
+
+  /workflows/graphs/{injectableName}:
+    x-swagger-router-controller: workflowGraphs
+    get:
+      operationId: workflowsGetGraphsByName
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Get the graph with the specified injectable name
+      description: |
+        Get the graph with the specified injectable name
+      parameters:
+        - name: injectableName
+          in: path
+          description: |
+            Graph injectable name
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            Graph with the specified injectable name
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      operationId: workflowsDeleteGraphsByName
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Delete the graph with the specified injectable name
+      description: |
+        Delete the graph with the specified injectable name
+      parameters:
+        - name: injectableName
+          in: path
+          description: |
+            Graph injectable name
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            Graph deleted
+          schema:
+            type: object
+        404:
+          description: |
+            The graph with the specified injectable name was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /workflows:
+    x-swagger-router-controller: workflows
+    get:
+      operationId: workflowsGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Get list of active and past run workflow instances
+      description: |
+        Get list of active and past run workflow instances
+      tags: [ "/api/2.0" ]
+      parameters:
+        - name: active
+          in: query
+          description: |
+            Filter active workflows
+          required: false
+          type: boolean
       responses:
         200:
           description: |
@@ -807,30 +972,132 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-    put:
-      operationId: unimplemented
+    post:
+      operationId: workflowsPost
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        define new workflow
+        Run a new workflow
       description: |
-        define new workflow
+        Run a new workflow
+      parameters:
+        - name: body
+          in: body
+          description: Workflow name
+          required: false
+          schema:
+            $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
-            Fetch workflows
+            Success
           schema:
             type: object
         500:
           description: |
-            Error problem was encountered, workflow was not written.
+            Error problem was encountered, workflow was not run.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Upload failed
           schema:
             $ref: '#/definitions/Error'
+
+  /workflows/{identifier}:
+    x-swagger-router-controller: workflows
+    get:
+      operationId: workflowsGetById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get a specific workflow
+      description: |
+        get a specific workflow
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Workflow identifier
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            Specified workflow
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      operationId: workflowsDeleteById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Delete the workflow with the specified ID
+      description: |
+        Delete the workflow with the specified ID
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Workflow ID
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            Canceled workflows for specified node
+          schema:
+            type: object
+        404:
+          description: |
+            The workflow with the identifier was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /workflows/{identifier}/cancel:
+    x-swagger-router-controller: workflows
+    put:
+      operationId: workflowsCancel
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        cancel the specified workflow
+      description: |
+        cancel the specified workflow
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Workflow identifier
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            Specified workflow
+          schema:
+            type: object
+        404:
+          description: |
+            The workflow with the identifier was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
 
   /nodes/{identifier}/workflows/active:
     x-swagger-router-controller: nodes
