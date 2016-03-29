@@ -21,25 +21,6 @@ tags:
   - name: "/api/2.0"
     description: RackHD 2.0 API
 paths:
-  /versions:
-    x-swagger-router-controller: versions
-    get:
-      description: Returns installed versions to the caller
-      # used as the method name of the controller
-      operationId: getVersions
-      tags: [ "/api/2.0" ]
-      responses:
-        "200":
-          description: Success
-          schema:
-            # a pointer to a definition
-            $ref: "#/definitions/VersionsResponse"
-        # responses may fall through to errors
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-
   /pollers/library:
     x-swagger-router-controller: pollers
     get:
