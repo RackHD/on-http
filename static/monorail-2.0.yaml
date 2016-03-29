@@ -1064,16 +1064,16 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /workflows/{identifier}/cancel:
+  /workflows/{identifier}/action:
     x-swagger-router-controller: workflows
     put:
-      operationId: workflowsCancel
+      operationId: workflowsAction
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        cancel the specified workflow
+        Perform the specified action on the selected workflow
       description: |
-        cancel the specified workflow
+        Perform the specified action on the selected workflow
       parameters:
         - name: identifier
           in: path
@@ -1081,6 +1081,13 @@ paths:
             Workflow identifier
           required: true
           type: string
+        - name: action
+          in: body
+          description:
+            Command to execute on selected workflow
+          required: true
+          schema:
+            $ref: '#/definitions/action'
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -2601,3 +2608,15 @@ definitions:
     required:
       - username
       - password
+  action:
+    description: Action object
+    properties:
+      command:
+        type: string
+        description: 'Command to execute'
+        enum: [ "cancel" ]
+      options:
+        type: object
+        description: 'Command options object'
+    required:
+      - command

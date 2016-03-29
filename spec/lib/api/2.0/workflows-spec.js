@@ -44,6 +44,7 @@ describe('Http.Api.Workflows.2.0', function () {
         };
         waterline.graphobjects = {
             find: sinon.stub().resolves([]),
+            findOne: sinon.stub().resolves(),
             findByIdentifier: sinon.stub().resolves(),
             needByIdentifier: sinon.stub().resolves()
         };
@@ -131,15 +132,17 @@ describe('Http.Api.Workflows.2.0', function () {
         });
     });
 
-    describe('workflowsCancel', function () {
+    describe('workflowsAction', function () {
         it('should cancel a task', function () {
-            var graph = { instancId: 'foobar',
+            var action = { command: 'cancel' };
+            var graph = { instanceId: 'foobar',
                           _status: 'cancelled'
                         };
 
             workflowApiService.cancelTaskGraph.resolves(graph);
-            return helper.request().put('/api/2.0/workflows/56e6ef601c3a31638be765fc/cancel')
+            return helper.request().put('/api/2.0/workflows/56e6ef601c3a31638be765fc/action')
                 .set('Content-Type', 'application/json')
+                .send(action)
                 .expect(200)
                 .expect(function() {
                     expect(workflowApiService.cancelTaskGraph).to.have.been.calledOnce;
@@ -173,5 +176,4 @@ describe('Http.Api.Workflows.2.0', function () {
         });
 
     });
-
 });

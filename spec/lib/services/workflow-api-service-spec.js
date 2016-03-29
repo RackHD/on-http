@@ -33,7 +33,8 @@ describe('Http.Services.Api.Workflows', function () {
         };
         waterline.graphobjects = {
             needByIdentifier: sinon.stub().resolves({ id: 'testgraphid', _status: 'pending' }),
-            find: sinon.stub().resolves()
+            find: sinon.stub().resolves(),
+            findOne: sinon.stub().resolves()
         };
         waterline.graphdefinitions = {
             destroy: sinon.stub().resolves({ injectableName: 'test' })
@@ -227,7 +228,7 @@ describe('Http.Services.Api.Workflows', function () {
     });
 
     it('should return a NotFoundError if the node was not found', function () {
-        store.findActiveGraphForTarget.rejects(new Errors.NotFoundError('Not Found'));
+        waterline.graphobjects.findOne.rejects(new Errors.NotFoundError('Not Found'));
         return expect(workflowApiService.findActiveGraphForTarget('testnodeid'))
             .to.be.rejectedWith(Errors.NotFoundError);
     });
