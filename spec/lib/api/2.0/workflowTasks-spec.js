@@ -134,7 +134,7 @@ describe('Http.Api.workflowTasks.2.0', function () {
                 expect(res.body).to.have.property('injectableName', 'dummyName');
                 expect(res.body).to.have.property('options').to.be.an('object');
                 expect(res.body).to.have.deep.property('options.oids', 'SNMPv2-MIB::sysDescr');
-                });
+            });
         });
 
         it('should return 404 when getWorkflowsTasksByName is not found', function () {

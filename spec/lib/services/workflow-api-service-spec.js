@@ -318,7 +318,7 @@ describe('Http.Services.Api.Workflows', function () {
         );
         waterline.graphobjects.needByIdentifier.rejects(mockWorkflowError);
         return workflowApiService.cancelTaskGraph()
-            .should.eventually.be.rejectedWith(mockWorkflowError);
+            .should.be.rejectedWith(mockWorkflowError);
     });
 
 
@@ -349,15 +349,9 @@ describe('Http.Services.Api.Workflows', function () {
     it('should return active workflows ', function() {
         var activeWorkflow = {
                                id      : 'testgraphid',
-                               _status :"pending"
-
-                           };
+                               _status : 'pending'
+                             };
         waterline.graphobjects.find.resolves(activeWorkflow);
-        return workflowApiService.getWorkflowById().then(function (workflows) {
-            expect(workflows).to.deep.equal(activeWorkflow);
-        });
+        return expect(workflowApiService.getWorkflowById()).to.become(activeWorkflow);
     });
-
-
-
 });
