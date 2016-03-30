@@ -1700,7 +1700,7 @@ paths:
   /config:
     x-swagger-router-controller: config
     get:
-      operationId: getConfig
+      operationId: configGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -1718,7 +1718,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     patch:
-      operationId: patchConfig
+      operationId: configPatch
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
