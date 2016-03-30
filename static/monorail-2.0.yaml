@@ -1747,7 +1747,7 @@ paths:
   /catalogs:
     x-swagger-router-controller: catalogs
     get:
-      operationId: getCatalog
+      operationId: catalogsGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -1776,7 +1776,7 @@ paths:
   /catalogs/{identifier}:
     x-swagger-router-controller: catalogs
     get:
-      operationId: getCatalogById
+      operationId: catalogsIdGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
