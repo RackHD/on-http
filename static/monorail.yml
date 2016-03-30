@@ -820,7 +820,35 @@ paths:
           description: Upload failed
           schema:
             $ref: '#/definitions/Error'
-  
+    post:
+      summary: |
+        create an unbound workflow
+      description: |
+        create an unbound workflow
+      parameters:
+        - name: name
+          in: query
+          description: |
+            The injectable Graph name
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: false
+          type: object
+      tags:
+        - workflow
+        - post
+      responses:
+        200:
+          description: |
+            the workflow that was created
+          schema: 
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /nodes/{identifier}/workflows/active:
     get:
       summary: |
