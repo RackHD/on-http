@@ -10,6 +10,7 @@ describe("Http.Services.Api.Nodes", function () {
     var updateByIdentifier;
     var create;
     var needByIdentifier;
+    var findByTag;
     var findActiveGraphForTarget;
     var computeNode;
     var enclosureNode;
@@ -736,8 +737,16 @@ describe("Http.Services.Api.Nodes", function () {
     });
 
     describe('Tagging', function() {
+
         var node = {
-            id: '1234abcd1234abcd1234abce'
+            id: '1234abcd1234abcd1234abcd',
+            name: 'name1',
+            type: 'compute',
+        };
+        var node1 = {
+            id: '5678efgh5678efgh5678efgh',
+            name: 'name1',
+            type: 'compute',
         };
 
         before(function() {
@@ -816,6 +825,17 @@ describe("Http.Services.Api.Nodes", function () {
                     expect(e).to.have.property('name').that.equals('AssertionError');
                     expect(waterline.nodes.findByTag).to.not.be.called;
                     expect(needByIdentifier).to.not.be.called;
+                });
+        });
+
+        it('should call waterline to get list of nodes and remove the specified' +
+            ' tag', function() {
+            var tagName = 'name1';
+            waterline.nodes.findByTag.resolves([node, node1]);
+            return nodeApiService.masterDelTagById(tagName)
+                .then(function() {
+                    expect(waterline.nodes.remTags).to.have.been.calledWith(node.id,tagName);
+                    expect(waterline.nodes.remTags).to.have.been.calledWith(node1.id,tagName);
                 });
         });
     });

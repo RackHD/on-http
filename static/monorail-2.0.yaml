@@ -1494,6 +1494,36 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+
+  /nodes/tags/{tagName}:
+    x-swagger-router-controller: nodes
+    delete:
+      operationId: nodesMasterDelTagById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Delete specified tag from all nodes.
+      description: |
+        Delete specified tag from all nodes.
+      parameters:
+        - name: tagName
+          in: path
+          description: The tag identifier
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: Delete successful
+        404:
+          description: The tag name identifier was not found.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /nodes/{identifier}:
     x-swagger-router-controller: nodes
     get:
@@ -1597,6 +1627,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+
   /nodes/{identifier}/tags:
     x-swagger-router-controller: nodes
     get:
