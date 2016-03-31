@@ -233,6 +233,38 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid system with sku', function() {
+        waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd')
+        .resolves(Promise.resolve({
+            id: '1234abcd1234abcd1234abcd',
+            name: '1234abcd1234abcd1234abcd',
+            sku: 'sku-value'
+        }));
+
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: catalogData
+        }));
+
+        waterline.workitems.findPollers.resolves([{
+            config: { command: 'chassis' }
+        }]);
+
+        taskProtocol.requestPollerCache.resolves([{
+            chassis: { power: "Unknown", uid: "Unknown"}
+        }]);
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id)
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+    
     it('should 404 an invalid system', function() {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id)
             .expect('Content-Type', /^application\/json/)

@@ -11,6 +11,7 @@ describe('Redfish Chassis Root', function () {
     var taskProtocol;
     var fs;
     var validator;
+    var env;
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -30,6 +31,9 @@ describe('Redfish Chassis Root', function () {
 
             taskProtocol = helper.injector.get('Protocol.Task');
             sinon.stub(taskProtocol);
+
+            env = helper.injector.get('Services.Environment');
+            sinon.stub(env, "get").resolves();
 
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
@@ -65,6 +69,7 @@ describe('Redfish Chassis Root', function () {
     after('stop HTTP server', function () {
         validator.validate.restore();
         redfish.render.restore();
+        env.get.restore();
         
         function restoreStubs(obj) {
             _(obj).methods().forEach(function (method) {
