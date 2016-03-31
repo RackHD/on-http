@@ -19,6 +19,7 @@ describe("SKU Pack Service", function() {
             dihelper.simpleWrapper({}, 'TaskGraph.TaskGraph'),
             helper.require("/lib/services/workflow-api-service"),
             helper.require("/lib/services/sku-pack-service"),
+            dihelper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),
             dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf')
         ]);
         waterline = helper.injector.get('Services.Waterline');
@@ -27,6 +28,15 @@ describe("SKU Pack Service", function() {
         Templates = helper.injector.get('Templates');
         Profiles = helper.injector.get('Profiles');
         Env = helper.injector.get('Services.Environment');
+
+        waterline.skus = {
+            needByIdentifier: sinon.stub(),
+            find: sinon.stub(),
+            create: sinon.stub()
+        };
+        waterline.nodes = {
+            find: sinon.stub()
+        };
 
         fs = helper.injector.get('fs');
         sinon.stub(fs, 'writeFileAsync');
@@ -60,6 +70,129 @@ describe("SKU Pack Service", function() {
         fs.renameAsync.restore();
         fs.unlinkAsync.restore();
         fs.statSync.restore();
+    });
+
+    it('should get the skus', function() {
+        waterline.skus.find.resolves({id: 'abc', sku: 'sku'});
+        return skuService.getSkus({}).then(function(val){
+            expect(waterline.skus.find).to.have.been.called;
+            expect(val.id).equal('abc');
+            expect(val.sku).equal('sku');
+        });
+    });
+
+    describe('should get a sku by id', function(){
+        before(function(){
+            sinon.stub(skuService, 'getPackInfo');
+        });
+        after(function(){
+            skuService.getPackInfo.restore();
+        });
+        it('should get a sku by id', function() {
+            waterline.skus.needByIdentifier.resolves({id: 'abc', sku: 'sku'});
+            skuService.getPackInfo.resolves({
+                description: 'descrpt',
+                version: 'vers'
+            });
+            return skuService.getSkusById('123').then(function(val){
+                expect(waterline.skus.needByIdentifier).to.have.been.called;
+                expect(val.id).equal('abc');
+                expect(val.sku).equal('sku');
+                expect(val.packInfo.description).equal('descrpt');
+                expect(val.packInfo.version).equal('vers');
+            });
+        });
+    });
+
+    describe('should put a skupack', function(){
+        before(function(){
+            sinon.stub(skuService, 'skuPackHandler');
+        });
+        after(function(){
+            skuService.skuPackHandler.restore();
+        });
+        it('should put a skupack', function() {
+            waterline.skus.needByIdentifier.resolves({id: 'abc', sku: 'sku'});
+            skuService.skuPackHandler.resolves({
+                id: "sku name test"
+            });
+            var req = {swagger:{params:{identifier:{value:123}}}};
+            var res = {};
+            return skuService.putPackBySkuId (req, res).then(function(val){
+                expect(waterline.skus.needByIdentifier).to.have.been.called;
+                expect(val.id).equal("sku name test");
+            });
+        });
+    });
+
+    describe('should delete a sku pack', function(){
+        before(function(){
+            sinon.stub(skuService, 'deletePack');
+        });
+        after(function(){
+            skuService.deletePack.restore();
+        });
+        it('should delete a sku pack', function() {
+            waterline.skus.needByIdentifier.resolves({id: 'abc', sku: 'sku'});
+            skuService.deletePack.resolves();
+            return skuService.deleteSkuPackById ('123').then(function(){
+                expect(waterline.skus.needByIdentifier).to.have.been.called;
+                expect(skuService.deletePack).to.have.been.called;
+            });
+        });
+    });
+
+    it('should get the nodes with a certain sku id ', function() {
+        waterline.skus.needByIdentifier.resolves({id: 'abc', sku: 'sku'});
+        waterline.nodes.find.resolves('123');
+        return skuService.getNodesSkusById('456').then(function(val){
+            expect(waterline.skus.needByIdentifier).to.have.been.called;
+            expect(val).equal('123');
+        });
+    });
+
+    describe('hould post a sku', function(){
+        before(function(){
+            sinon.stub(skuService, 'regenerateSkus');
+        });
+        after(function(){
+            skuService.regenerateSkus.restore();
+        });
+        it('should post a sku ', function() {
+          var sku =
+          {
+              "name": "my test sku",
+              "rules": [
+                  {
+                      "path": "dmi.Base Board Information.Manufacturer",
+                      "contains": "Intel"
+                  },
+                  {
+                      "path": "ohai.dmi.memory.total",
+                      "equals": "32946864kB"
+                  }
+              ],
+              "discoveryGraphName": "Graph.InstallCoreOS",
+              "discoveryGraphOptions": {
+                  "username": "testuser",
+                  "password": "hello",
+                  "hostname": "mycoreos"
+              },
+              "createdAt": "2016-04-07T12:25:18.529Z",
+              "updatedAt": "2016-04-07T12:25:18.529Z",
+              "id": "570651ae87b3579d76508d26"
+          };
+            waterline.skus.create.resolves(sku);
+            skuService.regenerateSkus.resolves();
+            return skuService.postSku(sku).then(function(val){
+                expect(waterline.skus.create).to.have.been.called;
+                expect(val.rules).equal(sku.rules);
+                expect(val.discoveryGraphName).equal(sku.discoveryGraphName);
+                expect(val.username).equal(sku.username);
+                expect(val.password).equal(sku.password);
+                expect(val.hostname).equal(sku.hostname);
+            });
+        });
     });
 
     it('should expose the appropriate methods', function() {
@@ -374,4 +507,8 @@ describe("SKU Pack Service", function() {
             done();
         });
     });
+
+
+
+
 });
