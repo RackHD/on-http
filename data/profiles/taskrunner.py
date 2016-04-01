@@ -6,6 +6,7 @@ Download and execute python scripts from the RackHD tasks api in a loop
 
 import urllib2
 import json
+import sys
 from time import sleep
 
 TASK_REQUEST_PERIOD = 5
@@ -57,6 +58,10 @@ while True:
             print "Failure running task {}".format(error)
             task['error'] = str(error)
             break
+
+    if "exit" in task_data.keys():
+        print "Task execution complete"
+        sys.exit(int(task_data["exit"]))
 
     print "Posting task data\n {}".format(task_data)
     task_data = json.dumps(task_data)

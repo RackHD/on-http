@@ -1,22 +1,32 @@
 def main():
     import json
-    import cli
+    # Python module names vary depending on nxos version
+    try:
+        from cli import clid
+    except:
+        from cisco import clid
     data = {}
 
     try:
-        community = json.loads(cli.clid('show snmp community'))
+        all = json.loads(clid('show snmp'))
+        data['snmp'] = all
+    except:
+        pass
+
+    try:
+        community = json.loads(clid('show snmp community'))
         data['community'] = community
     except:
         pass
 
     try:
-        host = json.loads(cli.clid('show snmp host'))
+        host = json.loads(clid('show snmp host'))
         data['host'] = host
     except:
         pass
 
     try:
-        group = json.loads(cli.clid('show snmp group'))
+        group = json.loads(clid('show snmp group'))
         data['group'] = group
     except:
         pass

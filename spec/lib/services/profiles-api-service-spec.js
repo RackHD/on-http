@@ -49,14 +49,14 @@ describe("Http.Services.Api.Profiles", function () {
             expect(taskProtocol.requestProperties).to.have.been.calledThrice;
         });
     });
-    
+
     describe("setLookup", function() {
         var node;
         var query = {
             'ip':'ip',
             'mac':'mac'
         };
-        
+
         it("setLookup should add IP lookup entry for new node", function() {
             this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
@@ -65,7 +65,7 @@ describe("Http.Services.Api.Profiles", function () {
                 expect(lookupService.setIpAddress).to.be.calledOnce;
             });
         });
-        
+
         it("setLookup does not add IP lookup entry for existing node", function() {
             node = {
                 discovered: true
@@ -77,7 +77,7 @@ describe("Http.Services.Api.Profiles", function () {
                 expect(lookupService.setIpAddress).to.not.be.called;
             });
         });
-        
+
         it("setLookup does not lookup node on missing required query string", function() {
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
             return profileApiService.setLookup({macs:'macs'})
@@ -85,7 +85,7 @@ describe("Http.Services.Api.Profiles", function () {
                 expect(lookupService.setIpAddress).to.not.be.called;
             });
         });
-        
+
     });
 
     describe("getNode", function() {
@@ -114,7 +114,8 @@ describe("Http.Services.Api.Profiles", function () {
 
         it("getNode should run discovery for a pre-existing node with no catalogs", function() {
             var node = {
-                discovered: sinon.stub().resolves(false)
+                discovered: sinon.stub().resolves(false),
+                type: 'compute'
             };
             this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
             this.sandbox.stub(taskProtocol, 'activeTaskExists').rejects(new Error(''));
@@ -153,7 +154,7 @@ describe("Http.Services.Api.Profiles", function () {
     });
 
     it('should run discovery', function() {
-        var node = { id: 'test' };
+        var node = { id: 'test', type: 'compute' };
         this.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves();
         this.sandbox.stub(profileApiService, 'waitForDiscoveryStart').resolves();
         return profileApiService.runDiscovery(node)
@@ -179,9 +180,10 @@ describe("Http.Services.Api.Profiles", function () {
     describe("renderProfile", function() {
 
         it("render profile fail when no active graph and cannot get node bootSettings", function() {
-            var node = { id: 'test' , bootSettings: {} };
+            var node = { id: 'test' , type: 'compute', bootSettings: {}};
 
             var bootSettingsFailure = {
+                context: undefined,
                 profile: 'error.ipxe',
                 options: {
                     error: 'Unable to retrieve node bootSettings'
@@ -199,7 +201,14 @@ describe("Http.Services.Api.Profiles", function () {
         });
 
         it("render profile pass when no active graphs and node has bootSettings", function() {
-            var node = { id: 'test' , bootSettings: { profile: 'profile', options: {} } };
+            var node = {
+                id: 'test',
+                type: 'compute',
+                bootSettings: {
+                    profile: 'profile',
+                    options: {}
+                }
+            };
 
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
             this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
@@ -212,12 +221,13 @@ describe("Http.Services.Api.Profiles", function () {
             });
         });
 
-        it("render profile fail due to no active graph or there is not bootSettings", function() {
-            var node = { id: 'test' };
+        it("render profile fail due to no active graph or there are no bootSettings", function() {
+            var node = { id: 'test', type: 'compute' };
             var activeGraphFailure = {
+                context: undefined,
                 profile: 'error.ipxe',
                 options: {
-                    error: 'Unable to retrieve node bootSettings'
+                    error: 'Unable to locate active workflow or there are no bootSettings'
                 }
             };
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
@@ -232,9 +242,10 @@ describe("Http.Services.Api.Profiles", function () {
         });
 
         it("render profile pass when having active graph and render succeed", function() {
-            var node = { id: 'test' };
+            var node = { id: 'test', type: 'compute' };
+            var graph = { context: {} };
 
-            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves({context: true});
+            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(graph);
             this.sandbox.stub(taskProtocol, 'requestProfile').resolves('profile');
             this.sandbox.stub(taskProtocol, 'requestProperties').resolves({});
 
@@ -243,16 +254,21 @@ describe("Http.Services.Api.Profiles", function () {
                 expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
                 expect(taskProtocol.requestProfile).to.have.been.calledOnce;
                 expect(taskProtocol.requestProperties).to.have.been.calledOnce;
-                expect(result).to.deep.equal({ profile: 'profile', options: { kargs: null }});
+                expect(result).to.deep.equal({
+                    context: graph.context,
+                    profile: 'profile',
+                    options: { kargs: null }
+                });
             });
         });
 
         it("render profile fail when retrieve workflow properties fail", function() {
-            var node = { id: 'test' };
+            var node = { id: 'test', type: 'compute' };
             var retrieveProperitesFailure = {
+                context: undefined,
                 profile: 'error.ipxe',
                 options: {
-                    error: 'Unable to retrieve workflow properties.'
+                    error: 'Unable to retrieve workflow properties'
                 }
             };
 
