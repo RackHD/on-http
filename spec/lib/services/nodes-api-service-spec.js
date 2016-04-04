@@ -10,7 +10,6 @@ describe("Http.Services.Api.Nodes", function () {
     var updateByIdentifier;
     var create;
     var needByIdentifier;
-    var findByTag;
     var findActiveGraphForTarget;
     var computeNode;
     var enclosureNode;
@@ -740,12 +739,12 @@ describe("Http.Services.Api.Nodes", function () {
 
         var node = {
             id: '1234abcd1234abcd1234abcd',
-            name: 'name1',
+            tags: ['name1'],
             type: 'compute',
         };
         var node1 = {
             id: '5678efgh5678efgh5678efgh',
-            name: 'name1',
+            tags: ['name1'],
             type: 'compute',
         };
 
