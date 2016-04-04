@@ -686,7 +686,8 @@ describe('Http.Api.Nodes', function () {
             sinon.stub(nodesApi, 'getTagsById').resolves([]);
             sinon.stub(nodesApi, 'addTagsById').resolves([]);
             sinon.stub(nodesApi, 'removeTagsById').resolves([]);
-            sinon.stub(nodesApi, 'masterDelTagById').resolves(['1234abcd1234abcd1234abcd', '5678efgh5678efgh5678efgh']);
+            sinon.stub(nodesApi, 'masterDelTagById')
+                .resolves(['1234abcd1234abcd1234abcd', '5678efgh5678efgh5678efgh']);
         });
 
         after(function() {
@@ -730,8 +731,9 @@ describe('Http.Api.Nodes', function () {
                 .expect(200)
                 .expect(function(res) {
                     expect(nodesApi.masterDelTagById).to.have.been.calledWith('name');
-                    expect(res.body).to.deep.equal(['1234abcd1234abcd1234abcd','5678efgh5678efgh5678efgh']);
-                })
+                    expect(res.body).to.deep.equal
+                    (['1234abcd1234abcd1234abcd','5678efgh5678efgh5678efgh']);
+                });
         });
     });
 });
