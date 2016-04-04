@@ -686,7 +686,7 @@ describe('Http.Api.Nodes', function () {
             sinon.stub(nodesApi, 'getTagsById').resolves([]);
             sinon.stub(nodesApi, 'addTagsById').resolves([]);
             sinon.stub(nodesApi, 'removeTagsById').resolves([]);
-            sinon.stub(nodesApi, 'masterDelTagById').resolves([]);
+            sinon.stub(nodesApi, 'masterDelTagById').resolves(['1234abcd1234abcd1234abcd', '5678efgh5678efgh5678efgh']);
         });
 
         after(function() {
@@ -728,10 +728,10 @@ describe('Http.Api.Nodes', function () {
             return helper.request().delete('/api/2.0/nodes/tags/name')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
-                .expect(function() {
+                .expect(function(res) {
                     expect(nodesApi.masterDelTagById).to.have.been.calledWith('name');
-                });
+                    expect(res.body).to.deep.equal(['1234abcd1234abcd1234abcd','5678efgh5678efgh5678efgh']);
+                })
         });
-
     });
 });
