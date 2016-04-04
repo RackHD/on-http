@@ -66,23 +66,47 @@ describe('Services.Http.Swagger', function() {
 
         it('should process query', function() {
             var req = {
+                query: {},
                 swagger: {
                     params: {
                         firstName: {
-                            parameterObject: { in: 'query'  },
+                            parameterObject: {
+                                in: 'query',
+                                type: 'string',
+                                definition: { name: 'firstName' }
+                            },
                             value: 'Rack'
                         },
                         lastName: {
-                            parameterObject: { in: 'query' },
+                            parameterObject: {
+                                in: 'query',
+                                type: 'string',
+                                definition: { name: 'lastName' }
+                            },
                             value: 'HD'
                         },
                         middleName: {
-                            parameterObject: { in: 'query' },
+                            parameterObject: {
+                                in: 'query',
+                                type: 'string',
+                                definition: { name: 'middleName' }
+                            },
                             value:'John+Paul+George'
                         },
+                        undefinedName: {
+                            parameterObject: {
+                                in: 'query',
+                                type: 'string',
+                                definition: { name: 'undefinedName' }
+                            },
+                            value: undefined
+                        },
                         inBody: {
-                            parameterObject: { in: 'body' },
-                            value: 'no a query'
+                            parameterObject: {
+                                in: 'body',
+                                type: 'string',
+                            },
+                            value: 'not a query'
                         }
                     }
                 }
@@ -91,7 +115,7 @@ describe('Services.Http.Swagger', function() {
                 headersSent: false
             };
             var mockData = {data: 'mock data'};
-            var optController = swaggerService.controller({success: 201}, mockController);
+            var optController = swaggerService.controller(mockController);
 
             expect(optController).to.be.a('function');
             mockController.resolves(mockData);
@@ -105,8 +129,7 @@ describe('Services.Http.Swagger', function() {
                 expect(req.swagger.query).to.have.property('middleName')
                     .and.to.deep.equal(['John', 'Paul', 'George']);
                 expect(req.swagger.query).not.to.have.property('inBody');
-                expect(req.swagger.options).to.have.property('success')
-                    .and.to.equal(201);
+                expect(req.swagger.query).not.to.have.property('undefinedName');
             });
         });
 
