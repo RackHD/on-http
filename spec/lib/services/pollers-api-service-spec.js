@@ -52,7 +52,7 @@ describe("Http.Services.Api.Pollers", function () {
         it('should return error if poller informations is not found', function () {
             var mockPollerError = new Errors.NotFoundError("Could not find workitem with identifier");
             waterline.workitems.find.rejects(mockPollerError);
-            return pollerService.getPollers().should.eventually.be.rejectedWith(mockPollerError);
+            return pollerService.getPollers().should.be.rejectedWith(mockPollerError);
         });
 
     });
@@ -88,7 +88,7 @@ describe("Http.Services.Api.Pollers", function () {
         it("should return error if specific poller info is not found", function () {
             var mockPollerError = new Errors.NotFoundError("Could not find workitem with identifier");
             waterline.workitems.needByIdentifier.rejects(mockPollerError);
-            return pollerService.getPollersById().should.eventually.be.rejectedWith(mockPollerError);
+            return pollerService.getPollersById().should.be.rejectedWith(mockPollerError);
         });
 
     });
@@ -130,7 +130,7 @@ describe("Http.Services.Api.Pollers", function () {
         it("Throws error when  postPollers runs with invalid input", function() {
             var mockPollerError = new Errors.ValidationError("Validation errors");
             waterline.workitems.create.rejects(mockPollerError);
-            return pollerService.postPollers().should.eventually.be.rejectedWith(mockPollerError);
+            return pollerService.postPollers().should.be.rejectedWith(mockPollerError);
         });
     });
 
