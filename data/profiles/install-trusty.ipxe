@@ -1,6 +1,0 @@
-echo Starting Ubuntu x64 installer for ${hostidentifier}
-set base-url http://<%=server%>:<%=port%>/ubuntu/dists/trusty/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64
-kernel ${base-url}/linux
-initrd ${base-url}/initrd.gz
-imgargs linux auto=true DEBIAN_FRONTEND=noninteractive url=http://<%=server%>:<%=port%>/api/common/templates/ubuntu-trusty-preseed hostname=<%=hostname%> log_host=<%=server%> BOOTIF=01-<%=macaddress%> interface=auto console=tty0 console=<%=comport%>,115200n8
-boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell

@@ -1,0 +1,6 @@
+echo Starting Ubuntu x64 installer for ${hostidentifier}
+set base-url <%=repo%>
+kernel ${base-url}/linux
+initrd ${base-url}/initrd.gz
+imgargs linux auto=true url=http://<%=server%>:<%=port%>/api/common/templates/ubuntu-preseed hostname=<%=hostname%> log_host=<%=server%> interface=auto console=<%=comport%>,115200n8 console=tty0
+boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell

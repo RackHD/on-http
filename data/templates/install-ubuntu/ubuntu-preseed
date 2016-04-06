@@ -18,6 +18,7 @@ d-i netcfg/choose_interface select auto
 d-i netcfg/get_hostname string <%=hostname%>
 d-i netcfg/get_domain string <%=domain%>
 
+
 # Disable that annoying WEP key dialog.
 d-i netcfg/wireless_wep string
 ### Mirror settings
@@ -31,7 +32,7 @@ d-i apt-setup/universe boolean false
 d-i apt-setup/backports boolean false
 d-i apt-setup/proposed boolean false
 d-i apt-setup/security_host string
-d-i apt-setup/local0/repository string deb http://<%=server%>:<%=port%>/ubuntu trusty main restricted universe multiverse
+d-i apt-setup/local0/repository string deb http://<%=server%>:<%=port%>/ubuntu <%=version%> main restricted universe multiverse
 d-i apt-setup/local0/source boolean false
 d-i debian-installer/allow_unauthenticated boolean true
 
@@ -47,7 +48,7 @@ d-i time/zone string US/Pacific
 d-i clock-setup/ntp boolean true
 
 ### Partitioning
-d-i partman-auto/disk string /dev/sda
+d-i partman-auto/disk string /dev/<%=installDisk%>
 d-i partman-auto/method string lvm
 
 d-i partman-lvm/device_remove_lvm boolean true
@@ -115,28 +116,20 @@ d-i partman/default_filesystem string ext4
 # Skip creation of a root account (normal user account will be able to
 # use sudo). The default is false; pretemplate this to true if you want to set
 # a root password.
-d-i passwd/root-login boolean false
+d-i passwd/root-login boolean true
 # Alternatively, to skip creation of a normal user account.
-#d-i passwd/make-user boolean true
+d-i passwd/make-user boolean false
 
 # Root password, either in clear text
-#d-i passwd/root-password password r00tme
-#d-i passwd/root-password-again password r00tme
 # or encrypted using an MD5 hash.
-#d-i passwd/root-password-crypted password [MD5 hash]
-
-# To create a normal user account.
-d-i passwd/user-fullname string <%=username%> User
-d-i passwd/username string <%=username%>
-d-i passwd/user-password-crypted password $6$Qey9BDGE2c1$qNz2CArubDFY9n3qIb7spwFx9Tp.lBR9zfO/1eDyq7PTF5XwEAO8s7hcLfH5gkS/JUE0UABCutH474wkfaBII1
-d-i passwd/user-uid string <%=uid%>
-d-i user-setup/encrypt-home boolean false
+d-i passwd/root-password-crypted password <%=rootEncryptedPassword%>
 
 ### Package selection
 tasksel tasksel/first multiselect ubuntu-server
 
 # Individual additional packages to install
-d-i pkgsel/include string openssh-server curl
+<% var pkgs = (typeof kvm === 'undefined' ? '' : 'qemu-kvm virt-manager libvirt0 python-libvirt bridge-utils') -%>
+d-i pkgsel/include string openssh-server curl <%=pkgs%>
 
 # Policy for applying updates. May be "none" (no automatic updates),
 # "unattended-upgrades" (install security updates automatically), or
@@ -179,4 +172,9 @@ xserver-xorg xserver-xorg/autodetect_monitor boolean true
 # packages and run commands in the target system.
 #d-i pretemplate/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 
-d-i preseed/late_command string in-target wget http://<%=server%>:<%=port%>/api/common/templates/ubuntu-trusty-sources -O /etc/apt/sources.list; in-target mkdir /home/<%=username%>/.ssh; in-target wget http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub -O /home/<%=username%>/.ssh/authorized_keys; in-target chown -R <%=uid%>:<%=uid%> /home/<%=username%>/.ssh; in-target /usr/sbin/useradd emc -p '$6$kS13aboz$s3V1/argaAqwpUR5xgCl3zc8x1nndOwGJfyMJMPrLBJp5TFtMY2.ymKVm.KTLWa0FAqtrQreGilBUtloK.rYr1' -s /bin/bash; cat blacklist mei >> /etc/modprobe.d/blacklist.conf
+d-i preseed/late_command string \
+in-target wget http://<%=server%>:<%=port%>/api/common/templates/ubuntu-sources -O /etc/apt/sources.list; \
+in-target wget http://<%=server%>:<%=port%>/api/common/templates/post-install-ubuntu.sh -O ./post-install.sh; \
+in-target chmod +x ./post-install.sh; \
+in-target ./post-install.sh; \
+in-target curl http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>
