@@ -96,11 +96,11 @@ describe('Http.Api.Tasks', function () {
                 .expect(404);
         });
 
-        it("should render a 500 if tasksApiService.getNode errors", function() {
+        it("should render a 400 if tasksApiService.getNode errors", function() {
             tasksApiService.getNode.rejects(new Error('asdf'));
             return helper.request()
                 .get('/api/2.0/tasks/bootstrap.js?macAddress=00:11:22:33:44:55')
-                .expect(500);
+                .expect(400);
         });
     });
 
