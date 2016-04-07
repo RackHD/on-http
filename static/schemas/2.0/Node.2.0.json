@@ -1,0 +1,35 @@
+{
+    "title": "Node.2.0",
+    "definitions": {
+        "Node": {
+            "description": "A node discovered by RackHD",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "Name of the node",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Type of node",
+                    "type": "string",
+                    "enum": ["compute", "switch", "dae", "pdu", "mgmt", "enclosure"]
+                },
+                "obmSettings": {
+                    "description": "Time of node discovery",
+                    "type": "array"
+                },
+                "snmpSettings": {
+                    "description": "Time of node update",
+                    "type": "object"
+                },
+                "bootSettings": {
+                    "description": "Specify node auto discovery",
+                    "type": "object"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        }
+    }
+}
