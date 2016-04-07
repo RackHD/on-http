@@ -870,6 +870,7 @@ paths:
       operationId: getObmLib
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: obm.2.0.json
       summary: |
         get list of possible OBM services
       description: |
@@ -892,6 +893,7 @@ paths:
       operationId: getObmLibById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: obm.2.0.json
       summary: |
         get a single OBM service
       description: |
@@ -1752,6 +1754,7 @@ paths:
       operationId: nodesGetById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: node.2.0.json
       summary: |
         List of all nodes or if there are none an empty object
       description: |
@@ -1955,6 +1958,7 @@ paths:
     x-swagger-router-controller: nodes
     get:
       x-swagger-serializer: nodes
+      x-view: node.2.0.json
       operationId: nodesGetAll
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]

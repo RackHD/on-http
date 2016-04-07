@@ -1,0 +1,13 @@
+{
+  "autoDiscover": "<%=autoDiscover%>",
+  "createdAt": "<%=createdAt%>",
+  "id" : "<%=id%>",
+<% if (hasOwnProperty("identifiers")) { %>
+  "identifiers": <%- JSON.stringify(identifiers) %>,
+<% } else  {%>
+  "identifiers": [],
+<% } %>
+  "name": "<%=name%>",
+  "type": "<%=type%>",
+  "updatedAt": "<%=updatedAt%>"
+}
