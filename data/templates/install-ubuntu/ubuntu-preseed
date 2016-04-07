@@ -48,7 +48,7 @@ d-i time/zone string US/Pacific
 d-i clock-setup/ntp boolean true
 
 ### Partitioning
-d-i partman-auto/disk string /dev/<%=installDisk%>
+d-i partman-auto/disk string <%=installDisk%>
 d-i partman-auto/method string lvm
 
 d-i partman-lvm/device_remove_lvm boolean true
@@ -173,8 +173,11 @@ xserver-xorg xserver-xorg/autodetect_monitor boolean true
 #d-i pretemplate/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 
 d-i preseed/late_command string \
-in-target wget http://<%=server%>:<%=port%>/api/common/templates/ubuntu-sources -O /etc/apt/sources.list; \
+<%_ if (undefined !== networkDevices && networkDevices.length > 0) { _%>
+wget http://<%=server%>:<%=port%>/api/common/templates/ubuntu-interfaces -O /etc/network/interfaces; \
+<%_ } _%>
 in-target wget http://<%=server%>:<%=port%>/api/common/templates/post-install-ubuntu.sh -O ./post-install.sh; \
 in-target chmod +x ./post-install.sh; \
 in-target ./post-install.sh; \
+in-target wget http://<%=server%>:<%=port%>/api/common/templates/ubuntu-sources -O /etc/apt/sources.list; \
 in-target curl http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>
