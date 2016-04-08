@@ -7,7 +7,17 @@
 <% } else  {%>
   "identifiers": [],
 <% } %>
+<% if (hasOwnProperty("tags")) { %>
+   "tags": <%- JSON.stringify(tags) %>,
+<% } else  {%>
+  "tags": [],
+<% } %>
   "name": "<%=name%>",
+<% if (hasOwnProperty("obmSettings")) { %>
+  "obmSettings": <%- JSON.stringify(obmSettings) %>,
+<% } else  {%>
+  "obmSettings": [],
+<% } %>
   "type": "<%=type%>",
   "updatedAt": "<%=updatedAt%>"
 }
