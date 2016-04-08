@@ -3,7 +3,7 @@ set base-url <%=repo%>
 # coreos.autologin <-- enable as kernel param to autologin for easier debugging
 # reference: https://coreos.com/os/docs/latest/booting-with-ipxe.html
 # JUST BOOT AND RUN COREOS
-# kernel ${base-url}/coreos_production_pxe.vmlinuz coreos.autologin cloud-config-url=http://<%=server%>:<%=port%>/api/common/templates/pxe-cloud-config.yml
+# kernel ${base-url}/<%=version=>/coreos_production_pxe.vmlinuz coreos.autologin cloud-config-url=http://<%=server%>:<%=port%>/api/common/templates/pxe-cloud-config.yml
 #
 kernel ${base-url}/<%=version%>/coreos_production_pxe.vmlinuz console=tty0 console=<%=comport%>,115200n8 coreos.autologin cloud-config-url=http://<%=server%>:<%=port%>/api/common/templates/install-coreos.sh
 initrd ${base-url}/<%=version%>/coreos_production_pxe_image.cpio.gz
