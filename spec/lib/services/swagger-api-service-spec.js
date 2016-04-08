@@ -17,7 +17,8 @@ describe('Services.Http.Swagger', function() {
                 dihelper.simpleWrapper(MockSerializable, 'Mock.Serializable'),
                 dihelper.simpleWrapper(new MockSchemaService(), 'Http.Api.Services.Schema')
             ])
-        )
+        );
+
         swaggerService = helper.injector.get('Http.Services.Swagger');
         views = helper.injector.get('Views');
         Promise = helper.injector.get('Promise');
@@ -490,11 +491,23 @@ describe('Services.Http.Swagger', function() {
             });
         });
 
-        it('should sned 204 on empty', function() {
+        it('should send 204 on empty', function() {
             req.swagger.options.send204OnEmpty = true;
             return renderer(req, res, 'foo', mockNext)
             .then(function() {
                 expect(status).to.be.calledWith(204);
+            },
+            function(err) {
+                expect(err).to.be.undefined;
+            });
+        });
+
+        it('should throw 500 on render error', function() {
+            res.body = { message: "foo" };
+            views.render = this.sandbox.stub().resolves();
+            return renderer(req, res, 'foo', mockNext)
+            .then(function() {
+                expect(mockNext).to.be.calledWithMatch({status: 500});
             },
             function(err) {
                 expect(err).to.be.undefined;
