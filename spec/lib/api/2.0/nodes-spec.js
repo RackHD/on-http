@@ -87,7 +87,12 @@ describe('Http.Api.Nodes', function () {
                     password: 'mypass'
                 }
             }
-        ]
+        ],
+        autoDiscover: "false",
+        identifiers: [],
+        createdAt: '010101',
+        updatedAt: '010101',
+        tags: []
     };
 
     describe('2.0 GET /nodes', function () {

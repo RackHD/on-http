@@ -2,6 +2,7 @@
   "autoDiscover": "<%=autoDiscover%>",
   "createdAt": "<%=createdAt%>",
   "id" : "<%=id%>",
+  "name": "<%=name%>",
 <% if (hasOwnProperty("identifiers")) { %>
   "identifiers": <%- JSON.stringify(identifiers) %>,
 <% } else  {%>
@@ -12,7 +13,6 @@
 <% } else  {%>
   "tags": [],
 <% } %>
-  "name": "<%=name%>",
 <% if (hasOwnProperty("obmSettings")) { %>
   "obmSettings": <%- JSON.stringify(obmSettings) %>,
 <% } else  {%>
