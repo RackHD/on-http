@@ -377,17 +377,45 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
-  /skus:
-    x-swagger-router-controller: unimplemented
-    get:
-      operationId: unimplemented
+  /skus/pack:
+    x-swagger-router-controller: skus
+    post:
+      operationId: skuPackPost
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
         get list of skus
       description: |
         get list of skus
+      tags: [ "/api/2.0" ]
+      consumes:
+        - application/x-www-form-urlencoded
+      responses:
+        200:
+          description: |
+             list of skus
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /skus:
+    x-swagger-router-controller: skus
+    get:
+      operationId: skusGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get list of skus
+      description: |
+        get list of skus
+      parameters:
+        - name: query
+          in: query
+          description: query object to pass through to waterline.
+          required: false
+          type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -400,13 +428,21 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
-      operationId: unimplemented
+      operationId: skusPost
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
         create a sku
       description: |
         create a sku
+      parameters:
+        - name: body
+          in: body
+          description: |
+            object post to apply.
+          required: true
+          schema:
+                  $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -424,9 +460,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /skus/{identifier}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: skus
     get:
-      operationId: unimplemented
+      operationId: skusIdGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -457,7 +493,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     patch:
-      operationId: unimplemented
+      operationId: skusPatch
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -468,9 +504,15 @@ paths:
         - name: identifier
           in: path
           description: |
-            The profile name.
+            The sku identifier
           required: true
           type: string
+        - name: body
+          in: body
+          description: object patches to apply.
+          required: true
+          schema:
+            $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -493,7 +535,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      operationId: unimplemented
+      operationId: skusIdDelete
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -524,9 +566,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /skus/{identifier}/nodes:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: skus
     get:
-      operationId: unimplemented
+      operationId: skusIdGetNodes
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -541,6 +583,74 @@ paths:
           required: true
           type: string
       tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            return nodes associated with that sku
+          schema:
+            type: object
+        404:
+          description: |
+            There is no sku with identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /skus/{identifier}/pack:
+    x-swagger-router-controller: skus
+    put:
+      operationId: skusIdPutPack
+      x-privileges: [ 'write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        post a sku pack to specific sku
+      description: |
+        post a sku pack to specific sku
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The profile name.
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      consumes:
+        - application/x-www-form-urlencoded
+      responses:
+        200:
+          description: |
+            return nodes associated with that sku
+          schema:
+            type: object
+        404:
+          description: |
+            There is no sku with identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      operationId: skusIdDeletePack
+      x-privileges: [ 'write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Delete a pack for a specific sku
+      description: |
+        Delete a pack for a specific sku.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The profile name.
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      consumes:
+        - application/x-www-form-urlencoded
       responses:
         200:
           description: |
