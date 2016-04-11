@@ -1,4 +1,4 @@
-// Copyright 2015, EMC, Inc.
+// Copyright 2016, EMC, Inc.
 /* jshint node:true */
 
 'use strict';
@@ -7,12 +7,14 @@ describe('Services.Http.Swagger', function() {
     var swaggerService;
     var Promise;
     function MockSerializable() {}
+    function MockSchemaService() {}
 
     before('inject swagger service', function() {
         helper.setupInjector(_.flattenDeep([
                 onHttpContext.prerequisiteInjectables,
                 onHttpContext.injectables,
-                dihelper.simpleWrapper(MockSerializable, 'Mock.Serializable')
+                dihelper.simpleWrapper(MockSerializable, 'Mock.Serializable'),
+                dihelper.simpleWrapper(new MockSchemaService(), 'Http.Api.Services.Schema')
             ])
         );
 
@@ -344,6 +346,42 @@ describe('Services.Http.Swagger', function() {
             MockSerializable.prototype.deserialize.rejects(mockError);
             return deserializer(req, res, mockNext).then(function() {
                 expect(mockNext).to.be.calledWith(mockError);
+            });
+        });
+    });
+
+    describe('validator()', function() {
+        var mockNext;
+        var validator;
+        var mockData = { name: "123" };
+
+        beforeEach(function() {
+            mockNext = sinon.stub();
+            MockSchemaService.prototype.addNamespace = sinon.stub();
+            MockSchemaService.prototype.addNamespace.resolves('foo');
+            MockSchemaService.prototype.validate = sinon.stub();
+            validator = swaggerService.validator();
+            expect(validator).to.be.a('function');
+        });
+
+        it('should skip validation if schema is undefined', function() {
+            MockSchemaService.prototype.validate.resolves([]);
+            validator(undefined, mockData, function() {
+                expect(MockSchemaService.prototype.validate).not.to.be.called;
+            });
+        });
+
+        it('should validate an object', function() {
+            MockSchemaService.prototype.validate.resolves([]);
+            validator(mockData, mockData, function() {
+                expect(MockSchemaService.prototype.validate).to.be.called;
+            });
+        });
+
+        it('should return error on validation error', function() {
+            MockSchemaService.prototype.validate.resolves({error: "error message"});
+            validator(mockData, mockData, function(err) {
+                expect(err.message).to.equal('error message');
             });
         });
     });

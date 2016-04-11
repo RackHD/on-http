@@ -1980,7 +1980,7 @@ paths:
             $ref: '#/definitions/Error'
     post:
       x-swagger-deserializer: nodes
-      # swagger template and schema names (not sure how to get schema in fitting)...
+      x-swagger-schema: Node.2.0.json#/definitions/Node
       operationId: nodesPost
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]

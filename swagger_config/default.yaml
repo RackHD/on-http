@@ -35,6 +35,11 @@ swagger:
       name: swagger_render
       templateNameKey: x-swagger-template
 
+    _rackhd_validator:
+      name: rackhd_validator
+      validateResponse: true
+      schemaNameKey: x-swagger-schema
+
     # pipe for all swagger-node controllers
     swagger_controllers:
       - onError: json_error_handler
@@ -45,6 +50,7 @@ swagger:
       - swagger_authz
       - swagger_security
       - _swagger_validate
+      - _rackhd_validator
       - express_compatibility
       - _swagger_deserializer
       - _router
