@@ -14,6 +14,7 @@ di.annotate(Runner, new di.Inject(
         'Services.Configuration',
         'Profiles',
         'Templates',
+        'Views',
         'fileService',
         'Promise',
         'Http.Services.SkuPack',
@@ -26,6 +27,7 @@ function Runner(
     configuration,
     profiles,
     templates,
+    views,
     fileService,
     Promise,
     skuPack,
@@ -36,7 +38,7 @@ function Runner(
     function start() {
         return core.start()
             .then(function() {
-                return Promise.all([profiles.load(), templates.load()]);
+                return Promise.all([profiles.load(), templates.load(), views.load()]);
             })
             .then(function() {
                 return fileService.start({

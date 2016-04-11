@@ -377,6 +377,116 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /views:
+    x-swagger-router-controller: views
+    get:
+      operationId: viewsGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get all views
+      description: |
+        get all views
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            all views
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /views/{identifier}:
+    x-swagger-router-controller: views
+    get:
+      operationId: viewsGetById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get view with specified identifier
+      description: |
+        get view with specified identifier
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Name of view to get
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            single view
+          schema:
+            type: object
+        404:
+          description: |
+            There is no view with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      operationId: viewsPut
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      consumes:
+        - text/plain
+        - application/octet-stream
+      summary: |
+        put a single view
+      description: |
+        put a single view
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Name of view to create or update
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            return template
+          schema:
+            type: object
+    delete:
+      operationId: viewsDelete
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        put a single view
+      description: |
+        put a single view
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Name of view to delete
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        204:
+          description: |
+            return template
+          schema:
+            type: object
+        404:
+          description: |
+            There is no view with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /skus/pack:
     x-swagger-router-controller: skus
     post:
