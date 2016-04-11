@@ -150,6 +150,18 @@ describe('Http.Api.Profiles', function () {
                 .expect(500);
         });
 
+        it("should call getNode with a compute node type", function() {
+            return helper.request().get('/api/1.1/profiles')
+                .query({ macs: [ '00:01:02:03:04:05' ] })
+                .expect(200)
+                .expect(function() {
+                    expect(profileApiService.getNode).to.have.been.calledWith(
+                        [ '00:01:02:03:04:05' ],
+                        { type: 'compute' }
+                    );
+                });
+        });
+
         it("should send down redirect.ipxe if 'macs' are not in req.query", function() {
             profileApiService.getNode.restore();
             return helper.request().get('/api/1.1/profiles')
