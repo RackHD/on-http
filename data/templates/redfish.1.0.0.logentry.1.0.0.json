@@ -5,20 +5,19 @@
     "Oem": {},
     "Id": "<%= entry.logId %>",
     "Name": "name",
-    "Severity": "Warning",
-    "EntryType": "<%= type.toUpperCase() %>",
-    "Created": "2012-03-07T14:44",
+    "EntryType": "<%= type %>",
+    "Created": "<%= entry.timestamp %>",
     "OemRecordFormat": "",
     "EntryCode": "<%= entry.value %>",
     "SensorType": "<%= entry.sensorType %>",
-    "SensorNumber": 0,
+    "SensorNumber": <%= entry.sensorNumber %>,
     "Message": "<%= entry.event %>",
     "MessageId": "",
     "MessageArgs": [],
     "Links": {
         "Oem": {},
         "OriginOfCondition": {
-            "@odata.id": "/redfish/v1/Chassis/<%=identifier%>/Thermal"
+            "@odata.id": "<%= entry.origin || 'null' %>"
         }
     }
 }

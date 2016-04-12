@@ -386,6 +386,7 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid sel log service entry collection', function() {
+        waterline.nodes.find.resolves([node]);
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
         }]);
@@ -395,7 +396,10 @@ describe('Redfish Systems Root', function () {
                 logId: 'abcd',
                 value: 'Assert',
                 sensorType: 'Temperature',
-                event: 'thermal event'
+                event: 'thermal event',
+                sensorNumber: '#0x01',
+                date: '01/01/1970',
+                time: '01:01:01'
             }]
         }]);
 
@@ -440,6 +444,7 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid sel log service entry', function() {
+        waterline.nodes.find.resolves([node]);
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
         }]);
@@ -449,7 +454,10 @@ describe('Redfish Systems Root', function () {
                 logId: 'abcd',
                 value: 'Assert',
                 sensorType: 'Temperature',
-                event: 'Thermal Event'
+                event: 'Thermal Event',
+                sensorNumber: '#0x01',
+                date: '01/01/1970',
+                time: '01:01:01'
             }]
         }]);
 
