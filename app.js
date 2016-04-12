@@ -18,7 +18,7 @@ di.annotate(Runner, new di.Inject(
         'fileService',
         'Promise',
         'Http.Services.SkuPack',
-        'Acl.Services'
+        'Http.Services.Api.Account'
     )
 );
 function Runner(
@@ -31,7 +31,7 @@ function Runner(
     fileService,
     Promise,
     skuPack,
-    aclService
+    accountService
 ) {
     var services = [];
 
@@ -52,7 +52,7 @@ function Runner(
                 return skuPack.start(configuration.get('skuPackRoot', './skupack.d'));
             })
             .then(function() {
-                return aclService.start();
+                return accountService.start();
             })
             .then(function() {
                 var endpoints = configuration.get('httpEndpoints', [{port: 8080}]);

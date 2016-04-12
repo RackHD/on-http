@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#AccountService/Accounts",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#ManagerAccountCollection.ManagerAccountCollection",
+    "Oem" : {},
+    "Name": "RackHD User Accounts",
+    "Members@odata.count": <%= users.length %>,
+    "Members": [
+        <% users.forEach(function(user, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/AccountService/Accounts/<%= user.username %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}

@@ -2605,6 +2605,35 @@ paths:
             $ref: '#/definitions/Error'
   /users:
     x-swagger-router-controller: users
+    get:
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      operationId: listUsers
+      summary: |
+        Retrieve a list of users
+      description: |
+        Retrieve a list of users
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            A list of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/user_obj'
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+        403:
+          description: Forbidden
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
     post:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt', 'anonymous' ]
@@ -2639,7 +2668,9 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-    put:
+  /users/{name}:
+    x-swagger-router-controller: users
+    patch:
       x-privileges: [ 'ConfigureUsers', 'ConfigureSelf' ]
       x-authentication-type: [ 'jwt' ]
       operationId: modifyUser
@@ -2648,6 +2679,11 @@ paths:
       description: |
         Update properties on a user
       parameters:
+        - name: name
+          in: path
+          description: username
+          required: true
+          type: string
         - name: body
           in: body
           description: User information
@@ -2673,6 +2709,71 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+    get:
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      operationId: getUser
+      summary: |
+        Get information about a user
+      description: |
+        Get information about a user
+      parameters:
+        - name: name
+          in: path
+          description: username
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            the user has been updated
+          schema:
+            $ref: '#/definitions/user_obj'
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+        403:
+          description: Forbidden
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      operationId: removeUser
+      summary: |
+        Delete a user
+      description: |
+        Delete a user
+      parameters:
+        - name: name
+          in: path
+          description: username
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            the user has been deleted
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+        403:
+          description: Forbidden
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /swagger:
     x-swagger-pipe: swagger_raw
 
@@ -2843,9 +2944,6 @@ definitions:
         type: string
       role:
         type: string
-    required:
-      - username
-      - password
   action:
     description: Action object
     properties:

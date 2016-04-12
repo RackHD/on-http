@@ -1,0 +1,18 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#AccountService/Accounts/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#ManagerAccount.1.0.0.ManagerAccount",
+    "Oem": {},
+    "Id": "<%= user.id %>",
+    "Description": "User Account",
+    "Name": "User Account",
+    "UserName": "<%= user.username %>",
+    "RoleId": "<%= user.role %>",
+    "Enabled": true,
+    "Locked": false,
+    "Links": {
+        "Role": {
+            "@odata.id": "<%=basepath%>/AccountService/Roles/<%=user.role%>"
+        }
+    }
+}

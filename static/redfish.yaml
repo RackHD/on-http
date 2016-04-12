@@ -715,12 +715,12 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /AccountService:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: account-service
     get:
       x-privileges: [ 'ConfigureUsers' ]
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve account service information
-      operationId: unimplemented
+      operationId: getAccountService
       tags: [ "/redfish/v1" ]
       responses:
         200:
@@ -731,8 +731,139 @@ paths:
           $ref: "#/responses/status_401"
         403:
           $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /AccountService/Accounts:
+    x-swagger-router-controller: account-service
+    get:
+      x-privileges: [ 'ConfigureUsers' ]
+      x-authentication-type: [ 'redfish', 'basic']
+      summary: retrieve information about the accounts
+      operationId: getAccounts
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/ManagerAccountCollection_ManagerAccountCollection"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      x-privileges: [ 'ConfigureUsers' ]
+      x-authentication-type: [ 'redfish', 'basic', 'anonymous' ]
+      summary: create a user with the provided information
+      operationId: createAccount
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/ManagerAccount.1.0.0_ManagerAccount"
+      responses:
+        201:
+          description: Success
+          $ref: "#/responses/status_201"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /AccountService/Accounts/{name}:
+    x-swagger-router-controller: account-service
+    get:
+      x-privileges: [ 'ConfigureUsers' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve information about the specified account
+      operationId: getAccount
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: name
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/ManagerAccount.1.0.0_ManagerAccount"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      x-privileges: [ 'ConfigureUsers' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: delete the specified account
+      operationId: removeAccount
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: name
+          in: path
+          required: true
+          type: string
+      responses:
+        204:
+          description: Success
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    patch:
+      x-privileges: [ 'ConfigureUsers', 'ConfigureSelf' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: update the user with the provided information
+      operationId: modifyAccount
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: name
+          in: path
+          required: true
+          type: string
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/ManagerAccount.1.0.0_ManagerAccount"
+      responses:
+        202:
+          description: Success
+          $ref: "#/responses/status_202"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /EventService:
     x-swagger-router-controller: unimplemented
     get:
@@ -752,61 +883,6 @@ paths:
           $ref: "#/responses/status_403"
         501:
           $ref: "#/responses/status_501"
-  /ManagerAccounts:
-    x-swagger-router-controller: unimplemented
-    get:
-      x-privileges: [ 'ConfigureManager' ]
-      x-authentication-type: [ 'redfish', 'basic' ]
-      summary: retrieve list of manager accounts
-      operationId: unimplemented
-      tags: [ "/redfish/v1" ]
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: "#/definitions/ManagerAccountCollection_ManagerAccountCollection"
-        400:
-          $ref: "#/responses/status_400"
-        401:
-          $ref: "#/responses/status_401"
-        403:
-          $ref: "#/responses/status_403"
-        404:
-          $ref: "#/responses/status_404"
-        500:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /ManagerAccounts/{identifier}:
-    x-swagger-router-controller: unimplemented
-    get:
-      x-privileges: [ 'ConfigureManager' ]
-      x-authentication-type: [ 'redfish', 'basic' ]
-      summary: retrieve a manager account by name
-      operationId: unimplemented
-      tags: [ "/redfish/v1" ]
-      parameters:
-        - name: identifier
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: "#/definitions/ManagerAccount.1.0.0_ManagerAccount"
-        400:
-          $ref: "#/responses/status_400"
-        401:
-          $ref: "#/responses/status_401"
-        403:
-          $ref: "#/responses/status_403"
-        404:
-          $ref: "#/responses/status_404"
-        500:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
   /Managers:
     x-swagger-router-controller: unimplemented
     get:
@@ -1003,7 +1079,7 @@ paths:
             description: Error
             schema:
               $ref: "#/definitions/ErrorResponse"
-  /Roles:
+  /AccountService/Roles:
     x-swagger-router-controller: roles
     get:
       x-privileges: [ 'ConfigureUsers' ]
@@ -1028,7 +1104,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /Roles/{identifier}:
+  /AccountService/Roles/{identifier}:
     x-swagger-router-controller: roles
     get:
       x-privileges: [ 'ConfigureUsers' ]
@@ -1386,6 +1462,11 @@ paths:
     x-swagger-pipe: swagger_raw
 
 responses:
+  status_201:
+    description: >
+      A request that created a new resource completed successfully. The Location header shall 
+      be set to the canonical URI for the newly created resource. A representation of the newly 
+      created resource may be included in the response body.
   status_202:
     description: >
       The request has been accepted for processing, but the processing has not been completed. 
