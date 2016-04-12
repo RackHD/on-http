@@ -2440,7 +2440,7 @@ paths:
             $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
             The created tag
           schema:
