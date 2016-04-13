@@ -2120,9 +2120,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /files/{fileidentifier}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: files
     get:
-      operationId: unimplemented
+      operationId: filesGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -2143,7 +2143,7 @@ paths:
         200:
           description: The file requested
           schema:
-            type: object
+            type: file
         404:
           description: File not found.
           schema:
@@ -2157,7 +2157,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     put:
-      operationId: unimplemented
+      operationId: filesPut
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -2180,11 +2180,10 @@ paths:
 #      consumes:
 #        - application/octet-stream
       tags: [ "/api/2.0" ]
+      consumes:
+        - application/octet-stream
+        - application/x-www-form-urlencoded
       responses:
-        200:
-          description: The file was stored
-          schema:
-            type: object
         201:
           description: Ready.
           schema:
@@ -2198,7 +2197,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      operationId: unimplemented
+      operationId: filesDelete
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -2227,7 +2226,102 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
+  /files/{filename}/latest/md5:
+    x-swagger-router-controller: files 
+    get:
+      operationId: filesMd5Get
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get file based on file name
+      description: |
+        Get file based on file name.
+      parameters:
+        - name: filename
+          in: path
+          description: File name of a file as provided when you originally stored it.
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: The file requested
+          schema:
+            type: object
+        404:
+          description: File not found.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Failed to serve file request.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /files/metadata/{filename}:
+    x-swagger-router-controller: files
+    get:
+      operationId: filesMetadataGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get file metadata by file name
+      description: |
+        Get file metadata by file name
+      parameters:
+        - name: filename
+          in: path
+          description: name of a file as provided when you originally stored it.
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: The file requested
+          schema:
+            type: object
+        404:
+          description: File not found.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Failed to serve file request.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /files:
+    x-swagger-router-controller: files
+    get:
+      operationId: filesGetAll
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get all available files
+      description: |
+        Get all available files
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: The file requested
+          schema:
+            type: object
+        404:
+          description: File not found.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Failed to serve file request.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /config:
     x-swagger-router-controller: config
     get:
