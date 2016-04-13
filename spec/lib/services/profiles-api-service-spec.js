@@ -184,7 +184,7 @@ describe("Http.Services.Api.Profiles", function () {
             var bootSettingsFailure = {
                 profile: 'error.ipxe',
                 options: {
-                    error: 'Unable to retrieve node bootSettings.'
+                    error: 'Unable to retrieve node bootSettings'
                 }
             };
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
@@ -217,7 +217,7 @@ describe("Http.Services.Api.Profiles", function () {
             var activeGraphFailure = {
                 profile: 'error.ipxe',
                 options: {
-                    error: 'Unable to locate active workflow or there is no bootSettings.'
+                    error: 'Unable to retrieve node bootSettings'
                 }
             };
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
@@ -234,9 +234,9 @@ describe("Http.Services.Api.Profiles", function () {
         it("render profile pass when having active graph and render succeed", function() {
             var node = { id: 'test' };
 
-            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(true);
+            this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves({context: true});
             this.sandbox.stub(taskProtocol, 'requestProfile').resolves('profile');
-            this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
+            this.sandbox.stub(taskProtocol, 'requestProperties').resolves({});
 
             return profileApiService.renderProfileFromTaskOrNode(node)
             .then(function(result) {
