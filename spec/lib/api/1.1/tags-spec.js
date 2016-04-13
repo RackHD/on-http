@@ -88,7 +88,7 @@ describe('Http.Api.Tags', function () {
                 .to.have.been.calledWith({
                     name: 'Graph.GenerateTags',
                     options: {
-                        defaults: {
+                        'generate-tag': {
                             nodeId: node.id
                         }
                     }
