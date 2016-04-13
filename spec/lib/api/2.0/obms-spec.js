@@ -9,9 +9,6 @@ describe('Http.Api.Obms', function () {
         return helper.startServer();
     });
 
-    beforeEach('reset test DB', function () {
-        return helper.reset();
-    });
 
     after('stop HTTP server', function () {
         return helper.stopServer();

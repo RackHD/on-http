@@ -6,6 +6,7 @@
 describe('Services.Http.Swagger', function() {
     var swaggerService;
     var Promise;
+    var views;
     function MockSerializable() {}
     function MockSchemaService() {}
 
@@ -19,7 +20,9 @@ describe('Services.Http.Swagger', function() {
         );
 
         swaggerService = helper.injector.get('Http.Services.Swagger');
+        views = helper.injector.get('Views');
         Promise = helper.injector.get('Promise');
+        this.sandbox = sinon.sandbox.create();
     });
 
     describe('controller()', function() {
@@ -385,4 +388,130 @@ describe('Services.Http.Swagger', function() {
             });
         });
     });
-});
+
+    describe('renderer()', function() {
+        var mockNext;
+        var renderer;
+        var send;
+        var status;
+        var set;
+        var res;
+        var req;
+
+        beforeEach(function() {
+            renderer = swaggerService.renderer;
+
+            // Initialize stubs
+            mockNext = sinon.stub();
+            send = sinon.stub();
+            status = sinon.stub().returns({send: send});
+            set = sinon.stub();
+
+            // Mock request and response objects
+            res = {
+                headersSent: false,
+                body: {},
+                status: status,
+                set: set
+            };
+            req = {
+                swagger: {
+                    options: {}
+                }
+            };
+
+            // Monkey-patch sandbox stubs into view.get
+            views.get = this.sandbox.stub();
+            views.load = this.sandbox.stub().resolves();
+            views.get.withArgs('collection.2.0.json').resolves({
+                contents:
+                    "[<% collection.forEach(function(element, i, arr) { %>" +
+                    "<%- element %><%= ( arr.length > 0 && i < arr.length-1  ) ? ',' : '' %>" +
+                    "<%  }); %>]"
+            });
+            views.get.withArgs('test.json').resolves({contents: '{ "message": "<%=message%>" }'});
+            views.get.resolves();
+        });
+
+        afterEach(function() {
+            this.sandbox.restore();
+            mockNext.reset();
+            status.reset();
+            send.reset();
+            set.reset();
+        });
+
+        it('should assert if headers sent', function() {
+            res.headersSent = true;
+            return renderer(req, res, 'foo', mockNext)
+            .then(function() {
+                expect(status).not.to.be.called;
+                expect(mockNext).to.be.calledOnce;
+            },
+            function(err) {
+                expect(err).to.be.undefined;
+            });
+        });
+
+        it('should skip rendering if view is undefined', function() {
+            res.body = { message: "foo" };
+            return renderer(req, res, undefined, mockNext)
+            .then(function() {
+                expect(status).to.be.calledWith(200);
+                expect(send).to.be.calledWith({ message: "foo" });
+            },
+            function(err) {
+                expect(err).to.be.undefined;
+            });
+        });
+
+        it('should render an object', function() {
+            res.body = { message: "foo" };
+            return renderer(req, res, 'test.json', mockNext)
+            .then(function() {
+                expect(status).to.be.calledWith(200);
+                expect(set).to.be.calledWith('Content-Type', 'application/json');
+                expect(send).to.be.calledWith('{"message":"foo"}');
+            },
+            function(err) {
+                expect(err).to.be.undefined;
+            });
+        });
+
+        it('should render a collection of objects()', function() {
+            res.body = [{message: "foo"}, {message: "bar"}];
+            return renderer(req, res, 'test.json', mockNext)
+            .then(function() {
+                expect(status).to.be.calledWith(200);
+                expect(set).to.be.calledWith('Content-Type', 'application/json');
+                expect(send).to.be.calledWith('[{"message":"foo"},{"message":"bar"}]');
+            },
+            function(err) {
+                expect(err).to.be.undefined;
+            });
+        });
+
+        it('should send 204 on empty', function() {
+            req.swagger.options.send204OnEmpty = true;
+            return renderer(req, res, 'foo', mockNext)
+            .then(function() {
+                expect(status).to.be.calledWith(204);
+            },
+            function(err) {
+                expect(err).to.be.undefined;
+            });
+        });
+
+        it('should throw 500 on render error', function() {
+            res.body = { message: "foo" };
+            views.render = this.sandbox.stub().resolves();
+            return renderer(req, res, 'foo', mockNext)
+            .then(function() {
+                expect(mockNext).to.be.calledWithMatch({status: 500});
+            },
+            function(err) {
+                expect(err).to.be.undefined;
+            });
+        });
+    });
+});;

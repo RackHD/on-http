@@ -33,7 +33,7 @@ swagger:
 
     _swagger_renderer:
       name: swagger_render
-      templateNameKey: x-swagger-template
+      templateNameKey: x-view
 
     _rackhd_validator:
       name: rackhd_validator
