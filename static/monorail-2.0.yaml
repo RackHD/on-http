@@ -490,6 +490,9 @@ paths:
   /skus/pack:
     x-swagger-router-controller: skus
     post:
+      consumes:
+        - multipart/form-data
+        - application/x-www-form-urlencoded
       operationId: skuPackPost
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
@@ -498,8 +501,6 @@ paths:
       description: |
         get list of skus
       tags: [ "/api/2.0" ]
-      consumes:
-        - application/x-www-form-urlencoded
       responses:
         200:
           description: |

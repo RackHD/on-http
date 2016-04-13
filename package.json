@@ -30,6 +30,7 @@
     "lodash": "^3.10.1",
     "moment": "~2.11.1",
     "mongodb": "^1.4.28",
+    "multer": "~1.1.0",
     "on-core": "git+https://github.com/RackHD/on-core.git",
     "on-finished": "^2.2.0",
     "on-tasks": "git+https://github.com/RackHD/on-tasks.git",
