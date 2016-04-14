@@ -251,6 +251,9 @@ describe('Http.Api.Skus', function () {
                 var req = fs.createReadStream('spec/lib/services/sku-static/pack.tar.gz');
                 var res = {};
                 req.on('open', function() {
+                    req.headers = {
+                        'content-type': 'application/x-www-form-urlencoded'
+                    };
                     skus.skuPackHandler(req, res).then(function(obj) {
                         expect(obj.id).equals("filename");
                         done();
