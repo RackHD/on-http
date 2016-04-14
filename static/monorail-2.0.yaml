@@ -1652,6 +1652,7 @@ paths:
       operationId: nodesGetObmById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: obm.2.0.json
       summary: |
         get the obm settings associated with a node.
       description: |

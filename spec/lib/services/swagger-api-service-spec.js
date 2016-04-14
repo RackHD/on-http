@@ -502,6 +502,17 @@ describe('Services.Http.Swagger', function() {
             });
         });
 
+        it('should throw 500 on invalid template', function() {
+            res.body = { message: "foo" };
+            return renderer(req, res, 'foo', mockNext)
+            .then(function() {
+                expect(mockNext).to.be.calledWithMatch({status: 500});
+            },
+            function(err) {
+                expect(err).to.be.undefined;
+            });
+        });
+
         it('should throw 500 on render error', function() {
             res.body = { message: "foo" };
             views.render = this.sandbox.stub().resolves();
