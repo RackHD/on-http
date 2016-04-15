@@ -47,7 +47,6 @@ reboot
 -fcoe*
 -b43-openfwwf
 kernel-firmware
--efibootmgr
 wget
 sudo
 perl
