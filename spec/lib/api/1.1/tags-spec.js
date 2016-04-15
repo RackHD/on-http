@@ -96,6 +96,13 @@ describe('Http.Api.Tags', function () {
         });
     });
 
+    it('should 409 when the tag already exists', function () {
+        waterline.tags.find.resolves([input]);
+        return helper.request().post('/api/1.1/tags')
+        .send(input)
+        .expect(409);
+    });
+
     it('should contain the tag in GET /tags', function () {
         return helper.request().get('/api/1.1/tags')
         .expect('Content-Type', /^application\/json/)
@@ -111,12 +118,34 @@ describe('Http.Api.Tags', function () {
         });
     });
 
+    it('should return a tag from GET /tags/:id with special characters', function () {
+        return helper.request().get('/api/1.1/tags/tag ^name^')
+        .expect('Content-Type', /^application\/json/)
+        .expect(200, input)
+        .then(function() {
+            expect(waterline.tags.findOne).to.have.been.calledWith({ name: 'tag ^name^' });
+        });
+    });
+    
+    it('should 404 an invalid tag from GET /tags/:id', function () {
+        waterline.tags.findOne.resolves();
+        return helper.request().get('/api/1.1/tags/bad-tag-name')
+        .expect('Content-Type', /^application\/json/)
+        .expect(404);
+    });
+
     it('should destroy a tag', function() {
         return helper.request().delete('/api/1.1/tags/tag-name')
         .expect(204)
         .then(function() {
             expect(waterline.tags.destroy).to.have.been.called;
         });
+    });
+
+    it('should 404 an invalid tag destroy', function() {
+        waterline.tags.findOne.resolves();
+        return helper.request().delete('/api/1.1/tags/tag-name')
+        .expect(404);
     });
 });
 

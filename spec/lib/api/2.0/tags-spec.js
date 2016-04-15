@@ -109,18 +109,10 @@ describe('Http.Api.Tags', function () {
                 });
         });
 
-        it('should skip creating a tag that already exists', function() {
+        it('should 409 creating a tag that already exists', function() {
             return helper.request().post('/api/2.0/tags')
                 .send(input)
-                .expect('Content-Type', /^application\/json/)
-                .expect(201)
-                .then(function (req) {
-                    var tag = req.body;
-                    expect(tag).to.have.property('name').that.equals(input.name);
-                    expect(tag).to.have.property('rules').that.deep.equals(input.rules);
-                    expect(tagsApi.createTag).to.have.not.been.called;
-                    expect(tagsApi.regenerateTags).to.have.not.been.called;
-                });
+                .expect(409);
         });
 
         it('should get tags', function() {
@@ -135,10 +127,33 @@ describe('Http.Api.Tags', function () {
                 .expect(200, input);
         });
 
+        it('should return a tag from GET /tags/:id with special characters', function () {
+            return helper.request().get('/api/2.0/tags/tag name')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200, input)
+                .then(function() {
+                    expect(tagsApi.getTag).to.have.been.calledWith('tag%20name');
+                });
+        });
+
+        it('should 404 an invalid GET /tags/:id', function () {
+            tagsApi.getTag.resetBehavior();
+            tagsApi.getTag.rejects(new Errors.NotFoundError());
+            return helper.request().get('/api/2.0/tags/bad-tag-name')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+
         it('should destroy a tag', function() {
             return helper.request().delete('/api/2.0/tags/tag-name')
                 .expect(204);
         });
 
+        it('should 404 an invalid tag', function() {
+            tagsApi.getTag.resetBehavior();
+            tagsApi.getTag.rejects(new Errors.NotFoundError());
+            return helper.request().delete('/api/2.0/tags/bad-tag-name')
+                .expect(204);
+        });
     });
 });
