@@ -2160,6 +2160,7 @@ paths:
       operationId: filesPut
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: file.2.0.json
       summary: |
         put file based on filename
       description: |
@@ -2266,6 +2267,7 @@ paths:
       operationId: filesMetadataGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: file.2.0.json
       summary: |
         get file metadata by file name
       description: |
