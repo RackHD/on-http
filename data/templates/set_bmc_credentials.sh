@@ -1,9 +1,23 @@
 #!/usr/bin/env bash
 
+channel=''
+function set_channel()
+{
+    for i in {1..15}; do
+        ipmitool -I lanplus -H 172.31.128.2 -U admin -P admin user list $i &>/dev/null
+        status=$?
+        if [ "$status" -eq "0" ] ; then
+            channel=$i
+            break
+        fi
+    done
+}
+set_channel
+
 echo " Getting the user list"
-cmdReturn=$(ipmitool user list)
+cmdReturn=$(ipmitool user list $channel)
 myarray=(${cmdReturn//$'\n'/ })
-cmdReturn1=$(ipmitool user summary)
+cmdReturn1=$(ipmitool user summary $channel)
 myarray1=(${cmdReturn1//$'\n'/ })
 userNumber=${myarray1[8]}
 user=$(<%=user%>)
@@ -19,7 +33,7 @@ for x in $cmdReturn; do
    echo "Username already present, overwriting existing user"
    ipmitool user set name $userNumber <%=user%>
    ipmitool user set password $userNumber <%=password%>
-   ipmitool channel setaccess 1 $userNumber callin=on ipmi=on link=on privilege=4
+   ipmitool channel setaccess $channel $userNumber callin=on ipmi=on link=on privilege=4
    ipmitool user enable $userNumber
    check=$((check + 1))
   exit
@@ -33,7 +47,7 @@ if [ $check == 0 ]; then
  userNumber=$((userNumber + 1))
  ipmitool user set name $userNumber <%=user%>
  ipmitool user set password $userNumber <%=password%>
- ipmitool channel setaccess 1 $userNumber callin=on ipmi=on link=on privilege=4
+ ipmitool channel setaccess $channel $userNumber callin=on ipmi=on link=on privilege=4
  ipmitool user enable $userNumber
 exit
 fi
