@@ -2185,7 +2185,7 @@ paths:
         - application/octet-stream
         - application/x-www-form-urlencoded
       responses:
-        201:
+        200:
           description: Ready.
           schema:
             type: string
@@ -2312,10 +2312,6 @@ paths:
           description: The file requested
           schema:
             type: object
-        404:
-          description: File not found.
-          schema:
-            $ref: '#/definitions/Error'
         500:
           description: Failed to serve file request.
           schema:
