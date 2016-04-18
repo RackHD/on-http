@@ -1,8 +1,7 @@
 iseq ${platform} efi && goto is_efi || goto not_efi
 
 :not_efi
-set 209:string http://<%=server%>:<%=port%>/api/common/templates/esx-pxelinux-cfg
-chain tftp://<%=server%>/undionly.kkpxe
+kernel <%=mbootFile%> -c http://<%=server%>:<%=port%>/api/common/templates/<%=esxBootConfigTemplate%> BOOTIF=01-${netX/mac}
 boot
 
 :is_efi
