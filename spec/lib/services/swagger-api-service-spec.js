@@ -416,7 +416,12 @@ describe('Services.Http.Swagger', function() {
             };
             req = {
                 swagger: {
-                    options: {}
+                    options: {},
+                    operation:{
+                        api:{
+                            basePath: "nothing"
+                        }
+                    }
                 }
             };
 

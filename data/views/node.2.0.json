@@ -3,21 +3,28 @@
   "createdAt": "<%=createdAt%>",
   "id" : "<%=id%>",
   "name": "<%=name%>",
-<% if (hasOwnProperty("identifiers")) { %>
-  "identifiers": <%- JSON.stringify(identifiers) %>,
+  <% if (hasOwnProperty("identifiers")) { %>
+"identifiers": <%- JSON.stringify(identifiers) %>,
 <% } else  {%>
-  "identifiers": [],
+"identifiers": [],
 <% } %>
 <% if (hasOwnProperty("tags")) { %>
-   "tags": <%- JSON.stringify(tags) %>,
+"tags": <%- JSON.stringify(tags) %>,
 <% } else  {%>
-  "tags": [],
+"tags": [],
 <% } %>
 <% if (hasOwnProperty("obmSettings")) { %>
-  "obmSettings": <%- JSON.stringify(obmSettings) %>,
+"obmSettings": <%- JSON.stringify(obmSettings) %>,
 <% } else  {%>
-  "obmSettings": [],
+"obmSettings": [],
 <% } %>
-  "type": "<%=type%>",
-  "updatedAt": "<%=updatedAt%>"
+"type": "<%=type%>",
+<% if (hasOwnProperty("sku")) { %>
+<% if (sku === null) { %>
+"sku" : null,
+<% } else  {%>
+"sku" : "<%=basepath %>/skus/<%=sku%>",
+<% } %>
+<% } %>
+"updatedAt": "<%=updatedAt%>"
 }
