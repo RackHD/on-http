@@ -103,6 +103,8 @@ echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/ne
       <% if( undefined != n.ipv4.vlanId ) { %>
         <% n.ipv4.vlanId.forEach(function(vid) { %>
           echo "Configuring vlan <%=vid%> on <%=n.device%>"
+          sed -i '/^BOOTPROTO=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          sed -i '/^ONBOOT=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
           echo "DEVICE=<%=n.device%>.<%=vid%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
           echo "BOOTPROTO=none" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
           echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
@@ -113,6 +115,8 @@ echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/ne
         <% }); %>
       <% } else { %>
         echo "Configuring device <%=n.device%>"
+        sed -i '/^BOOTPROTO=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        sed -i '/^ONBOOT=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "DEVICE=<%=n.device%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "BOOTPROTO=none" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
@@ -125,6 +129,8 @@ echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/ne
       <% if( undefined != n.ipv6.vlanId ) { %>
         <% n.ipv6.vlanId.forEach(function(vid) { %>
           echo "Configuring vlan <%=vid%> on <%=n.device%>"
+          sed -i '/^BOOTPROTO=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
+          sed -i '/^ONBOOT=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
           echo "DEVICE=<%=n.device%>.<%=vid%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
           echo "BOOTPROTO=none" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
           echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
@@ -136,6 +142,8 @@ echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/ne
         <% }); %>
       <% } else { %>
         echo "Configuring device <%=n.device%>"
+        sed -i '/^BOOTPROTO=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
+        sed -i '/^ONBOOT=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "DEVICE=<%=n.device%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "BOOTPROTO=none" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
