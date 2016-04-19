@@ -127,6 +127,11 @@ describe("fileService disk backend", function() {
     it("should resolve a promise for a writestream on successful put", function() {
         var fakeStream = new EventEmitter();
 
+        execker.exec = sinon.stub();
+        execker.exec.callsArgWith(0, null, null);
+
+        waterline.files.findOne.returns(execker);
+        waterline.files.create.returns(Promise.resolve(fakeFile));
         fs.createWriteStream.returns(fakeStream);
 
         var streamObjPromise = backend.put('file.txt');
@@ -145,6 +150,9 @@ describe("fileService disk backend", function() {
             fakeStream.on('error', function(){
                 resolve();
             });
+            execker.exec = sinon.stub();
+            execker.exec.callsArgWith(0, null, null);
+            waterline.files.findOne.returns(execker);
             waterline.files.create.returns(Promise.reject());
 
             backend.put('aFilename.txt');
