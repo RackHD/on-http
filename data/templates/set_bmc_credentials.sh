@@ -16,7 +16,7 @@ set_channel
 echo "channel number is" $channel
 if [ -z "${channel}" ]; then
  echo "Channel number was not set correctly, exiting script"
-exit
+exit 1
 fi
 echo " Getting the user list"
 cmdReturn=$(ipmitool user list $channel)
