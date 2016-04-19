@@ -4,7 +4,7 @@ channel=''
 function set_channel()
 {
     for i in {1..15}; do
-        ipmitool -I lanplus -H 172.31.128.2 -U admin -P admin user list $i &>/dev/null
+        ipmitool user list $i &>/dev/null
         status=$?
         if [ "$status" -eq "0" ] ; then
             channel=$i
@@ -13,7 +13,11 @@ function set_channel()
     done
 }
 set_channel
-
+echo "channel number is" $channel
+if [ -z "${channel}" ]; then
+ echo "Channel number was not set correctly, exiting script"
+exit
+fi
 echo " Getting the user list"
 cmdReturn=$(ipmitool user list $channel)
 myarray=(${cmdReturn//$'\n'/ })
