@@ -8,7 +8,9 @@
     "Messages": [],
     "TaskStatus": "<%= graph.status %>",
     "StartTime": "<%= graph.startTime %>",
+    <% if(graph.endTime) { %>
     "EndTime": "<%= graph.endTime %>",
+    <% } %>
     "Id": "<%= graph.id %>",
     "Oem" : {
         "RackHD": {
