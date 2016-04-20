@@ -121,6 +121,18 @@ describe('Http.Api.Skus', function () {
             .expect(200, _.merge({}, sku, { packInfo: null }) );
         });
 
+        it('should 409 reposting the same sku', function() {
+            return helper.request().post('/api/2.0/skus')
+            .send(input)
+            .expect(409);
+        });
+
+        it('should 200 reputting the same sku', function() {
+            return helper.request().put('/api/2.0/skus')
+            .send(input)
+            .expect(200);
+        });
+
         describe('PATCH /skus/:id', function () {
             var updated;
 
