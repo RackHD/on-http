@@ -59,13 +59,24 @@ while True:
             task['error'] = str(error)
             break
 
-    if "exit" in task_data.keys():
-        print "Task execution complete"
-        sys.exit(int(task_data["exit"]))
+    try:
+        if "exit" in task_data.keys():
+            print "Task execution complete"
+            sys.exit(int(task_data["exit"]))
+        task_data = json.dumps(task_data)
+        req = urllib2.Request(TASKS_URI, task_data, json_content_type)
+    except Exception as error:
+        task_data = [{'error': str(error)}]
+        task_data = json.dumps(task_data)
+        req = urllib2.Request(TASKS_URI, task_data, json_content_type)
 
-    print "Posting task data\n {}".format(task_data)
-    task_data = json.dumps(task_data)
-    req = urllib2.Request(TASKS_URI, task_data, json_content_type)
-    urllib2.urlopen(req)
+    for _ in range(3):
+        try:
+            print "Posting task data\n {}".format(task_data)
+            urllib2.urlopen(req)
+        except urllib2.URLError:
+            sleep(TASK_REQUEST_PERIOD)
+            continue
+        break
 
     sleep(TASK_REQUEST_PERIOD)
