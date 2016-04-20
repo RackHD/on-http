@@ -9,7 +9,6 @@
     "ServiceEnabled": true,
     "MaxNumberOfRecords": <%= log.size %>,
     "OverWritePolicy": "<%= log.policy || 'Unknown' %>",
-    "DateTime": "<%= log.lastWriteDate || 'Unknown' %>",
     "DateTimeLocalOffset": "+00:00",
     "Actions" : {
         "Oem": {},
