@@ -6,14 +6,14 @@ try:
 except:
     from cisco import cli
 
+tmp_config_path = "volatile:poap.cfg"
+tmp_config_path_unix = "/volatile/poap.cfg"
+
 
 def deploy_startup_config():
     startup_config_uri = '<%= (hasOwnProperty("startupConfigUri") ? startupConfigUri : "" )%>'
     if not startup_config_uri:
         return
-
-    tmp_config_path = "volatile:poap.cfg"
-    tmp_config_path_unix = "/volatile/poap.cfg"
 
     try:
         os.remove(tmp_config_path_unix)
@@ -77,4 +77,5 @@ def main():
     # So we have to do all these operations in the same script, that way they
     # are not order-dependant.
     cli("copy running-config startup-config")
-    cli("copy running-config scheduled-config")
+    cli("copy running-config %s" % tmp_config_path)
+    cli("copy %s scheduled-config" % tmp_config_path)
