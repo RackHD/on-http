@@ -68,14 +68,18 @@ describe('Redfish Schemas', function () {
             });
     });
 
-    it('should return valid AccountService.1.0.0 schema json', function () {
+    it('should return 404 on invalid schema information ', function () {
 
-        return helper.request().get('/redfish/v1/SchemaStore/en/AccountService.1.0.0')
+        return helper.request().get('/redfish/v1/Schemas/AccountService.1.0.01')
             .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function(res) {
-                expect(res.body.type).to.equal("object");
-            });
+            .expect(404);
+    });
+
+    it('should return 404 on invalid schema json', function () {
+
+        return helper.request().get('/redfish/v1/SchemaStore/en/AccountService.1.0.01')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
     });
 
 
