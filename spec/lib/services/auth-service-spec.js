@@ -345,6 +345,10 @@ describe('Auth.Service', function () {
 
     describe('Token should not expire as expected', function () {
         before('start https server expiration set to 1 second', function () {
+
+            /*
+            TODO: https://github.com/RackHD/RackHD/issues/195
+
             return Promise.resolve().then(function(){
                 setConfig();
                 helper.injector.get('Services.Configuration')
@@ -353,6 +357,14 @@ describe('Auth.Service', function () {
             }).then(function() {
                 server.stop();
             }).then(function (){
+                helper.injector.get('Services.Configuration')
+                    .set('authTokenExpireIn', 0);
+                startServer(endpoint);
+            });
+            */
+
+            return Promise.resolve().then(function() {
+                setConfig();
                 helper.injector.get('Services.Configuration')
                     .set('authTokenExpireIn', 0);
                 startServer(endpoint);
