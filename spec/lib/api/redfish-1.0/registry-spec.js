@@ -82,7 +82,18 @@ describe('Redfish Registries', function () {
             });
     });
 
-    it('should return registry contents ', function () {
+    it('should 404 an invalid registry ', function () {
+        return helper.request().get('/redfish/v1/Registries/Base.1.0.1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404)
+            .expect(function(res) {
+                expect(res.body.error).to.be.an('object');
+                expect(res.body.error).to.be.an('object').with.property('code','Base.1.0.' +
+                    'GeneralError');
+            });
+    });
+
+    it('should 404 invalid registry contents ', function () {
         return helper.request().get('/redfish/v1/Registries/en/Base.1.0.1')
             .expect('Content-Type', /^application\/json/)
             .expect(404)
