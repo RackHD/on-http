@@ -32,7 +32,8 @@ describe("SKU Pack Service", function() {
         waterline.skus = {
             needByIdentifier: sinon.stub(),
             find: sinon.stub(),
-            create: sinon.stub()
+            create: sinon.stub(),
+            findOne: sinon.stub()
         };
         waterline.nodes = {
             find: sinon.stub()
@@ -151,7 +152,7 @@ describe("SKU Pack Service", function() {
         });
     });
 
-    describe('hould post a sku', function(){
+    describe('should post a sku', function(){
         before(function(){
             sinon.stub(skuService, 'regenerateSkus');
         });
@@ -183,6 +184,7 @@ describe("SKU Pack Service", function() {
               "id": "570651ae87b3579d76508d26"
           };
             waterline.skus.create.resolves(sku);
+            waterline.skus.findOne.resolves();
             skuService.regenerateSkus.resolves();
             return skuService.postSku(sku).then(function(val){
                 expect(waterline.skus.create).to.have.been.called;

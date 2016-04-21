@@ -570,6 +570,38 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+    put:
+      operationId: skusPut
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        create or update a sku
+      description: |
+        create or update a sku
+      parameters:
+        - name: body
+          in: body
+          description: |
+            object post to apply.
+          required: true
+          schema:
+            $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            create or updated sku definition
+          schema:
+            type: object
+        500:
+          description: |
+            Update failed
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /skus/{identifier}:
     x-swagger-router-controller: skus
     get:
