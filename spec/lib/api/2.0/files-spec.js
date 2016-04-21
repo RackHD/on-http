@@ -13,10 +13,10 @@ describe('Http.Api.Internal.Files', function () {
 
         return helper.startServer([]).then(function () {
             Promise = helper.injector.get('Promise');
-            return helper.request().get('/api/2.0/files')
+            return helper.request().get('/api/2.0/files');
         }).then(function (res) {
             return Promise.map(res.body, function (file) {
-                helper.request().delete('/api/2.0/files/' + file)
+                helper.request().delete('/api/2.0/files/' + file);
             });
         }).then(function () {
             return helper.request().put('/api/2.0/files/mockfile')
@@ -30,7 +30,7 @@ describe('Http.Api.Internal.Files', function () {
             return helper.request().get('/api/2.0/files');
         }).then(function (res) {
             numFilesBefore = res.body.length;
-        })
+        });
     });
 
     after('stop HTTP server', function () {
@@ -41,7 +41,7 @@ describe('Http.Api.Internal.Files', function () {
         it('should get file by name', function () {
             return helper.request().get('/api/2.0/files/mockfile')
                 .expect('Content-Type', /^application\/octet-stream/)
-                .expect(200, 'hello')
+                .expect(200, 'hello');
         });
 
         it('should get file by uuid', function () {
@@ -123,7 +123,7 @@ describe('Http.Api.Internal.Files', function () {
         it('should get 404 for bad filename', function () {
             return helper.request().get('/api/2.0/files/' + badFilename + '/metadata')
                 .expect(404)
-                .expect('Content-Type', /^application\/json/)
+                .expect('Content-Type', /^application\/json/);
         });
     });
 
@@ -133,14 +133,14 @@ describe('Http.Api.Internal.Files', function () {
                 .expect(function (res) {
                     expect(res.body).to.be.an('array');
                     expect(res.body).to.have.lengthOf(1);
-                })
+                });
         });
     });
 
     describe('DELETE /files/{fileidentifier}', function () {
         it('should delete file by uuid', function () {
             return helper.request().delete('/api/2.0/files/' + uuid)
-                .expect(204)
+                .expect(204);
         });
 
         it('should fail to get deleted file', function () {
@@ -151,7 +151,7 @@ describe('Http.Api.Internal.Files', function () {
 
         it('should return 404 if file not found', function () {
             return helper.request().delete('/api/2.0/files/' + badUuid)
-                .expect(404)
+                .expect(404);
         });
     });
 });
