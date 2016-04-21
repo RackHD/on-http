@@ -15,15 +15,19 @@
                     "enum": ["compute", "switch", "dae", "pdu", "mgmt", "enclosure"]
                 },
                 "obmSettings": {
-                    "description": "Time of node discovery",
+                    "description": "OBM settings",
                     "type": "array"
                 },
                 "snmpSettings": {
-                    "description": "Time of node update",
+                    "description": "SNMP settings",
                     "type": "object"
                 },
                 "bootSettings": {
-                    "description": "Specify node auto discovery",
+                    "description": "Default ipxe profile settings",
+                    "type": "object"
+                },
+                "sshSettings": {
+                    "description": "SSH settings",
                     "type": "object"
                 }
             },
