@@ -1191,6 +1191,11 @@ paths:
           required: false
           schema:
             $ref: '#/definitions/generic_obj'
+        - name: name
+          in: query
+          description: Workflow name
+          required: false
+          type: string
       tags: [ "/api/2.0" ]
       responses:
         201:
