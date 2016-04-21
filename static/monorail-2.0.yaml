@@ -1731,8 +1731,7 @@ paths:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+              node id value
           required: true
           type: string
         - name: body
@@ -1762,6 +1761,8 @@ paths:
       x-swagger-serializer: nodes
       # swagger template and schema names (not sure how to get schema in fitting)...
       operationId: nodesGetSshById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         get the ssh settings associated with a node.
       description: |
@@ -1770,8 +1771,11 @@ paths:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+              node id value
+          required: true
+          type: string
+      responses:
+        200:
           description: ssh settings
           schema:
             type: object
@@ -1788,6 +1792,8 @@ paths:
       x-swagger-deserializer: nodes
       # swagger template and schema names (not sure how to get schema in fitting)...
       operationId: nodesPostSshById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
       summary: |
         set the ssh settings associated with a node.
       description: |
