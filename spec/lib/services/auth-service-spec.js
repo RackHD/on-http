@@ -30,7 +30,7 @@ describe('Auth.Service', function () {
     function startServer(endpoint){
         var Server = helper.injector.get('Http.Server');
         server = new Server(endpoint);
-        server.start();
+        return server.start();
     }
 
     function cleanUp(){
@@ -349,13 +349,13 @@ describe('Auth.Service', function () {
                 setConfig();
                 helper.injector.get('Services.Configuration')
                     .set('authTokenExpireIn', 1);
-                startServer(endpoint);
+                return startServer(endpoint);
             }).then(function() {
-                server.stop();
+                return server.stop();
             }).then(function (){
                 helper.injector.get('Services.Configuration')
                     .set('authTokenExpireIn', 0);
-                startServer(endpoint);
+                return startServer(endpoint);
             });
         });
 
