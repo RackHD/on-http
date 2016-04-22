@@ -1,0 +1,20 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#AccountService",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#AccountService.1.0.0.AccountService",
+    "Oem": {},
+    "Id": "AccountService",
+    "Description": "Account Service",
+    "Name": "Account Service",
+    "Status": {},
+    "ServiceEnabled": true,
+    "MinPasswordLength": 8,
+    "MaxPasswordLength": 32,
+    "AccountLockoutThreshold": 0,
+    "Accounts" : {
+        "@odata.id": "<%= basepath %>/AccountService/Accounts"
+    },
+    "Roles": {
+        "@odata.id": "<%= basepath %>/AccountService/Roles"
+    }
+}

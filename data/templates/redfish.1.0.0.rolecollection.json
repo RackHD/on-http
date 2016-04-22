@@ -9,7 +9,7 @@
   "Members":[
     <% roles.forEach(function(role, i, arr) { %>
 {
-  "@odata.id": "<%= basepath %>/Roles/<%= roles[i][0] %>"
+  "@odata.id": "<%= basepath %>/AccountService/Roles/<%= roles[i][0] %>"
 }
 <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
 <% }); %>

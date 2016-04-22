@@ -24,7 +24,7 @@ describe('Redfish Roles', function () {
     });
 
     it('should return valid roles', function () {
-        return helper.request().get('/redfish/v1/Roles')
+        return helper.request().get('/redfish/v1/AccountService/Roles')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function(res) {
@@ -34,7 +34,7 @@ describe('Redfish Roles', function () {
     });
 
     it('should returnthe roles of  ReadOnly ', function () {
-        return helper.request().get('/redfish/v1/Roles/ReadOnly')
+        return helper.request().get('/redfish/v1/AccountService/Roles/ReadOnly')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function(res) {
