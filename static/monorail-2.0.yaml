@@ -2157,19 +2157,19 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /files/{fileidentifier}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: files
     get:
-      operationId: unimplemented
+      operationId: filesGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get file based on uuid
+        get file based on uuid or file name
       description: |
-        Get file based on uuid.
+        Get file based on uuid or file name.
       parameters:
         - name: fileidentifier
           in: path
-          description: uuid of a file as provided when you originally stored it.
+          description: uuid or file name of a file as provided when you originally stored it.
           required: true
           type: string
       tags: [ "/api/2.0" ]
@@ -2180,7 +2180,7 @@ paths:
         200:
           description: The file requested
           schema:
-            type: object
+            type: file
         404:
           description: File not found.
           schema:
@@ -2194,9 +2194,10 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     put:
-      operationId: unimplemented
+      operationId: filesPut
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: file.2.0.json
       summary: |
         put file based on filename
       description: |
@@ -2217,12 +2218,11 @@ paths:
 #      consumes:
 #        - application/octet-stream
       tags: [ "/api/2.0" ]
+      consumes:
+        - application/octet-stream
+        - application/x-www-form-urlencoded
       responses:
         200:
-          description: The file was stored
-          schema:
-            type: object
-        201:
           description: Ready.
           schema:
             type: string
@@ -2235,17 +2235,17 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      operationId: unimplemented
+      operationId: filesDelete
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
         delete file based on uuid
       description: |
-        Put file based on filename, returns the uuid of the stored file.
+        Delete a file based on uuid.
       parameters:
         - name: fileidentifier
           in: path
-          description: filename identifier of the file you wish to delete
+          description: UUID of the file you wish to delete
           required: true
           type: string
       tags: [ "/api/2.0" ]
@@ -2264,7 +2264,99 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
+  /files/{filename}/md5:
+    x-swagger-router-controller: files 
+    get:
+      operationId: filesMd5Get
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get md5sum based on file name
+      description: |
+        Get md5sum based on file name.
+      parameters:
+        - name: filename
+          in: path
+          description: File name of a file as provided when you originally stored it.
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: The file requested
+          schema:
+            type: object
+        404:
+          description: File not found.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Failed to serve file request.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /files/{filename}/metadata:
+    x-swagger-router-controller: files
+    get:
+      operationId: filesMetadataGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      x-view: file.2.0.json
+      summary: |
+        get file metadata by file name
+      description: |
+        Get file metadata by file name
+      parameters:
+        - name: filename
+          in: path
+          description: name of a file as provided when you originally stored it.
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: The file requested
+          schema:
+            type: object
+        404:
+          description: File not found.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Failed to serve file request.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /files:
+    x-swagger-router-controller: files
+    get:
+      operationId: filesGetAll
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get all available files
+      description: |
+        Get all available files
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: The file requested
+          schema:
+            type: object
+        500:
+          description: Failed to serve file request.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /config:
     x-swagger-router-controller: config
     get:
