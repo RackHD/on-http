@@ -7,6 +7,7 @@ describe('Http.Api.Profiles', function () {
     var taskProtocol;
     var lookupService;
     var profiles;
+    var presenter;
     var profileApiService;
     var Errors;
 
@@ -31,6 +32,8 @@ describe('Http.Api.Profiles', function () {
         sinon.stub(workflowApiService, 'findActiveGraphForTarget').resolves({});
         sinon.stub(workflowApiService, 'createActiveGraph').resolves({ instanceId: 'test' });
 
+        presenter = helper.injector.get('common-api-presenter');
+
         profiles = helper.injector.get('Profiles');
         sinon.stub(profiles, 'getAll').resolves([]);
         sinon.stub(profiles, 'get').resolves('');
@@ -54,6 +57,7 @@ describe('Http.Api.Profiles', function () {
         resetMocks(lookupService);
         resetMocks(taskProtocol);
         resetMocks(workflowApiService);
+        resetMocks(presenter.CommonApiPresenter.prototype);
         resetMocks(profiles);
         resetMocks(profileApiService);
     });
@@ -139,13 +143,25 @@ describe('Http.Api.Profiles', function () {
                     expect(profileApiService.setLookup).to.have.been.calledOnce;
                 });
         });
-        
+
         it("should send 500 set mac and ip fails", function() {
             profileApiService.setLookup.rejects(new Error('error'));
             return helper.request().get('/api/1.1/profiles?mac=00:01:02:03:04:05&&ip=1.1.1.1')
                 .expect(500);
         });
-        
+
+        it("should call getNode with a compute node type", function() {
+            return helper.request().get('/api/1.1/profiles')
+                .query({ macs: [ '00:01:02:03:04:05' ] })
+                .expect(200)
+                .expect(function() {
+                    expect(profileApiService.getNode).to.have.been.calledWith(
+                        [ '00:01:02:03:04:05' ],
+                        { type: 'compute' }
+                    );
+                });
+        });
+
         it("should send down redirect.ipxe if 'macs' are not in req.query", function() {
             profileApiService.getNode.restore();
             return helper.request().get('/api/1.1/profiles')
@@ -215,6 +231,74 @@ describe('Http.Api.Profiles', function () {
                 .expect(function() {
                     expect(profiles.get).to.have.been.calledWith('test.profile');
                 });
+        });
+    });
+
+    describe("GET /profiles/switch/:vendor", function() {
+        it("should send down taskrunner.py", function() {
+            sinon.spy(presenter.CommonApiPresenter.prototype, 'renderProfile');
+            var _renderProfileSpy = presenter.CommonApiPresenter.prototype.renderProfile;
+            profileApiService.getNode.resolves({
+                id: 'testid',
+                type: 'switch'
+            });
+
+            return helper.request().get('/api/1.1/profiles/switch/testswitchvendor')
+                .expect(200)
+                .expect(function() {
+                    expect(_renderProfileSpy).to.have.been.calledWith(
+                        'taskrunner.py',
+                        { identifier: 'testid' }
+                    );
+                });
+        });
+
+        it("should send a 500 if profileApiService.getNode fails", function() {
+            profileApiService.getNode.rejects(new Error('test'));
+
+            return helper.request().get('/api/1.1/profiles/switch/testswitchvendor')
+                .expect(500);
+        });
+
+        it("should return a 400 for a known node with no active graph", function() {
+            profileApiService.getNode.resolves({ type: 'switch' });
+            workflowApiService.findActiveGraphForTarget.resolves(null);
+
+            return helper.request().get('/api/1.1/profiles/switch/testswitchvendor')
+                .expect(400, /Unable to locate active workflow/);
+        });
+
+        it("should return a 500 on failing to retrieve workflow properties", function() {
+            profileApiService.getNode.resolves({ type: 'switch' });
+            workflowApiService.findActiveGraphForTarget.resolves({});
+
+            taskProtocol.requestProfile.resolves('test.profile');
+            taskProtocol.requestProperties.rejects(new Error('Test workflow properties error'));
+
+            return helper.request().get('/api/1.1/profiles/switch/testswitchvendor')
+                .expect(500, /Unable.*properties/);
+        });
+
+        it("should return a task specific profile for a switch with an active task", function() {
+            profileApiService.getNode.resolves({ type: 'switch' });
+            workflowApiService.findActiveGraphForTarget.resolves({});
+            taskProtocol.requestProfile.resolves('test.profile');
+            taskProtocol.requestProperties.resolves({});
+
+            return helper.request().get('/api/1.1/profiles/switch/testswitchvendor')
+                .expect(200)
+                .expect(function() {
+                    expect(profiles.get).to.have.been.calledWith('test.profile');
+                });
+        });
+
+        it("should throw a 400 on a request from an unknown switch vendor", function() {
+            profileApiService.getNode.restore();
+            profileApiService.createNodeAndRunDiscovery.restore();
+            profileApiService.runDiscovery.restore();
+            taskProtocol.activeTaskExists.rejects(new Error('test'));
+            return helper.request().get('/api/1.1/profiles/switch/unknown')
+                .expect(400, /Unknown.*vendor/);
         });
     });
 });
