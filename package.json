@@ -46,7 +46,8 @@
     "swagger-tools": "~0.9.11",
     "tar": "~2.2.1",
     "tv4": "~1.2.7",
-    "ws": "^0.8.0"
+    "ws": "^0.8.0",
+    "url-parse": "~1.1.1"
   },
   "devDependencies": {
     "apidoc": "^0.12.1",

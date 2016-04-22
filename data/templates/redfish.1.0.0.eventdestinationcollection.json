@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#EventService/Members/Events/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#EventDestinationCollection.EventDestinationCollection",
+    "Name": "Event Subscription Collection",
+    "Members@odata.count": <%= subscriptions.length %>,
+    "Members": [
+        <% subscriptions.forEach(function(subscription, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/EventService/Subscriptions/<%=subscription.Id%>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+    
+}

@@ -1,0 +1,26 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata/EventService",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#EventService.1.0.0.EventService",
+    "Id": "EventService",
+    "Name": "Event Service",
+    "Status": {},
+    "EventTypesForSubscription": [                
+        "StatusChange",
+        "ResourceUpdated",
+        "ResourceAdded",
+        "ResourceRemoved",
+        "Alert"
+    ],
+    "DeliveryRetryAttempts": <%= retryAttempts %>,
+    "DeliveryRetryIntervalSeconds": <%= timeoutInSeconds %>,
+    "ServiceEnabled": true,
+    "Actions": {
+        "#EventService.SubmitTestEvent": {
+            "target": "<%= basepath %>/EventService/Actions/EventService.SubmitTestEvent"
+        }
+    },
+    "Subscriptions": {
+        "@odata.id": "<%= basepath %>/EventService/Subscriptions"
+    }
+}

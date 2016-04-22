@@ -1,0 +1,11 @@
+{
+    "@odata.context": "<%= basepath %>/$metadata#EventService/Members/Subscriptions/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#EventService.1.0.0.EventDestination",
+    "Id": "<%= subscription.Id %>",
+    "Name": "Event Subscription Destination",
+    "Destination": "<%= subscription.Destination %>",
+    "EventTypes": <%- JSON.stringify(subscription.EventTypes) %>,
+    "Context": "<%= subscription.Context %>",
+    "Protocol": "<%= subscription.Protocol %>"
+}

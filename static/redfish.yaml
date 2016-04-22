@@ -784,6 +784,128 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /EventService:
+    x-swagger-router-controller: event-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of policies used by event service listeners
+      operationId: eventServiceRoot
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/EventService.1.0.0_EventService"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        501:
+          $ref: "#/responses/status_501"
+  /EventService/Subscriptions:
+    x-swagger-router-controller: event-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve collection of subscribed events
+      operationId: getEventsCollection
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/EventDestinationCollection_EventDestinationCollection"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        501:
+          $ref: "#/responses/status_501"  
+    post:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve collection of subscribed events
+      operationId: createSubscription
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/EventDestination.1.0.0_EventDestination"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/EventDestinationCollection_EventDestinationCollection"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        501:
+          $ref: "#/responses/status_501"  
+  /EventService/Subscriptions/{index}:
+    x-swagger-router-controller: event-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve specific event subscription
+      operationId: getEvent
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: index
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/EventDestination.1.0.0_EventDestination"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        501:
+          $ref: "#/responses/status_501"    
+    delete:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: delete specific event subscription
+      operationId: deleteEvent
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: index
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        501:
+          $ref: "#/responses/status_501"   
+  /EventService/Actions/EventService.SubmitTestEvent:
+    x-swagger-router-controller: event-service
+    post:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: submit a test event action
+      operationId: testEvent
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        501:
+          $ref: "#/responses/status_501"        
   /AccountService/Accounts/{name}:
     x-swagger-router-controller: account-service
     get:
@@ -864,25 +986,6 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /EventService:
-    x-swagger-router-controller: unimplemented
-    get:
-      x-privileges: [ 'Login' ]
-      x-authentication-type: [ 'redfish', 'basic' ]
-      summary: retrieve list of policies used by event service listeners
-      operationId: unimplemented
-      tags: [ "/redfish/v1" ]
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: "#/definitions/EventService.1.0.0_EventService"
-        401:
-          $ref: "#/responses/status_401"
-        403:
-          $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
   /Managers:
     x-swagger-router-controller: unimplemented
     get:
@@ -2311,6 +2414,82 @@ definitions:
         $ref: '#/definitions/Resource_Oem'
         description: This is the manufacturer/provider specific extension moniker
           used to divide the Oem object into sections.
+    type: object
+  EventDestination.1.0.0_EventDestination:
+    description: This is the base type for resources and referenceable members.
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Context:
+        description: A client-supplied string that is stored with the event destination
+          subscription.
+        type: string
+      Description:
+        description: Provides a description of this resource and is used for commonality  in
+          the schema definitions.
+        readOnly: true
+        type: string
+      Destination:
+        description: The URI of the destination Event Service.
+        readOnly: true
+        type: string
+      EventTypes:
+        description: This property shall contain the types of events that shall be
+          sent to the desination.
+        items:
+          enum:
+          - StatusChange
+          - ResourceUpdated
+          - ResourceAdded
+          - ResourceRemoved
+          - Alert
+          type: string
+        readOnly: true
+        type: array
+      HttpHeaders:
+        description: This is for setting HTTP headers, such as authorization information.  This
+          object will be null on a GET.
+        items:
+          $ref: '#/definitions/EventDestination.1.0.0_HttpHeaderProperty'
+        type: array
+      Id:
+        description: Uniquely identifies the resource within the collection of like
+          resources.
+        readOnly: true
+        type: string
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+      Protocol:
+        description: The protocol type of the event connection.
+        enum:
+        - Redfish
+        readOnly: true
+        type: string
+    required:
+    - Destination
+    - EventTypes
+    - Context
+    - Protocol
+    type: object
+  EventDestination.1.0.0_HttpHeaderProperty:
+    description: The value of the HTTP header is the property value.  The header name
+      is the property name.
+    properties: {}
     type: object
   EventDestinationCollection_EventDestinationCollection:
     properties:
@@ -5055,6 +5234,7 @@ definitions:
         description: Provides a description of this resource and is used for commonality  in
           the schema definitions.
         readOnly: true
+        type: string
       Members:
         description: Contains the members of this collection.
         items:
