@@ -424,7 +424,20 @@ describe('Http.Server', function () {
             app.get('/testrejectvalidationdeserializer', rest(function () {
                 return { item: 'value' };
             }, { deserializer: function () {
-                return Promise.reject(new Errors.ValidationError());
+                return Promise.reject(new Error(new Errors.ValidationError()));
+            } }));
+
+            return helper.request(TESTURL).get('/testrejectvalidationdeserializer')
+                .expect('Content-Type', /^application\/json/)
+                .expect(400);
+        });
+
+        it('should 400 if a deserializer returns a promise rejected with a SchemaError',
+           function () {
+            app.get('/testrejectvalidationdeserializer', rest(function () {
+                return { item: 'value' };
+            }, { deserializer: function () {
+                return Promise.reject(new Error(new Errors.SchemaError('test')));
             } }));
 
             return helper.request(TESTURL).get('/testrejectvalidationdeserializer')
