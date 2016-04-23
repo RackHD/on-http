@@ -897,6 +897,12 @@ paths:
       summary: submit a test event action
       operationId: testEvent
       tags: [ "/redfish/v1" ]
+      parameters:
+        - name: body
+          in: body
+          required: false
+          schema: 
+            type: object
       responses:
         200:
           description: Success
