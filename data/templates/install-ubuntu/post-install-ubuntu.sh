@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # create SSH key for root
-<% if (undefined !== rootSshKey) { -%>
+<% if ('undefined' !== typeof rootSshKey && null !== rootSshKey) { -%>
 mkdir /root/.ssh
 echo <%=rootSshKey%> > /root/.ssh/authorized_keys
 chown -R root:root /root/.ssh
