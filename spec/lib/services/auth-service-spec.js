@@ -14,6 +14,7 @@ describe('Auth.Service', function () {
     var UNAUTHORIZED_STATUS = 401;
     var ERROR_STATUS = 500;
 
+
     var token = '';
     var endpoint = {
         "address": "0.0.0.0",
@@ -101,6 +102,10 @@ describe('Auth.Service', function () {
             comparePassword: function(password) { return password === 'admin123'; }
         });
         waterline.localusers.findOne.resolves();
+
+        //Override the ES6-Thim Promise with Bluebird Promise from DI
+        //Promise.delay is only valid on bluebird Promise
+        Promise = helper.injector.get('Promise');
     });
 
     after('remove waterline definition', function() {
@@ -327,7 +332,6 @@ describe('Auth.Service', function () {
 
         it('Should get token expire error', function() {
             this.timeout(5000);
-
             return Promise.delay(1000)
                 .then(function(){
                     return helper.request('https://localhost:9443')
@@ -348,16 +352,19 @@ describe('Auth.Service', function () {
     describe('Token should not expire as expected', function () {
         before('start https server expiration set to 1 second', function () {
             return Promise.resolve().then(function(){
-                setConfig();
-                helper.injector.get('Services.Configuration')
-                    .set('authTokenExpireIn', 1);
-                return startServer(endpoint);
-            }).then(function() {
-                return server.stop();
-            }).then(function (){
-                helper.injector.get('Services.Configuration')
-                    .set('authTokenExpireIn', 0);
-                return startServer(endpoint);
+            setConfig();
+            helper.injector.get('Services.Configuration')
+                .set('authTokenExpireIn', 1);
+
+            return startServer(endpoint)
+                .then(function () {
+                    return server.stop();
+                })
+                .then(function () {
+                    helper.injector.get('Services.Configuration')
+                        .set('authTokenExpireIn', 0);
+                    return startServer(endpoint);
+                });
             });
         });
 
