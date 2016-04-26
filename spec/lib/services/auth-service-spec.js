@@ -35,11 +35,8 @@ describe('Auth.Service', function () {
     }
 
     function cleanUp(){
-        return Promise.resolve()
-        .then(function(){
-             return server.stop();
-        })
-        .then(function(){
+        return server.stop()
+            .then(function(){
             sandbox.restore();
             return restoreConfig();
         });
