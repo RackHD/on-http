@@ -1,0 +1,34 @@
+{
+    "title": "Poller.2.0",
+    "definitions": {
+        "PartialPoller": {
+            "description": "A poller for periodic collection of telemetry data",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "Type of poller",
+                    "type": "string",
+                    "enum": ["ipmi", "snmp", "redfish"]
+                },
+                "pollInterval": {
+                    "description": "Interval at which poller will run",
+                    "type": "number"
+                },
+                "paused": {
+                    "description": "Asserted if poller is paused",
+                    "type": "boolean"
+                },
+                "config": {
+                    "description": "Poller configuration object",
+                    "type": "object"
+                }
+            }
+        },
+        "Poller": {
+            "$ref": "#/definitions/PartialPoller",
+            "required": [
+                "type", "pollInterval", "config"
+            ]
+        }
+    }
+}

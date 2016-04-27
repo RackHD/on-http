@@ -52,7 +52,6 @@ describe('Http.Api.Pollers', function () {
                 expect(res.body).to.have.deep.property('config.command', 'sdr');
                 expect(res.body).to.have.deep.property('config.host', '0.0.0.0');
                 expect(res.body).to.have.deep.property('config.user', 'myuser');
-                expect(res.body).to.have.deep.property('config.password', 'mypass');
                 expect(res.body).to.have.property('id').to.be.a('string');
                 expect(res.body).to.have.property('createdAt').to.be.a('string');
                 expect(res.body).to.have.property('updatedAt').to.be.a('string');

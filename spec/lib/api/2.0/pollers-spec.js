@@ -16,7 +16,9 @@ describe('Http.Api.Pollers', function () {
     });
 
     beforeEach('reset test DB', function () {
-        return helper.reset();
+        return helper.reset().then(function() {
+            return helper.injector.get('Views').load();
+        });
     });
 
     after('stop HTTP server', function () {
@@ -52,10 +54,7 @@ describe('Http.Api.Pollers', function () {
                 expect(res.body).to.have.deep.property('config.command', 'sdr');
                 expect(res.body).to.have.deep.property('config.host', '0.0.0.0');
                 expect(res.body).to.have.deep.property('config.user', 'myuser');
-                expect(res.body).to.have.deep.property('config.password', 'mypass');
                 expect(res.body).to.have.property('id').to.be.a('string');
-                expect(res.body).to.have.property('createdAt').to.be.a('string');
-                expect(res.body).to.have.property('updatedAt').to.be.a('string');
                 expect(res.body).to.have.property('lastStarted', null);
                 expect(res.body).to.have.property('lastFinished', null);
             });
@@ -86,7 +85,6 @@ describe('Http.Api.Pollers', function () {
                 expect(res.body).to.have.property('pollInterval', 6000);
                 expect(res.body).to.have.property('config').to.be.an('object');
                 expect(res.body).to.have.deep.property('config.host', '0.0.0.0');
-                expect(res.body).to.have.deep.property('config.communityString', 'public');
 
                 expect(res.body).to.have.deep.property('config.extensionMibs')
                     .to.be.an.instanceOf(Array);
@@ -99,11 +97,24 @@ describe('Http.Api.Pollers', function () {
                     .and.to.include('PowerNet-MIB::rPDUIdentDeviceLinetoLineVoltage');
 
                 expect(res.body).to.have.property('id').to.be.a('string');
-                expect(res.body).to.have.property('createdAt').to.be.a('string');
-                expect(res.body).to.have.property('updatedAt').to.be.a('string');
                 expect(res.body).to.have.property('lastStarted', null);
                 expect(res.body).to.have.property('lastFinished', null);
             });
+    });
+
+    it('should 400 when required field is missing from POST /pollers', function () {
+        return helper.request().post('/api/2.0/pollers')
+            .send({
+                pollInterval: 5000,
+                config: {
+                    command: 'sdr',
+                    host: '0.0.0.0',
+                    user: 'myuser',
+                    password: 'mypass'
+                }
+            })
+            .expect('Content-Type', /^application\/json/)
+            .expect(400);
     });
 
     // TODO: probably change this later to not just be a static check
@@ -259,13 +270,18 @@ describe('Http.Api.Pollers', function () {
                 expect(res.body).to.have.property('failureCount', poller.failureCount);
                 expect(res.body).to.have.property('config').to.be.an('object');
                 expect(res.body).to.have.property('id', poller.id);
-                expect(res.body).to.have.property('createdAt', poller.createdAt);
-                expect(res.body).to.have.property('updatedAt')
-                .to.not.equal(poller.updatedAt);
                 expect(res.body).to.have.property('lastStarted', poller.lastStarted);
                 expect(res.body).to.have.property('lastFinished', poller.lastFinished);
                 expect(res.body).to.have.property('paused', false);
             });
+        });
+
+        it('should 400 on invalid PATCH /pollers', function () {
+            poller.pollInterval = 'some string';
+            return helper.request().patch('/api/2.0/pollers/' + poller.id)
+            .send(poller)
+            .expect('Content-Type', /^application\/json/)
+            .expect(400);
         });
 
         it('should create pollers that are not paused by default', function () {

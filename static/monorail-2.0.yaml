@@ -78,10 +78,10 @@ paths:
   /pollers:
     x-swagger-router-controller: pollers
     get:
-      x-swagger-serializer: pollers
       operationId: pollersGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: poller.2.0.json
       summary: |
         get list of all pollers
       description: |
@@ -98,10 +98,11 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
-      x-swagger-deserializer: pollers
       operationId: pollersPost
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: poller.2.0.json#/definitions/Poller
+      x-view: poller.2.0.json
       summary: |
         create a poller
       description: |
@@ -127,10 +128,10 @@ paths:
   /pollers/{identifier}:
     x-swagger-router-controller: pollers
     get:
-      x-swagger-serializer: pollers
       operationId: pollersIdGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: poller.2.0.json
       summary: |
         Get specifics of the specified poller
       description: |
@@ -159,10 +160,11 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     patch:
-      x-swagger-deserializer: pollers
       operationId: pollersPatch
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: poller.2.0.json#/definitions/PartialPoller
+      x-view: poller.2.0.json
       summary: |
         patch specifics of the specified poller
       description: |
@@ -2088,7 +2090,7 @@ paths:
             $ref: '#/definitions/Error'
     post:
       x-swagger-deserializer: nodes
-      x-swagger-schema: Node.2.0.json#/definitions/Node
+      x-swagger-schema: node.2.0.json#/definitions/Node
       operationId: nodesPost
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
