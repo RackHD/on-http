@@ -37,9 +37,10 @@ describe('Http.Api.Login', function () {
     function cleanUp(){
         return server.stop()
             .then(function(){
-            sandbox.restore();
-            return restoreConfig();
-        });
+                sandbox.restore();
+                return restoreConfig();
+            }
+        );
     }
     
     function restoreConfig(){
@@ -262,10 +263,10 @@ describe('Http.Api.Login', function () {
 
         after('stop server, restore mock and configure',function () {
             return cleanUp().then(function(){
-                        //restore endpoint
-                        endpoint.authEnabled = true;
-                        return;
-                    });
+                //restore endpoint
+                endpoint.authEnabled = true;
+                return;
+            });
         });
     });
 
