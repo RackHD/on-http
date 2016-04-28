@@ -158,7 +158,7 @@ describe('Redfish Event Service', function () {
         return helper.request().post(
             '/redfish/v1/EventService/Actions/EventService.SubmitTestEvent'
         )
-        .send([])
+        .send({})
         .expect(200)
         .expect(function() {
             expect(tv4.validate.called).to.be.true;
