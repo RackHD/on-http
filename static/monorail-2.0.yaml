@@ -2119,15 +2119,21 @@ paths:
             $ref: '#/definitions/Error'
 
   /lookups:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: lookups
     get:
-      operationId: unimplemented
+      operationId: lookupsGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
         find all
       description: |
         find all
+      parameters:
+      - name: q
+        in: query
+        description: query object to pass through to waterline.
+        required: false
+        type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -2141,17 +2147,18 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
-      operationId: unimplemented
+      operationId: lookupsPost
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: Lookups.2.0.json#/definitions/LookupPost
       summary: |
         find all
       description: |
         put all
       parameters:
-      - name: content
+      - name: body
         in: body
-        description: foo
+        description: lookup record to create
         required: true
         schema:
          $ref: '#/definitions/generic_obj'
@@ -2166,9 +2173,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /lookups/{id}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: lookups
     get:
-      operationId: unimplemented
+      operationId: lookupsGetById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -2193,32 +2200,67 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-    post:
-      operationId: unimplemented
+    delete:
+      operationId: lookupsDelById
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        post id
+        Delete specified lookup details.
       description: |
-        post id
+        Delete specified lookup details.
       parameters:
-      - name: id
-        in: path
-        description: id of thing to lookup
-        required: true
-        type: string
-      - name: content
-        in: body
-        description: foo
-        required: true
-        schema:
-         $ref: '#/definitions/generic_obj'
+        - name: id
+          in: path
+          description: |
+            id of the lookup record to delete
+          required: true
+          type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: waterline response
+          description: Delete successful
+        404:
+          description: The lookup with the identifier was not found.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    patch:
+      operationId: lookupsPatchById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: Lookups.2.0.json#/definitions/LookupBase
+      summary: |
+        Patch specified lookup record
+      description: |
+        Patch specified lookup record
+      parameters:
+        - name: id
+          in: path
+          description: |
+            id of the lookup record to patch.
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            object patches to apply.
+          required: true
+          schema:
+           $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: patch succeeded
           schema:
             type: object
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
