@@ -1,10 +1,17 @@
 #!/bin/bash
+set -ex
 
 # Ensure we're always in the right directory.
 SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 cd $SCRIPT_DIR/..
 
-BRANCH=$(git symbolic-ref --short -q HEAD)
+# Use the TRAVIS_BRANCH var if defined as travis vm
+# doesn't run the git symbolic-ref command.
+if [ -z "$TRAVIS_BRANCH" ]; then
+   BRANCH=$(git symbolic-ref --short -q HEAD)
+else
+   BRANCH=${TRAVIS_BRANCH}
+fi
 
 npm prune --production
 git clone --branch v2.1.5 https://github.com/swagger-api/swagger-codegen.git
