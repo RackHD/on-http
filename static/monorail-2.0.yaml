@@ -2967,6 +2967,52 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /schemas/{identifier}:
+    x-swagger-router-controller: schemas2
+    get:
+      operationId: schemasIdGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get a schema by specifying its identifier
+      description: |
+        Gets a schema by identifier.
+      parameters:
+        - name: identifier
+          in: path
+          description: identifier of a schema
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /schemas:
+    x-swagger-router-controller: schemas2
+    get:
+      operationId: schemasGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get list of all schemas
+      description: |
+        Get a list of all schemas.
+      tags: [ "/api/2.0" ]
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
 
   /swagger:
     x-swagger-pipe: swagger_raw
