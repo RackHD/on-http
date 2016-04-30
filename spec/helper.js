@@ -32,6 +32,7 @@ helper.startServer = function (overrides, endpointOpt) {
     helper.setupTestConfig();
 
     helper.injector.get('Services.Configuration')
+        .set('enableUPnP', false)
         .set('skuPackRoot', 'spec/lib/services/sku-static')
         .set('httpEndpoints', [ _.merge( {}, 
             {

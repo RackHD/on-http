@@ -4,13 +4,13 @@
 'use strict';
 
 describe('Redfish Endpoint', function () {
-    var configuration;
     var tv4;
     var redfish;
     var validator;
     var fs;
     var Promise;
     var template;
+    var systemUuid;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -32,6 +32,8 @@ describe('Redfish Endpoint', function () {
             Promise = helper.injector.get('Promise');
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
+            systemUuid = helper.injector.get('SystemUuid');
+            sinon.stub(systemUuid, 'getUuid');
         });
     });
 
@@ -41,10 +43,12 @@ describe('Redfish Endpoint', function () {
 
         validator.validate.reset();
         redfish.render.reset();
+        systemUuid.getUuid.reset();
     });
 
     afterEach('tear down mocks', function () {
         tv4.validate.restore();
+        systemUuid.getUuid.restore();
     });
 
     after('stop HTTP server', function () {
@@ -55,6 +59,7 @@ describe('Redfish Endpoint', function () {
     });
 
     it('should return a valid service root', function () {
+        systemUuid.getUuid.resolves('66ddf9c7-a3a4-47fc-b603-60737d1f15a8');
         return helper.request().get('/redfish/v1')
             .expect('Content-Type', /^application\/json/)
             .expect(200)

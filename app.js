@@ -18,7 +18,8 @@ di.annotate(Runner, new di.Inject(
         'fileService',
         'Promise',
         'Http.Services.SkuPack',
-        'Http.Services.Api.Account'
+        'Http.Services.Api.Account',
+        'Http.Services.uPnP'
     )
 );
 function Runner(
@@ -31,7 +32,8 @@ function Runner(
     fileService,
     Promise,
     skuPack,
-    accountService
+    accountService,
+    uPnPService
 ) {
     var services = [];
 
@@ -53,6 +55,11 @@ function Runner(
             })
             .then(function() {
                 return accountService.start();
+            })
+            .then(function() {
+                if(configuration.get('enableUPnP', true)) {
+                    return uPnPService.start();
+                }
             })
             .then(function() {
                 var endpoints = configuration.get('httpEndpoints', [{port: 8080}]);

@@ -47,7 +47,9 @@
     "tar": "~2.2.1",
     "tv4": "~1.2.7",
     "ws": "^0.8.0",
-    "url-parse": "~1.1.1"
+    "url-parse": "~1.1.1",
+    "node-ssdp": "~2.7.0",
+    "ip": "~1.1.2"
   },
   "devDependencies": {
     "apidoc": "^0.12.1",

@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0" configId="1">
+    <specVersion>
+        <major>1</major>
+        <minor>1</minor>
+    </specVersion>
+    <device>
+        <deviceType>urn:schemas-upnp-org:device:on-http:1</deviceType>
+        <friendlyName>RackHD</friendlyName>
+        <manufacturer>EMC Corporation</manufacturer>
+        <modelName>RackHD</modelName>
+        <modelURL>http://rackhd.readthedocs.io/en/latest/</modelURL>
+        <manufacturerURL>https://github.com/RackHD</manufacturerURL>
+        <UDN>uuid:<%= udn %></UDN>
+        <iconList>
+            <icon>
+                <mimetype>image/png</mimetype>
+                <width>200</width>
+                <height>200</height>
+                <depth>48</depth>
+                <url>/upnp/rackhd.png</url>
+            </icon>
+        </iconList>
+        <serviceList>
+            <service>
+                <serviceType>urn:schemas-upnp-org:service:api:1.1</serviceType>
+                <serviceId>urn:upnp-org:serviceId:api:1.1</serviceId>
+                <SCPDURL>/upnp/upnp-on-http-api1.1.xml</SCPDURL>
+                <controlURL></controlURL>
+                <eventSubURL></eventSubURL>
+            </service>
+            <service>
+                <serviceType>urn:schemas-upnp-org:service:api:2.0</serviceType>
+                <serviceId>urn:upnp-org:serviceId:api:2.0</serviceId>
+                <SCPDURL>/upnp/upnp-on-http-api2.0.xml</SCPDURL>
+                <controlURL></controlURL>
+                <eventSubURL></eventSubURL>
+            </service>
+            <service>
+                <serviceType>urn:dmtf-org:service:redfish-rest:1</serviceType>
+                <serviceId>urn:dmtf-org:serviceId:redfish-rest:1</serviceId>
+                <SCPDURL>/upnp/upnp-on-http-redfish-1.0.xml</SCPDURL>
+                <controlURL></controlURL>
+                <eventSubURL></eventSubURL>
+            </service>
+        </serviceList>
+    </device>
+</root>
