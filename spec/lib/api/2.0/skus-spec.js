@@ -118,7 +118,7 @@ describe('Http.Api.Skus', function () {
         it('should return the same sku from GET /skus/:id', function () {
             return helper.request().get('/api/2.0/skus/' + sku.id)
             .expect('Content-Type', /^application\/json/)
-            .expect(200, _.merge({}, sku, { packInfo: null }) );
+            .expect(200, _.merge({}, sku, { packInfo: { description: null, version: null } }) );
         });
 
         it('should 409 reposting the same sku', function() {

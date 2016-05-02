@@ -12,6 +12,9 @@ describe("SKU Pack Service", function() {
     var Templates;
     var Profiles;
     var Env;
+    var Errors;
+    var sandbox;
+    var self = this;
 
     before(function() {
         helper.setupInjector([
@@ -28,49 +31,45 @@ describe("SKU Pack Service", function() {
         Templates = helper.injector.get('Templates');
         Profiles = helper.injector.get('Profiles');
         Env = helper.injector.get('Services.Environment');
+        Errors = helper.injector.get('Errors');
+        fs = helper.injector.get('fs');
 
         waterline.skus = {
-            needByIdentifier: sinon.stub(),
-            find: sinon.stub(),
-            create: sinon.stub(),
-            findOne: sinon.stub()
-        };
-        waterline.nodes = {
-            find: sinon.stub()
+            needByIdentifier: function() {},
+            find: function() {},
+            create: function() {},
+            findOne: function() {},
+            update: function() {}
         };
 
-        fs = helper.injector.get('fs');
-        sinon.stub(fs, 'writeFileAsync');
-        sinon.stub(fs, 'readFileAsync');
-        sinon.stub(fs, 'readdirAsync');
-        sinon.stub(fs, 'statAsync');
-        sinon.stub(fs, 'mkdirAsync');
-        sinon.stub(fs, 'renameAsync');
-        sinon.stub(fs, 'unlinkAsync');
-        sinon.stub(fs, 'statSync');
+        waterline.nodes = {
+            find: function() {}
+        };
+
+        self.sandbox = sinon.sandbox.create();
+        self.sandbox.stub(waterline.skus, 'needByIdentifier');
+        self.sandbox.stub(waterline.skus, 'find');
+        self.sandbox.stub(waterline.skus, 'create');
+        self.sandbox.stub(waterline.skus, 'findOne');
+        self.sandbox.stub(waterline.skus, 'update');
+        self.sandbox.stub(waterline.nodes, 'find');
+        self.sandbox.stub(fs, 'writeFileAsync');
+        self.sandbox.stub(fs, 'readFileAsync');
+        self.sandbox.stub(fs, 'readdirAsync');
+        self.sandbox.stub(fs, 'statAsync');
+        self.sandbox.stub(fs, 'mkdirAsync');
+        self.sandbox.stub(fs, 'renameAsync');
+        self.sandbox.stub(fs, 'unlinkAsync');
+        self.sandbox.stub(fs, 'statSync');
     });
 
     beforeEach(function() {
         skuService.skuHandlers = {};
-        fs.writeFileAsync.reset();
-        fs.readFileAsync.reset();
-        fs.readdirAsync.reset();
-        fs.statAsync.reset();
-        fs.mkdirAsync.reset();
-        fs.renameAsync.reset();
-        fs.unlinkAsync.reset();
-        fs.statSync.reset();
+        self.sandbox.reset();
     });
 
     helper.after(function () {
-        fs.writeFileAsync.restore();
-        fs.readFileAsync.restore();
-        fs.readdirAsync.restore();
-        fs.statAsync.restore();
-        fs.mkdirAsync.restore();
-        fs.renameAsync.restore();
-        fs.unlinkAsync.restore();
-        fs.statSync.restore();
+        self.sandbox.restore();
     });
 
     it('should get the skus', function() {
@@ -220,7 +219,8 @@ describe("SKU Pack Service", function() {
     });
 
     describe('configuration file', function() {
-        var data = {
+        var skuAData = {
+            id: 'a',
             httpStaticRoot: 'static',
             httpTemplateRoot: 'templates',
             workflowRoot: 'workflows',
@@ -234,10 +234,9 @@ describe("SKU Pack Service", function() {
         };
 
         before(function() {
-            fs.readdirAsync.withArgs('./valid').resolves(['a.json']);
-            fs.statAsync.withArgs('./valid/a.json')
-                .resolves({ isDirectory: function() { return false; } });
-            fs.readFileAsync.withArgs('./valid/a.json').resolves(JSON.stringify(data));
+            waterline.skus.find.resolves([skuAData]);
+            waterline.skus.findOne.withArgs({id: 'a'}).resolves(skuAData);
+            waterline.skus.findOne.resolves();
             fs.readdirAsync.withArgs('./valid/a/templates').resolves(['template.file']);
             fs.readdirAsync.withArgs('./valid/a/profiles').resolves(['profile.ipxe']);
             fs.readdirAsync.withArgs('./valid/a/workflows').resolves(['graph.json']);
@@ -251,6 +250,7 @@ describe("SKU Pack Service", function() {
             fs.readFileAsync.withArgs('./valid/a/templates/template.file')
                 .resolves('content');
             fs.statSync.returns({ isFile: function() { return true; }});
+            fs.statAsync.resolves({ isDirectory: function() { return false; }});
 
             waterline.taskdefinitions = {
                 findOne: sinon.stub(),
@@ -306,53 +306,18 @@ describe("SKU Pack Service", function() {
             workflowApiService.defineTaskGraph.resolves();
             return skuService.start('./valid').then(function() {
                 expect(('a' in skuService.skuHandlers)).to.equal(true);
-                expect(fs.readdirAsync.called).to.be.true;
-                expect(fs.statAsync.called).to.be.true;
-                expect(fs.readFileAsync.called).to.be.true;
                 workflowApiService.defineTask.should.have.been.calledWith({
                     injectableName: 'Task.ABC::a'
                 });
                 workflowApiService.defineTaskGraph.should.have.been.calledWith({
                     injectableName: 'Graph.ABC::a'
                 });
-                Env.set.should.have.been.calledWith('config', data.skuConfig, 'a');
+                Env.set.should.have.been.calledWith('config', _.merge({}, skuAData.skuConfig, { Graph: { ABC : 'Graph.ABC::a'}}), 'a');
             });
         });
 
-        it('should not load a task if it is already loaded', function() {
-            waterline.taskdefinitions.findOne.resolves({injectableName: 'Task.ABC::a'});
-            waterline.graphdefinitions.findOne.resolves();
-            workflowApiService.defineTask.resolves();
-            workflowApiService.defineTaskGraph.resolves();
-            return skuService.start('./valid').then(function() {
-                expect(('a' in skuService.skuHandlers)).to.equal(true);
-                expect(fs.readdirAsync.called).to.be.true;
-                expect(fs.statAsync.called).to.be.true;
-                expect(fs.readFileAsync.called).to.be.true;
-                workflowApiService.defineTask.should.not.have.been.called;
-                workflowApiService.defineTaskGraph.should.have.been.calledWith({
-                    injectableName: 'Graph.ABC::a'
-                });
-            });
-        });
-
-        it('should not load a graph if it is already loaded', function() {
-            waterline.taskdefinitions.findOne.resolves();
-            waterline.graphdefinitions.findOne.resolves({injectableName: 'Graph.ABC::a'});
-            workflowApiService.defineTask.resolves();
-            workflowApiService.defineTaskGraph.resolves();
-            return skuService.start('./valid').then(function() {
-                expect(('a' in skuService.skuHandlers)).to.equal(true);
-                expect(fs.readdirAsync.called).to.be.true;
-                expect(fs.statAsync.called).to.be.true;
-                expect(fs.readFileAsync.called).to.be.true;
-                workflowApiService.defineTask.should.have.been.calledWith(
-                    {
-                        injectableName: 'Task.ABC::a'
-                    }
-                );
-                workflowApiService.defineTaskGraph.should.not.have.been.called;
-            });
+        it('should 404 registering an invalid sku', function() {
+            return skuService.registerPack('invalid').should.be.rejectedWith(Errors.NotFoundError);
         });
 
         it('should unregister a pack', function() {
@@ -361,7 +326,7 @@ describe("SKU Pack Service", function() {
             waterline.templates.destroy.resolves();
             waterline.profiles.destroy.resolves();
             return skuService.start('./valid').then(function() {
-                return skuService.unregisterPack('a', JSON.stringify(data));
+                return skuService.unregisterPack('a', skuAData);
             })
             .then(function() {
                 expect(fs.readdirAsync.called).to.be.true;
@@ -373,8 +338,8 @@ describe("SKU Pack Service", function() {
         });
 
         it('should get details on a pack', function() {
-            var newdata = _.omit(data, ['description', 'version']);
-            fs.readFileAsync.withArgs('./valid/a.json').resolves(JSON.stringify(newdata));
+            var newdata = _.omit(skuAData, ['description', 'version']);
+            waterline.skus.findOne.withArgs({id: 'a'}).resolves(newdata);
             return skuService.start('./valid').then(function() {
                 return skuService.getPackInfo('a');
             }).then(function(obj) {
@@ -384,37 +349,15 @@ describe("SKU Pack Service", function() {
         });
         
         it('should get details on a pack', function() {
-            fs.readFileAsync.withArgs('./valid/a.json').resolves(JSON.stringify(data));
+            waterline.skus.findOne.withArgs({id: 'a'}).resolves(skuAData);
             return skuService.start('./valid').then(function() {
                 return skuService.getPackInfo('a');
             }).then(function(obj) {
                 expect(obj.description).to.be.a.string;
-                expect(obj.description).to.equal(data.description);
+                expect(obj.description).to.equal(skuAData.description);
                 expect(obj.version).to.be.a.string;
-                expect(obj.version).to.equal(data.version);
+                expect(obj.version).to.equal(skuAData.version);
             });
-        });
-    });
-
-    it('should not load an invalid configuration file', function() {
-        var data = {
-            httpStaticRoot: 'static',
-            httpTemplateRoot: 'templates'
-        };
-        fs.readdirAsync.withArgs('./valid').resolves(['a.json', 'b.json']);
-        fs.statAsync.resolves({ isDirectory: function() { return false; } });
-        fs.readFileAsync.withArgs('./valid/a.json').resolves('{invalidjson}');
-        fs.readFileAsync.withArgs('./valid/b.json').resolves(JSON.stringify(data));
-        fs.readdirAsync.withArgs('./valid/a/templates').resolves([]);
-        fs.readdirAsync.withArgs('./valid/b/templates').resolves([]);
-
-        return skuService.start('./valid').then(function(vals) {
-            expect(vals.length).to.equal(2);
-            expect(('a' in skuService.skuHandlers)).to.equal(false);
-            expect(('b' in skuService.skuHandlers)).to.equal(true);
-            expect(fs.readdirAsync.called).to.be.true;
-            expect(fs.statAsync.called).to.be.true;
-            expect(fs.readFileAsync.called).to.be.true;
         });
     });
 
@@ -428,10 +371,7 @@ describe("SKU Pack Service", function() {
         };
         fs.readdirAsync.withArgs('./valid').resolves(
             ['static', 'templates', 'workflows', 'tasks', 'profiles']);
-        return skuService.validatePack(JSON.stringify(data), './valid').then(function(res) {
-            expect(res).to.be.true;
-            expect(fs.readdirAsync.called).to.be.true;
-        });
+        return skuService.validatePack(JSON.stringify(data), './valid').should.not.be.rejected;
     });
 
     it('should reject an invalid pack', function() {
@@ -440,20 +380,25 @@ describe("SKU Pack Service", function() {
             httpTemplateRoot: 'templates',
         };
         fs.readdirAsync.withArgs('./valid').resolves(['static']);
-        return skuService.validatePack(JSON.stringify(data), './valid').then(function(res) {
-            expect(res).to.be.false;
-            expect(fs.readdirAsync.called).to.be.true;
-        });
+        return skuService.validatePack(JSON.stringify(data), './valid').should.be.rejectedWith(Errors.BadRequestError);
     });
 
     it('should install a pack', function() {
         var data = {
             httpStaticRoot: 'static',
-            httpTemplateRoot: 'templates'
+            httpTemplateRoot: 'templates',
+            name: 'my test sku',
+            rules: [
+                { 
+                    path: 'dmi.Base Board Information.Manufacturer',
+                    contains: 'Intel'
+                }
+            ]
         };
+        waterline.skus.find.resolves([]);
+        waterline.skus.findOne.withArgs({id: 'skuid'}).resolves(data);
         fs.readFileAsync.withArgs('./valid/config.json').resolves(JSON.stringify(data));
         fs.readdirAsync.withArgs('./valid').resolves(['static', 'templates', 'config.json']);
-        fs.readdirAsync.withArgs('./root').resolves([]);
         fs.statAsync.withArgs('./root/skuid').rejects();
         fs.mkdirAsync.resolves();
         fs.renameAsync.resolves();
@@ -461,7 +406,7 @@ describe("SKU Pack Service", function() {
             return skuService.installPack('./valid', 'skuid');
         })
         .spread(function(name, contents) {
-            expect(name).to.equal('./root/skuid.json');
+            expect(name).to.equal('skuid');
             expect(contents).to.equal(JSON.stringify(data));
             expect(fs.readFileAsync.called).to.be.true;
             expect(fs.readdirAsync.called).to.be.true;
@@ -477,7 +422,6 @@ describe("SKU Pack Service", function() {
             httpTemplateRoot: 'templates'
         };
         fs.readdirAsync.withArgs('./root/skuid/templates').resolves([]);
-        fs.readFileAsync.withArgs('./root/skuid.json').resolves(JSON.stringify(data));
         return skuService.start('./root').then(function() {
             skuService.skuHandlers.skuid = {};
             return skuService.deletePack('skuid');
@@ -485,7 +429,6 @@ describe("SKU Pack Service", function() {
         .then(function(skuid) {
             expect(skuid).to.equal('skuid');
             expect(('skuid' in skuService.skuHandlers)).to.be.false;
-            expect(fs.readFileAsync.called).to.be.true;
             expect(fs.readdirAsync.called).to.be.true;
         });
     });
