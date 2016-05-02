@@ -23,7 +23,8 @@ describe("SKU Pack Service", function() {
             helper.require("/lib/services/workflow-api-service"),
             helper.require("/lib/services/sku-pack-service"),
             dihelper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),
-            dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf')
+            dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf'),
+            dihelper.requireWrapper('fs-extra', 'fs', undefined, __dirname)
         ]);
         waterline = helper.injector.get('Services.Waterline');
         workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
@@ -58,7 +59,7 @@ describe("SKU Pack Service", function() {
         self.sandbox.stub(fs, 'readdirAsync');
         self.sandbox.stub(fs, 'statAsync');
         self.sandbox.stub(fs, 'mkdirAsync');
-        self.sandbox.stub(fs, 'renameAsync');
+        self.sandbox.stub(fs, 'moveAsync');
         self.sandbox.stub(fs, 'unlinkAsync');
         self.sandbox.stub(fs, 'statSync');
     });
@@ -401,7 +402,7 @@ describe("SKU Pack Service", function() {
         fs.readdirAsync.withArgs('./valid').resolves(['static', 'templates', 'config.json']);
         fs.statAsync.withArgs('./root/skuid').rejects();
         fs.mkdirAsync.resolves();
-        fs.renameAsync.resolves();
+        fs.moveAsync.resolves();
         return skuService.start('./root').then(function() {
             return skuService.installPack('./valid', 'skuid');
         })
@@ -412,7 +413,7 @@ describe("SKU Pack Service", function() {
             expect(fs.readdirAsync.called).to.be.true;
             expect(fs.statAsync.called).to.be.true;
             expect(fs.mkdirAsync.called).to.be.true;
-            expect(fs.renameAsync.called).to.be.true;
+            expect(fs.moveAsync.called).to.be.true;
         });
     });
 
