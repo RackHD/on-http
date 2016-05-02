@@ -25,7 +25,7 @@ def parse_version(versionString):
         # Add key for the Arista switch model
         if (line.find(':') == -1):
             emptyValue = True
-	    line = '"Hardwaremodel":' + line + '"'
+            line = '"Hardwaremodel":' + line + '"'
 
         if (line.endswith(":")):
             line = line.replace(':', ':""')
