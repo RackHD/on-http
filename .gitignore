@@ -47,6 +47,7 @@ static/http/
 static/smb/
 static/tftp/
 static/web-ui/
+static/swagger-ui/
 
 build/
 
