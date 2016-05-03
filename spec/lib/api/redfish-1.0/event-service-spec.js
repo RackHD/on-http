@@ -14,7 +14,13 @@ describe('Redfish Event Service', function () {
     var identifier;
     var eventDestination = {
         Destination: 'http://1.1.1.1:8080',
-        EventTypes: ['Alert', 'StatusChange'],
+        EventTypes: [
+            'Alert', 
+            'StatusChange', 
+            'ResourceAdded', 
+            'ResourceUpdated', 
+            'ResourceRemoved'
+        ],
         Context: 'Event Context',
         Protocol: 'Redfish'
     };
@@ -175,6 +181,18 @@ describe('Redfish Event Service', function () {
         events.value[0].reading.sdrType = 'Discrete';
         events.value[0].reading.statesAsserted = ['AssertedState']; 
         expect(eventService.eventCallback(events)).to.be.fullfilled;
+    });
+    
+    it('should handle resource event', function() {
+        var eventService = helper.require('/lib/api/redfish-1.0/event-service.js');
+        var resourceEvent = {
+            value: {
+                data: [{data:'data'}],
+                EventType: 'ResourceUpdated',
+                pollerName: 'FabricService'
+            }
+        };
+        expect(eventService.eventCallback(resourceEvent)).to.be.fullfilled;
     });
     
     it('should delete a valid subscription', function() {    
