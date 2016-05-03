@@ -1,0 +1,35 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Managers/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Manager.1.0.0.Manager",
+    "Oem": {},
+    "Id": "<%= identifier %>",
+    "Name": "Manager",
+    "ManagerType": "<%= managerType %>",
+    "Links": {
+        "ManagerForServers@odata.count": <%= systems.length %>,
+        "ManagerForServers": [
+        <% systems.forEach(function(system, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Systems/<%= system %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+        ],
+        "ManagerForChassis@odata.count": <%= chassis.length %>,
+        "ManagerForChassis": [
+        <% chassis.forEach(function(chassis, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Chassis/<%= chassis %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+        ]
+    },
+    "Model": "<%= mcInfo['Product Name'] %>",
+    "FirmwareVersion": "<%= mcInfo['Firmware Revision'] %>",
+    "Status" : {},
+    "EthernetInterfaces" : {
+        "@odata.id": "<%= url %>/EthernetInterfaces"
+    }
+}

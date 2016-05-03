@@ -5,33 +5,42 @@
     "Oem": {},
     "Id": "<%= identifier %>",
     "Description": "",
-	"Name": "Chassis",
-	"ChassisType": "<%= chassisType %>",
-	"AssetTag" : "<%= ohai.data.dmi.chassis.asset_tag %>",
-	"Manufacturer": "<%= ohai.data.dmi.chassis.manufacturer %>",
+    "Name": "Chassis",
+    "ChassisType": "<%= chassisType %>",
+    "AssetTag" : "<%= ohai.data.dmi.chassis.asset_tag %>",
+    "Manufacturer": "<%= ohai.data.dmi.chassis.manufacturer %>",
     "Model": "<%= ohai.data.dmi.system.product_name %>",
     "SKU": "<%= ohai.data.dmi.chassis.sku_number %>",
     "SerialNumber": "<%= ohai.data.dmi.chassis.serial_number %>",
     "Actions": {
         "Oem": {},
-		"#Chassis.Reset": {}
+        "#Chassis.Reset": {}
     },
     "Status": {},
     "Thermal": {
-		"@odata.id": "<%= basepath %>/Chassis/<%= identifier %>/Thermal"
-	},
-	"Power": {
-		"@odata.id": "<%= basepath %>/Chassis/<%= identifier %>/Power"
-	},
+        "@odata.id": "<%= basepath %>/Chassis/<%= identifier %>/Thermal"
+    },
+    "Power": {
+        "@odata.id": "<%= basepath %>/Chassis/<%= identifier %>/Power"
+    },
     "LogServices": {},
     "IndicatorLED": "<%= chassisData.uid %>",
-	"Links": {
+    "Links": {
         "Oem": {},
         "ComputerSystems@odata.count": <%= targetList.length %>,
         "ComputerSystems": [
             <% targetList.forEach(function(target, i, arr) { %>
                 {
                     "@odata.id": "<%= basepath %>/Systems/<%= target %>"
+                }
+                <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+            <% }); %>
+        ],
+        "ManagedBy@odata.count": <%= obm.length %>,
+        "ManagedBy": [
+            <% obm.forEach(function(obm, i, arr) { %>
+                {
+                    "@odata.id": "<%= basepath %>/Managers/<%= obm %>"
                 }
                 <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
             <% }); %>

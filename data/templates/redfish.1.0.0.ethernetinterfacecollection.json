@@ -8,7 +8,7 @@
     "Members": [
         <% net.forEach(function(n, i, arr) { %>
             {
-                "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/EthernetInterfaces/<%=n%>"
+                "@odata.id": "<%= url %>/<%= n %>"
             }
             <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
         <% }); %>

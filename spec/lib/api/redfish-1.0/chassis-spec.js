@@ -100,6 +100,28 @@ describe('Redfish Chassis Root', function () {
         ]
     };
 
+    var system = {
+        id: '1234abcd1234abcd1234abcd',
+        name: 'name',
+        type: 'compute',
+        obmSettings: [
+            {
+                service: 'ipmi-obm-service',
+                config: {
+                    host: '1.2.3.4',
+                    user: 'myuser',
+                    password: 'mypass'
+                }
+            }
+        ],
+        relations: [
+            {
+                relationType: 'enclosedBy',
+                targets: [ '4567efgh4567efgh4567efgh' ]
+            }
+        ]
+    };
+
     var catalogData = {
         dmi: {
             chassis : {
@@ -136,6 +158,7 @@ describe('Redfish Chassis Root', function () {
     it('should return valid chassis and related targets', function() {
         waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
         waterline.nodes.needByIdentifier.resolves(Promise.resolve(enclosure));
+        waterline.nodes.findByIdentifier.resolves(Promise.resolve(system));
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
@@ -163,6 +186,7 @@ describe('Redfish Chassis Root', function () {
     it('should return valid chassis and related targets by serial number', function() {
         waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
         waterline.nodes.needByIdentifier.resolves(Promise.resolve(enclosure));
+        waterline.nodes.findByIdentifier.resolves(Promise.resolve(system));
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',

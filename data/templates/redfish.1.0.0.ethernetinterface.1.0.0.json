@@ -1,0 +1,30 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Systems/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#EthernetInterface.1.0.0.EthernetInterface",
+    "Oem" : {},
+    "Id": "<%= index %>",
+    "Description": "",
+    "Name": "Manager Ethernet Interface",
+    "Status": {},
+    "InterfaceEnabled": true,
+    "PermanentMACAddress": "<%= hostMAC %>",
+    "MACAddress": "<%= hostMAC %>",
+    <% if (typeof vlan !== 'undefined') { %>
+    "VLAN": {
+        "VLANEnable": true,
+        "VLANId": <%= vlan %>
+    },
+    <% } %>
+    "IPv4Addresses" : [
+    <% ipv4.forEach(function(ipv4, i, arr) { %>
+        {
+            "Address": "<%= ipv4.ipaddr %>",
+            "SubnetMask": "<%= ipv4.ipsubnet %>",
+            "AddressOrigin": "<%= ipv4.ipsrc %>",
+            "Gateway": "<%= ipv4.ipgateway %>"
+        }
+        <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+    <% }); %>
+    ]
+}

@@ -1,0 +1,15 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Managers",
+    "@odata.type": "#ManagerCollection.ManagerCollection",
+    "Name": "Manager Collection",
+    "Oem": {},
+    "Members@odata.count": <%= (managers.length) %>,
+    "Members": [
+        <% managers.forEach(function(manager, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Managers/<%=manager.id%>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}

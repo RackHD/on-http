@@ -993,12 +993,12 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /Managers:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: managers
     get:
       x-privileges: [ 'ConfigureManager' ]
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of management servers
-      operationId: unimplemented
+      operationId: listManagers
       tags: [ "/redfish/v1" ]
       responses:
         200:
@@ -1018,12 +1018,12 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /Managers/{identifier}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: managers
     get:
       x-privileges: [ 'ConfigureManager' ]
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve list of management servers
-      operationId: unimplemented
+      operationId: getManager
       tags: [ "/redfish/v1" ]
       parameters:
         - name: identifier
@@ -1035,6 +1035,70 @@ paths:
           description: Success
           schema:
             $ref: "#/definitions/Manager.1.0.0_Manager"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Managers/{identifier}/EthernetInterfaces:
+    x-swagger-router-controller: managers
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve information about the ethernet interfaces
+      operationId: listManagerEthernetInterfaces
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/EthernetInterfaceCollection_EthernetInterfaceCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Managers/{identifier}/EthernetInterfaces/{index}:
+    x-swagger-router-controller: managers
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve information about the specified ethernet interface
+      operationId: getManagerEthernetInterface
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+        - name: index
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/EthernetInterface.1.0.0_EthernetInterface"
         400:
           $ref: "#/responses/status_400"
         401:

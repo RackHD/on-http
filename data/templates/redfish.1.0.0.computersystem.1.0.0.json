@@ -62,8 +62,15 @@
     },
     "Links": {
         "Oem": {},
-        "ManagedBy@odata.count": 0,
-        "ManagedBy": [],
+        "ManagedBy@odata.count": <%= obm.length %>,
+        "ManagedBy": [
+            <% obm.forEach(function(obm, i, arr) { %>
+                {
+                    "@odata.id": "<%= basepath %>/Managers/<%= obm %>"
+                }
+                <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+            <% }); %>
+        ],
         "PoweredBy@odata.count": 0,
         "PoweredBy": [],
         "CooledBy@odata.count": 0,
