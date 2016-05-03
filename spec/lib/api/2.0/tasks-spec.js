@@ -18,7 +18,10 @@ describe('Http.Api.Tasks', function () {
         taskProtocol = helper.injector.get('Protocol.Task');
         // Defaults, you can tack on .resolves().rejects().resolves(), etc. like so
         taskProtocol.activeTaskExists = sinon.stub().resolves();
-        taskProtocol.requestCommands = sinon.stub().resolves({ testcommands: 'cmd' });
+        taskProtocol.requestCommands = sinon.stub().resolves({
+                                                            "identifier":"1234", 
+                                                            "tasks": [ {"cmd": "testfoo"}
+                                                             ]});
         taskProtocol.respondCommands = sinon.stub();
 
         tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
@@ -29,7 +32,9 @@ describe('Http.Api.Tasks', function () {
 
         templates = helper.injector.get('Templates');
 
-        return helper.reset();
+        return helper.reset().then(function(){
+          return helper.injector.get('Views').load();
+          });
     });
 
     after('stop HTTP server', function () {
@@ -42,7 +47,10 @@ describe('Http.Api.Tasks', function () {
             return helper.request().get('/api/2.0/tasks/testnodeid')
             .expect(200)
             .expect(function (res) {
-                expect(res.body).to.deep.equal({ testcommands: 'cmd' });
+                expect(res.body).to.deep.equal({
+                                               "identifier":"1234",
+                                               "tasks": [ {"cmd": "testfoo"}
+                                               ]});
             });
         });
 
@@ -61,6 +69,7 @@ describe('Http.Api.Tasks', function () {
             return helper.request().get('/api/2.0/tasks/testnodeid')
             .expect(404);
         });
+
 
 
     });
@@ -114,7 +123,7 @@ describe('Http.Api.Tasks', function () {
                 return x;
             }
 
-            var data = { foo: createBigString() };
+            var data = {"identifier": createBigString(),"tasks": [{"cmd": "testfoo"}]};
 
             return helper.request().post('/api/2.0/tasks/123')
             .send(data)
