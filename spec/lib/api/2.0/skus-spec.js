@@ -115,10 +115,6 @@ describe('Http.Api.Skus.2.0', function() {
         workflowApiService.createAndRunGraph.restore();
     });
 
-
-
-
-
     it('should return an empty array from GET /skus', function () {
         skuApiService.getSkus.resolves([]);
         return helper.request().get('/api/2.0/skus')
@@ -153,7 +149,6 @@ describe('Http.Api.Skus.2.0', function() {
             .expect(200, [sku]);
         });
 
-
         it('should return the same sku from GET /skus/:id', function () {
             skuApiService.getSkusById.resolves(input);
             return helper.request().get('/api/2.0/skus/' + sku.id)
@@ -161,8 +156,6 @@ describe('Http.Api.Skus.2.0', function() {
             .expect(200)
             .then(function (res) {
                     var checkSku = res.body;
-                    console.log("Printing checkSku hereeeeeeeee");
-                    console.log(checkSku);
                     expect(checkSku).to.have.property('name').that.equals(input.name);
                 });
         });
@@ -206,7 +199,6 @@ describe('Http.Api.Skus.2.0', function() {
                     .expect(200)
                     .then(function (res) {
                         updated = res.body;
-                        console.log(updated);
                         expect(updated).to.have.property('name').that.equals(sku.name);
                         expect(updated).to.have.property('rules').that.deep.equals(sku.rules);
                     });
