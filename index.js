@@ -44,7 +44,8 @@ function onHttpContextFactory(di, directory) {
             require('./app'),
             helper.requireWrapper('rimraf', 'rimraf', undefined, __dirname),
             helper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),
-            helper.requireWrapper('fs-extra', 'fs', undefined, __dirname)
+            helper.requireWrapper('fs-extra', 'fs', undefined, __dirname),
+            helper.requireWrapper('os', 'os', undefined, __dirname)
         ]),
 
         prerequisiteInjectables: _.flattenDeep([
