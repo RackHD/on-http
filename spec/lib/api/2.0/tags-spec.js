@@ -132,7 +132,7 @@ describe('Http.Api.Tags', function () {
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, input)
                 .then(function() {
-                    expect(tagsApi.getTag).to.have.been.calledWith('tag%20name');
+                    expect(tagsApi.getTag).to.have.been.calledWith('tag name');
                 });
         });
 
