@@ -31,6 +31,9 @@ describe('Http.Services.Api.Workflows', function () {
         waterline.nodes = {
             needByIdentifier: sinon.stub().resolves({ id: 'testnodeid' })
         };
+        waterline.lookups = {
+           findOneByTerm: sinon.stub().resolves() 
+        };
         waterline.graphobjects = {
             needByIdentifier: sinon.stub().resolves({ id: 'testgraphid', _status: 'pending' }),
             find: sinon.stub().resolves(),

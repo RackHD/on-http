@@ -5,12 +5,13 @@
 describe("Http.Services.Api.Profiles", function () {
     var profileApiService;
     var Errors;
+    var Constants;
     var taskProtocol;
     var workflowApiService;
     var eventsProtocol;
     var waterline;
     var lookupService;
-
+    
     before("Http.Services.Api.Profiles before", function() {
         helper.setupInjector([
             helper.di.simpleWrapper({}, 'TaskGraph.Store'),
@@ -23,9 +24,13 @@ describe("Http.Services.Api.Profiles", function () {
         ]);
         profileApiService = helper.injector.get("Http.Services.Api.Profiles");
         Errors = helper.injector.get("Errors");
+        Constants = helper.injector.get("Constants");
         waterline = helper.injector.get('Services.Waterline');
         waterline.nodes = {
             findByIdentifier: function() {}
+        };
+        waterline.lookups = {
+            upsertProxyToMacAddress: function() {}
         };
         taskProtocol = helper.injector.get("Protocol.Task");
         workflowApiService = helper.injector.get("Http.Services.Api.Workflows");
@@ -55,17 +60,40 @@ describe("Http.Services.Api.Profiles", function () {
 
     describe("setLookup", function() {
         var node;
-        var query = {
-            'ip':'ip',
-            'mac':'mac'
+        var proxy;
+        var req = {
+            query: {
+                'ip':'ip',
+                'mac':'mac'
+            },
+            get: function(header) {
+                if(header === Constants.HttpHeaders.ApiProxyIp) {
+                    return proxy;
+                }
+            }
         };
 
         it("setLookup should add IP lookup entry for new node", function() {
             this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
+            this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress').resolves();
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
-            return profileApiService.setLookup(query)
+ 
+            return profileApiService.setLookup(req)
             .then(function() {
                 expect(lookupService.setIpAddress).to.be.calledOnce;
+                expect(waterline.lookups.upsertProxyToMacAddress).to.not.be.called;
+            });
+        });
+
+        it("setLookup should add IP lookup entry and proxy for new node", function() {
+            proxy = '12.1.1.1';
+            this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
+            this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress').resolves();
+            this.sandbox.stub(lookupService, 'setIpAddress').resolves();
+            return profileApiService.setLookup(req)
+            .then(function() {
+                expect(lookupService.setIpAddress).to.be.calledOnce;
+                expect(waterline.lookups.upsertProxyToMacAddress).to.be.calledOnce;
             });
         });
 
@@ -74,18 +102,22 @@ describe("Http.Services.Api.Profiles", function () {
                 discovered: true
             };
             this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
+            this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress').resolves();
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
-            return profileApiService.setLookup(query)
+            return profileApiService.setLookup(req)
             .then(function() {
                 expect(lookupService.setIpAddress).to.not.be.called;
+                expect(waterline.lookups.upsertProxyToMacAddress).to.be.calledOnce;
             });
         });
 
         it("setLookup does not lookup node on missing required query string", function() {
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
-            return profileApiService.setLookup({macs:'macs'})
+            this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress').resolves();
+            return profileApiService.setLookup({query: {macs:'macs'}})
             .then(function() {
                 expect(lookupService.setIpAddress).to.not.be.called;
+                expect(waterline.lookups.upsertProxyToMacAddress).to.not.be.called;
             });
         });
 
@@ -158,6 +190,7 @@ describe("Http.Services.Api.Profiles", function () {
 
     it('should run discovery', function() {
         var node = { id: 'test', type: 'compute' };
+        this.sandbox.stub(lookupService, 'nodeIdToProxy').resolves();
         this.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves();
         this.sandbox.stub(profileApiService, 'waitForDiscoveryStart').resolves();
         return profileApiService.runDiscovery(node)
