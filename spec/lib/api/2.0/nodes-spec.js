@@ -781,10 +781,11 @@ describe('Http.Api.Nodes', function () {
         });
 
         it('should delete the currently active workflow', function () {
-            nodeApiService.delActiveWorkflowById.resolves();
+            var graph = {id: '123'};
+            nodeApiService.delActiveWorkflowById.resolves(graph);
 
             return helper.request().delete('/api/2.0/nodes/123/workflows/active')
-                .expect(204)
+                .expect(202)
                 .expect(function () {
                     expect(nodeApiService.delActiveWorkflowById).to.have.been.calledOnce;
                     expect(nodeApiService.delActiveWorkflowById).to.have.been.calledWith('123');
