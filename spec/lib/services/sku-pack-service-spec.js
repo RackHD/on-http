@@ -241,13 +241,13 @@ describe("SKU Pack Service", function() {
                 "updatedAt": "2016-04-07T12:25:18.529Z",
                 "id": "570651ae87b3579d76508d26"
             };
-            waterline.skus.updateByIdentifier.resolves({id: '570651ae87b3579d76508d26', name: 'updatedSkuName'});
+            waterline.skus.updateByIdentifier.resolves({id: '570651ae87b3579d76508d26',
+                name: 'updatedSkuName'});
             skuService.regenerateSkus.resolves();
             return skuService.patchSku(sku.id).then(function (val) {
                 expect(waterline.skus.updateByIdentifier).to.have.been.called;
                 expect(val.name).equal('updatedSkuName');
             });
-
         });
     });
 
@@ -315,7 +315,6 @@ describe("SKU Pack Service", function() {
                 expect(skuService.patchSku).to.have.been.called;
             });
         });
-
     });
 
     describe('should delete sku by ID', function(){
@@ -333,7 +332,7 @@ describe("SKU Pack Service", function() {
                 expect(sku).to.deep.equal(emptySku);
                 expect(waterline.skus.destroyByIdentifier).to.have.been.called;
                 expect(skuService.regenerateSkus).to.have.been.calledOnce;
-            })
+            });
         });
 
     });

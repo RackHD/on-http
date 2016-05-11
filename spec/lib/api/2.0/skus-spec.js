@@ -118,7 +118,7 @@ describe('Http.Api.Skus.2.0', function() {
         return helper.request().get('/api/2.0/skus')
             .expect('Content-Type', /^application\/json/)
             .expect(200, [])
-            .then(function (res) {
+            .then(function () {
                 expect(skuApiService.getSkus).to.have.been.called;
             });
     });
@@ -148,7 +148,7 @@ describe('Http.Api.Skus.2.0', function() {
             return helper.request().get('/api/2.0/skus')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, [sku])
-                .then(function (res) {
+                .then(function () {
                     expect(skuApiService.getSkus).to.have.been.called;
             });
         });
@@ -170,7 +170,7 @@ describe('Http.Api.Skus.2.0', function() {
             return helper.request().put('/api/2.0/skus')
                 .send(input)
                 .expect(200)
-                .then(function (res) {
+                .then(function () {
                     expect(skuApiService.upsertSku).to.have.been.called;
                 });
         });
