@@ -167,7 +167,7 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
 <% } %>
 
 #signify ORA the installation completed
-/usr/bin/wget --spider http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub
+/usr/bin/wget -s http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub
 
 #reboot the system after host configuration
 esxcli system shutdown reboot -d 10 -r "Rebooting after first boot host configuration"
