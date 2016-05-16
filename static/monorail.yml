@@ -12,6 +12,8 @@ produces:
   # x-gzip explicitly for files once the bugs listed 
   #   in comments below are fixed by swagger team.
   - application/x-gzip
+consumes:
+  - application/json
 securityDefinitions:
   auth_token:
     type: apiKey
