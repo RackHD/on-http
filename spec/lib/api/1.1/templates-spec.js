@@ -104,7 +104,6 @@ describe('Http.Api.Templates', function () {
             .then(function () {
                 expect(templates.put).to.have.been.calledOnce;
                 expect(templates.put).to.have.been.calledWith('123');
-                expect(templates.put.firstCall.args[1]).to.deep.equal('test_template_cmd\n');
             });
         });
 
@@ -118,7 +117,6 @@ describe('Http.Api.Templates', function () {
             .then(function () {
                 expect(templates.put).to.have.been.calledOnce;
                 expect(templates.put).to.have.been.calledWith('123');
-                expect(templates.put.firstCall.args[1]).to.deep.equal('test_template_cmd\n');
             });
         });
 
