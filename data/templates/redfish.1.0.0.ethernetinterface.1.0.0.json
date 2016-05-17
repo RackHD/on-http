@@ -8,8 +8,10 @@
     "Name": "Manager Ethernet Interface",
     "Status": {},
     "InterfaceEnabled": true,
+    <% if(typeof hostMAC !== 'undefined') { %>
     "PermanentMACAddress": "<%= hostMAC %>",
     "MACAddress": "<%= hostMAC %>",
+    <% } %>
     <% if (typeof vlan !== 'undefined') { %>
     "VLAN": {
         "VLANEnable": true,
@@ -19,10 +21,16 @@
     "IPv4Addresses" : [
     <% ipv4.forEach(function(ipv4, i, arr) { %>
         {
-            "Address": "<%= ipv4.ipaddr %>",
-            "SubnetMask": "<%= ipv4.ipsubnet %>",
-            "AddressOrigin": "<%= ipv4.ipsrc %>",
-            "Gateway": "<%= ipv4.ipgateway %>"
+            "Address": "<%= ipv4.ipaddr %>"
+            <% if(typeof ipv4.ipsubnet !== 'undefined') { %>
+            ,"SubnetMask": "<%= ipv4.ipsubnet %>"
+            <% } %>
+            <% if(typeof ipv4.ipsrc !== 'undefined') { %>
+            ,"AddressOrigin": "<%= ipv4.ipsrc %>"
+            <% } %>
+            <% if(typeof ipv4.ipgateway !== 'undefined') { %>
+            ,"Gateway": "<%= ipv4.ipgateway %>"
+            <% } %>
         }
         <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
     <% }); %>

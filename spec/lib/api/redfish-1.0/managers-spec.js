@@ -213,5 +213,52 @@ describe('Redfish Managers', function () {
             .expect(404);
     });
 
+    it('should return the RackHD manager', function() {
+        return helper.request().get('/redfish/v1/Managers/RackHD')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should patch the RackHD manager', function() {
+        waterline.nodes.find.resolves([node]);
+        return helper.request().patch('/redfish/v1/Managers/RackHD')
+            .send({ NetworkProtocol: { SSDP: { ProtocolEnabled: false }}})
+            .expect(204);
+    });
+
+    it('should 405 a patch when it is not the RackHD manager', function() {
+        return helper.request().patch('/redfish/v1/Managers/RackHD1')
+            .expect('Content-Type', /^application\/json/)
+            .send({ NetworkProtocol: { SSDP: { ProtocolEnabled: false }}})
+            .expect(405);
+    });
+
+    it('should return the RackHD manager ethernet interface collection', function() {
+        return helper.request().get('/redfish/v1/Managers/RackHD/EthernetInterfaces')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should return the RackHD manager ethernet interface', function() {
+        return helper.request().get('/redfish/v1/Managers/RackHD/EthernetInterfaces')
+        .then(function(res) {
+            return Promise.map(res.body.Members, function(member) {
+                return helper.request().get(member['@odata.id'])
+                    .expect('Content-Type', /^application\/json/)
+                    .expect(200);
+            });
+        });
+    });
+
 });
 
