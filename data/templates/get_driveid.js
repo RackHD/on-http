@@ -28,7 +28,7 @@ function parseDriveWwid(idList) {
 
     //According to SCSI-3 spec, vendor specified logic unit name string is 60
 	//Only IDE and SCSI disk will be retrieved
-    var scsiLines = [], sataLines = [], wwnLines = [], requiredStrLen = 60;
+    var scsiLines = [], sataLines = [], wwnLines = [], usbLines = [], requiredStrLen = 60;
     lines.forEach(function(line){
         if ( line && !(line.match('part')) && line.match(/sd[a-z]$|hd[a-z]$/i)){
             var nameIndex = line.lastIndexOf('/'), idIndex = line.lastIndexOf('->');
@@ -40,6 +40,9 @@ function parseDriveWwid(idList) {
             }
             else if (line.indexOf('wwn') === 0) {
                 wwnLines.push([line.slice(nameIndex + 1), line.slice(0, idIndex)]);
+            }
+            else if (line.indexOf('usb') === 0) {
+                usbLines.push([line.slice(nameIndex + 1), line.slice(0, idIndex)]);
             }
         }
     });
@@ -101,13 +104,17 @@ function parseDriveWwid(idList) {
         return [esxiLine[0], 'naa.' + split[1].slice(1)];
     });
 
+    var esxiUsb = usbLines.map(function(esxiLine) {
+        return [esxiLine[0], 'mpx.'];
+    });
+
     //linuxLine example: ["sda", "scsi-35000c500725f45d7"]
     //linuxParsed example: ["sda", "/dev/disk/by-id/scsi-35000c500725f45d7"]
-    var linuxParsed = sataLines.concat(scsiLines).map(function(linuxLine) {
+    var linuxParsed = sataLines.concat(scsiLines, usbLines).map(function(linuxLine) {
         return [linuxLine[0], '/dev/disk/by-id/' + linuxLine[1]];
     });
 
-    return {esxiDriveIds: esxiSata.concat(esxiScsi), linuxDriveIds: linuxParsed};
+    return {esxiDriveIds: esxiSata.concat(esxiScsi, esxiUsb), linuxDriveIds: linuxParsed};
 }
 
 
@@ -185,6 +192,18 @@ function buildDriveMap(wwidData, vdData, scsiData) {
                 }
             }
         });
+        //vmhbaAdapter:CChannel:TTarget:LLUN
+        //Adapter is set to default value 32 for only one eUsb
+        if (esxiWwid[1] === "mpx.") {
+            esxiWwid[1] = '';
+            if (scsiId !== '') {
+                var hctl = scsiId.split(":");
+                if (hctl.length === 4) {
+                    esxiWwid[1] = "mpx.vmhba32:C".concat(hctl[1], ":T", hctl[2], ":L", hctl[3]);
+                }
+            }
+            vd = '';
+        }
         driveIds.push({"scsiId": scsiId, "virtualDisk": vd,
             "esxiWwid": esxiWwid[1], "devName": diskPath});
     });
