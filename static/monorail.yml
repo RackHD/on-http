@@ -728,7 +728,8 @@ paths:
         - name: body
           in: body
           required: false
-          type: object
+          schema:
+            type: object
       tags:
         - workflow
         - task
@@ -802,7 +803,8 @@ paths:
         - name: body
           in: body
           required: false
-          type: object
+          schema:
+            type: object
       tags:
         - workflow
         - put
@@ -836,7 +838,8 @@ paths:
         - name: body
           in: body
           required: false
-          type: object
+          schema:
+            type: object
       tags:
         - workflow
         - post
@@ -969,7 +972,8 @@ paths:
         - name: body
           in: body
           required: false
-          type: object
+          schema:
+            type: object
       tags:
         - nodes
         - workflow
@@ -1006,7 +1010,8 @@ paths:
         - name: body
           in: body
           required: false
-          type: object
+          schema:
+            type: object
       tags:
         - nodes
         - dhcp
@@ -1568,7 +1573,8 @@ paths:
           description: |
             object patches to apply.
           required: true
-          type: object
+          schema:
+            type: object
       tags:
         - lookups
         - get
@@ -1743,7 +1749,8 @@ paths:
         - name: body
           in: body
           required: true
-          type: object
+          schema:
+            type: object
       tags:
         - config
         - patch
