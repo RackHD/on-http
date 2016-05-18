@@ -677,6 +677,7 @@ paths:
         default:
           description: Unexpected error
           schema:
+            $ref: '#/definitions/Error'
 
   /workflows/tasks/library:
     get:
