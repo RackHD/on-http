@@ -27,8 +27,11 @@ rootpw --iscrypted <%=rootEncryptedPassword%>
 
 #create all users
 <% users.forEach(function(user) { %>
-    user --name=<%=user.name%> --uid=<%=user.uid%> --iscrypted --password <%=user.encryptedPassword%>
-<% }) %>
+<%_  if( typeof user.uid !== 'undefined' ) { _%>
+        user --name=<%=user.name%> --uid=<%=user.uid%> --iscrypted --password <%=user.encryptedPassword%>
+<%_  } else { _%>
+        user --name=<%=user.name%>  --iscrypted --password <%=user.encryptedPassword%>
+<%_ }}) _%>
 
 # Disk Partitioning
 zerombr
