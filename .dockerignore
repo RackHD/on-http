@@ -7,10 +7,14 @@
 .travis.yml
 build-package.bash
 debianstatic/
+extra/
 Dockerfile
 Gruntfile.js
 HWIMO-*
 LICENSE
 migrate.js
+node_modules/
 README.md
 spec/
+static/web-ui/
+static/swagger-ui/
