@@ -19,16 +19,21 @@ describe('get_driveid script', function() {
         'lrwxrwxrwx 1 root root  9 Dec 22 07:31 ata-QEMU_DVD-ROM_QM00003 -> ../../sr0\n' +
         'lrwxrwxrwx 1 root root  9 Dec 22 07:31 ata-QEMU_HARDDISK_QM00001 -> ../../sda';
 
-    //Configure for case with SATADOM and SATA Drive
+    //Configure for case with SATADOM, SATA Drive and eUsb
     var mockScsiStd =
         '[5:0:0:0]    disk    ATA      HUS724040ALA640  MFAO  /dev/sda\n' +
         '[6:0:0:0]   disk    ATA      32GB SATA Flash  SFDE  /dev/sdb\n' +
-        '[7:2:0:0]    disk    LSI      MRROMB           4.26  /dev/sdc';
+        '[7:2:0:0]    disk    LSI      MRROMB           4.26  /dev/sdc\n' +
+        '[8:0:0:0]   disk    SMART    eUSB             0298  /dev/sdd';
     var mockVdInfoStd =
+    //jshint ignore: start
         'total 0\n' +
         'drwxr-xr-x 2 root root 360 Dec 22 10:02 ./\n' +
         'drwxr-xr-x 5 root root 100 Dec 22 10:02 ../\n' +
-        'lrwxrwxrwx 1 root root   9 Dec 24 11:05 pci-0000:03:00.0-scsi-7:2:0:0 -> ../../sdc';
+        'lrwxrwxrwx 1 root root   9 Dec 24 11:05 pci-0000:03:00.0-scsi-7:2:0:0 -> ../../sdc\n' +
+        'lrwxrwxrwx 1 root root  9 May 15 08:45 pci-0000:00:14.0-usb-0:5:1.0-scsi-0:0:0:0 -> ../../sdd';
+    //jshint ignore: end
+
     var mockWwidStd =
     //jshint ignore: start
         'total 0\n' +
@@ -39,7 +44,8 @@ describe('get_driveid script', function() {
         'lrwxrwxrwx 1 root root   9 Dec 22 10:03 ata-HUS724040ALA640_PBJY9ZJX -> ../../sda\n' +
         'lrwxrwxrwx 1 root root   9 Dec 24 11:05 scsi-3600163600196c0401e0c0e6511cec3c0 -> ../../sdc\n' +
         'lrwxrwxrwx 1 root root   9 Dec 22 10:03 wwn-0x5000cca23de98340 -> ../../sda\n' +
-        'lrwxrwxrwx 1 root root   9 Dec 24 11:05 wwn-0x600163600196c0401e0c0e6511cec3c0 -> ../../sdc'; //
+        'lrwxrwxrwx 1 root root   9 Dec 24 11:05 wwn-0x600163600196c0401e0c0e6511cec3c0 -> ../../sdc\n' +//
+        'lrwxrwxrwx 1 root root  9 May 15 08:45 usb-SMART_eUSB_SPG143500HQ-0:0 -> ../../sdd';
     //jshint ignore: end
 
     describe('parser', function() {
@@ -91,6 +97,14 @@ describe('get_driveid script', function() {
                         "devName":"sdc",
                         "identifier":2,
                         "linuxWwid":"/dev/disk/by-id/scsi-3600163600196c0401e0c0e6511cec3c0"
+                    },
+                    {
+                        "scsiId":"8:0:0:0",
+                        "virtualDisk":"",
+                        "esxiWwid":"mpx.vmhba32:C0:T0:L0",
+                        "devName":"sdd",
+                        "identifier":3,
+                        "linuxWwid":"/dev/disk/by-id/usb-SMART_eUSB_SPG143500HQ-0:0"
                     }
                 ]
                 //jshint ignore: end
