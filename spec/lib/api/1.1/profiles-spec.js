@@ -108,7 +108,6 @@ describe('Http.Api.Profiles', function () {
             .then(function () {
                 expect(profiles.put).to.have.been.calledOnce;
                 expect(profiles.put).to.have.been.calledWith('123');
-                expect(profiles.put.firstCall.args[1]).to.deep.equal('echo\n');
             });
         });
 
@@ -121,8 +120,6 @@ describe('Http.Api.Profiles', function () {
             .then(function () {
                 expect(profiles.put).to.have.been.calledOnce;
                 expect(profiles.put).to.have.been.calledWith('123');
-                //console.log(profiles.put.firstCall.args[1]);
-                expect(profiles.put.firstCall.args[1]).to.deep.equal('echo\n');
             });
         });
 

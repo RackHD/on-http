@@ -285,6 +285,10 @@ describe("SKU Pack Service", function() {
         beforeEach(function() {
             workflowApiService.defineTask.reset();
             workflowApiService.defineTaskGraph.reset();
+            waterline.templates.findOne = sinon.stub().resolves();
+            waterline.profiles.findOne = sinon.stub().resolves();
+            waterline.templates.destroy = sinon.stub().resolves([]);
+            waterline.profiles.destroy = sinon.stub().resolves([]);
         });
 
         after(function() {
@@ -324,8 +328,10 @@ describe("SKU Pack Service", function() {
         it('should unregister a pack', function() {
             waterline.taskdefinitions.destroy.resolves();
             waterline.graphdefinitions.destroy.resolves();
-            waterline.templates.destroy.resolves();
-            waterline.profiles.destroy.resolves();
+            waterline.templates.destroy.resolves([ { path: 'template' } ]);
+            waterline.profiles.destroy.resolves([ { path: 'profile' } ]);
+            waterline.templates.findOne.onCall(1).resolves({ path: 'template' });
+            waterline.profiles.findOne.onCall(1).resolves({ path: 'profile' });
             return skuService.start('./valid').then(function() {
                 return skuService.unregisterPack('a', skuAData);
             })
