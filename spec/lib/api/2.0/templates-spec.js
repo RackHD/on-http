@@ -177,10 +177,10 @@ describe('Http.Api.Templates', function () {
                 needByIdentifier: sinon.stub().resolves({
                     id: 'node id'
                 })
-            }
+            };
             findActiveGraphForTarget.resolves(graph);
             this.sandbox.stub(swagger, 'makeRenderableOptions').resolves({});
-            taskProtocol.requestProperties.resolves({})
+            taskProtocol.requestProperties.resolves({});
             return helper.request().get('/api/2.0/templates/123')
             .expect(200)
             .then(function () {
@@ -212,8 +212,9 @@ describe('Http.Api.Templates', function () {
 
         it('should delete the new templates', function () {
             return helper.request().delete('/api/2.0/templates/library/test_foo')
-            .expect(200)
+            .expect(200);
         });
+
         it('should return a  404 error when new template is requested', function () {
             return helper.request().get('/api/2.0/templates/library/test_foo')
             .expect('Content-Type', /^application\/json/)

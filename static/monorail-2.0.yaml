@@ -334,7 +334,7 @@ paths:
           type: string
         - name: scope
           in: query
-          description: | 
+          description: |
             template scope
           required: false
           type: string
@@ -373,7 +373,7 @@ paths:
           type: string
         - name: scope
           in: query
-          description: | 
+          description: |
             template scope
           required: false
           type: string
@@ -395,7 +395,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     put:
-      operationId: templatesLibPut 
+      operationId: templatesLibPut
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -411,7 +411,7 @@ paths:
           type: string
         - name: scope
           in: query
-          description: | 
+          description: |
             template scope
           required: false
           type: string
@@ -452,7 +452,7 @@ paths:
           type: string
         - name: scope
           in: query
-          description: | 
+          description: |
             template scope
           required: false
           type: string
@@ -473,7 +473,7 @@ paths:
             $ref: '#/definitions/Error'
 
   /templates/{name}:
-    x-swagger-router-controller: templates 
+    x-swagger-router-controller: templates
     get:
       operationId: templatesGetByName
       x-privileges: [ 'Read' ]
