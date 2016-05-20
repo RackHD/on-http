@@ -14,7 +14,8 @@ describe('Http.Api.Templates', function () {
     var findActiveGraphForTarget;
 
     before('start HTTP server', function () {
-        this.timeout(10000);
+        this.timeout(5000);
+
         return helper.startServer([
         ]);
     });
@@ -40,7 +41,7 @@ describe('Http.Api.Templates', function () {
 
         workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
         findActiveGraphForTarget = this.sandbox.stub(
-                workflowApiService, 'findActiveGraphForTarget');
+            workflowApiService, 'findActiveGraphForTarget');
 
 
         sinon.stub(workflowApiService, 'createActiveGraph').resolves({ instanceId: 'test' });
@@ -84,11 +85,11 @@ describe('Http.Api.Templates', function () {
         it('should return a list of templates', function () {
             templates.getAll.resolves([template]);
             return helper.request().get('/api/2.0/templates/metadata')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200, [template])
-            .then(function () {
-                expect(templates.getAll).to.have.been.calledOnce;
-            });
+                .expect('Content-Type', /^application\/json/)
+                .expect(200, [template])
+                .then(function () {
+                    expect(templates.getAll).to.have.been.calledOnce;
+                });
         });
     });
 
@@ -96,22 +97,22 @@ describe('Http.Api.Templates', function () {
         it('should return a single template', function () {
             templates.getName.resolves(template);
             return helper.request().get('/api/2.0/templates/metadata/123')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200, template)
-            .then(function() {
-                expect(templates.getName).to.have.been.calledWith('123');
-            });
+                .expect('Content-Type', /^application\/json/)
+                .expect(200, template)
+                .then(function() {
+                    expect(templates.getName).to.have.been.calledWith('123');
+                });
         });
 
         it('should return 404 for invalid templates name', function() {
             templates.getName.rejects(new Errors.NotFoundError('bad_template'));
             return helper.request().get('/api/2.0/templates/metadata/test')
-            .expect('Content-Type', /^application\/json/)
-            .expect(404)
-            .then(function() {
-                expect(templates.getName).to.have.been.calledOnce;
-                expect(templates.getName).to.have.been.calledWith('test');
-            });
+                .expect('Content-Type', /^application\/json/)
+                .expect(404)
+                .then(function() {
+                    expect(templates.getName).to.have.been.calledOnce;
+                    expect(templates.getName).to.have.been.calledWith('test');
+                });
         });
 
     });
@@ -120,27 +121,27 @@ describe('Http.Api.Templates', function () {
         it('should return a single template', function () {
             templates.getName.resolves(template);
             return helper.request().get('/api/2.0/templates/metadata/123')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200, template)
-            .then(function() {
-                expect(templates.getName).to.have.been.calledWith('123');
-            });
+                .expect('Content-Type', /^application\/json/)
+                .expect(200, template)
+                .then(function() {
+                    expect(templates.getName).to.have.been.calledWith('123');
+                });
         });
 
         it('should return 404 for invalid templates name', function() {
             templates.get.rejects(new Errors.NotFoundError('bad_template'));
             return helper.request().get('/api/2.0/templates/library/test')
-            .expect(404)
-            .then(function() {
-                expect(templates.get).to.have.been.calledOnce;
-                expect(templates.get).to.have.been.calledWith('test');
-            });
+                .expect(404)
+                .then(function() {
+                    expect(templates.get).to.have.been.calledOnce;
+                    expect(templates.get).to.have.been.calledWith('test');
+                });
         });
 
     });
 
     describe('2.0 PUT /templates/library/:name', function () {
-        beforeEach('should PUT new mockfile', function () {
+        it('should PUT new mockfile', function () {
             return helper.request().put('/api/2.0/templates/library/testTemplate')
                 .send('test\n')
                 .expect(200)
@@ -150,21 +151,12 @@ describe('Http.Api.Templates', function () {
                 });
         });
 
-        it('should get new templates', function () {
-            return helper.request().get('/api/2.0/templates/metadata/testTemplate')
-            .expect(200)
-            .then(function () {
-                expect(templates.getName).to.have.been.calledOnce;
-                expect(templates.getName).to.have.been.calledWith('testTemplate');
-            });
-        });
-
         it('should 400 error when templates.put() fails', function () {
             templates.put.rejects(new Error('dummy'));
             return helper.request().put('/api/2.0/templates/library/123')
-            .send('test_template_foo\n')
-            .expect('Content-Type', /^application\/json/)
-            .expect(400);
+                .send('test_template_foo\n')
+                .expect('Content-Type', /^application\/json/)
+                .expect(400);
         });
     });
 
@@ -182,43 +174,18 @@ describe('Http.Api.Templates', function () {
             this.sandbox.stub(swagger, 'makeRenderableOptions').resolves({});
             taskProtocol.requestProperties.resolves({});
             return helper.request().get('/api/2.0/templates/123')
-            .expect(200)
-            .then(function () {
-                expect(templates.render).to.have.been.calledOnce;
-                expect(templates.render).to.have.been.calledWith('123');
-            });
+                .expect(200)
+                .then(function () {
+                    expect(templates.render).to.have.been.calledOnce;
+                    expect(templates.render).to.have.been.calledWith('123');
+                });
         });
     });
 
-    describe('2.0 DELETE /templates/library/:name', function () {
-        beforeEach('should PUT new mockfile', function () {
-            return helper.request().put('/api/2.0/templates/library/test_foo')
-                .send('testFoo\n')
-                .expect(200)
-                .expect(function(){
-                    expect(templates.put).to.have.been.calledOnce;
-                    expect(templates.put).to.have.been.calledWith('test_foo');
-                });
-        });
-
-        it('should get new templates', function () {
-            return helper.request().get('/api/2.0/templates/metadata/test_foo')
-            .expect(200)
-            .then(function () {
-                expect(templates.getName).to.have.been.calledOnce;
-                expect(templates.getName).to.have.been.calledWith('test_foo');
-            });
-        });
-
-        it('should delete the new templates', function () {
+    describe('2.0 delete /templates/library/:name', function () {
+        it('should delete a template', function () {
             return helper.request().delete('/api/2.0/templates/library/test_foo')
-            .expect(200);
-        });
-
-        it('should return a  404 error when new template is requested', function () {
-            return helper.request().get('/api/2.0/templates/library/test_foo')
-            .expect('Content-Type', /^application\/json/)
-            .expect(404);
+                .expect(200);
         });
     });
 
