@@ -204,9 +204,13 @@ describe("SKU Pack Service", function() {
             var sku =
             {"name": "my test sku"};
             waterline.skus.findOne.resolves({});
-            return skuService.postSku(sku).catch(function(err){
-                expect(err.status).equal(409);
-            });
+            return skuService.postSku(sku)
+                .then(function() {
+                    throw new Error('postSku should be rejected!');
+                })
+                .catch(function (err) {
+                    expect(err.status).equal(409);
+                });
         });
     });
 
@@ -297,11 +301,15 @@ describe("SKU Pack Service", function() {
         });
 
         it('should return err status if postSku fails a non-409', function(){
-            var err = new Errors.BaseError('internal server error');
-            err.status = 500; //Checking if not 409
-            return skuService.upsertSku(sku).catch(function (err) {
-                expect(err.status).equal(500);
-            });
+            return skuService.upsertSku(sku)
+                .then(function() {
+                    throw new Error('internal server error');
+                })
+                .catch(function (err) {
+                    var err = new Errors.BaseError('internal server error');
+                    err.status = 500; //Checking if not 409
+                    expect(err.status).equal(500);
+                });
         });
 
         it('should patch sku if post failed due to Duplicate error', function(){

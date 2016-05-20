@@ -17,7 +17,6 @@ describe('Http.Api.Skus.2.0', function() {
         return helper.startServer([
         ]).then(function() {
             waterline = helper.injector.get('Services.Waterline');
-            sinon.stub(waterline.nodes);
             sinon.stub(waterline.skus);
             workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
             nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
@@ -38,7 +37,6 @@ describe('Http.Api.Skus.2.0', function() {
                 }
             }).value();
         }
-        resetStubs(waterline.nodes);
         resetStubs(waterline.skus);
         resetStubs(workflowApiService);
 
@@ -109,7 +107,6 @@ describe('Http.Api.Skus.2.0', function() {
         skuApiService.regenerateSkus.restore();
         skuApiService.getNodesSkusById.restore();
         skuApiService.deleteSkuById.restore();
-
         workflowApiService.createAndRunGraph.restore();
     });
 
