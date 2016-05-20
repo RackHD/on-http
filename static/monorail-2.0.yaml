@@ -750,14 +750,14 @@ paths:
       x-privileges: [ 'write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        post a sku pack to specific sku
+        put a sku pack to specific sku
       description: |
-        post a sku pack to specific sku
+        put a sku pack to specific sku
       parameters:
         - name: identifier
           in: path
           description: |
-            The profile name.
+            The identifier of the sku pack.
           required: true
           type: string
       tags: [ "/api/2.0" ]
@@ -766,12 +766,12 @@ paths:
       responses:
         200:
           description: |
-            return nodes associated with that sku
+            return sku pack id.
           schema:
             type: object
         404:
           description: |
-            There is no sku with identifier.
+            There is no skupack with identifier.
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2281,15 +2281,21 @@ paths:
             $ref: '#/definitions/Error'
 
   /lookups:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: lookups
     get:
-      operationId: unimplemented
+      operationId: lookupsGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
         find all
       description: |
         find all
+      parameters:
+      - name: q
+        in: query
+        description: query object to pass through to waterline.
+        required: false
+        type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -2303,17 +2309,18 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
-      operationId: unimplemented
+      operationId: lookupsPost
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: Lookups.2.0.json#/definitions/LookupPost
       summary: |
         find all
       description: |
         put all
       parameters:
-      - name: content
+      - name: body
         in: body
-        description: foo
+        description: lookup record to create
         required: true
         schema:
          $ref: '#/definitions/generic_obj'
@@ -2328,9 +2335,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /lookups/{id}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: lookups
     get:
-      operationId: unimplemented
+      operationId: lookupsGetById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -2355,32 +2362,67 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-    post:
-      operationId: unimplemented
+    delete:
+      operationId: lookupsDelById
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        post id
+        Delete specified lookup details.
       description: |
-        post id
+        Delete specified lookup details.
       parameters:
-      - name: id
-        in: path
-        description: id of thing to lookup
-        required: true
-        type: string
-      - name: content
-        in: body
-        description: foo
-        required: true
-        schema:
-         $ref: '#/definitions/generic_obj'
+        - name: id
+          in: path
+          description: |
+            id of the lookup record to delete
+          required: true
+          type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: waterline response
+          description: Delete successful
+        404:
+          description: The lookup with the identifier was not found.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    patch:
+      operationId: lookupsPatchById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: Lookups.2.0.json#/definitions/LookupBase
+      summary: |
+        Patch specified lookup record
+      description: |
+        Patch specified lookup record
+      parameters:
+        - name: id
+          in: path
+          description: |
+            id of the lookup record to patch.
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            object patches to apply.
+          required: true
+          schema:
+           $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: patch succeeded
           schema:
             type: object
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -3177,6 +3219,110 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /tasks/bootstrap.js:
+    x-swagger-router-controller: tasks
+    get:
+#      disable for now until we are using redfish renderer
+#      x-swagger-template: 'bootstrap.js'
+      operationId: getBootstrap
+      summary: |
+        get tasks bootstrap.js
+      description: |
+        used internally by the system - get tasks bootstrap.js
+      parameters:
+        - name: macAddress
+          in: query
+          description: query object to pass through to waterline.
+          required: false
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/VersionsResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /tasks/{identifier}:
+    x-swagger-router-controller: tasks
+    get:
+    #do I need a serializer?
+      operationId: getTasksById
+      x-view: tasks.2.0.json
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+
+      summary: |
+        get specific task
+      description: |
+        get specific task
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            task identifier
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            single task
+          schema:
+            type: object
+        404:
+          description: |
+            There is no task with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+#do I need a serializer      x-swagger-serializer: pollers
+      operationId: postTaskById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      x-view: tasks.2.0.json
+      summary: |
+        post specific task
+      description: |
+        post specific task
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            poller identifier
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            obm settings to apply.
+          required: true
+          schema:
+            $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            Specifics of the specified task
+          schema:
+            type: object
+        404:
+          description: |
+            There is no  task with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
   /swagger:
     x-swagger-pipe: swagger_raw
