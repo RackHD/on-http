@@ -36,7 +36,32 @@ rootpw --iscrypted <%=rootEncryptedPassword%>
 # Disk Partitioning
 zerombr
 clearpart --all --drives=<%=installDisk%>
-autopart
+
+<% if(installPartitions !== undefined && installPartitions.length > 0) { %>
+    <% installPartitions.forEach(function(partition) { %>
+        # mountPoint and size is required
+        <% if(partition.mountPoint !== undefined && partition.size !== undefined) { %>
+            <% if(partition.fsType !== undefined) { %>
+                <% if(partition.size === 'auto') { %>
+                    partition <%=partition.mountPoint%> --grow --fstype=<%=partition.fsType%>
+                <% } else { %>
+                    partition <%=partition.mountPoint%> --size=<%=partition.size%> --fstype=<%=partition.fsType%>
+                <% } %>
+            <% } else { %>
+                # fsType is optional
+                <% if(partition.size === 'auto') { %>
+                    partition <%=partition.mountPoint%> --grow
+                <% } else { %>
+                    partition <%=partition.mountPoint%> --size=<%=partition.size%>
+                <% } %>
+            <% } %>
+        <% } %>
+    <% }) %>
+<% } else { %>
+    # auto partitioning if no partitions are specified
+    autopart
+<% } %>
+
 # END of Disk Partitioning
 
 # Make sure we reboot into the new system when we are finished
