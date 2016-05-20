@@ -750,14 +750,14 @@ paths:
       x-privileges: [ 'write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        post a sku pack to specific sku
+        put a sku pack to specific sku
       description: |
-        post a sku pack to specific sku
+        put a sku pack to specific sku
       parameters:
         - name: identifier
           in: path
           description: |
-            The profile name.
+            The identifier of the sku pack.
           required: true
           type: string
       tags: [ "/api/2.0" ]
@@ -766,12 +766,12 @@ paths:
       responses:
         200:
           description: |
-            return nodes associated with that sku
+            return sku pack id.
           schema:
             type: object
         404:
           description: |
-            There is no sku with identifier.
+            There is no skupack with identifier.
           schema:
             $ref: '#/definitions/Error'
         default:

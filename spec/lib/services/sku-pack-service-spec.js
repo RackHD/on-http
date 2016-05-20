@@ -40,6 +40,8 @@ describe("SKU Pack Service", function() {
             find: function() {},
             create: function() {},
             findOne: function() {},
+            destroyByIdentifier: function(){},
+            updateByIdentifier: function(){},
             update: function() {}
         };
 
@@ -54,6 +56,8 @@ describe("SKU Pack Service", function() {
         self.sandbox.stub(waterline.skus, 'findOne');
         self.sandbox.stub(waterline.skus, 'update');
         self.sandbox.stub(waterline.nodes, 'find');
+        self.sandbox.stub(waterline.skus, 'destroyByIdentifier');
+        self.sandbox.stub(waterline.skus, 'updateByIdentifier');
         self.sandbox.stub(fs, 'writeFileAsync');
         self.sandbox.stub(fs, 'readFileAsync');
         self.sandbox.stub(fs, 'readdirAsync');
@@ -183,11 +187,111 @@ describe("SKU Pack Service", function() {
               "updatedAt": "2016-04-07T12:25:18.529Z",
               "id": "570651ae87b3579d76508d26"
           };
-            waterline.skus.create.resolves(sku);
-            waterline.skus.findOne.resolves();
+          waterline.skus.create.resolves(sku);
+          waterline.skus.findOne.resolves();
+          skuService.regenerateSkus.resolves();
+          return skuService.postSku(sku).then(function(val){
+              expect(waterline.skus.create).to.have.been.called;
+              expect(val.rules).equal(sku.rules);
+              expect(val.discoveryGraphName).equal(sku.discoveryGraphName);
+              expect(val.username).equal(sku.username);
+              expect(val.password).equal(sku.password);
+              expect(val.hostname).equal(sku.hostname);
+          });
+        });
+
+        it('should return an error Duplicate name found', function() {
+            var sku =
+            {"name": "my test sku"};
+            waterline.skus.findOne.resolves({});
+            return skuService.postSku(sku)
+                .then(function() {
+                    throw new Error('postSku should be rejected!');
+                })
+                .catch(function (err) {
+                    expect(err.status).equal(409);
+                });
+        });
+    });
+
+    describe('should patch a sku', function() {
+        before(function () {
+            sinon.stub(skuService, 'regenerateSkus');
+        });
+        after(function () {
+            skuService.regenerateSkus.restore();
+        });
+        it('should patch a sku ', function () {
+            var sku =
+            {
+                "name": "my test sku",
+                "rules": [
+                    {
+                        "path": "dmi.Base Board Information.Manufacturer",
+                        "contains": "Intel"
+                    },
+                    {
+                        "path": "ohai.dmi.memory.total",
+                        "equals": "32946864kB"
+                    }
+                ],
+                "discoveryGraphName": "Graph.InstallCoreOS",
+                "discoveryGraphOptions": {
+                    "username": "testuser",
+                    "password": "hello",
+                    "hostname": "mycoreos"
+                },
+                "createdAt": "2016-04-07T12:25:18.529Z",
+                "updatedAt": "2016-04-07T12:25:18.529Z",
+                "id": "570651ae87b3579d76508d26"
+            };
+            waterline.skus.updateByIdentifier.resolves({id: '570651ae87b3579d76508d26',
+                name: 'updatedSkuName'});
             skuService.regenerateSkus.resolves();
-            return skuService.postSku(sku).then(function(val){
-                expect(waterline.skus.create).to.have.been.called;
+            return skuService.patchSku(sku.id).then(function (val) {
+                expect(waterline.skus.updateByIdentifier).to.have.been.called;
+                expect(val.name).equal('updatedSkuName');
+            });
+        });
+    });
+
+    describe('should upsert a sku', function() {
+        before(function () {
+            sinon.stub(skuService, 'postSku');
+            sinon.stub(skuService, 'patchSku');
+
+        });
+        after(function () {
+            skuService.postSku.restore();
+            skuService.patchSku.restore();
+        });
+        var sku =
+        {
+            "name": "my test sku",
+            "rules": [
+                {
+                    "path": "dmi.Base Board Information.Manufacturer",
+                    "contains": "Intel"
+                },
+                {
+                    "path": "ohai.dmi.memory.total",
+                    "equals": "32946864kB"
+                }
+            ],
+            "discoveryGraphName": "Graph.InstallCoreOS",
+            "discoveryGraphOptions": {
+                "username": "testuser",
+                "password": "hello",
+                "hostname": "mycoreos"
+            },
+            "createdAt": "2016-04-07T12:25:18.529Z",
+            "updatedAt": "2016-04-07T12:25:18.529Z",
+            "id": "570651ae87b3579d76508d26"
+        };
+
+        it('should return sku if a sku is posted', function(){
+            skuService.postSku.resolves(sku);
+            return skuService.upsertSku(sku).then(function (val) {
                 expect(val.rules).equal(sku.rules);
                 expect(val.discoveryGraphName).equal(sku.discoveryGraphName);
                 expect(val.username).equal(sku.username);
@@ -195,6 +299,50 @@ describe("SKU Pack Service", function() {
                 expect(val.hostname).equal(sku.hostname);
             });
         });
+
+        it('should return err status if postSku fails a non-409', function(){
+            return skuService.upsertSku(sku)
+                .then(function() {
+                    throw new Error('internal server error');
+                })
+                .catch(function (err) {
+                    var err = new Errors.BaseError('internal server error');
+                    err.status = 500; //Checking if not 409
+                    expect(err.status).equal(500);
+                });
+        });
+
+        it('should patch sku if post failed due to Duplicate error', function(){
+            var err = new Errors.BaseError('duplicate name found');
+            err.status = 409;
+            skuService.postSku.rejects(err);
+            waterline.skus.findOne.resolves(sku);
+            skuService.patchSku.resolves(sku);
+            return skuService.upsertSku(sku).then(function () {
+                expect(waterline.skus.findOne).to.have.been.called;
+                expect(skuService.patchSku).to.have.been.called;
+            });
+        });
+    });
+
+    describe('should delete sku by ID', function(){
+        before(function(){
+            sinon.stub(skuService, 'regenerateSkus');
+        });
+        after(function(){
+            skuService.regenerateSkus.restore();
+        });
+        it('should delete sku by ID', function(){
+            var emptySku = [];
+            waterline.skus.destroyByIdentifier.resolves(emptySku);
+            skuService.regenerateSkus.resolves();
+            return skuService.deleteSkuById().then(function(sku){
+                expect(sku).to.deep.equal(emptySku);
+                expect(waterline.skus.destroyByIdentifier).to.have.been.called;
+                expect(skuService.regenerateSkus).to.have.been.calledOnce;
+            });
+        });
+
     });
 
     it('should expose the appropriate methods', function() {
