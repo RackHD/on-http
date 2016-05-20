@@ -16,8 +16,8 @@ rootpw <%=rootPlainPassword%>
     <% if( n.device.substring(0,5) === 'vmnic' ) { %>
       <% if(typeof n.ipv4 !== 'undefined') { %>
         <% ipopts = '--ip=' + n.ipv4.ipAddr + ' --gateway=' + n.ipv4.gateway + ' --netmask=' + n.ipv4.netmask %>
-        <% if (typeof n.ipv4.vlanId !== 'undefined' ) { %>
-          <% ipopts += ' --vlandid=' + n.ipv4.vlanId[0] %>
+        <% if (typeof n.ipv4.vlanIds !== 'undefined' ) { %>
+          <% ipopts += ' --vlandid=' + n.ipv4.vlanIds[0] %>
         <% } %>
         network --bootproto=static --device=<%=n.device%> <%=ipopts%>
       <% } else { %>
@@ -113,8 +113,8 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
 <% if( undefined !== networkDevices ) { %>
   <% networkDevices.forEach(function(n) { %>
     <% if( undefined !== n.ipv4 ) { %>
-      <% if( undefined !== n.ipv4.vlanId ) { %>
-        <% n.ipv4.vlanId.forEach(function(vid) { %>
+      <% if( undefined !== n.ipv4.vlanIds ) { %>
+        <% n.ipv4.vlanIds.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
           esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v "<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>"
           esxcli network ip interface remove -i <%=vmkname%>
@@ -133,8 +133,8 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
       <% } %>
     <% } %>
     <% if( undefined !== n.ipv6 ) { %>
-      <% if( undefined !== n.ipv6.vlanId ) { %>
-        <% n.ipv6.vlanId.forEach(function(vid) { %>
+      <% if( undefined !== n.ipv6.vlanIds ) { %>
+        <% n.ipv6.vlanIds.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
           esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
           esxcli network ip interface remove -i <%=vmkname%>

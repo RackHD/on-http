@@ -103,8 +103,8 @@ echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/ne
   <% ipv6 = 0 %>
   <% networkDevices.forEach(function(n) { %>
     <% if( undefined != n.ipv4 ) { %>
-      <% if( undefined != n.ipv4.vlanId ) { %>
-        <% n.ipv4.vlanId.forEach(function(vid) { %>
+      <% if( undefined != n.ipv4.vlanIds ) { %>
+        <% n.ipv4.vlanIds.forEach(function(vid) { %>
           echo "Configuring vlan <%=vid%> on <%=n.device%>"
           sed -i '/^BOOTPROTO=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
           sed -i '/^ONBOOT=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
@@ -129,8 +129,8 @@ echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/ne
       <% } %>
     <% } %>
     <% if( undefined != n.ipv6 ) { %>
-      <% if( undefined != n.ipv6.vlanId ) { %>
-        <% n.ipv6.vlanId.forEach(function(vid) { %>
+      <% if( undefined != n.ipv6.vlanIds ) { %>
+        <% n.ipv6.vlanIds.forEach(function(vid) { %>
           echo "Configuring vlan <%=vid%> on <%=n.device%>"
           sed -i '/^BOOTPROTO=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
           sed -i '/^ONBOOT=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>

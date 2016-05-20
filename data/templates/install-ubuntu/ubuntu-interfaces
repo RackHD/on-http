@@ -2,8 +2,8 @@
     <%_ for (p in n) { _%>
         <%_ ip = n[p]; _%>
         <%_ if (['ipv4', 'ipv6'].indexOf(p) === -1 || undefined == ip) continue; _%>
-        <%_ if (undefined !== ip.vlanId) { _%>
-            <%_ ip.vlanId.forEach(function(vid) { _%>
+        <%_ if (undefined !== ip.vlanIds) { _%>
+            <%_ ip.vlanIds.forEach(function(vid) { _%>
 auto <%=n.device%>.<%=vid%>
 iface <%=n.device%>.<%=vid%> inet static
 address <%=ip.ipAddr%>
