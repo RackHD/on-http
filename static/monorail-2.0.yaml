@@ -294,16 +294,16 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /templates/library:
-    x-swagger-router-controller: unimplemented
+  /templates/metadata:
+    x-swagger-router-controller: templates
     get:
-      operationId: unimplemented
+      operationId: templatesMetaGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get list of possible templates
+        get list of metadata for all templates
       description: |
-        get list of possible templates
+        get list of metadata for all templates
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -315,10 +315,49 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /templates/library/{identifier}:
-    x-swagger-router-controller: unimplemented
+  /templates/metadata/{name}:
+    x-swagger-router-controller: templates
     get:
-      operationId: unimplemented
+      operationId: templatesMetaGetByName
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get metadata for a specific template
+      description: |
+        get metadata for a specific template
+      parameters:
+        - name: name
+          in: path
+          description: |
+            template name
+          required: true
+          type: string
+        - name: scope
+          in: query
+          description: |
+            template scope
+          required: false
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            single template metadata
+          schema:
+            type: object
+        404:
+          description: |
+            There is no template with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /templates/library/{name}:
+    x-swagger-router-controller: templates
+    get:
+      operationId: templatesLibGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -326,10 +365,128 @@ paths:
       description: |
         get a single template
       parameters:
-        - name: identifier
+        - name: name
           in: path
           description: |
-            template identifier
+            template name
+          required: true
+          type: string
+        - name: scope
+          in: query
+          description: |
+            template scope
+          required: false
+          type: string
+          default: 'global'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            single template
+          schema:
+            type: object
+        404:
+          description: |
+            There is no template with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      operationId: templatesLibPut
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        put a single template
+      description: |
+        put a single template
+      parameters:
+        - name: name
+          in: path
+          description: |
+            objectid of template
+          required: true
+          type: string
+        - name: scope
+          in: query
+          description: |
+            template scope
+          required: false
+          type: string
+          default: 'global'
+      consumes:
+        - text/plain
+        - application/x-www-form-urlencoded
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            return template
+          schema:
+            type: object
+        404:
+          description: |
+            There is no template with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      operationId: templatesLibDelete
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        delete a single template
+      description: |
+        delete a single template
+      parameters:
+        - name: name
+          in: path
+          description: |
+            objectid of template
+          required: true
+          type: string
+        - name: scope
+          in: query
+          description: |
+            template scope
+          required: false
+          type: string
+          default: 'global'
+      tags: [ "/api/2.0" ]
+      responses:
+        204:
+          description: |
+            delete template
+        404:
+          description: |
+            There is no template with specified identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /templates/{name}:
+    x-swagger-router-controller: templates
+    get:
+      operationId: templatesGetByName
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get a single template
+      description: |
+        get a single template
+      parameters:
+        - name: name
+          in: path
+          description: |
+            template name
           required: true
           type: string
       tags: [ "/api/2.0" ]
@@ -348,37 +505,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-    put:
-      operationId: unimplemented
-      x-privileges: [ 'Write' ]
-      x-authentication-type: [ 'jwt' ]
-      summary: |
-        put a single template
-      description: |
-        put a single template
-      parameters:
-        - name: identifier
-          in: path
-          description: |
-            objectid of template
-          required: true
-          type: string
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: |
-            return template
-          schema:
-            type: object
-        404:
-          description: |
-            There is no template with specified identifier.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+
   /views:
     x-swagger-router-controller: views
     get:
