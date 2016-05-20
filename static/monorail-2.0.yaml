@@ -750,14 +750,14 @@ paths:
       x-privileges: [ 'write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        put a sku pack to specific sku
+        post a sku pack to specific sku
       description: |
-        put a sku pack to specific sku
+        post a sku pack to specific sku
       parameters:
         - name: identifier
           in: path
           description: |
-            The identifier of the sku pack.
+            The profile name.
           required: true
           type: string
       tags: [ "/api/2.0" ]
@@ -766,12 +766,12 @@ paths:
       responses:
         200:
           description: |
-            return sku pack id.
+            return nodes associated with that sku
           schema:
             type: object
         404:
           description: |
-            There is no skupack with identifier.
+            There is no sku with identifier.
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -811,17 +811,127 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
-  /profiles/library:
-    x-swagger-router-controller: unimplemented
+  /profiles:
+    x-swagger-router-controller: profiles
     get:
-      operationId: unimplemented
+      operationId: profilesGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
         get list of possible profiles
       description: |
         get list of possible profiles
+      tags: [ "/api/2.0" ]
+      parameters:
+        - name: macs
+          in: query
+          description: |
+            List of valid MAC addresses to lookup
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+        - name: mac
+          in: query
+          description: |
+            When macs parameter is not passed, passed with IP adds MAC address to lookup
+          required: false
+          type: string
+        - name: ip
+          in: query
+          description: |
+            When macs parameters is not passed, passed with MAC adds IP address to lookup
+          required: false
+          type: string
+      responses:
+        200:
+          description: |
+            list of profiles for specified mac / ip
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /profiles/switch/error:
+    x-swagger-router-controller: profiles
+    post:
+      operationId: profilesPostSwitchError
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        create a switch error
+      description: |
+        create a switch error
+      parameters:
+        - name: body
+          in: body
+          description: |
+            switch error.
+          required: true
+          schema:
+                  $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            switch error posted.
+          schema:
+            type: object
+        500:
+          description: |
+            Upload failed.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /profiles/switch/{vendor}:
+    x-swagger-router-controller: profiles
+    get:
+      operationId: profilesGetSwitchVendor
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get a single profile
+      description: |
+        get a single profile
+      parameters:
+        - name: vendor
+          in: path
+          description: |
+            The switch vendor name.
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            return profile
+          schema:
+            type: object
+        404:
+          description: |
+            Profile not found.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /profiles/metadata:
+    x-swagger-router-controller: profiles
+    get:
+      operationId: profilesGetMetadata
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      x-view: profiles.2.0.json
+      summary: |
+        get list of possible profiles from database
+      description: |
+        get list of possible profiles from database
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -833,22 +943,66 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /profiles/library/{identifier}:
-    x-swagger-router-controller: unimplemented
+  /profiles/metadata/{name}:
+    x-swagger-router-controller: profiles
     get:
-      operationId: unimplemented
+      operationId: profilesGetMetadataByName
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: profiles.2.0.json
       summary: |
-        get a single profile
+        get a single profile's metadata from database
       description: |
-        get a single profile
+        get a single profile's metadata from database
       parameters:
-        - name: identifier
+        - name: name
           in: path
           description: |
             The profile name.
           required: true
+          type: string
+        - name: scope
+          in: query
+          description: Profile scope 
+          required: false
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            return profile
+          schema:
+            type: object
+        404:
+          description: |
+            There is no profile in the library with identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /profiles/library/{name}:
+    x-swagger-router-controller: profiles
+    get:
+      operationId: profilesGetLibByName
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get a single profile's raw data
+      description: |
+        get a single profile's raw data
+      parameters:
+        - name: name
+          in: path
+          description: |
+            The profile name.
+          required: true
+          type: string
+        - name: scope
+          in: query
+          description: Profile scope
+          required: false
           type: string
       tags: [ "/api/2.0" ]
       responses:
@@ -867,7 +1021,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     put:
-      operationId: unimplemented
+      operationId: profilesPutLibByName
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -875,12 +1029,20 @@ paths:
       description: |
         put a single profile
       parameters:
-        - name: identifier
+        - name: name
           in: path
           description: |
             The profile name.
           required: true
           type: string
+        - name: scope
+          in: query
+          description: Profile scope
+          required: false
+          type: string
+      consumes:
+        - application/octet-stream
+        - application/x-www-form-urlencoded
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -2119,21 +2281,15 @@ paths:
             $ref: '#/definitions/Error'
 
   /lookups:
-    x-swagger-router-controller: lookups
+    x-swagger-router-controller: unimplemented
     get:
-      operationId: lookupsGet
+      operationId: unimplemented
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
         find all
       description: |
         find all
-      parameters:
-      - name: q
-        in: query
-        description: query object to pass through to waterline.
-        required: false
-        type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -2147,18 +2303,17 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
-      operationId: lookupsPost
+      operationId: unimplemented
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
-      x-swagger-schema: Lookups.2.0.json#/definitions/LookupPost
       summary: |
         find all
       description: |
         put all
       parameters:
-      - name: body
+      - name: content
         in: body
-        description: lookup record to create
+        description: foo
         required: true
         schema:
          $ref: '#/definitions/generic_obj'
@@ -2173,9 +2328,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /lookups/{id}:
-    x-swagger-router-controller: lookups
+    x-swagger-router-controller: unimplemented
     get:
-      operationId: lookupsGetById
+      operationId: unimplemented
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -2200,67 +2355,32 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-    delete:
-      operationId: lookupsDelById
+    post:
+      operationId: unimplemented
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Delete specified lookup details.
+        post id
       description: |
-        Delete specified lookup details.
+        post id
       parameters:
-        - name: id
-          in: path
-          description: |
-            id of the lookup record to delete
-          required: true
-          type: string
+      - name: id
+        in: path
+        description: id of thing to lookup
+        required: true
+        type: string
+      - name: content
+        in: body
+        description: foo
+        required: true
+        schema:
+         $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: Delete successful
-        404:
-          description: The lookup with the identifier was not found.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
-    patch:
-      operationId: lookupsPatchById
-      x-privileges: [ 'Write' ]
-      x-authentication-type: [ 'jwt' ]
-      x-swagger-schema: Lookups.2.0.json#/definitions/LookupBase
-      summary: |
-        Patch specified lookup record
-      description: |
-        Patch specified lookup record
-      parameters:
-        - name: id
-          in: path
-          description: |
-            id of the lookup record to patch.
-          required: true
-          type: string
-        - name: body
-          in: body
-          description: |
-            object patches to apply.
-          required: true
-          schema:
-           $ref: '#/definitions/generic_obj'
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: patch succeeded
+          description: waterline response
           schema:
             type: object
-        404:
-          description: Not found
-          schema:
-            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
@@ -3057,110 +3177,6 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /tasks/bootstrap.js:
-    x-swagger-router-controller: tasks
-    get:
-#      disable for now until we are using redfish renderer
-#      x-swagger-template: 'bootstrap.js'
-      operationId: getBootstrap
-      summary: |
-        get tasks bootstrap.js
-      description: |
-        used internally by the system - get tasks bootstrap.js
-      parameters:
-        - name: macAddress
-          in: query
-          description: query object to pass through to waterline.
-          required: false
-          type: string
-      tags: [ "/api/2.0" ]
-      responses:
-        "200":
-          description: Success
-          schema:
-            # a pointer to a definition
-            $ref: "#/definitions/VersionsResponse"
-        # responses may fall through to errors
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /tasks/{identifier}:
-    x-swagger-router-controller: tasks
-    get:
-    #do I need a serializer?
-      operationId: getTasksById
-      x-view: tasks.2.0.json
-      x-privileges: [ 'Read' ]
-      x-authentication-type: [ 'jwt' ]
-
-      summary: |
-        get specific task
-      description: |
-        get specific task
-      parameters:
-        - name: identifier
-          in: path
-          description: |
-            task identifier
-          required: true
-          type: string
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: |
-            single task
-          schema:
-            type: object
-        404:
-          description: |
-            There is no task with specified identifier.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    post:
-#do I need a serializer      x-swagger-serializer: pollers
-      operationId: postTaskById
-      x-privileges: [ 'Write' ]
-      x-authentication-type: [ 'jwt' ]
-      x-view: tasks.2.0.json
-      summary: |
-        post specific task
-      description: |
-        post specific task
-      parameters:
-        - name: identifier
-          in: path
-          description: |
-            poller identifier
-          required: true
-          type: string
-        - name: body
-          in: body
-          description: |
-            obm settings to apply.
-          required: true
-          schema:
-            $ref: '#/definitions/generic_obj'
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: |
-            Specifics of the specified task
-          schema:
-            type: object
-        404:
-          description: |
-            There is no  task with specified identifier.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
 
   /swagger:
     x-swagger-pipe: swagger_raw

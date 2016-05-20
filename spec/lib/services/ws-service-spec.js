@@ -21,7 +21,8 @@ describe('Services.WebSocket', function () {
             onHttpContext.helper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),
             helper.requireGlob('/lib/api/1.1/**/*.js'),
             helper.requireGlob('/lib/services/**/*.js'),
-            helper.requireGlob('/lib/serializables/**/*.js')
+            helper.requireGlob('/lib/serializables/**/*.js'),
+            helper.requireGlob('/lib/api/view/**/*.js')
         ];
     });
 
