@@ -938,17 +938,127 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
-  /profiles/library:
-    x-swagger-router-controller: unimplemented
+  /profiles:
+    x-swagger-router-controller: profiles
     get:
-      operationId: unimplemented
+      operationId: profilesGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
         get list of possible profiles
       description: |
         get list of possible profiles
+      tags: [ "/api/2.0" ]
+      parameters:
+        - name: macs
+          in: query
+          description: |
+            List of valid MAC addresses to lookup
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+        - name: mac
+          in: query
+          description: |
+            When macs parameter is not passed, passed with IP adds MAC address to lookup
+          required: false
+          type: string
+        - name: ip
+          in: query
+          description: |
+            When macs parameters is not passed, passed with MAC adds IP address to lookup
+          required: false
+          type: string
+      responses:
+        200:
+          description: |
+            list of profiles for specified mac / ip
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /profiles/switch/error:
+    x-swagger-router-controller: profiles
+    post:
+      operationId: profilesPostSwitchError
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        create a switch error
+      description: |
+        create a switch error
+      parameters:
+        - name: body
+          in: body
+          description: |
+            switch error.
+          required: true
+          schema:
+                  $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            switch error posted.
+          schema:
+            type: object
+        500:
+          description: |
+            Upload failed.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /profiles/switch/{vendor}:
+    x-swagger-router-controller: profiles
+    get:
+      operationId: profilesGetSwitchVendor
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get a single profile
+      description: |
+        get a single profile
+      parameters:
+        - name: vendor
+          in: path
+          description: |
+            The switch vendor name.
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            return profile
+          schema:
+            type: object
+        404:
+          description: |
+            Profile not found.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /profiles/metadata:
+    x-swagger-router-controller: profiles
+    get:
+      operationId: profilesGetMetadata
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      x-view: profiles.2.0.json
+      summary: |
+        get list of possible profiles from database
+      description: |
+        get list of possible profiles from database
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -960,22 +1070,66 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /profiles/library/{identifier}:
-    x-swagger-router-controller: unimplemented
+  /profiles/metadata/{name}:
+    x-swagger-router-controller: profiles
     get:
-      operationId: unimplemented
+      operationId: profilesGetMetadataByName
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: profiles.2.0.json
       summary: |
-        get a single profile
+        get a single profile's metadata from database
       description: |
-        get a single profile
+        get a single profile's metadata from database
       parameters:
-        - name: identifier
+        - name: name
           in: path
           description: |
             The profile name.
           required: true
+          type: string
+        - name: scope
+          in: query
+          description: Profile scope 
+          required: false
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            return profile
+          schema:
+            type: object
+        404:
+          description: |
+            There is no profile in the library with identifier.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /profiles/library/{name}:
+    x-swagger-router-controller: profiles
+    get:
+      operationId: profilesGetLibByName
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        get a single profile's raw data
+      description: |
+        get a single profile's raw data
+      parameters:
+        - name: name
+          in: path
+          description: |
+            The profile name.
+          required: true
+          type: string
+        - name: scope
+          in: query
+          description: Profile scope
+          required: false
           type: string
       tags: [ "/api/2.0" ]
       responses:
@@ -994,7 +1148,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     put:
-      operationId: unimplemented
+      operationId: profilesPutLibByName
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -1002,12 +1156,20 @@ paths:
       description: |
         put a single profile
       parameters:
-        - name: identifier
+        - name: name
           in: path
           description: |
             The profile name.
           required: true
           type: string
+        - name: scope
+          in: query
+          description: Profile scope
+          required: false
+          type: string
+      consumes:
+        - application/octet-stream
+        - application/x-www-form-urlencoded
       tags: [ "/api/2.0" ]
       responses:
         200:

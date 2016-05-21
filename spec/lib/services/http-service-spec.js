@@ -28,7 +28,8 @@ describe('Http.Server', function () {
             helper.requireGlob('/lib/api/*.js'),
             helper.requireGlob('/lib/api/1.1/**/*.js'),
             helper.requireGlob('/lib/services/**/*.js'),
-            helper.requireGlob('/lib/serializables/**/*.js')
+            helper.requireGlob('/lib/serializables/**/*.js'),
+            helper.requireGlob('/lib/api/view/**/*.js')
         ];
     });
 
