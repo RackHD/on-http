@@ -2283,6 +2283,7 @@ paths:
       operationId: nodesPatchTagById
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: node.2.0.json#/definitions/PartialNode
       summary: |
         Patch tags onto specified node
       description: |

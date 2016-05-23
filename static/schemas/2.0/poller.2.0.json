@@ -25,9 +25,13 @@
             }
         },
         "Poller": {
-            "$ref": "#/definitions/PartialPoller",
-            "required": [
-                "type", "pollInterval", "config"
+            "allOf": [
+                { "$ref": "#/definitions/PartialPoller" },
+                {
+                    "required": [
+                        "type", "pollInterval", "config"
+                    ]
+                }
             ]
         }
     }

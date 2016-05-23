@@ -19,8 +19,10 @@
             }
         },
         "LookupPost": {
-            "$ref": "#/definitions/LookupBase",
-            "required": ["macAddress"]
+            "allOf": [
+                { "$ref": "#/definitions/LookupBase" },
+                { "required": [ "macAddress" ] }
+            ]
         }
     }
 }
