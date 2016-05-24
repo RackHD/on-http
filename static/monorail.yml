@@ -9,7 +9,7 @@ schemes:
 basePath: /api/1.1
 produces:
   - application/json
-  # x-gzip explicitly for files once the bugs listed 
+  # x-gzip explicitly for files once the bugs listed
   #   in comments below are fixed by swagger team.
   - application/x-gzip
 consumes:
@@ -36,7 +36,9 @@ paths:
           description: |
             list of all pollers
           schema:
-            type: object
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
@@ -60,8 +62,8 @@ paths:
       responses:
         200:
           description: |
-            single library poller 
-          schema: 
+            single library poller
+          schema:
             type: object
         404:
           description: |
@@ -86,7 +88,9 @@ paths:
           description: |
             list of all pollers
           schema:
-            type: object
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
@@ -128,8 +132,8 @@ paths:
       responses:
         200:
           description: |
-            Specifics of the specified poller 
-          schema: 
+            Specifics of the specified poller
+          schema:
             type: object
         404:
           description: |
@@ -158,8 +162,8 @@ paths:
       responses:
         200:
           description: |
-            Specifics of the patched poller 
-          schema: 
+            Specifics of the patched poller
+          schema:
             type: object
         404:
           description: |
@@ -188,7 +192,7 @@ paths:
       responses:
         204:
           description: |
-            Poller delete successfully 
+            Poller delete successfully
         404:
           description: |
             There is no poller with specified identifier.
@@ -218,7 +222,7 @@ paths:
         200:
           description: |
             data for poller
-          schema: 
+          schema:
             type: object
         404:
           description: |
@@ -243,7 +247,9 @@ paths:
           description: |
             list of possible templates
           schema:
-            type: object
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
@@ -268,7 +274,7 @@ paths:
         200:
           description: |
             single template
-          schema: 
+          schema:
             type: object
         404:
           description: |
@@ -298,7 +304,7 @@ paths:
         200:
           description: |
             return template
-          schema: 
+          schema:
             type: object
         404:
           description: |
@@ -346,8 +352,10 @@ paths:
         200:
           description: |
              list of skus
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
@@ -364,7 +372,7 @@ paths:
         200:
           description: |
             sku to create
-          schema: 
+          schema:
             type: object
         500:
           description: |
@@ -395,7 +403,7 @@ paths:
         200:
           description: |
             return sku
-          schema: 
+          schema:
             type: object
         404:
           description: |
@@ -425,7 +433,7 @@ paths:
         200:
           description: |
             sku to patch
-          schema: 
+          schema:
             type: object
         404:
           description: |
@@ -460,7 +468,7 @@ paths:
         204:
           description: |
             return all skus
-          schema: 
+          schema:
             type: object
         404:
           description: |
@@ -492,8 +500,10 @@ paths:
         200:
           description: |
             return nodes associated with that sku
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         404:
           description: |
             There is no sku with identifier.
@@ -517,8 +527,10 @@ paths:
         200:
           description: |
             list of possible profiles
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
@@ -543,7 +555,7 @@ paths:
         200:
           description: |
             return profile
-          schema: 
+          schema:
             type: object
         404:
           description: |
@@ -573,7 +585,7 @@ paths:
         200:
           description: |
             profile to put
-          schema: 
+          schema:
             type: object
         500:
           description: |
@@ -584,7 +596,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  
+
   /obms/library:
     get:
       summary: |
@@ -598,8 +610,10 @@ paths:
         200:
           description: |
             get list of possible OBM services
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
@@ -624,18 +638,18 @@ paths:
         200:
           description: |
             return OBM service
-          schema: 
+          schema:
             type: object
         404:
           description: |
-            The obm service with the identifier was not found 
+            The obm service with the identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  
+
   /workflows/library:
     get:
       summary: |
@@ -649,13 +663,15 @@ paths:
         200:
           description: |
             List all workflows available to run
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  
+
   /workflows/library/{injectableName}:
     get:
       summary: |
@@ -674,8 +690,10 @@ paths:
         200:
           description: |
             List all workflows available to run
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
@@ -694,8 +712,10 @@ paths:
         200:
           description: |
             List workflow tasks library
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
@@ -715,8 +735,10 @@ paths:
         200:
           description: |
             Fetch tasks from task library
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
@@ -740,12 +762,12 @@ paths:
         200:
           description: |
             Add tasks to task library
-          schema: 
+          schema:
             type: object
         500:
           description: |
             Error problem was encountered, task was not written.
-          schema: 
+          schema:
             $ref: '#/definitions/Error'
         default:
           description: Upload failed
@@ -770,7 +792,7 @@ paths:
         200:
           description: |
             Fetch workflows
-          schema: 
+          schema:
             type: object
         default:
           description: Unexpected error
@@ -790,8 +812,10 @@ paths:
         200:
           description: |
             Fetch workflows
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
@@ -814,12 +838,12 @@ paths:
         200:
           description: |
             Fetch workflows
-          schema: 
+          schema:
             type: object
         500:
           description: |
             Error problem was encountered, workflow was not written.
-          schema: 
+          schema:
             $ref: '#/definitions/Error'
         default:
           description: Upload failed
@@ -849,7 +873,7 @@ paths:
         200:
           description: |
             the workflow that was created
-          schema: 
+          schema:
             type: object
         default:
           description: Unexpected error
@@ -877,11 +901,11 @@ paths:
         200:
           description: |
             Fetch currently running workflows for specified node
-          schema: 
+          schema:
             type: object
         404:
           description: |
-            The node with the identifier was not found 
+            The node with the identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -909,11 +933,11 @@ paths:
         200:
           description: |
             Canceled workflows for specified node
-          schema: 
+          schema:
             type: object
         404:
           description: |
-            The node with the identifier was not found 
+            The node with the identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -942,11 +966,13 @@ paths:
         200:
           description: |
             all workflows for specified node, empty object if none exist.
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         404:
           description: |
-            The node with the identifier was not found 
+            The node with the identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -984,11 +1010,11 @@ paths:
         200:
           description: |
             the workflow that was created
-          schema: 
+          schema:
             type: object
         404:
           description: |
-            The node with the identifier was not found 
+            The node with the identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -998,7 +1024,7 @@ paths:
   /nodes/{macaddress}/dhcp/whitelist:
     post:
       summary: |
-        Add a whitelist of specified mac address 
+        Add a whitelist of specified mac address
       description: |
         Add a whitelist of specified mac address
       parameters:
@@ -1023,11 +1049,11 @@ paths:
         201:
           description: |
             the add was successful and it returns the whitelist
-          schema: 
+          schema:
             type: object
         404:
           description: |
-            The node with the identifier was not found 
+            The node with the identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1058,14 +1084,14 @@ paths:
             delete completed successfully
         404:
           description: |
-            The node with the identifier was not found 
+            The node with the identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-    
+
   /nodes/{identifier}/pollers:
     get:
       summary: |
@@ -1088,18 +1114,20 @@ paths:
         200:
           description: |
             all pollers of specified node, empty object if none exist.
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         404:
           description: |
-            The node with the identifier was not found 
+            The node with the identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  
+
   /nodes/{identifier}/catalogs/{source}:
     get:
       summary: |
@@ -1129,11 +1157,11 @@ paths:
           description: |
             specific source catalog of specified node, |
             empty object if none exist.
-          schema: 
+          schema:
             type: object
         404:
           description: |
-            The node with the identifier was not found 
+            The node with the identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1163,18 +1191,20 @@ paths:
         200:
           description: |
             all catalogs of specified node, empty object if none exist.
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         404:
           description: |
-            The node with the identifier was not found 
+            The node with the identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  
+
   /nodes/{identifier}/obm/identify:
     get:
       summary: |
@@ -1197,7 +1227,7 @@ paths:
       responses:
         200:
           description: obm identity light settings
-          schema: 
+          schema:
             type: object
         404:
           description: |
@@ -1226,7 +1256,7 @@ paths:
           description: |
             obm settings to apply.
           required: true
-          schema: 
+          schema:
             type: boolean
       tags:
         - nodes
@@ -1266,8 +1296,10 @@ paths:
       responses:
         200:
           description: obm settings
-          schema: 
-            type: object
+          schema:
+            type: array
+            items:
+              type: object
         404:
           description: |
             The node with the identifier was not found or has no obm settings.
@@ -1295,7 +1327,7 @@ paths:
           description: |
             obm settings to apply.
           required: true
-          schema: 
+          schema:
             type: object
       tags:
         - nodes
@@ -1335,7 +1367,7 @@ paths:
           description: array of all
           schema:
             type: array
-            items: 
+            items:
               type: object
         404:
           description: The node with the identifier was not found.
@@ -1390,7 +1422,7 @@ paths:
           description: |
             object patches to apply.
           required: true
-          schema: 
+          schema:
             type: object
       tags:
         - nodes
@@ -1422,7 +1454,7 @@ paths:
           description: array of all
           schema:
             type: array
-            items: 
+            items:
               type: object
         400:
           description: invalidAttributes - 1 attribute is invalid
@@ -1478,7 +1510,7 @@ paths:
           description: array of all
           schema:
             type: array
-            items: 
+            items:
               type: object
         default:
           description: Unexpected error
@@ -1528,7 +1560,7 @@ paths:
           description: array of all
           schema:
             type: array
-            items: 
+            items:
               type: object
         default:
           description: Unexpected error
@@ -1553,7 +1585,7 @@ paths:
           description: array of all
           schema:
             type: array
-            items: 
+            items:
               type: object
         default:
           description: Unexpected error
@@ -1585,7 +1617,7 @@ paths:
           description: array of all
           schema:
             type: array
-            items: 
+            items:
               type: object
         default:
           description: Unexpected error
@@ -1636,8 +1668,8 @@ paths:
         - files
         - get
       responses:
-# https://github.com/swagger-api/swagger-spec/issues/260 means we can't 
-# describe the return of a file easily today until jsonspec and swagger 
+# https://github.com/swagger-api/swagger-spec/issues/260 means we can't
+# describe the return of a file easily today until jsonspec and swagger
 # are "fixed"
         200:
           description: The file requested
@@ -1735,7 +1767,7 @@ paths:
         - get
       responses:
         200:
-          description: An array of configuration objects
+          description: configuration object
           schema:
             type: object
         default:
@@ -1812,9 +1844,7 @@ paths:
         200:
           description: A single catalog
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/catalog'
+            $ref: '#/definitions/catalog'
         default:
           description: NotFound error
   /dhcp:
@@ -1855,9 +1885,7 @@ paths:
         200:
           description: A single lease
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/lease'
+            $ref: '#/definitions/lease'
         default:
           description: NotFound error
     delete:
