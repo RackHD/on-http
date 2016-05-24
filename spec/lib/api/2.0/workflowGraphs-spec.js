@@ -5,6 +5,9 @@
 
 describe('Http.Api.Workflows.2.0', function () {
     var workflowApiService;
+    var arpCache = { 
+        getCurrent: sinon.stub().resolves([])
+    };
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -17,6 +20,7 @@ describe('Http.Api.Workflows.2.0', function () {
 
         return helper.startServer([
             dihelper.simpleWrapper(workflowApiService, 'Http.Services.Api.Workflows'),
+            dihelper.simpleWrapper(arpCache, 'ARPCache')
         ]);
     });
 

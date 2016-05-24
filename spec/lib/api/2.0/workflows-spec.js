@@ -6,6 +6,9 @@
 describe('Http.Api.Workflows.2.0', function () {
     var waterline;
     var workflowApiService;
+    var arpCache = { 
+        getCurrent: sinon.stub().resolves([])
+    };
 
     before('start HTTP server', function () {
         var self = this;
@@ -21,7 +24,8 @@ describe('Http.Api.Workflows.2.0', function () {
         this.sandbox = sinon.sandbox.create();
 
         return helper.startServer([
-            dihelper.simpleWrapper(waterline, 'Services.Waterline')
+            dihelper.simpleWrapper(waterline, 'Services.Waterline'),
+            dihelper.simpleWrapper(arpCache, 'ARPCache')
         ])
         .then(function() {
             workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
