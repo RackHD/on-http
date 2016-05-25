@@ -1933,14 +1933,12 @@ definitions:
     properties:
       id:
         type: string
-      profile:
-        type: string
       name:
         type: string
       obmSettings:
-        type: object
-      ipAddresses:
-        type: object
+        type: array
+      type:
+        type: string
       workflows:
         type: array
         items:
@@ -1950,9 +1948,20 @@ definitions:
         items:
           $ref: '#/definitions/catalog'
       sku:
-        $ref: '#/definitions/sku'
+        type: string
+      snmpSettings:
+        type: object
+      bootSettings:
+        type: object
+      sshSettings:
+        type: object
+      autoDiscover:
+        type: boolean
+      relations:
+        type: array
+      tags:
+        type: array
     required:
-    - profile
     - name
   graphobject:
     properties:
