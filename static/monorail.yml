@@ -1345,6 +1345,104 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /nodes/{identifier}/tags:
+    get:
+      summary: |
+        get the tags associated with a node.
+      description: |
+        get the tags associated with a node.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by
+          required: true
+          type: string
+      tags:
+        - nodes
+        - tags
+        - get
+      responses:
+        200:
+          description: tags
+          schema:
+            type: array
+            items:
+              type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: |
+        Patch specified node's tags
+      description: |
+        Patch specified node's tags
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            tags to apply
+          required: true
+          schema:
+            type: object
+      tags:
+        - nodes
+        - patch
+        - tags
+      responses:
+        200:
+          description: patch succeeded
+          schema:
+            type: object
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /nodes/{identifier}/tags/{tagname}:
+    delete:
+      summary: |
+        Remove tag from specified node.
+      description: |
+        Remove tag from specified node.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            Mac addresses and unique aliases to identify the node by
+          required: true
+          type: string
+        - name: tagname
+          in: path
+          description: |
+            tag to remove from node
+          required: true
+          type: string
+      tags:
+        - nodes
+        - delete
+        - tags
+      responses:
+        200:
+          description: Delete successful
+        404:
+          description: The node with the identifier was not found.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /nodes/{identifier}:
     get:
       summary: |
@@ -1910,6 +2008,51 @@ paths:
               $ref: '#/definitions/lease'
         default:
           description: NotFound error
+  /tags:
+    get:
+      summary: |
+        Fetch tags
+      description: |
+        Fetch tags
+      tags:
+        - tags
+        - get
+      responses:
+        200:
+          description: array of all tags fetched
+          schema:
+            type: array
+            items:
+              type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: |
+        post tag
+      description: |
+        create new tag
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+      tags:
+        - tags
+        - post
+      responses:
+        201:
+          description: tag accepted successfully
+        409:
+          description: tag already exists
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
 definitions:
   catalog:
@@ -1928,6 +2071,13 @@ definitions:
     - id
     - source
     - node
+  tag:
+    type: object
+    properties:
+      name:
+        type: string
+    required:
+    - name
   node:
     type: object
     properties:
