@@ -220,7 +220,7 @@ describe('Redfish Systems Root', function () {
         }]);
 
         taskProtocol.requestPollerCache.resolves([{
-            chassis: { power: "Unknown", uid: "Unknown"}
+            chassis: { power: "Unknown", uid: "Reserved"}
         }])
 
         return helper.request().get('/redfish/v1/Systems/' + node.id)
@@ -252,7 +252,7 @@ describe('Redfish Systems Root', function () {
         }]);
 
         taskProtocol.requestPollerCache.resolves([{
-            chassis: { power: "Unknown", uid: "Unknown"}
+            chassis: { power: "Unknown", uid: "Reserved"}
         }]);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id)
@@ -396,7 +396,7 @@ describe('Redfish Systems Root', function () {
         }]);
 
         taskProtocol.requestPollerCache.resolves([{
-            selInformation: { '# of Alloc Units': 10, uid: "Unknown"}
+            selInformation: { '# of Alloc Units': 10, uid: "Reserved"}
         }]);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id + 
