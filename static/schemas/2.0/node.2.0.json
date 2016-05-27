@@ -1,7 +1,7 @@
 {
     "title": "Node.2.0",
     "definitions": {
-        "Node": {
+        "PartialNode": {
             "description": "A node discovered by RackHD",
             "type": "object",
             "properties": {
@@ -30,9 +30,12 @@
                     "description": "SSH settings",
                     "type": "object"
                 }
-            },
-            "required": [
-                "name"
+            }
+        },
+        "Node": {
+            "allOf": [
+                { "$ref": "#/definitions/PartialNode" },
+                { "required": [ "name" ] }
             ]
         }
     }
