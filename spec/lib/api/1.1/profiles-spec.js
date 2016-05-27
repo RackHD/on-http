@@ -75,6 +75,7 @@ describe('Http.Api.Profiles', function () {
     describe('GET /profiles/library', function () {
         it('should return a list of profiles', function () {
             profiles.getAll.resolves([profile]);
+            profiles.get.resolves(profile);
             return helper.request().get('/api/1.1/profiles/library')
             .expect('Content-Type', /^application\/json/)
             .expect(200, [profile])

@@ -71,6 +71,7 @@ describe('Http.Api.Templates', function () {
     describe('GET /templates/library', function () {
         it('should return a list of templates', function () {
             templates.getAll.resolves([template]);
+            templates.get.resolves(template);
             return helper.request().get('/api/1.1/templates/library')
             .expect('Content-Type', /^application\/json/)
             .expect(200, [template])
