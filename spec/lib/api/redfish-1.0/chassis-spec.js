@@ -170,7 +170,7 @@ describe('Redfish Chassis Root', function () {
         }]);
 
         taskProtocol.requestPollerCache.resolves([{
-            chassis: { power: "Unknown", uid: "Unknown"}
+            chassis: { power: "Unknown", uid: "Reserved"}
         }]);
 
         return helper.request().get('/redfish/v1/Chassis/' + enclosure.id)
@@ -198,7 +198,7 @@ describe('Redfish Chassis Root', function () {
         }]);
 
         taskProtocol.requestPollerCache.resolves([{
-            chassis: { power: "Unknown", uid: "Unknown"}
+            chassis: { power: "Unknown", uid: "Reserved"}
         }]);
 
         return helper.request().get('/redfish/v1/Chassis/ABCDEFG')
