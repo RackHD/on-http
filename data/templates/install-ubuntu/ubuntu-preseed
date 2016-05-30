@@ -24,8 +24,12 @@ d-i netcfg/wireless_wep string
 ### Mirror settings
 # If you select ftp, the mirror/country string does not need to be set.
 d-i mirror/country string manual
-d-i mirror/http/hostname string <%=server%>:<%=port%>
-d-i mirror/http/directory string /ubuntu
+# Get server:port from repo
+<% var repoHostname = repo.match(/^(https?:\/\/)?([a-zA-Z0-9\.:-]+)/)[2] -%>
+d-i mirror/http/hostname string <%=repoHostname%>
+# Get directory from repo
+<% var repoDirectory = repo.replace(/^(https?:\/\/)?([a-zA-Z0-9\.:-]+)/g,"") -%>
+d-i mirror/http/directory string <%=repoDirectory%>
 d-i apt-setup/restricted boolean false
 d-i mirror/http/proxy string
 d-i apt-setup/universe boolean false
