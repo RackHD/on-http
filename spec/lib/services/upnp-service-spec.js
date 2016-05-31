@@ -10,15 +10,42 @@ describe("UPnP Service", function() {
     var fs;
     var ejs = require('ejs');
     var SSDP = require('node-ssdp').Server;
+    var SSDPClient = require('node-ssdp').Client;
     var EventEmitter = require('events').EventEmitter;
     var emitter = new EventEmitter();
     var udn = '<%= udn %>';
     var uuid = '66ddf9c7-a3a4-47fc-b603-60737d1f15a8';
     var sandbox = sinon.sandbox.create();
+    var rx = {
+        Observable: {
+            interval: sandbox.stub().returns({
+                subscribe: sandbox.spy(function(f1,f2) {
+                    f1();
+                    f2({error:'error'});
+                    return {
+                        dispose: sandbox.stub().resolves()
+                    };
+                })
+            })
+        }
+    };
+    var messenger = {
+        start: sandbox.stub().returns(
+            Promise.resolve()
+        ),
+        stop: sandbox.stub().returns(
+            Promise.resolve()
+        ),
+        publish: sandbox.stub().returns(
+            Promise.resolve()
+        )
+    };
     
     before(function() {
         helper.setupInjector([
-            helper.require("/lib/services/upnp-service")
+            helper.require("/lib/services/upnp-service"),
+            helper.di.simpleWrapper(messenger, 'Services.Messenger'),
+            helper.di.simpleWrapper(rx,'Rx')
         ]);
         helper.injector.get('Services.Configuration')
         .set('httpEndpoints', [{
@@ -41,6 +68,9 @@ describe("UPnP Service", function() {
         sandbox.stub(SSDP.prototype, 'stop').resolves();
         sandbox.stub(SSDP.prototype, 'addUSN').resolves();
         
+        sandbox.stub(SSDPClient.prototype, 'start').resolves();
+        sandbox.stub(SSDPClient.prototype, 'search').resolves();
+        
         systemUuid.getUuid.resolves(uuid);
         fs.readFileAsync.resolves(udn);
         fs.writeFileAsync.resolves();
@@ -58,8 +88,8 @@ describe("UPnP Service", function() {
         
         it('should start service', function() {
             return uPnPService.start()
-            .then(function(data) {
-                expect(data).to.equal(uPnPService.registry);
+            .then(function() {
+                expect(uPnPService.ssdpList.length).to.equal(uPnPService.registry.length);
             });
         });
         
@@ -118,6 +148,27 @@ describe("UPnP Service", function() {
                 });
             });
         });
+        
+        it('should run client poller event', function(done) {
+            SSDPClient.prototype.on = function(event, callback) {
+                emitter.on(event, function(headers, code, info) {
+                    callback.call(uPnPService, headers, code, info);
+                });
+            };
+            return uPnPService.start()
+            .then(function() {
+                emitter.emit('response', {header:'header'},{code:'200'},{info:'info'});
+                setImmediate(function() {
+                    try {
+                        expect(messenger.publish).to.have.been.calledOnce;
+                        done();
+                    } catch(e) {
+                        done(e);
+                    }
+                });
+            });
+        });
+        
     });
 });
 
