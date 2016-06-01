@@ -82,6 +82,7 @@ describe("Http.Services.Api.Profiles", function () {
             .then(function() {
                 expect(lookupService.setIpAddress).to.be.calledOnce;
                 expect(waterline.lookups.upsertProxyToMacAddress).to.not.be.called;
+                expect(result).to.not.be.undefined;
             });
         });
 
@@ -94,6 +95,7 @@ describe("Http.Services.Api.Profiles", function () {
             .then(function() {
                 expect(lookupService.setIpAddress).to.be.calledOnce;
                 expect(waterline.lookups.upsertProxyToMacAddress).to.be.calledOnce;
+                expect(result).to.not.be.undefined;
             });
         });
 
@@ -105,9 +107,10 @@ describe("Http.Services.Api.Profiles", function () {
             this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress').resolves();
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
             return profileApiService.setLookup(req)
-            .then(function() {
+            .then(function(result) {
                 expect(lookupService.setIpAddress).to.not.be.called;
                 expect(waterline.lookups.upsertProxyToMacAddress).to.be.calledOnce;
+                expect(result).to.be.undefined;
             });
         });
 
