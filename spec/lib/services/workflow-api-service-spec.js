@@ -155,7 +155,10 @@ describe('Http.Services.Api.Workflows', function () {
             expect(store.findActiveGraphForTarget).to.have.been.calledWith('testnodeid');
             expect(workflowApiService.createActiveGraph).to.have.been.calledOnce;
             expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
-                graphDefinition, { test: 1 }, { target: 'testnodeid', test: 2, proxy: 'proxy' }, 'test'
+                graphDefinition, 
+                { test: 1 }, 
+                { target: 'testnodeid', test: 2, proxy: 'proxy' }, 
+                'test'
             );
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
