@@ -1,0 +1,22 @@
+#!/bin/sh
+# esx       callback to rackhd post installation API hook
+# description: calls back to rackhd post installation API hook
+
+echo "Attempting to call back to RackHD ESX installer"
+
+# *sigh*, busybox shell does not support {1..30}. Retry 30 times with 1 second
+# sleep in between.
+for retry in $(awk 'BEGIN { for ( i=0; i<30; i++ ) { print i; } }');
+do
+    wget -s http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>
+    if [ "$?" -ne 0 ];
+    then
+        echo "Failed to connect to RackHD API callback, retrying"
+        sleep 1
+    else
+        exit 0
+    fi
+done;
+
+echo "Exceeded retries connecting to RackHD API callback. Exiting with failure code 1"
+exit 1

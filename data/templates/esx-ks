@@ -78,6 +78,28 @@ server 1.vmware.pool.ntp.org
 __NTP_CONFIG__
 /sbin/chkconfig ntpd on
 
+# Download the service to callback to RackHD after OS installation/reboot completion
+# %firstboot ends with a reboot, this script will run afterwards to signify completion
+# of the installer and all reboot steps.
+#
+# The approved method for adding startup commands is to write to /etc/rc.local.d/local.sh, 
+# which is a pre-existing file with a sticky bit set by VisorFS. You can't just create new
+# files and expect them to stick around, even if you set a sticky bit yourself.
+# The /sbin/auto-backup.sh script will ensure the changes are persisted across reboots and
+# MUST be executed after making any changes.
+#
+# See these links for more information:
+# http://www.virtuallyghetto.com/2011/08/how-to-persist-configuration-changes-in.html
+# http://blogs.vmware.com/vsphere/2011/09/how-often-does-esxi-write-to-the-boot-disk.html
+# https://communities.vmware.com/message/1273849#1273849
+#
+# NOTE: this method only works for ESXi 5.1 or greater. For older versions, the changes
+# must be written to /etc/rc.local instead.
+#
+# NOTE: this script will execute right away as a result of writing it to local.sh
+# along with executing on every subsequent boot
+wget http://<%=server%>:<%=port%>/api/common/templates/<%=rackhdCallbackScript%> -O /etc/rc.local.d/local.sh
+
 #backup ESXi configuration to persist it
 /sbin/auto-backup.sh
 
@@ -165,9 +187,6 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
     <%=n%>
   <% }); %>
 <% } %>
-
-#signify ORA the installation completed
-/usr/bin/wget -s http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub
 
 #reboot the system after host configuration
 esxcli system shutdown reboot -d 10 -r "Rebooting after first boot host configuration"
