@@ -1,10 +1,10 @@
 iseq ${platform} efi && goto is_efi || goto not_efi
 
 :not_efi
-kernel <%=mbootFile%> -c http://<%=server%>:<%=port%>/api/common/templates/<%=esxBootConfigTemplate%> BOOTIF=01-${netX/mac}
+kernel <%=mbootFile%> -c <%=installScriptUri%> BOOTIF=01-${netX/mac}
 boot
 
 :is_efi
-kernel <%=repo%>/efi/boot/bootx64.efi -c http://<%=server%>:<%=port%>/api/common/templates/<%=esxBootConfigTemplate%>
+kernel <%=repo%>/efi/boot/bootx64.efi -c <%=installScriptUri%>
 boot
 
