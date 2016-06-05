@@ -153,7 +153,7 @@ def convert_raid_to_jbod():
             subprocess.check_output(command, shell=False)
             command = [raid_tool, disk_argument["virtualDisk"], "del", "force"]
             subprocess.check_output(command, shell=False)
-            disk_list_without_raid = disk_list_without_raid + create_jbod(disk_argument, raid_tool)
+            disk_list_without_raid += create_jbod(disk_argument, raid_tool)
     return disk_list_without_raid
 
 
