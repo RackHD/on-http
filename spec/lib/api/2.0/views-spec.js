@@ -97,17 +97,17 @@ describe('Http.Api.Views', function () {
 
         it('should create an application/octet-stream view', function() {
             var view = {name: 'foo', content: 'foo', scope: 'global'};
-            var req = helper.request().put('/api/2.0/views/foo');
-
             viewsProtocol.put.resolves(view);
-            req.set('Content-Type', 'application/octet-stream');
-            req.write(new Buffer('{ "message": "hello" }', 'ascii'));
-            req.end(function(err, res) {
-                expect(res.get('Content-Type')).to.match(/^application\/json/);
-                expect(res.status).to.equal(200);
-                expect(res.body).to.deep.equal(view);
-                expect(viewsProtocol.put).to.have.been.calledOnce;
-            });
+
+            return helper.request().put('/api/2.0/views/foo')
+                .set('Content-Type', 'application/octet-stream')
+                .send(new Buffer('{ "message": "hello" }', 'ascii'))
+                .expect(200)
+                .expect(function(res) {
+                    expect(res.get('Content-Type')).to.match(/^application\/json/);
+                    expect(res.body).to.deep.equal(view);
+                    expect(viewsProtocol.put).to.have.been.calledOnce;
+                });
         });
 
         it('should reject invalid data type', function() {
