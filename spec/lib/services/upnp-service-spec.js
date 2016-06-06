@@ -80,6 +80,12 @@ describe("UPnP Service", function() {
         sandbox.reset();
     });
 
+    afterEach(function() {
+        emitter.removeAllListeners('advertise-bye');
+        emitter.removeAllListeners('advertise-alive');
+        emitter.removeAllListeners('response');
+    });
+
     helper.after(function () {
         sandbox.restore();
     });
@@ -148,7 +154,7 @@ describe("UPnP Service", function() {
                 });
             });
         });
-        
+
         it('should run client poller event', function(done) {
             SSDPClient.prototype.on = function(event, callback) {
                 emitter.on(event, function(headers, code, info) {
@@ -168,7 +174,6 @@ describe("UPnP Service", function() {
                 });
             });
         });
-        
     });
 });
 
