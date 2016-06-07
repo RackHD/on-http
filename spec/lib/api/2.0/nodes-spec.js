@@ -628,7 +628,7 @@ describe('2.0 Http.Api.Nodes', function () {
                 .expect(200, node.workflows)
                 .then(function(res){
                     expect(res.body[0]).to.have.property('status', 'pending');
-            });
+		});
         });
 
         it('should return a 404 if the node was not found', function () {
