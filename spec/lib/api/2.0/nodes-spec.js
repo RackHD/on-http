@@ -2,7 +2,7 @@
 
 'use strict';
 
-describe('Http.Api.Nodes', function () {
+describe('2.0 Http.Api.Nodes', function () {
     var configuration;
     var waterline;
     var ObmService;
@@ -29,19 +29,18 @@ describe('Http.Api.Nodes', function () {
             sinon.stub(waterline.catalogs);
             sinon.stub(waterline.workitems);
             sinon.stub(waterline.graphobjects);
+
             ObmService = helper.injector.get('Task.Services.OBM');
             sinon.stub(ObmService.prototype, 'identifyOn');
             sinon.stub(ObmService.prototype, 'identifyOff');
             workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
-            nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
-            sinon.stub(workflowApiService);
 
+            nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
             Promise = helper.injector.get('Promise');
             Constants = helper.injector.get('Constants');
             Errors = helper.injector.get('Errors');
             nodesApi = helper.injector.get('Http.Services.Api.Nodes');
         });
-
     });
 
     beforeEach('reset stubs', function () {
@@ -197,7 +196,6 @@ describe('Http.Api.Nodes', function () {
         });
     });
 
-
     describe('DELETE /nodes/:identifier', function () {
         beforeEach(function() {
             sinon.stub(nodeApiService, 'removeNode');
@@ -322,7 +320,6 @@ describe('Http.Api.Nodes', function () {
                     expect(waterline.nodes.updateByIdentifier).to.not.have.been.called;
                 });
         });
-
     });
 
     describe('POST /nodes/:identifier/obm/identify', function () {
@@ -603,14 +600,11 @@ describe('Http.Api.Nodes', function () {
         it('should get a list of workflows', function () {
             var node = {
                 id: '123',
-                workflows: [
-                    {
+                workflows: [{
                         name: 'TestGraph.Dummy'
-                    }
-                ]
+                    }]
             };
 
-            waterline.nodes.needByIdentifier.resolves(node);
             waterline.graphobjects.find.resolves(node.workflows);
 
             return helper.request().get('/api/2.0/nodes/123/workflows')
@@ -618,9 +612,27 @@ describe('Http.Api.Nodes', function () {
                 .expect(200, node.workflows);
         });
 
-        it('should return a 404 if the node was not found', function () {
-            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+        it('should return an active workflow', function() {
+            var node = {
+                id: '123',
+                workflows: [{
+                    name: 'TestGraph.Dummy',
+                    status: 'pending'
+                }]
+            };
 
+            waterline.graphobjects.find.resolves(node.workflows);
+
+            return helper.request().get('/api/2.0/nodes/123/workflows')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200, node.workflows)
+                .then(function(res){
+                    expect(res.body[0]).to.have.property('status', 'pending');
+            });
+        });
+
+        it('should return a 404 if the node was not found', function () {
+            waterline.graphobjects.find.rejects(new Errors.NotFoundError('Not Found'));
             return helper.request().get('/api/2.0/nodes/123/workflows')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
@@ -736,40 +748,10 @@ describe('Http.Api.Nodes', function () {
         });
     });
 
-    describe('GET /nodes/:identifier/workflows/active', function() {
-        beforeEach(function() {
-            sinon.stub(nodeApiService, 'getActiveNodeWorkflowById');
-        });
+    describe('DELETE /nodes/:identifier/workflows/action', function() {
+        var graph = {id: '123'};
+        var action = { command: 'cancel'};
 
-        afterEach(function() {
-            nodeApiService.getActiveNodeWorkflowById.restore();
-        });
-
-        it('should get the currently active workflow', function () {
-            var graph = {
-                instanceId: '0987'
-            };
-            nodeApiService.getActiveNodeWorkflowById.resolves(graph);
-
-            return helper.request().get('/api/2.0/nodes/123/workflows/active')
-                .expect('Content-Type', /^application\/json/)
-                .expect(200)
-                .expect(function () {
-                    expect(nodeApiService.getActiveNodeWorkflowById).to.have.been.calledOnce;
-                    expect(nodeApiService.getActiveNodeWorkflowById).to.have.been.calledWith('123');
-                });
-        });
-
-        it('should return a 404', function () {
-            nodeApiService.getActiveNodeWorkflowById.rejects(new Errors.NotFoundError('Not Found'));
-
-            return helper.request().get('/api/2.0/nodes/123/workflows/active')
-                .expect('Content-Type', /^application\/json/)
-                .expect(404);
-        });
-    });
-
-    describe('DELETE /nodes/:identifier/workflows/active', function() {
         beforeEach(function() {
             sinon.stub(nodeApiService, 'delActiveWorkflowById');
         });
@@ -781,10 +763,11 @@ describe('Http.Api.Nodes', function () {
         });
 
         it('should delete the currently active workflow', function () {
-            var graph = {id: '123'};
             nodeApiService.delActiveWorkflowById.resolves(graph);
 
-            return helper.request().delete('/api/2.0/nodes/123/workflows/active')
+            return helper.request().put('/api/2.0/nodes/123/workflows/action')
+                .set('Content-Type', 'application/json')
+                .send(action)
                 .expect(202)
                 .expect(function () {
                     expect(nodeApiService.delActiveWorkflowById).to.have.been.calledOnce;
@@ -792,11 +775,11 @@ describe('Http.Api.Nodes', function () {
                 });
         });
 
-        it('should return a 404 if the node was not found', function () {
-            nodeApiService.delActiveWorkflowById.restore();
-            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
-
-            return helper.request().delete('/api/2.0/nodes/123/workflows/active')
+        it('should return a 404 if no active workflow for node', function () {
+            nodeApiService.delActiveWorkflowById.rejects(new Errors.NotFoundError('Not Found'));
+            return helper.request().put('/api/2.0/nodes/123/workflows/action')
+                .set('Content-Type', 'application/json')
+                .send(action)
                 .expect(404);
         });
     });
