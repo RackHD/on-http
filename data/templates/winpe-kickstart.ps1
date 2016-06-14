@@ -1,4 +1,4 @@
-$repo = "\\<%=server%>\Lwin"
+$repo = "<%=repo%>"
 $smb_passwd = "<%=smbPassword%>"
 $smb_user = "<%=smbUser%>"
 Start-Sleep -s 2
