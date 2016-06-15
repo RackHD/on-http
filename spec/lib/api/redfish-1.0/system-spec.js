@@ -177,9 +177,57 @@ describe('Redfish Systems Root', function () {
                 'Thread Count': '20',
                 Version: 'Intel(R) Xeon(R) CPU E5-2650 v3 @ 2.30GHz',
                 ID: 'test',
+                'Status': 'Populated, Enabled',
                 Family: 'test'
+            },
+            {
+                "Asset Tag": "Not Specified",
+                "Characteristics": "None",
+                "Current Speed": "Unknown",
+                "External Clock": "Unknown",
+                Family: "<OUT OF SPEC>",
+                ID: "test2",
+                "L1 Cache Handle": "Not Provided",
+                "L2 Cache Handle": "Not Provided",
+                "L3 Cache Handle": "Not Provided",
+                Manufacturer: "Not Specified",
+                "Max Speed": "Unknown",
+                "Part Number": "Not Specified",
+                "Serial Number": "Not Specified",
+                "Socket Designation": "SOCKET 1",
+                "Status": "Unpopulated",
+                "Type": "<OUT OF SPEC>",
+                "Upgrade": "<OUT OF SPEC>",
+                Version: "Not Specified",
+                "Voltage": "Unknown"
             }
         ],
+    };
+
+    var catalogDataWithBadProcessor = {
+        'Processor Information' : [
+            {
+                "Asset Tag": "Not Specified",
+                "Characteristics": "None",
+                "Current Speed": "Unknown",
+                "External Clock": "Unknown",
+                Family: "<OUT OF SPEC>",
+                ID: "test2",
+                "L1 Cache Handle": "Not Provided",
+                "L2 Cache Handle": "Not Provided",
+                "L3 Cache Handle": "Not Provided",
+                Manufacturer: "Not Specified",
+                "Max Speed": "Unknown",
+                "Part Number": "Not Specified",
+                "Serial Number": "Not Specified",
+                "Socket Designation": "SOCKET 1",
+                "Status": "Unpopulated",
+                "Type": "<OUT OF SPEC>",
+                "Upgrade": "<OUT OF SPEC>",
+                Version: "Not Specified",
+                "Voltage": "Unknown"
+            }
+          ]
     };
 
     var smartCatalog = [
@@ -293,6 +341,20 @@ describe('Redfish Systems Root', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
+
+    it('should 404 an invalid processor list', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: catalogDataWithBadProcessor
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+ 
+    
 
     it('should return a valid processor', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
