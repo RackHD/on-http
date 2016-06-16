@@ -109,6 +109,50 @@ esxcli system maintenanceMode set -e true
 #copy the first boot logs
 cp /var/log/hostd.log "/vmfs/volumes/datastore1/firstboot-hostd.log"
 cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.log"
+
+#create python script to add/update vmk mac
+cat > postLookup.py <<EOF
+import urllib, urllib2, json, sys, time
+
+args = sys.argv
+query_args = { 'q': args[1] }
+encoded_args = urllib.urlencode(query_args)
+
+url = "http://<%=server%>:<%=port%>/api/1.1/lookups"
+
+time.sleep(5)
+response = urllib2.urlopen(url + "?" + encoded_args)
+data = json.loads(response.read())
+print data
+
+request = urllib2.Request(url)
+body = {'node': '<%=task.nodeId%>', 'macAddress'  : args[1]}
+
+if len(data) > 0:
+  request = urllib2.Request(url + "/" + data[0]["id"])
+  request.get_method = lambda: 'PATCH'
+if len(args) > 2:
+  body.update({'ipAddress': args[2]})
+
+request.add_header('Content-Type', 'application/json')
+
+response = urllib2.urlopen(request, json.dumps(body))
+data = json.loads(response.read())
+print data
+
+EOF
+
+
+postLookup () {
+  echo "Attempting postLookup operation on $1" >> /vmfs/volumes/datastore1/firstboot.log
+  mac=`localcli --formatter=table network ip interface list | grep $1 | awk '{print $3}'`
+  if [ "<%=version%>" == "5.5" ]; then
+    mac=`localcli --formatter=table network ip interface list | grep $1 | awk '{print $2}'`
+  fi
+  
+  python postLookup.py $mac $2
+}
+
 <% if( undefined !== dnsServers ) { %>
   esxcli network ip dns search add <%=domain%>
   <% dnsServers.forEach(function(dns) { %>
@@ -133,53 +177,69 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
 
 <% vmkid = 0 %>
 <% if( undefined !== networkDevices ) { %>
-  <% networkDevices.forEach(function(n) { %>
-    <% if( undefined !== n.ipv4 ) { %>
-      <% if( undefined !== n.ipv4.vlanIds ) { %>
-        <% n.ipv4.vlanIds.forEach(function(vid) { %>
+  <% if( networkDevices.length > 0 ) { %>
+
+    <% networkDevices.forEach(function(n) { %>
+      <% if( undefined !== n.ipv4 ) { %>
+        <% if( undefined !== n.ipv4.vlanIds ) { %>
+          <% n.ipv4.vlanIds.forEach(function(vid) { %>
+            <% vmkname = 'vmk' + vmkid++ %>
+            esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v "<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>"
+            esxcli network ip interface remove -i <%=vmkname%>
+            esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>.<%=vid%>
+            esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
+            esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%> 
+            esxcli network vswitch standard portgroup set -p <%=n.device%>.<%=vid%> -v <%=vid %>
+            postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
+          <% }); %>
+        <% } else { %>
           <% vmkname = 'vmk' + vmkid++ %>
-          esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v "<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>"
+          esxcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
           esxcli network ip interface remove -i <%=vmkname%>
-          esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>.<%=vid%>
+          esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
           esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
           esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%> 
-          esxcli network vswitch standard portgroup set -p <%=n.device%>.<%=vid%> -v <%=vid %>
-        <% }); %>
-      <% } else { %>
-        <% vmkname = 'vmk' + vmkid++ %>
-        esxcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-        esxcli network ip interface remove -i <%=vmkname%>
-        esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
-        esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
-        esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%> 
+          postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
+        <% } %>
       <% } %>
-    <% } %>
-    <% if( undefined !== n.ipv6 ) { %>
-      <% if( undefined !== n.ipv6.vlanIds ) { %>
-        <% n.ipv6.vlanIds.forEach(function(vid) { %>
+      <% if( undefined !== n.ipv6 ) { %>
+        <% if( undefined !== n.ipv6.vlanId ) { %>
+          <% n.ipv6.vlanId.forEach(function(vid) { %>
+            <% vmkname = 'vmk' + vmkid++ %>
+            esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+            esxcli network ip interface remove -i <%=vmkname%>
+            esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>.<%=vid%>
+            esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
+            esxcli network vswitch standard portgroup set -p <%=n.device%>.<%=vid%> -v <%=vid %>
+          <% }); %>
+        <% } else { %>
           <% vmkname = 'vmk' + vmkid++ %>
-          esxcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+          esxcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
           esxcli network ip interface remove -i <%=vmkname%>
-          esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>.<%=vid%>
+          esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
           esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
-          esxcli network vswitch standard portgroup set -p <%=n.device%>.<%=vid%> -v <%=vid %>
-        <% }); %>
-      <% } else { %>
+        <% } %>
+      <% } %>
+      <% if( (undefined === n.ipv6) && (undefined === n.ipv4) ) { %>
         <% vmkname = 'vmk' + vmkid++ %>
         esxcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
         esxcli network ip interface remove -i <%=vmkname%>
         esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
-        esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
+        esxcli network ip interface ipv4 set -i <%=vmkname%> -t dhcp
       <% } %>
-    <% } %>
-    <% if( (undefined === n.ipv6) && (undefined === n.ipv4) ) { %>
-      <% vmkname = 'vmk' + vmkid++ %>
-      esxcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-      esxcli network ip interface remove -i <%=vmkname%>
-      esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
-      esxcli network ip interface ipv4 set -i <%=vmkname%> -t dhcp
-    <% } %>
-  <% }); %>
+    <% }); %>
+  <% } else { %>
+    for nic in $(esxcli network nic list | grep vmnic | awk '{print $1}'); do
+      esxcli network vswitch standard add -v vSwitch${nic#vmnic*}
+      esxcli network vswitch standard uplink add -v vSwitch${nic#vmnic*} -u ${nic}
+      esxcli network vswitch standard portgroup add -p ${nic} -v vSwitch${nic#vmnic*}
+      esxcli network ip interface remove -i vmk${nic#vmnic*}
+      esxcli network ip interface add -i vmk${nic#vmnic*} -p ${nic}
+      esxcli network ip interface ipv4 set -i vmk${nic#vmnic*} -t dhcp
+      postLookup vmk${nic#vmnic*}
+
+    done
+  <% } %>
 <% } %>
 
 <% if( typeof postInstallCommands !== 'undefined' ) { %>
