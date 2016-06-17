@@ -30,7 +30,7 @@ describe('Http.Api.Workflows.2.0', function () {
         .then(function() {
             workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
             self.sandbox.stub(workflowApiService, 'defineTask').resolves();
-            self.sandbox.stub(workflowApiService, 'getActiveWorkflows').resolves();
+            self.sandbox.stub(workflowApiService, 'getAllWorkflows').resolves();
             self.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves();
             self.sandbox.stub(workflowApiService, 'getWorkflowById').resolves();
             self.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves();
@@ -68,19 +68,19 @@ describe('Http.Api.Workflows.2.0', function () {
     describe('workflowsGet', function () {
         it('should return a list of persisted graph objects', function () {
             var graph = { name: 'foobar' };
-            workflowApiService.getActiveWorkflows.resolves([graph]);
+            workflowApiService.getAllWorkflows.resolves([graph]);
 
             return helper.request().get('/api/2.0/workflows')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, [graph])
                 .expect(function () {
-                    expect(workflowApiService.getActiveWorkflows).to.have.been.calledOnce;
+                    expect(workflowApiService.getAllWorkflows).to.have.been.calledOnce;
                 });
         });
 
         it('should return 404 if not found ', function () {
             var Errors = helper.injector.get('Errors');
-            workflowApiService.getActiveWorkflows.rejects(new Errors.NotFoundError('test'));
+            workflowApiService.getAllWorkflows.rejects(new Errors.NotFoundError('test'));
 
             return helper.request().get('/api/2.0/workflows')
                 .expect('Content-Type', /^application\/json/)
