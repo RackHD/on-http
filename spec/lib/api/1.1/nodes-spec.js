@@ -2,7 +2,7 @@
 
 'use strict';
 
-describe('Http.Api.Nodes', function () {
+describe('Http.Api.Nodes v1.1', function () {
     var configuration;
     var waterline;
     var ObmService;
@@ -35,6 +35,8 @@ describe('Http.Api.Nodes', function () {
             workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
             nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
             sinon.stub(workflowApiService);
+            sinon.stub(nodeApiService, "getAllNodes");
+            sinon.stub(nodeApiService, "getNodeById");
 
             Promise = helper.injector.get('Promise');
             Constants = helper.injector.get('Constants');
@@ -74,32 +76,36 @@ describe('Http.Api.Nodes', function () {
         return helper.stopServer();
     });
 
+    var obm =[{
+        config: {},
+        id: "574dcd5794ab6e2506fd107a",
+        node: "1234abcd1234abcd1234abcd",
+        service: "noop-obm-service"
+    }];
+
     var node = {
+        autoDiscover: "false",
+        createdAt: '010101',
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
+        identifiers: [],
+        tags: [],
+        obmSettings: [],
+        obms: obm,
         type: 'compute',
-        obmSettings: [
-            {
-                service: 'ipmi-obm-service',
-                config: {
-                    host: '1.2.3.4',
-                    user: 'myuser',
-                    password: 'mypass'
-                }
-            }
-        ]
+        updatedAt: '010101'
     };
 
     describe('GET /nodes', function () {
         it('should return a list of nodes', function () {
             waterline.nodes.find.resolves([node]);
+            nodeApiService.getAllNodes.resolves([node]);
 
             return helper.request().get('/api/1.1/nodes')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, [node]);
         });
     });
-
     describe('POST /nodes', function () {
         beforeEach(function() {
             sinon.stub(nodeApiService, 'postNode');
@@ -126,22 +132,24 @@ describe('Http.Api.Nodes', function () {
 
     describe('GET /nodes/:id', function () {
         it('should return a single node', function () {
-            waterline.nodes.needByIdentifier.resolves(node);
+            waterline.nodes.find.resolves(node);
+            nodeApiService.getNodeById.resolves(node);
 
             return helper.request().get('/api/1.1/nodes/1234')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, node)
                 .expect(function () {
-                    expect(waterline.nodes.needByIdentifier).to.have.been.calledWith('1234');
+                    expect(nodeApiService.getNodeById).to.have.been.called;
+
                 });
         });
 
-        it('should return a 404 if the node was not found', function () {
-            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+        it('should return an empty arrya if the node was not found', function () {
+            waterline.nodes.find.resolves([]);
+            nodeApiService.getNodeById.withArgs('1234').resolves([]);
 
             return helper.request().get('/api/1.1/nodes/1234')
-                .expect('Content-Type', /^application\/json/)
-                .expect(404);
+                .expect(200, []);
         });
     });
 
@@ -169,26 +177,6 @@ describe('Http.Api.Nodes', function () {
                 .send(node)
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
-        });
-
-        it('should not update a compute node with unsupported OBM settings', function () {
-            var invalidNode = {
-                obmSettings: [
-                    {
-                        config: {},
-                        service: 'panduit-obm-service'
-                    }
-                ]
-            };
-
-            waterline.nodes.needByIdentifier.resolves(node);
-            return helper.request().patch('/api/1.1/nodes/1234')
-                .send(invalidNode)
-                .expect('Content-Type', /^application\/json/)
-                .expect(400)
-                .expect(function () {
-                    expect(waterline.nodes.updateByIdentifier).to.not.have.been.called;
-                });
         });
     });
 
@@ -220,155 +208,6 @@ describe('Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
             return helper.request().delete('/api/1.1/nodes/1234')
-                .expect('Content-Type', /^application\/json/)
-                .expect(404);
-        });
-    });
-
-    describe('GET /nodes/:identifier/obm', function () {
-        it('should return a list of the node\'s OBM settings', function () {
-            waterline.nodes.needByIdentifier.resolves(node);
-
-            return helper.request().get('/api/1.1/nodes/1234/obm')
-                .expect('Content-Type', /^application\/json/)
-                .expect(200, node.obmSettings);
-        });
-
-        it('should return a 404 if the node was not found', function () {
-            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
-
-            return helper.request().get('/api/1.1/nodes/1234/obm')
-                .expect('Content-Type', /^application\/json/)
-                .expect(404);
-        });
-
-        it('should return a 404 if the node has no OBM settings', function () {
-            waterline.nodes.needByIdentifier.resolves({ id: node.id });
-
-            return helper.request().get('/api/1.1/nodes/1234/obm')
-                .expect('Content-Type', /^application\/json/)
-                .expect(404);
-        });
-    });
-
-    describe('POST /nodes/:identifier/obm', function () {
-        var obmSetting = {
-            service: 'ipmi-obm-service',
-            config: {
-                'host': '5.6.7.8',
-                'user': 'myuser2',
-                'password': 'mypass2'
-            }
-        };
-        var serializedObmSetting = {
-            service: 'ipmi-obm-service',
-            config: {
-                'host': '5.6.7.8',
-                'user': 'myuser2',
-                'password': 'REDACTED'
-            }
-        };
-
-        it('should add a new set of OBM settings to an existing array', function () {
-            var updated = _.cloneDeep(node);
-            updated.obmSettings.push(obmSetting);
-            waterline.nodes.needByIdentifier.resolves(node);
-            waterline.nodes.updateByIdentifier.resolves(updated);
-            return helper.request().post('/api/1.1/nodes/1234/obm')
-                .send(obmSetting)
-                .expect('Content-Type', /^application\/json/)
-                .expect(201)
-                .expect(function(data) {
-                    expect(_.last(data.body.obmSettings)).to.deep.equal(serializedObmSetting);
-                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledOnce;
-                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledWith('1234');
-                    expect(waterline.nodes.updateByIdentifier.firstCall.args[1].obmSettings[1].host)
-                        .to.equal(obmSetting.host);
-                });
-        });
-
-        it('should add a new set of OBM settings if none exist', function () {
-            waterline.nodes.needByIdentifier.resolves({ id: node.id });
-            var updated = _.cloneDeep(node);
-            updated.obmSettings = [ obmSetting ];
-            var expected = _.cloneDeep(updated);
-            expected.obmSettings = [ serializedObmSetting ];
-            waterline.nodes.updateByIdentifier.resolves(updated);
-            return helper.request().post('/api/1.1/nodes/1234/obm')
-                .send(obmSetting)
-                .expect('Content-Type', /^application\/json/)
-                .expect(201)
-                .expect(function (data) {
-                    expect(_.last(data.body.obmSettings)).to.deep.equal(serializedObmSetting);
-                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledOnce;
-                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledWith('1234');
-                    expect(waterline.nodes.updateByIdentifier.firstCall.args[1].obmSettings[0].host)
-                        .to.equal(obmSetting.host);
-                });
-        });
-
-        it('should return a 404 if the node was not found', function () {
-            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
-
-            return helper.request().post('/api/1.1/nodes/1234/obm')
-                .send(obmSetting)
-                .expect('Content-Type', /^application\/json/)
-                .expect(404);
-        });
-
-        it('should not add a new unsupported OBM settings', function () {
-            var invalidSetting = {
-                config: {},
-                service: 'panduit-obm-service'
-            };
-
-            waterline.nodes.needByIdentifier.resolves(node);
-
-            return helper.request().post('/api/1.1/nodes/1234/obm')
-                .send(invalidSetting)
-                .expect('Content-Type', /^application\/json/)
-                .expect(400)
-                .expect(function () {
-                    expect(waterline.nodes.updateByIdentifier).to.not.have.been.called;
-                });
-        });
-
-    });
-
-    describe('POST /nodes/:identifier/obm/identify', function () {
-        it('should enable OBM identify on a node', function () {
-            waterline.nodes.needByIdentifier.resolves(node);
-            ObmService.prototype.identifyOn.resolves({});
-
-            return helper.request().post('/api/1.1/nodes/1234/obm/identify')
-                .send({ value: true })
-                .expect('Content-Type', /^application\/json/)
-                .expect(200)
-                .expect(function () {
-                    expect(ObmService.prototype.identifyOn).to.have.been.calledOnce;
-                    expect(ObmService.prototype.identifyOn).to.have.been.calledWith(node.id);
-                });
-        });
-
-        it('should disable OBM identify on a node', function () {
-            waterline.nodes.needByIdentifier.resolves(node);
-            ObmService.prototype.identifyOff.resolves({});
-
-            return helper.request().post('/api/1.1/nodes/1234/obm/identify')
-                .send({ value: false })
-                .expect('Content-Type', /^application\/json/)
-                .expect(200)
-                .expect(function () {
-                    expect(ObmService.prototype.identifyOff).to.have.been.calledOnce;
-                    expect(ObmService.prototype.identifyOff).to.have.been.calledWith(node.id);
-                });
-        });
-
-        it('should return a 404 if the node was not found', function () {
-            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
-
-            return helper.request().post('/api/1.1/nodes/1234/obm/identify')
-                .send({ value: true })
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });

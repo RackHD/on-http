@@ -1,4 +1,13 @@
 {
+<%
+    var _ = injector.get('_');
+    var obmId = null;
+    obms.forEach( function (value, key){
+        if(value.node){
+            obmId = value.id;
+        }
+    });
+%>
   "autoDiscover": "<%=autoDiscover%>",
   "createdAt": "<%=createdAt%>",
   "id" : "<%=id%>",
@@ -17,6 +26,11 @@
 "obmSettings": <%- JSON.stringify(obmSettings) %>,
 <% } else  {%>
 "obmSettings": [],
+<% } %>
+<% if (obms !== null) { %>
+"obms": "<%=basepath%>/obms/<%=obmId%>",
+<% } else { %>
+"obms": null,
 <% } %>
 "type": "<%=type%>",
 <% if (hasOwnProperty("sku")) { %>

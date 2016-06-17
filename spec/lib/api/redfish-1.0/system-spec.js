@@ -48,6 +48,8 @@ describe('Redfish Systems Root', function () {
 
             nodeApi = helper.injector.get('Http.Services.Api.Nodes');
             sinon.stub(nodeApi, "setNodeWorkflowById");
+            sinon.stub(nodeApi, "getAllNodes");
+            sinon.stub(nodeApi, "getNodeById");
 
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
@@ -111,6 +113,54 @@ describe('Redfish Systems Root', function () {
         return helper.stopServer();
     });
 
+    var obm =[{
+        id: "574dcd5794ab6e2506fd107a",
+        node: "1234abcd1234abcd1234abcd",
+        service: 'ipmi-obm-service',
+        config: {
+            host: '1.2.3.4',
+            user: 'myuser',
+            password: 'mypass'
+       }    
+    }];
+
+    var node = {
+        autoDiscover: "false",
+        createdAt: '010101',
+        id: '1234abcd1234abcd1234abcd',
+        name: 'name',
+        identifiers: [],
+        tags: [],
+        obmSettings: [],
+        obms: '/api/2.0/obms/574dcd5794ab6e2506fd107a',
+        type: 'compute',
+        updatedAt: '010101',
+        relations: [
+            {
+                relationType: 'enclosedBy',
+                targets: [ '4567efgh4567efgh4567efgh' ]
+            }
+        ]
+    };
+    var rawNode = {
+        autoDiscover: "false",
+        createdAt: '010101',
+        id: '1234abcd1234abcd1234abcd',
+        name: 'name',
+        identifiers: [],
+        tags: [],
+        obmSettings: [],
+        obms: obm,
+        type: 'compute',
+        updatedAt: '010101',
+        relations: [
+            {
+                relationType: 'enclosedBy',
+                targets: [ '4567efgh4567efgh4567efgh' ]
+            }
+        ]
+    };
+    /*
     var node = {
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
@@ -132,7 +182,7 @@ describe('Redfish Systems Root', function () {
             }
         ]
     };
-
+    */
     var catalogData = {
         dmi: {
             chassis : {
@@ -222,6 +272,7 @@ describe('Redfish Systems Root', function () {
         taskProtocol.requestPollerCache.resolves([{
             chassis: { power: "Unknown", uid: "Reserved"}
         }])
+        nodeApi.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(rawNode);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id)
             .expect('Content-Type', /^application\/json/)
@@ -232,7 +283,7 @@ describe('Redfish Systems Root', function () {
                 expect(redfish.render.called).to.be.true;
             });
     });
-
+    
     it('should return a valid system with sku', function() {
         waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd')
         .resolves(Promise.resolve({
@@ -255,6 +306,8 @@ describe('Redfish Systems Root', function () {
             chassis: { power: "Unknown", uid: "Reserved"}
         }]);
 
+        nodeApi.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(rawNode);
+
         return helper.request().get('/redfish/v1/Systems/' + node.id)
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -264,8 +317,9 @@ describe('Redfish Systems Root', function () {
                 expect(redfish.render.called).to.be.true;
             });
     });
-    
+
     it('should 404 an invalid system', function() {
+        nodeApi.getNodeById.withArgs('bad'+node.id).resolves([]);
         return helper.request().get('/redfish/v1/Systems/bad' + node.id)
             .expect('Content-Type', /^application\/json/)
             .expect(404);
@@ -595,6 +649,5 @@ describe('Redfish Systems Root', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(400);
     });
-
 });
 
