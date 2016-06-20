@@ -144,6 +144,7 @@ function parseVdInfo(pathList) {
             var scsiIdArray = scsiId.split(':');
             //Suppose controller id = 0 stands for JBOD
             if (scsiIdArray[1] === "0") {
+                //JBOD should have no virtual disk attribute
                 vdStr = '';
             } else {
                 vdStr = ['/c', scsiIdArray[0], '/v', scsiIdArray[2]].join('');
