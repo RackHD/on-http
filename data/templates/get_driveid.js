@@ -142,7 +142,13 @@ function parseVdInfo(pathList) {
         var scsiId = line[1].slice(line[1].lastIndexOf('-') + 1), vdStr;
         if (scsiId.split(':').length === 4){
             var scsiIdArray = scsiId.split(':');
-            vdStr = ['/c', scsiIdArray[0], '/v', scsiIdArray[2]].join('');
+            //Suppose controller id = 0 stands for JBOD
+            if (scsiIdArray[1] === "0") {
+                //JBOD should have no virtual disk attribute
+                vdStr = '';
+            } else {
+                vdStr = ['/c', scsiIdArray[0], '/v', scsiIdArray[2]].join('');
+            }
         }
         return [line[0], vdStr, scsiId];
     });
