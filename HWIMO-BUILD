@@ -16,7 +16,7 @@ cp ../package.json .
 rsync -ar ../debianstatic/on-http/ debian
 
 rm -rf node_modules
-npm install
+npm install --cache=`pwd`
 npm run apidoc
 
 # The following is a workaround for a bug in npm 1.3.10 where
@@ -24,7 +24,7 @@ npm run apidoc
 # We are replacing "npm prune --production with a fresh
 # "npm install --production"
 rm -rf node_modules
-npm install --production
+npm install --production --cache=`pwd`
 
 git log -n 1 --pretty=format:%h.%ai.%s > commitstring.txt
 
