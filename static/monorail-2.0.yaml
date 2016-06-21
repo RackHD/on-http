@@ -1638,42 +1638,10 @@ paths:
             $ref: '#/definitions/Error'
 
 
-  /nodes/{identifier}/workflows/active:
+  /nodes/{identifier}/workflows/action:
     x-swagger-router-controller: nodes
-    get:
-      operationId: nodesGetActiveWorkflowById
-      x-privileges: [ 'Read' ]
-      x-authentication-type: [ 'jwt' ]
-      summary: |
-        Fetch currently running workflows for specified node
-      description: |
-        Fetch currently running workflows for specified node
-      parameters:
-        - name: identifier
-          in: path
-          description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
-          required: true
-          type: string
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: |
-            Fetch currently running workflows for specified node
-          schema:
-            type: object
-        404:
-          description: |
-            The node with the identifier was not found
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    delete:
-      operationId: nodesDelActiveWorkflowById
+    put:
+      operationId: nodesWorkflowActionById
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -1688,6 +1656,13 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
+        - name: action
+          in: body
+          description:
+            Command to execute on selected workflow
+          required: true
+          schema:
+            $ref: '#/definitions/action'
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -1723,6 +1698,12 @@ paths:
             expect a string or an array of strings.
           required: true
           type: string
+        - name: active
+          in: query
+          description: |
+            Filter active workflows
+          required: false
+          type: boolean
       tags: [ "/api/2.0" ]
       responses:
         200:

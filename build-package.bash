@@ -50,7 +50,7 @@ cat > /tmp/sed.script << EOF
 s%{{name}}%${3}%
 EOF
 
-find . -type f -iname "*.in" -print0 | while IFS= read -r -d $'\0' file; do
+find ./debian -type f -iname "*.in" -print0 | while IFS= read -r -d $'\0' file; do
     outFile=$(echo $file | sed -f /tmp/sed.script)
     cat $file | sed -f /tmp/sed.script > ${outFile%.in}
     rm $file
