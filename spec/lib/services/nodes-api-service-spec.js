@@ -278,11 +278,11 @@ describe("Http.Services.Api.Nodes", function () {
                 id: '123'
             };
             var graph = {
-                id: 'testgraphid'
+                instanceId: 'testgraphid'
             };
             waterline.nodes.needByIdentifier.resolves(node);
             findActiveGraphForTarget.resolves(graph);
-            this.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves(graph.id);
+            this.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves(graph.instanceId);
 
             return nodeApiService.delActiveWorkflowById('testnodeid')
             .then(function() {
@@ -291,7 +291,7 @@ describe("Http.Services.Api.Nodes", function () {
                     .to.have.been.calledWith(node.id);
                 expect(workflowApiService.cancelTaskGraph).to.have.been.calledOnce;
                 expect(workflowApiService.cancelTaskGraph)
-                    .to.have.been.calledWith(graph.id);
+                    .to.have.been.calledWith(graph.instanceId);
             });
         });
 

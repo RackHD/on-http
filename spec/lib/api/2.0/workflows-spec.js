@@ -6,7 +6,7 @@
 describe('Http.Api.Workflows.2.0', function () {
     var waterline;
     var workflowApiService;
-    var arpCache = { 
+    var arpCache = {
         getCurrent: sinon.stub().resolves([])
     };
 
@@ -32,7 +32,7 @@ describe('Http.Api.Workflows.2.0', function () {
             self.sandbox.stub(workflowApiService, 'defineTask').resolves();
             self.sandbox.stub(workflowApiService, 'getAllWorkflows').resolves();
             self.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves();
-            self.sandbox.stub(workflowApiService, 'getWorkflowById').resolves();
+            self.sandbox.stub(workflowApiService, 'getWorkflowByInstanceId').resolves();
             self.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves();
             self.sandbox.stub(workflowApiService, 'deleteTaskGraph').resolves();
         });
@@ -115,20 +115,21 @@ describe('Http.Api.Workflows.2.0', function () {
     describe('workflowsGetById', function () {
         it('should return a single persisted graph', function () {
             var graph = { id: 'foobar' };
-            workflowApiService.getWorkflowById.resolves(graph);
+            workflowApiService.getWorkflowByInstanceId.resolves(graph);
 
             return helper.request().get('/api/2.0/workflows/foobar')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, graph)
                 .expect(function () {
-                    expect(workflowApiService.getWorkflowById).to.have.been.calledOnce;
-                    expect(workflowApiService.getWorkflowById).to.have.been.calledWith('foobar');
+                    expect(workflowApiService.getWorkflowByInstanceId).to.have.been.calledOnce;
+                    expect(workflowApiService.getWorkflowByInstanceId)
+                        .to.have.been.calledWith('foobar');
                 });
         });
 
         it('should return a 404 if not found', function () {
             var Errors = helper.injector.get('Errors');
-            workflowApiService.getWorkflowById.rejects(new Errors.NotFoundError('test'));
+            workflowApiService.getWorkflowByInstanceId.rejects(new Errors.NotFoundError('test'));
 
             return helper.request().get('/api/2.0/workflows/12345')
                 .expect('Content-Type', /^application\/json/)

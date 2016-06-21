@@ -1539,7 +1539,7 @@ paths:
   /workflows/{identifier}:
     x-swagger-router-controller: workflows
     get:
-      operationId: workflowsGetById
+      operationId: workflowsGetByInstanceId
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -1565,7 +1565,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      operationId: workflowsDeleteById
+      operationId: workflowsDeleteByInstanceId
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
