@@ -7,5 +7,5 @@ Standards-Version: 3.9.4
 
 Package: on-http
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, nodejs, nodejs-legacy, npm, mongodb
+Depends: ${shlibs:Depends}, ${misc:Depends}, nodejs (>= 4.4.5-1nodesource1~), mongodb
 Description: RackHD HTTP engine service
