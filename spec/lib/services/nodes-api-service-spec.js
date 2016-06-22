@@ -15,7 +15,6 @@ describe("Http.Services.Api.Nodes", function () {
     var enclosureNode;
     var _;
     var eventsProtocol;
-    var publishNodeAlert;
 
     before("Http.Services.Api.Nodes before", function() {
         helper.setupInjector([
@@ -546,9 +545,9 @@ describe("Http.Services.Api.Nodes", function () {
                     .calledWith({id: computeNodeBefore.id});
                 expect(eventsProtocol.publishNodeAlert)
                     .to.have.been.calledWith(computeNodeBefore.id, {
-                            nodeId : computeNodeBefore.id,
-                            nodeType: computeNodeBefore.type,
-                            state: "deleted"})
+                        nodeId : computeNodeBefore.id,
+                        nodeType: computeNodeBefore.type,
+                        state: "removed"})
                     .to.have.been.calledOnce;
             });
         });
@@ -566,7 +565,7 @@ describe("Http.Services.Api.Nodes", function () {
                     .to.have.been.calledWith(computeNode.id, {
                         nodeId : computeNode.id,
                         nodeType: computeNode.type,
-                        state: "deleted"})
+                        state: "removed"})
                     .to.have.been.calledOnce;
             });
         });
@@ -592,7 +591,7 @@ describe("Http.Services.Api.Nodes", function () {
                     .to.have.been.calledWith(noopNode.id, {
                         nodeId : noopNode.id,
                         nodeType: noopNode.type,
-                        state: "deleted"})
+                        state: "removed"})
                     .to.have.been.calledOnce;
             });
         });
@@ -629,7 +628,7 @@ describe("Http.Services.Api.Nodes", function () {
                     .to.have.been.calledWith(computeNode.id, {
                         nodeId : computeNode.id,
                         nodeType: computeNode.type,
-                        state: "deleted"})
+                        state: "removed"})
                     .to.have.been.calledOnce;
             });
         });
@@ -669,7 +668,7 @@ describe("Http.Services.Api.Nodes", function () {
                     .to.have.been.calledWith(enclosureNode.id, {
                         nodeId : enclosureNode.id,
                         nodeType: enclosureNode.type,
-                        state: "deleted"})
+                        state: "removed"})
                     .to.have.callCount(3);
             });
         });
@@ -726,7 +725,7 @@ describe("Http.Services.Api.Nodes", function () {
                     .to.have.been.calledWith(enclosureNode.id, {
                         nodeId : enclosureNode.id,
                         nodeType: enclosureNode.type,
-                        state: "deleted"})
+                        state: "removed"})
                     .to.have.callCount(3);
             });
         });
