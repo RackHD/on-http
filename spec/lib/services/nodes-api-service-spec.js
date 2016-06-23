@@ -14,6 +14,7 @@ describe("Http.Services.Api.Nodes", function () {
     var computeNode;
     var enclosureNode;
     var _;
+    var eventsProtocol;
 
     before("Http.Services.Api.Nodes before", function() {
         helper.setupInjector([
@@ -28,6 +29,7 @@ describe("Http.Services.Api.Nodes", function () {
         Errors = helper.injector.get("Errors");
         waterline = helper.injector.get('Services.Waterline');
         _ = helper.injector.get('_');
+        eventsProtocol = helper.injector.get('Protocol.Events');
         waterline.nodes = {
             create: function() {},
             needByIdentifier: function() {},
@@ -78,6 +80,7 @@ describe("Http.Services.Api.Nodes", function () {
         updateByIdentifier = this.sandbox.stub(waterline.nodes, 'updateByIdentifier');
         findActiveGraphForTarget = this.sandbox.stub(
                 workflowApiService, 'findActiveGraphForTarget');
+        this.sandbox.stub(eventsProtocol, 'publishNodeAlert').resolves({});
 
     });
 
@@ -540,6 +543,12 @@ describe("Http.Services.Api.Nodes", function () {
                 expect(waterline.nodes.destroy).to.have.been.calledOnce;
                 expect(waterline.nodes.destroy).to.have.been
                     .calledWith({id: computeNodeBefore.id});
+                expect(eventsProtocol.publishNodeAlert)
+                    .to.have.been.calledWith(computeNodeBefore.id, {
+                        nodeId : computeNodeBefore.id,
+                        nodeType: computeNodeBefore.type,
+                        state: "removed"})
+                    .to.have.been.calledOnce;
             });
         });
 
@@ -552,6 +561,12 @@ describe("Http.Services.Api.Nodes", function () {
                 expect(node).to.equal(computeNode);
                 expect(updateByIdentifier).to.not.have.been.called;
                 expect(waterline.nodes.destroy).to.have.been.calledOnce;
+                expect(eventsProtocol.publishNodeAlert)
+                    .to.have.been.calledWith(computeNode.id, {
+                        nodeId : computeNode.id,
+                        nodeType: computeNode.type,
+                        state: "removed"})
+                    .to.have.been.calledOnce;
             });
         });
 
@@ -572,6 +587,12 @@ describe("Http.Services.Api.Nodes", function () {
                 expect(node).to.equal(noopNode);
                 expect(updateByIdentifier).to.not.have.been.called;
                 expect(waterline.nodes.destroy).to.have.been.calledOnce;
+                expect(eventsProtocol.publishNodeAlert)
+                    .to.have.been.calledWith(noopNode.id, {
+                        nodeId : noopNode.id,
+                        nodeType: noopNode.type,
+                        state: "removed"})
+                    .to.have.been.calledOnce;
             });
         });
 
@@ -603,10 +624,16 @@ describe("Http.Services.Api.Nodes", function () {
                 expect(node).to.equal(computeNode);
                 expect(waterline.nodes.destroy).to.have.been.calledOnce;
                 expect(waterline.nodes.destroy).to.have.been.calledWith({id: computeNode.id});
+                expect(eventsProtocol.publishNodeAlert)
+                    .to.have.been.calledWith(computeNode.id, {
+                        nodeId : computeNode.id,
+                        nodeType: computeNode.type,
+                        state: "removed"})
+                    .to.have.been.calledOnce;
             });
         });
 
-        it("removeNode should delete compute node when deleting enlosure", function() {
+        it("removeNode should delete compute node when deleting enclosure", function() {
             var computeNode2 = {
                 id: '1234abcd1234abcd1234abce',
                 type: 'compute',
@@ -637,6 +664,12 @@ describe("Http.Services.Api.Nodes", function () {
                 expect(waterline.nodes.destroy).to.have.been.calledWith({id: computeNode.id});
                 expect(waterline.nodes.destroy).to.have.been.calledWith({id: computeNode2.id});
                 expect(waterline.nodes.destroy).to.have.been.calledWith({id: enclosureNode.id});
+                expect(eventsProtocol.publishNodeAlert)
+                    .to.have.been.calledWith(enclosureNode.id, {
+                        nodeId : enclosureNode.id,
+                        nodeType: enclosureNode.type,
+                        state: "removed"})
+                    .to.have.callCount(3);
             });
         });
 
@@ -688,6 +721,12 @@ describe("Http.Services.Api.Nodes", function () {
                 expect(updateByIdentifier).to.have.been
                     .calledWith(pduNode.id,
                                 {relations: pduNodeAfter.relations});
+                expect(eventsProtocol.publishNodeAlert)
+                    .to.have.been.calledWith(enclosureNode.id, {
+                        nodeId : enclosureNode.id,
+                        nodeType: enclosureNode.type,
+                        state: "removed"})
+                    .to.have.callCount(3);
             });
         });
 
@@ -726,6 +765,7 @@ describe("Http.Services.Api.Nodes", function () {
                         ', active workflow is running');
                     expect(waterline.nodes.destroy).to.not.have.been.called;
                     expect(updateByIdentifier).to.not.have.been.called;
+                    expect(eventsProtocol.publishNodeAlert).to.not.have.been.called;
                     done();
                 } catch (e) {
                     done(e);
