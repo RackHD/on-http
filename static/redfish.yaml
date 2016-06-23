@@ -901,8 +901,8 @@ paths:
         - name: body
           in: body
           required: false
-          schema: 
-            type: object
+          schema:
+            $ref: "#/definitions/testEvent"
       responses:
         200:
           description: Success
@@ -5913,3 +5913,6 @@ definitions:
     properties:
       message:
         type: string
+  testEvent:
+    type: object
+

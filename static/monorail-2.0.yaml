@@ -2035,6 +2035,7 @@ paths:
       operationId: nodesGetSshById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      tags: [ "/api/2.0" ]
       summary: |
         get the ssh settings associated with a node.
       description: |
