@@ -173,7 +173,7 @@ describe('Http.Services.Api.Workflows', function () {
         workflowApiService.runTaskGraph.resolves();
         store.findActiveGraphForTarget.resolves();
         waterline.nodes.needByIdentifier.resolves({ id: 'testnodeid', sku: 'skuid' });
-        env.get.withArgs('Graph.Test').resolves('Graph.Test');
+        env.get.withArgs('config.Graph.Test').resolves('Graph.Test');
 
         return workflowApiService.createAndRunGraph({
             name: 'Graph.Test',
@@ -194,7 +194,8 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
                 .to.have.been.calledWith(graph.instanceId, 'test');
-            expect(env.get).to.have.been.calledWith('Graph.Test', 'Graph.Test', ['skuid']);
+            expect(env.get).to.have.been.calledWith('config.Graph.Test', 'Graph.Test', 
+                ['skuid', "global"]);
         });
     });
 
@@ -204,7 +205,7 @@ describe('Http.Services.Api.Workflows', function () {
         workflowApiService.runTaskGraph.resolves();
         store.findActiveGraphForTarget.resolves();
         waterline.nodes.needByIdentifier.resolves({ id: 'testnodeid', sku: 'skuid' });
-        env.get.withArgs('Graph.Test').resolves('Graph.Test.skuid');
+        env.get.withArgs('config.Graph.Test').resolves('Graph.Test.skuid');
 
         return workflowApiService.createAndRunGraph({
             name: 'Graph.Test',
@@ -225,7 +226,8 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
                 .to.have.been.calledWith(graph.instanceId, 'test');
-            expect(env.get).to.have.been.calledWith('Graph.Test', 'Graph.Test', ['skuid']);
+            expect(env.get).to.have.been.calledWith('config.Graph.Test', 'Graph.Test', 
+                ['skuid', "global"]);
         });
     });
 
