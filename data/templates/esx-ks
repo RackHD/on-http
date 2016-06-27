@@ -79,7 +79,12 @@ esxcli system settings advanced set -o /UserVars/ESXiShellInteractiveTimeout -i 
 esxcli network firewall set --default-action false --enabled no
 
 # set hostname and domain
-esxcli system hostname set --domain <%=domain%> --host <%=hostname%>
+# if hostname is 'localhost', domain cannot be set.
+<% if (domain) { %>
+esxcli system hostname set --host <%=hostname%> --domain <%=domain%>
+<% } else { %>
+esxcli system hostname set --host <%=hostname%>
+<% } %>
 
 #config root account
 <% if (typeof rootSshKey !== 'undefined') { %>
@@ -112,7 +117,9 @@ esxcli system maintenanceMode set -e true
 cp /var/log/hostd.log "/vmfs/volumes/datastore1/firstboot-hostd.log"
 cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.log"
 <% if( undefined !== dnsServers ) { %>
-  esxcli network ip dns search add <%=domain%>
+  <% if (domain) { %>
+  esxcli network ip dns search add --domain=<%=domain%>
+  <% } %>
   <% dnsServers.forEach(function(dns) { %>
     esxcli network ip dns server add --server=<%= dns %>
   <% }); %>
