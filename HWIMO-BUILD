@@ -18,13 +18,7 @@ rsync -ar ../debianstatic/on-http/ debian
 rm -rf node_modules
 npm install --cache=`pwd`
 npm run apidoc
-
-# The following is a workaround for a bug in npm 1.3.10 where
-# prune --production removes the redfish-node module which is needed.
-# We are replacing "npm prune --production with a fresh
-# "npm install --production"
-rm -rf node_modules
-npm install --production --cache=`pwd`
+npm prune --production
 
 git log -n 1 --pretty=format:%h.%ai.%s > commitstring.txt
 
