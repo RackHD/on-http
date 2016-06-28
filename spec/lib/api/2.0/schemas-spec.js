@@ -4,26 +4,28 @@
 'use strict';
 
 describe('Http.Api.Schemas', function () {
-
+    var schemaService;
     var stubGetNamespace;
     var stubGetSchema;
 
     before('start HTTP server', function () {
-        this.timeout(5000);
+        this.timeout(10000);
         return helper.startServer([]).then(function () {
-            var schemaService = helper.injector.get('Http.Api.Services.Schema');
+            schemaService = helper.injector.get('Http.Api.Services.Schema');
             stubGetNamespace = sinon.stub(schemaService, "getNamespace");
             stubGetSchema = sinon.stub(schemaService, "getSchema");
         });
     });
 
-    after('stop HTTP server', function () {
-        return helper.stopServer();
-    });
-
-    beforeEach("reset stubs", function() {
+    afterEach("reset stubs", function() {
         stubGetNamespace.reset();
         stubGetSchema.reset();
+    });
+
+    after('stop HTTP server', function () {
+        schemaService.getSchema.restore();
+        schemaService.getNamespace.restore();
+        return helper.stopServer();
     });
 
     describe("GET /schemas", function() {

@@ -36,10 +36,6 @@ describe('Http.Api.workflowTasks.2.0', function () {
         });
     });
 
-    after('stop HTTP server', function () {
-        return helper.stopServer();
-    });
-
     beforeEach('set up mocks', function () {
         waterline.nodes = {
             findByIdentifier: sinon.stub().resolves()
@@ -62,6 +58,10 @@ describe('Http.Api.workflowTasks.2.0', function () {
         this.sandbox.reset();
     });
 
+    after('stop HTTP server', function () {
+        this.sandbox.restore();
+        return helper.stopServer();
+    });
 
     describe('workflowsPutTask ', function () {
         it('should persist a task', function () {

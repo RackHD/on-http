@@ -6,22 +6,22 @@
 describe('Http.Api.Config v2.0', function () {
     var configuration;
     before('start HTTP server', function () {
-        this.timeout(5000);
-        return helper.startServer();
-    });
-
-    beforeEach('set up mocks', function () {
-        configuration = helper.injector.get('Services.Configuration');
-        sinon.stub(configuration, 'set').returns(configuration);
-        sinon.stub(configuration, 'getAll').returns({});
+        this.timeout(10000);
+        return helper.startServer().then(function() {
+            configuration = helper.injector.get('Services.Configuration');
+            sinon.stub(configuration, 'set').returns(configuration);
+            sinon.stub(configuration, 'getAll').returns({});
+        });
     });
 
     afterEach('tear down mocks', function () {
-        configuration.set.restore();
-        configuration.getAll.restore();
+        configuration.set.reset();
+        configuration.getAll.reset();
     });
 
     after('stop HTTP server', function () {
+        configuration.set.restore();
+        configuration.getAll.restore();
         return helper.stopServer();
     });
 

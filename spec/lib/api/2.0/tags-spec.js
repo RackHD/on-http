@@ -30,10 +30,9 @@ describe('Http.Api.Tags', function () {
             nodesApi = helper.injector.get('Http.Services.Api.Nodes');
             tagsApi = helper.injector.get('Http.Services.Api.Tags');
         });
-
     });
 
-    beforeEach('reset stubs', function () {
+    afterEach('reset stubs', function () {
         function resetStubs(obj) {
             _(obj).methods().forEach(function (method) {
                 if (obj[method] && obj[method].reset) {

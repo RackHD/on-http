@@ -9,7 +9,6 @@ describe('Http.Api.Obms', function () {
         return helper.startServer();
     });
 
-
     after('stop HTTP server', function () {
         return helper.stopServer();
     });
@@ -47,6 +46,5 @@ describe('Http.Api.Obms', function () {
                 expect(res.body).to.have.property('service').that.equals('panduit-obm-service');
                 expect(res.body).to.have.property('config').that.is.an('object');
             });
-
     });
 });

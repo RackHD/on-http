@@ -6,7 +6,6 @@
 describe('Http.Api.Skus.2.0', function() {
     var waterline;
     var workflowApiService;
-    var nodeApiService;
     var Promise;
     var Constants;
     var Errors;
@@ -19,17 +18,26 @@ describe('Http.Api.Skus.2.0', function() {
             waterline = helper.injector.get('Services.Waterline');
             sinon.stub(waterline.skus);
             workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
-            nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
-            sinon.stub(nodeApiService);
+
             skuApiService = helper.injector.get('Http.Services.SkuPack');
             Promise = helper.injector.get('Promise');
             Constants = helper.injector.get('Constants');
             Errors = helper.injector.get('Errors');
-        });
 
+            sinon.stub(skuApiService, 'getSkus');
+            sinon.stub(skuApiService, 'postSku');
+            sinon.stub(skuApiService, 'getSkusById');
+            sinon.stub(skuApiService, 'upsertSku');
+            sinon.stub(skuApiService, 'patchSku');
+            sinon.stub(skuApiService, 'getNodesSkusById');
+            sinon.stub(skuApiService, 'regenerateSkus');
+            sinon.stub(skuApiService, 'deleteSkuById');
+
+            sinon.stub(workflowApiService, 'createAndRunGraph');
+        });
     });
 
-    beforeEach('reset stubs', function () {
+    afterEach('reset stubs', function () {
         function resetStubs(obj) {
             _(obj).methods().forEach(function (method) {
                 if (obj[method] && obj[method].reset) {
@@ -39,10 +47,19 @@ describe('Http.Api.Skus.2.0', function() {
         }
         resetStubs(waterline.skus);
         resetStubs(workflowApiService);
-
     });
 
     after('stop HTTP server', function () {
+        skuApiService.getSkus.restore();
+        skuApiService.postSku.restore();
+        skuApiService.getSkusById.restore();
+        skuApiService.upsertSku.restore();
+        skuApiService.patchSku.restore();
+        skuApiService.regenerateSkus.restore();
+        skuApiService.getNodesSkusById.restore();
+        skuApiService.deleteSkuById.restore();
+        workflowApiService.createAndRunGraph.restore();
+
         return helper.stopServer();
     });
 
@@ -84,31 +101,6 @@ describe('Http.Api.Skus.2.0', function() {
         discoveryGraphOptions: { test: 1 },
         id: '0987'
     };
-
-    beforeEach(function() {
-        sinon.stub(skuApiService, 'getSkus');
-        sinon.stub(skuApiService, 'postSku');
-        sinon.stub(skuApiService, 'getSkusById');
-        sinon.stub(skuApiService, 'upsertSku');
-        sinon.stub(skuApiService, 'patchSku');
-        sinon.stub(skuApiService, 'getNodesSkusById');
-        sinon.stub(skuApiService, 'regenerateSkus');
-        sinon.stub(skuApiService, 'deleteSkuById');
-
-        sinon.stub(workflowApiService, 'createAndRunGraph');
-    });
-
-    afterEach(function() {
-        skuApiService.getSkus.restore();
-        skuApiService.postSku.restore();
-        skuApiService.getSkusById.restore();
-        skuApiService.upsertSku.restore();
-        skuApiService.patchSku.restore();
-        skuApiService.regenerateSkus.restore();
-        skuApiService.getNodesSkusById.restore();
-        skuApiService.deleteSkuById.restore();
-        workflowApiService.createAndRunGraph.restore();
-    });
 
     it('should return an empty array from GET /skus', function () {
         skuApiService.getSkus.resolves([]);
