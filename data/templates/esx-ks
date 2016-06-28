@@ -80,7 +80,7 @@ esxcli network firewall set --default-action false --enabled no
 
 # set hostname and domain
 # if hostname is 'localhost', domain cannot be set.
-<% if (domain) { %>
+<% if ( typeof domain !== 'undefined' ) { %>
 esxcli system hostname set --host <%=hostname%> --domain <%=domain%>
 <% } else { %>
 esxcli system hostname set --host <%=hostname%>
@@ -117,7 +117,7 @@ esxcli system maintenanceMode set -e true
 cp /var/log/hostd.log "/vmfs/volumes/datastore1/firstboot-hostd.log"
 cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.log"
 <% if( undefined !== dnsServers ) { %>
-  <% if (domain) { %>
+  <% if ( typeof domain !== 'undefined' ) { %>
   esxcli network ip dns search add --domain=<%=domain%>
   <% } %>
   <% dnsServers.forEach(function(dns) { %>
