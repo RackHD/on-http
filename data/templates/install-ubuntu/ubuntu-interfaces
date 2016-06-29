@@ -1,3 +1,4 @@
+<%_ if (typeof networkDevices !== 'undefined' && networkDevices.length > 0) { _%>
 <%_ networkDevices.forEach(function(n) { _%>
     <%_ for (p in n) { _%>
         <%_ ip = n[p]; _%>
@@ -21,7 +22,8 @@ gateway <%=ip.gateway%>
         <%_ } _%>
     <%_ } _%>
 <%_ }); _%>
+<%_ } _%>
 
-<% if (undefined !== dnsServers && dnsServers.length > 0) { -%>
+<% if (typeof dnsServers !== 'undefined' && dnsServers.length > 0) { -%>
 dns-nameservers <%=dnsServers.join(' ')%>
 <% } -%>
