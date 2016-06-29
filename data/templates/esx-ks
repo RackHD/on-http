@@ -108,8 +108,11 @@ esxcli network firewall set --default-action false --enabled no
 cat > /etc/ntp.conf << __NTP_CONFIG__
 restrict default kod nomodify notrap noquerynopeer
 restrict 127.0.0.1 kkl,lkl
-server 0.vmware.pool.ntp.org
-server 1.vmware.pool.ntp.org
+<% if( typeof ntpServers !== 'undefined' ) { %>
+   <% ntpServers.forEach(function(ntp) { %>
+      server <%= ntp %>
+   <% }); %>
+<% } %>
 __NTP_CONFIG__
 /sbin/chkconfig ntpd on
 
