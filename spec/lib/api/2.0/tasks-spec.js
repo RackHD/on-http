@@ -37,8 +37,26 @@ describe('Http.Api.Tasks', function () {
           });
     });
 
+    afterEach('restoring stubs', function() {
+        function resetStubs(obj) {
+            _(obj).methods().forEach(function (method) {
+                if (obj[method] && obj[method].reset) {
+                    obj[method].reset();
+                }
+            }).value();
+        }
+
+        resetStubs(taskProtocol.activeTaskExists);
+        resetStubs(taskProtocol.requestCommands);
+        resetStubs(taskProtocol.respondCommands);
+        resetStubs(tasksApiService.getNode);
+        resetStubs(lookupService.ipAddressToMacAddress);
+    });
+
     after('stop HTTP server', function () {
-        return helper.stopServer();
+        return helper.reset().then(function(){
+            return helper.stopServer();
+        });
     });
 
     describe('GET /tasks/:id', function () {
@@ -69,9 +87,6 @@ describe('Http.Api.Tasks', function () {
             return helper.request().get('/api/2.0/tasks/testnodeid')
             .expect(404);
         });
-
-
-
     });
 
     describe("GET /tasks/bootstrap.js", function() {

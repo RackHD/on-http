@@ -24,7 +24,7 @@ describe('Http.Api.Views', function () {
         });
     });
 
-    beforeEach('reset stubs', function () {
+    afterEach('reset stubs', function () {
         _(viewsProtocol).methods().forEach(function (method) {
             if (_(viewsProtocol).has(method)) {
               viewsProtocol[method].reset();

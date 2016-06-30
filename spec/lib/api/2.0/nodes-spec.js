@@ -43,7 +43,7 @@ describe('2.0 Http.Api.Nodes', function () {
         });
     });
 
-    beforeEach('reset stubs', function () {
+    afterEach('reset stubs', function () {
         function resetStubs(obj) {
             _(obj).methods().forEach(function (method) {
                 if (obj[method] && obj[method].reset) {

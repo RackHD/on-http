@@ -5,6 +5,7 @@
 
 describe('Http.Api.Workflows.2.0', function () {
     var waterline;
+    var Errors;
     var workflowApiService;
     var arpCache = {
         getCurrent: sinon.stub().resolves([])
@@ -12,7 +13,7 @@ describe('Http.Api.Workflows.2.0', function () {
 
     before('start HTTP server', function () {
         var self = this;
-        this.timeout(5000);
+        this.timeout(10000);
 
         waterline = {
             start: sinon.stub(),
@@ -28,6 +29,7 @@ describe('Http.Api.Workflows.2.0', function () {
             dihelper.simpleWrapper(arpCache, 'ARPCache')
         ])
         .then(function() {
+            Errors = helper.injector.get('Errors');
             workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
             self.sandbox.stub(workflowApiService, 'defineTask').resolves();
             self.sandbox.stub(workflowApiService, 'getAllWorkflows').resolves();
@@ -36,10 +38,6 @@ describe('Http.Api.Workflows.2.0', function () {
             self.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves();
             self.sandbox.stub(workflowApiService, 'deleteTaskGraph').resolves();
         });
-    });
-
-    after('stop HTTP server', function () {
-        return helper.stopServer();
     });
 
     beforeEach('set up mocks', function () {
@@ -65,6 +63,11 @@ describe('Http.Api.Workflows.2.0', function () {
         this.sandbox.reset();
     });
 
+    after('stop HTTP server', function () {
+        this.sandbox.restore();
+        return helper.stopServer();
+    });
+
     describe('workflowsGet', function () {
         it('should return a list of persisted graph objects', function () {
             var graph = { name: 'foobar' };
@@ -79,14 +82,12 @@ describe('Http.Api.Workflows.2.0', function () {
         });
 
         it('should return 404 if not found ', function () {
-            var Errors = helper.injector.get('Errors');
             workflowApiService.getAllWorkflows.rejects(new Errors.NotFoundError('test'));
 
             return helper.request().get('/api/2.0/workflows')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
-
     });
 
     describe('workflowsPost', function () {
@@ -106,11 +107,9 @@ describe('Http.Api.Workflows.2.0', function () {
                     expect(res.body).to.have.property("friendlyName", "Catalog dmi");
                     expect(res.body).to.have.property("implementsTask", "Task.Base.Linux.Catalog");
                     expect(res.body).to.have.property("injectableName", "Task.Catalog.dmi");
-
                 });
         });
     });
-
 
     describe('workflowsGetById', function () {
         it('should return a single persisted graph', function () {
@@ -128,7 +127,6 @@ describe('Http.Api.Workflows.2.0', function () {
         });
 
         it('should return a 404 if not found', function () {
-            var Errors = helper.injector.get('Errors');
             workflowApiService.getWorkflowByInstanceId.rejects(new Errors.NotFoundError('test'));
 
             return helper.request().get('/api/2.0/workflows/12345')
@@ -160,7 +158,6 @@ describe('Http.Api.Workflows.2.0', function () {
         });
     });
 
-
    describe('workflowsDeleteById', function () {
 
         var workflow = {
@@ -179,6 +176,5 @@ describe('Http.Api.Workflows.2.0', function () {
                          .to.have.been.calledWith(workflow.id);
                 });
         });
-
     });
 });
