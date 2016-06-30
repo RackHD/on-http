@@ -83,25 +83,21 @@ describe('2.0 Http.Api.Nodes', function () {
 
     var node = {
         autoDiscover: "false",
-        createdAt: '010101',
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
         tags: [],
         obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a' }],
-        type: 'compute',
-        updatedAt: '010101'
+        type: 'compute'
     };
     var rawNode = {
         autoDiscover: "false",
-        createdAt: '010101',
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
         tags: [],
         obms: obm,
-        type: 'compute',
-        updatedAt: '010101'
+        type: 'compute'
     };
 
     describe('2.0 GET /nodes', function () {

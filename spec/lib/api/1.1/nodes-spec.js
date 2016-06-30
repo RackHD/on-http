@@ -103,27 +103,23 @@ describe('Http.Api.Nodes v1.1', function () {
 // functionality and excludes obms/ObmSettings
     var nodeModelData = {
         autoDiscover: "false",
-        createdAt: '010101',
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
         tags: [],
-        type: 'compute',
-        updatedAt: '010101'
+        type: 'compute'
     };
 
 // NODE by default displays obms from OBM model. Later
 // it is modified in 1.1 controller ( refer obm mock data)
     var node = {
         autoDiscover: "false",
-        createdAt: '010101',
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
         tags: [],
         obms:  obm,
         type: 'compute',
-        updatedAt: '010101',
         toJSON: function () { return nodeModelData; }
     };
 
@@ -131,7 +127,6 @@ describe('Http.Api.Nodes v1.1', function () {
 // it is modified in 1.1 controller ( refer obm mock data)
     var modifiedNode = {
         autoDiscover: "false",
-        createdAt: '010101',
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
@@ -140,8 +135,7 @@ describe('Http.Api.Nodes v1.1', function () {
             service: 'noop-obm-service',
             config:{}
         }],
-        type: 'compute',
-        updatedAt: '010101'
+        type: 'compute'
     };
 
 // MOCK data to test _renderNodeObmSettings function
@@ -329,7 +323,6 @@ describe('Http.Api.Nodes v1.1', function () {
     describe('POST /nodes/:identifier/obm', function () {
         var outputNode = {
             autoDiscover: "false",
-            createdAt: '010101',
             id: '1234abcd1234abcd1234abcd',
             name: 'name',
             identifiers: [],
@@ -342,8 +335,7 @@ describe('Http.Api.Nodes v1.1', function () {
                 'password': 'mypass2'
             }
             }],
-            type: 'compute',
-            updatedAt: '010101'
+            type: 'compute'
         };
 
         var serializedObmSetting = {

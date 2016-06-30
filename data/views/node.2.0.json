@@ -9,7 +9,6 @@
     });
 %>
   "autoDiscover": "<%=autoDiscover%>",
-  "createdAt": "<%=createdAt%>",
   "id" : "<%=id%>",
   "name": "<%=name%>",
   <% if (hasOwnProperty("identifiers")) { %>
@@ -34,13 +33,12 @@
 <% }); %>
 ],
 <% } %>
-"type": "<%=type%>",
 <% if (hasOwnProperty("sku")) { %>
 <% if (sku === null) { %>
-"sku" : null,
+"sku" : null
 <% } else  {%>
-"sku" : "<%=basepath %>/skus/<%=sku%>",
+"sku" : "<%=basepath %>/skus/<%=sku%>"
 <% } %>
 <% } %>
-"updatedAt": "<%=updatedAt%>"
+"type": "<%=type%>"
 }

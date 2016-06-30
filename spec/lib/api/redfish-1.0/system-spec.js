@@ -126,14 +126,12 @@ describe('Redfish Systems Root', function () {
     // Node new mock data with OBM model change
     var node = {
         autoDiscover: "false",
-        createdAt: '010101',
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
         tags: [],
         obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a'}],
         type: 'compute',
-        updatedAt: '010101',
         relations: [
             {
                 relationType: 'enclosedBy',
@@ -143,14 +141,12 @@ describe('Redfish Systems Root', function () {
     };
     var rawNode = {
         autoDiscover: "false",
-        createdAt: '010101',
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
         tags: [],
         obms: obm,
         type: 'compute',
-        updatedAt: '010101',
         relations: [
             {
                 relationType: 'enclosedBy',
