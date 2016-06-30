@@ -112,7 +112,7 @@ describe('Redfish Systems Root', function () {
         restoreStubs(taskProtocol);
         return helper.stopServer();
     });
-
+   //OBM model's mock data
     var obm =[{
         id: "574dcd5794ab6e2506fd107a",
         node: "1234abcd1234abcd1234abcd",
@@ -123,7 +123,7 @@ describe('Redfish Systems Root', function () {
             password: 'mypass'
        }    
     }];
-
+    // Node new mock data with OBM model change
     var node = {
         autoDiscover: "false",
         createdAt: '010101',
@@ -131,8 +131,7 @@ describe('Redfish Systems Root', function () {
         name: 'name',
         identifiers: [],
         tags: [],
-        obmSettings: [],
-        obms: '/api/2.0/obms/574dcd5794ab6e2506fd107a',
+        obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a'}],
         type: 'compute',
         updatedAt: '010101',
         relations: [
@@ -149,7 +148,6 @@ describe('Redfish Systems Root', function () {
         name: 'name',
         identifiers: [],
         tags: [],
-        obmSettings: [],
         obms: obm,
         type: 'compute',
         updatedAt: '010101',
@@ -160,29 +158,7 @@ describe('Redfish Systems Root', function () {
             }
         ]
     };
-    /*
-    var node = {
-        id: '1234abcd1234abcd1234abcd',
-        name: 'name',
-        type: 'compute',
-        obmSettings: [
-            {
-                service: 'ipmi-obm-service',
-                config: {
-                    host: '1.2.3.4',
-                    user: 'myuser',
-                    password: 'mypass'
-                }
-            }
-        ],
-        relations: [
-            {
-                relationType: 'enclosedBy',
-                targets: [ '4567efgh4567efgh4567efgh' ]
-            }
-        ]
-    };
-    */
+
     var catalogData = {
         dmi: {
             chassis : {

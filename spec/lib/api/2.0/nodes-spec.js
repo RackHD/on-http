@@ -88,8 +88,7 @@ describe('2.0 Http.Api.Nodes', function () {
         name: 'name',
         identifiers: [],
         tags: [],
-        obmSettings: [],
-        obms: '/api/2.0/obms/574dcd5794ab6e2506fd107a',
+        obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a' }],
         type: 'compute',
         updatedAt: '010101'
     };
@@ -100,7 +99,6 @@ describe('2.0 Http.Api.Nodes', function () {
         name: 'name',
         identifiers: [],
         tags: [],
-        obmSettings: [],
         obms: obm,
         type: 'compute',
         updatedAt: '010101'
@@ -149,7 +147,8 @@ describe('2.0 Http.Api.Nodes', function () {
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, node)
                 .expect(function () {
-                    expect(nodeApiService.getNodeById).to.have.been.calledWith('1234abcd1234abcd1234abcd');
+                    expect(nodeApiService.getNodeById).to.have.been
+                        .calledWith('1234abcd1234abcd1234abcd');
                     expect(nodeApiService.getNodeById).to.have.been.called;
                 });
         });

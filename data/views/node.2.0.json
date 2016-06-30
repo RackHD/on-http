@@ -1,10 +1,10 @@
 {
 <%
     var _ = injector.get('_');
-    var obmId = null;
+    var obmId = [];
     obms.forEach( function (value, key){
         if(value.node){
-            obmId = value.id;
+            obmId.push(value.id);
         }
     });
 %>
@@ -22,15 +22,17 @@
 <% } else  {%>
 "tags": [],
 <% } %>
-<% if (hasOwnProperty("obmSettings")) { %>
-"obmSettings": <%- JSON.stringify(obmSettings) %>,
-<% } else  {%>
-"obmSettings": [],
-<% } %>
-<% if (obms !== null) { %>
-"obms": "<%=basepath%>/obms/<%=obmId%>",
-<% } else { %>
+<% if (obms == null) { %>    
 "obms": null,
+<% } else { %>
+"obms":[
+<% obmId.forEach(function (ids, i, arr){ %>
+{
+"obm":"<%=basepath %>/obms/<%=ids%>"
+}
+<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+<% }); %>
+],
 <% } %>
 "type": "<%=type%>",
 <% if (hasOwnProperty("sku")) { %>
