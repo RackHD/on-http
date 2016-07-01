@@ -101,7 +101,7 @@ describe('Http.Api.Views', function () {
 
             return helper.request().put('/api/2.0/views/foo')
                 .set('Content-Type', 'application/octet-stream')
-                .send(new Buffer('{ "message": "hello" }', 'ascii'))
+                .send('{ "message": "hello" }')
                 .expect(200)
                 .expect(function(res) {
                     expect(res.get('Content-Type')).to.match(/^application\/json/);
