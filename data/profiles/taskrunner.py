@@ -23,7 +23,6 @@ def download_task_data():
     """
     print("Download Task", TASKS_URI)
     session = requests.Session()
-    response = requests.Response()
     response = session.get(TASKS_URI, auth=("", ""))
     _task_data = response.text
     session.close()
@@ -35,7 +34,6 @@ def download_script(downloadUrl):
     Download a python script from the tasks API
     """
     session = requests.Session()
-    script = requests.Response()
     url = 'http://<%=server%>:<%=port%>' + downloadUrl
     print("Downloading script at {}".format(url))
     script = session.get(url, auth=("", ""))
@@ -77,14 +75,12 @@ while True:
             sys.exit(int(task_data["exit"]))
         task_data = json.dumps(task_data)
         session = requests.Session()
-        req = requests.Response()
         req = session.post(TASKS_URI, data=task_data, auth=("", ""), headers=json_content_type)
         session.close()
     except Exception as error:
         task_data = [{'error': str(error)}]
         task_data = json.dumps(task_data)
         session = requests.Session()
-        req = requests.Response()
         req = session.post(TASKS_URI, data=task_data, auth=("", ""), headers=json_content_type)
         session.close()
 
@@ -92,7 +88,6 @@ while True:
         try:
             print("Posting task data\n {}".format(task_data))
             session = requests.Session()
-            response = requests.Response()
             response = session.get(req)
             session.close()
         except:
