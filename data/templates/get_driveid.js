@@ -3,13 +3,43 @@
 'use strict';
 
 var exec = require('child_process').exec;
+var execSync = require('child_process').execSync;
 
 var cmdDriveWwid = 'ls -l /dev/disk/by-id';
 var cmdVdInfo = 'ls -l /dev/disk/by-path';
 var cmdScsiId = 'lsscsi';
+var cmdSataRawInfo = 'sudo hdparm --Istdout';
 var options = {
     timeout: 10000 //10 seconds
 };
+
+/**
+ * Get SATA drive's SN string.
+ * @param {String} SATA drive's name, eg. 'sda'
+ * @return {String} SATA drive's SN string with 20 characters like 'QM00007_____________'
+ */
+function getSataSnStr(sataDrive) {
+    var output = execSync(cmdSataRawInfo + ' /dev/' + sataDrive);
+    var lines = output.toString().split('\n');
+    var snHexStr = lines.reduce(function (result,line) {
+        if(line.length === 39) {
+            result.push(line);
+        }
+        return result;
+    },[]).join(' ').split(' ').slice(10, 20).join('');
+
+    var snStr = '';
+    for(var i = 0; i < snHexStr.length; i+=2) {
+        var ascii = Number('0x' + snHexStr.charAt(i) + snHexStr.charAt(i+1));
+        var snChar = String.fromCharCode(ascii);
+        if(snChar === ' ') {
+            snStr += '_';
+        } else {
+            snStr += snChar;
+        }
+    }
+    return snStr;
+}
 
 /**
  * Parse the Drive WWID output
@@ -69,7 +99,7 @@ function parseDriveWwid(idList) {
         var headIndex = line.indexOf('-'), snIndex = line.lastIndexOf('_');
         var headStr = ['t10.', line.slice(0, headIndex).toUpperCase(), '_____'].join(''),
             vendorStr = line.slice(headIndex + 1, snIndex + 1),
-            snStr = line.slice(snIndex + 1),
+            snStr = getSataSnStr(esxiLine[0]),
             dashStr = '';
         for (var i = 0; i< requiredStrLen - vendorStr.length - snStr.length; i += 1){
             dashStr += '_';
