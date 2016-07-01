@@ -4,7 +4,8 @@
 'use strict';
 
 describe('Http.Api.Lookup 2.0', function () {
-    var waterline, stub, Promise, _;
+    var waterline, stub, Promise, _, findByTerm, create,
+        needOneById, updateOneById, destroyOneById;
 
     var data = [
         {
@@ -58,59 +59,61 @@ describe('Http.Api.Lookup 2.0', function () {
         return helper.startServer().then(function () {
             Promise = helper.injector.get('Promise');
             _ = helper.injector.get('_');
+            waterline = helper.injector.get('Services.Waterline');
+            findByTerm = sinon.stub(waterline.lookups, 'findByTerm').resolves(data);
+            create = sinon.stub(waterline.lookups, 'create').resolves(data[0]);
+            needOneById = sinon.stub(waterline.lookups, 'needOneById').resolves(data[0]);
+            updateOneById = sinon.stub(waterline.lookups, 'updateOneById').resolves(data[0]);
+            destroyOneById = sinon.stub(waterline.lookups, 'destroyOneById').resolves(data[0]);
         });
     });
 
-    before(function () {
-        waterline = helper.injector.get('Services.Waterline');
-    });
-
     afterEach(function () {
-        if (stub) {
-            stub.restore();
-            stub = undefined;
-        }
+        findByTerm.reset();
+        create.reset();
+        needOneById.reset();
+        updateOneById.reset();
+        destroyOneById.reset();
     });
 
     after('stop HTTP server', function () {
+        findByTerm.restore();
+        create.restore();
+        needOneById.restore();
+        updateOneById.restore();
+        destroyOneById.restore();
         return helper.stopServer();
     });
 
     describe('/api/2.0/lookups', function () {
         describe('GET', function () {
             it('should call waterline.lookups.findByTerm', function() {
-                stub = sinon.stub(waterline.lookups, 'findByTerm').resolves(data);
-
                 return helper.request().get('/api/2.0/lookups')
                     .expect('Content-Type', /^application\/json/)
                     .expect(200)
                     .expect(function () {
-                        expect(stub).to.have.been.calledWith(undefined);
+                        expect(findByTerm).to.have.been.calledWith(undefined);
                     });
             });
 
             it('should call waterline.lookups.findByterm with 123', function() {
-                stub = sinon.stub(waterline.lookups, 'findByTerm').resolves(data);
-
                 return helper.request().get('/api/2.0/lookups?q=123')
                     .expect('Content-Type', /^application\/json/)
                     .expect(200)
                     .expect(function () {
-                        expect(stub).to.have.been.calledWith('123');
+                        expect(findByTerm).to.have.been.calledWith('123');
                     });
             });
         });
 
         describe('POST', function () {
             it('should call waterline.lookups.create', function() {
-                stub = sinon.stub(waterline.lookups, 'create').resolves(data[0]);
-
                 return helper.request().post('/api/2.0/lookups')
                     .send(data[0])
                     .expect('Content-Type', /^application\/json/)
                     .expect(201)
                     .expect(function () {
-                        expect(stub).to.have.been.calledWith(sinon.match(data[0]));
+                        expect(create).to.have.been.calledWith(sinon.match(data[0]));
                     });
             });
             it('should reject invalid input', function() {
@@ -127,32 +130,27 @@ describe('Http.Api.Lookup 2.0', function () {
     describe('/api/2.0/lookups/:id', function () {
         describe('GET', function () {
             it('should call waterline.lookups.needOneById with 123', function() {
-                stub = sinon.stub(waterline.lookups, 'needOneById').resolves(data[0]);
-
                 return helper.request().get('/api/2.0/lookups/123')
                     .expect('Content-Type', /^application\/json/)
                     .expect(200)
                     .expect(function () {
-                        expect(stub).to.have.been.calledWith('123');
+                        expect(needOneById).to.have.been.calledWith('123');
                     });
             });
         });
 
         describe('PATCH', function () {
             it('should call waterline.lookups.updateOneById with 123', function() {
-                stub = sinon.stub(waterline.lookups, 'updateOneById').resolves(data[0]);
-
                 return helper.request().patch('/api/2.0/lookups/123')
                     .send(data[0])
                     .expect('Content-Type', /^application\/json/)
                     .expect(200)
                     .expect(function () {
-                        expect(stub).to.have.been.calledWith('123', sinon.match(data[0]));
+                        expect(updateOneById).to.have.been.calledWith('123', sinon.match(data[0]));
                     });
             });
-            it('should reject invalid input', function() {
-                stub = sinon.stub(waterline.lookups, 'updateOneById').resolves(data[0]);
 
+            it('should reject invalid input', function() {
                 return Promise.map(invalidData, function (data) {
                     return helper.request().post('/api/2.0/lookups')
                         .send(data)
@@ -164,13 +162,11 @@ describe('Http.Api.Lookup 2.0', function () {
 
         describe('DELETE', function () {
             it('should call waterline.lookups.destroyOneById with 123', function() {
-                stub = sinon.stub(waterline.lookups, 'destroyOneById').resolves(data[0]);
-
                 return helper.request().delete('/api/2.0/lookups/123')
                     .expect('Content-Type', /^application\/json/)
                     .expect(200)
                     .expect(function () {
-                        expect(stub).to.have.been.calledWith('123');
+                        expect(destroyOneById).to.have.been.calledWith('123');
                     });
             });
         });

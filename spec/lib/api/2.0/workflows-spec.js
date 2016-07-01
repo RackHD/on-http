@@ -5,14 +5,15 @@
 
 describe('Http.Api.Workflows.2.0', function () {
     var waterline;
+    var Errors;
     var workflowApiService;
-    var arpCache = { 
+    var arpCache = {
         getCurrent: sinon.stub().resolves([])
     };
 
     before('start HTTP server', function () {
         var self = this;
-        this.timeout(5000);
+        this.timeout(10000);
 
         waterline = {
             start: sinon.stub(),
@@ -28,18 +29,15 @@ describe('Http.Api.Workflows.2.0', function () {
             dihelper.simpleWrapper(arpCache, 'ARPCache')
         ])
         .then(function() {
+            Errors = helper.injector.get('Errors');
             workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
             self.sandbox.stub(workflowApiService, 'defineTask').resolves();
-            self.sandbox.stub(workflowApiService, 'getActiveWorkflows').resolves();
+            self.sandbox.stub(workflowApiService, 'getAllWorkflows').resolves();
             self.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves();
-            self.sandbox.stub(workflowApiService, 'getWorkflowById').resolves();
+            self.sandbox.stub(workflowApiService, 'getWorkflowByInstanceId').resolves();
             self.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves();
             self.sandbox.stub(workflowApiService, 'deleteTaskGraph').resolves();
         });
-    });
-
-    after('stop HTTP server', function () {
-        return helper.stopServer();
     });
 
     beforeEach('set up mocks', function () {
@@ -65,28 +63,31 @@ describe('Http.Api.Workflows.2.0', function () {
         this.sandbox.reset();
     });
 
+    after('stop HTTP server', function () {
+        this.sandbox.restore();
+        return helper.stopServer();
+    });
+
     describe('workflowsGet', function () {
         it('should return a list of persisted graph objects', function () {
             var graph = { name: 'foobar' };
-            workflowApiService.getActiveWorkflows.resolves([graph]);
+            workflowApiService.getAllWorkflows.resolves([graph]);
 
             return helper.request().get('/api/2.0/workflows')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, [graph])
                 .expect(function () {
-                    expect(workflowApiService.getActiveWorkflows).to.have.been.calledOnce;
+                    expect(workflowApiService.getAllWorkflows).to.have.been.calledOnce;
                 });
         });
 
         it('should return 404 if not found ', function () {
-            var Errors = helper.injector.get('Errors');
-            workflowApiService.getActiveWorkflows.rejects(new Errors.NotFoundError('test'));
+            workflowApiService.getAllWorkflows.rejects(new Errors.NotFoundError('test'));
 
             return helper.request().get('/api/2.0/workflows')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
-
     });
 
     describe('workflowsPost', function () {
@@ -106,29 +107,27 @@ describe('Http.Api.Workflows.2.0', function () {
                     expect(res.body).to.have.property("friendlyName", "Catalog dmi");
                     expect(res.body).to.have.property("implementsTask", "Task.Base.Linux.Catalog");
                     expect(res.body).to.have.property("injectableName", "Task.Catalog.dmi");
-
                 });
         });
     });
 
-
     describe('workflowsGetById', function () {
         it('should return a single persisted graph', function () {
             var graph = { id: 'foobar' };
-            workflowApiService.getWorkflowById.resolves(graph);
+            workflowApiService.getWorkflowByInstanceId.resolves(graph);
 
             return helper.request().get('/api/2.0/workflows/foobar')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, graph)
                 .expect(function () {
-                    expect(workflowApiService.getWorkflowById).to.have.been.calledOnce;
-                    expect(workflowApiService.getWorkflowById).to.have.been.calledWith('foobar');
+                    expect(workflowApiService.getWorkflowByInstanceId).to.have.been.calledOnce;
+                    expect(workflowApiService.getWorkflowByInstanceId)
+                        .to.have.been.calledWith('foobar');
                 });
         });
 
         it('should return a 404 if not found', function () {
-            var Errors = helper.injector.get('Errors');
-            workflowApiService.getWorkflowById.rejects(new Errors.NotFoundError('test'));
+            workflowApiService.getWorkflowByInstanceId.rejects(new Errors.NotFoundError('test'));
 
             return helper.request().get('/api/2.0/workflows/12345')
                 .expect('Content-Type', /^application\/json/)
@@ -159,7 +158,6 @@ describe('Http.Api.Workflows.2.0', function () {
         });
     });
 
-
    describe('workflowsDeleteById', function () {
 
         var workflow = {
@@ -178,6 +176,5 @@ describe('Http.Api.Workflows.2.0', function () {
                          .to.have.been.calledWith(workflow.id);
                 });
         });
-
     });
 });

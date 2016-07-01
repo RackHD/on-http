@@ -60,6 +60,11 @@ describe('Http.Api.Users', function () {
         this.sandbox.reset();
     });
 
+    after('stop HTTP server', function () {
+        this.sandbox.restore();
+        return helper.stopServer();
+    });
+
     it('should 201 a user post attempt with localexception', function() {
         accountService.listUsers.resolves([]);
         accountService.createUser.resolves(userObj);
@@ -271,10 +276,4 @@ describe('Http.Api.Users', function () {
                     .expect(401);
             });
     });
-
-    after('stop HTTP server', function () {
-        this.sandbox.restore();
-        return helper.stopServer();
-    });
-
 });

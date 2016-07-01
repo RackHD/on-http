@@ -48,6 +48,8 @@ describe('Redfish Systems Root', function () {
 
             nodeApi = helper.injector.get('Http.Services.Api.Nodes');
             sinon.stub(nodeApi, "setNodeWorkflowById");
+            sinon.stub(nodeApi, "getAllNodes");
+            sinon.stub(nodeApi, "getNodeById");
 
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
@@ -110,21 +112,41 @@ describe('Redfish Systems Root', function () {
         restoreStubs(taskProtocol);
         return helper.stopServer();
     });
-
+   //OBM model's mock data
+    var obm =[{
+        id: "574dcd5794ab6e2506fd107a",
+        node: "1234abcd1234abcd1234abcd",
+        service: 'ipmi-obm-service',
+        config: {
+            host: '1.2.3.4',
+            user: 'myuser',
+            password: 'mypass'
+       }    
+    }];
+    // Node new mock data with OBM model change
     var node = {
+        autoDiscover: "false",
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
+        identifiers: [],
+        tags: [],
+        obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a'}],
         type: 'compute',
-        obmSettings: [
+        relations: [
             {
-                service: 'ipmi-obm-service',
-                config: {
-                    host: '1.2.3.4',
-                    user: 'myuser',
-                    password: 'mypass'
-                }
+                relationType: 'enclosedBy',
+                targets: [ '4567efgh4567efgh4567efgh' ]
             }
-        ],
+        ]
+    };
+    var rawNode = {
+        autoDiscover: "false",
+        id: '1234abcd1234abcd1234abcd',
+        name: 'name',
+        identifiers: [],
+        tags: [],
+        obms: obm,
+        type: 'compute',
         relations: [
             {
                 relationType: 'enclosedBy',
@@ -177,9 +199,57 @@ describe('Redfish Systems Root', function () {
                 'Thread Count': '20',
                 Version: 'Intel(R) Xeon(R) CPU E5-2650 v3 @ 2.30GHz',
                 ID: 'test',
+                'Status': 'Populated, Enabled',
                 Family: 'test'
+            },
+            {
+                "Asset Tag": "Not Specified",
+                "Characteristics": "None",
+                "Current Speed": "Unknown",
+                "External Clock": "Unknown",
+                Family: "<OUT OF SPEC>",
+                ID: "test2",
+                "L1 Cache Handle": "Not Provided",
+                "L2 Cache Handle": "Not Provided",
+                "L3 Cache Handle": "Not Provided",
+                Manufacturer: "Not Specified",
+                "Max Speed": "Unknown",
+                "Part Number": "Not Specified",
+                "Serial Number": "Not Specified",
+                "Socket Designation": "SOCKET 1",
+                "Status": "Unpopulated",
+                "Type": "<OUT OF SPEC>",
+                "Upgrade": "<OUT OF SPEC>",
+                Version: "Not Specified",
+                "Voltage": "Unknown"
             }
         ],
+    };
+
+    var catalogDataWithBadProcessor = {
+        'Processor Information' : [
+            {
+                "Asset Tag": "Not Specified",
+                "Characteristics": "None",
+                "Current Speed": "Unknown",
+                "External Clock": "Unknown",
+                Family: "<OUT OF SPEC>",
+                ID: "test2",
+                "L1 Cache Handle": "Not Provided",
+                "L2 Cache Handle": "Not Provided",
+                "L3 Cache Handle": "Not Provided",
+                Manufacturer: "Not Specified",
+                "Max Speed": "Unknown",
+                "Part Number": "Not Specified",
+                "Serial Number": "Not Specified",
+                "Socket Designation": "SOCKET 1",
+                "Status": "Unpopulated",
+                "Type": "<OUT OF SPEC>",
+                "Upgrade": "<OUT OF SPEC>",
+                Version: "Not Specified",
+                "Voltage": "Unknown"
+            }
+          ]
     };
 
     var smartCatalog = [
@@ -222,6 +292,7 @@ describe('Redfish Systems Root', function () {
         taskProtocol.requestPollerCache.resolves([{
             chassis: { power: "Unknown", uid: "Reserved"}
         }])
+        nodeApi.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(rawNode);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id)
             .expect('Content-Type', /^application\/json/)
@@ -232,7 +303,7 @@ describe('Redfish Systems Root', function () {
                 expect(redfish.render.called).to.be.true;
             });
     });
-
+    
     it('should return a valid system with sku', function() {
         waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd')
         .resolves(Promise.resolve({
@@ -255,6 +326,8 @@ describe('Redfish Systems Root', function () {
             chassis: { power: "Unknown", uid: "Reserved"}
         }]);
 
+        nodeApi.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(rawNode);
+
         return helper.request().get('/redfish/v1/Systems/' + node.id)
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -264,8 +337,9 @@ describe('Redfish Systems Root', function () {
                 expect(redfish.render.called).to.be.true;
             });
     });
-    
+
     it('should 404 an invalid system', function() {
+        nodeApi.getNodeById.withArgs('bad'+node.id).resolves([]);
         return helper.request().get('/redfish/v1/Systems/bad' + node.id)
             .expect('Content-Type', /^application\/json/)
             .expect(404);
@@ -293,6 +367,20 @@ describe('Redfish Systems Root', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
+
+    it('should 404 an invalid processor list', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: catalogDataWithBadProcessor
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+ 
+    
 
     it('should return a valid processor', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
@@ -595,6 +683,5 @@ describe('Redfish Systems Root', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(400);
     });
-
 });
 

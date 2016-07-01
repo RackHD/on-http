@@ -32,10 +32,10 @@ describe('Http.Services.Api.Workflows', function () {
             needByIdentifier: sinon.stub().resolves({ id: 'testnodeid' })
         };
         waterline.lookups = {
-           findOneByTerm: sinon.stub().resolves() 
+           findOneByTerm: sinon.stub().resolves()
         };
         waterline.graphobjects = {
-            needByIdentifier: sinon.stub().resolves({ id: 'testgraphid', _status: 'pending' }),
+            needOne: sinon.stub().resolves({ id: 'testgraphid', _status: 'pending' }),
             find: sinon.stub().resolves(),
             findOne: sinon.stub().resolves()
         };
@@ -155,9 +155,9 @@ describe('Http.Services.Api.Workflows', function () {
             expect(store.findActiveGraphForTarget).to.have.been.calledWith('testnodeid');
             expect(workflowApiService.createActiveGraph).to.have.been.calledOnce;
             expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
-                graphDefinition, 
-                { test: 1 }, 
-                { target: 'testnodeid', test: 2, proxy: 'proxy' }, 
+                graphDefinition,
+                { test: 1 },
+                { target: 'testnodeid', test: 2, proxy: 'proxy' },
                 'test'
             );
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
@@ -173,7 +173,7 @@ describe('Http.Services.Api.Workflows', function () {
         workflowApiService.runTaskGraph.resolves();
         store.findActiveGraphForTarget.resolves();
         waterline.nodes.needByIdentifier.resolves({ id: 'testnodeid', sku: 'skuid' });
-        env.get.withArgs('Graph.Test').resolves('Graph.Test');
+        env.get.withArgs('config.Graph.Test').resolves('Graph.Test');
 
         return workflowApiService.createAndRunGraph({
             name: 'Graph.Test',
@@ -194,7 +194,8 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
                 .to.have.been.calledWith(graph.instanceId, 'test');
-            expect(env.get).to.have.been.calledWith('Graph.Test', 'Graph.Test', ['skuid']);
+            expect(env.get).to.have.been.calledWith('config.Graph.Test', 'Graph.Test', 
+                ['skuid', "global"]);
         });
     });
 
@@ -204,7 +205,7 @@ describe('Http.Services.Api.Workflows', function () {
         workflowApiService.runTaskGraph.resolves();
         store.findActiveGraphForTarget.resolves();
         waterline.nodes.needByIdentifier.resolves({ id: 'testnodeid', sku: 'skuid' });
-        env.get.withArgs('Graph.Test').resolves('Graph.Test.skuid');
+        env.get.withArgs('config.Graph.Test').resolves('Graph.Test.skuid');
 
         return workflowApiService.createAndRunGraph({
             name: 'Graph.Test',
@@ -225,7 +226,8 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
                 .to.have.been.calledWith(graph.instanceId, 'test');
-            expect(env.get).to.have.been.calledWith('Graph.Test', 'Graph.Test', ['skuid']);
+            expect(env.get).to.have.been.calledWith('config.Graph.Test', 'Graph.Test', 
+                ['skuid', "global"]);
         });
     });
 
@@ -352,7 +354,7 @@ describe('Http.Services.Api.Workflows', function () {
         var mockWorkflowError = new Errors.TaskCancellationError(
             "testid is not an active workflow"
         );
-        waterline.graphobjects.needByIdentifier.rejects(mockWorkflowError);
+        waterline.graphobjects.needOne.rejects(mockWorkflowError);
         return workflowApiService.cancelTaskGraph()
             .should.be.rejectedWith(mockWorkflowError);
     });
@@ -369,16 +371,16 @@ describe('Http.Services.Api.Workflows', function () {
         });
     });
 
-    it('should return workflow by id ', function() {
-        waterline.graphobjects.needByIdentifier.resolves(workflow);
-        return workflowApiService.getWorkflowById().then(function (workflows) {
+    it('should return workflow by instanceId ', function() {
+        waterline.graphobjects.needOne.resolves(workflow);
+        return workflowApiService.getWorkflowByInstanceId().then(function (workflows) {
             expect(workflows).to.deep.equal(workflow);
         });
     });
 
-    it('should return Not Found Error when invalid id is passed', function() {
-        waterline.graphobjects.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
-        return expect(workflowApiService.getWorkflowById())
+    it('should return Not Found Error when invalid instanceId is passed', function() {
+        waterline.graphobjects.needOne.rejects(new Errors.NotFoundError('Not Found'));
+        return expect(workflowApiService.getWorkflowByInstanceId())
                .to.be.rejectedWith(Errors.NotFoundError);
     });
 
@@ -388,6 +390,6 @@ describe('Http.Services.Api.Workflows', function () {
                                _status : 'pending'
                              };
         waterline.graphobjects.find.resolves(activeWorkflow);
-        return expect(workflowApiService.getWorkflowById()).to.become(activeWorkflow);
+        return expect(workflowApiService.getWorkflowByInstanceId()).to.become(activeWorkflow);
     });
 });
