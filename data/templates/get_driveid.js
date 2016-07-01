@@ -40,8 +40,9 @@ function getSataSnStr(sataDrive) {
      *  .....
      */
     var lines = output.toString().split('\n');
+    var hexLineMatch = /^([0-9A-Fa-f]{4}\s+){7}[0-9A-Fa-f]{4}$/;
     var snHexStr = lines.reduce(function (result,line) {
-        if(line.length === 39) {
+        if(hexLineMatch.test(line)) {
             result.push(line);
         }
         return result;
