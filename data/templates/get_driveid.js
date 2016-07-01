@@ -15,11 +15,30 @@ var options = {
 
 /**
  * Get SATA drive's SN string.
- * @param {String} SATA drive's name, eg. 'sda'
+ * @param {String} sataDrive SATA drive's name, eg. 'sda'
  * @return {String} SATA drive's SN string with 20 characters like 'QM00007_____________'
  */
 function getSataSnStr(sataDrive) {
     var output = execSync(cmdSataRawInfo + ' /dev/' + sataDrive);
+    /*  output data like below:
+     *  $ sudo hdparm --Istdout /dev/sda
+     *  dev/sda:
+     *
+     *  0040 3fff 0000 0010 7e00 0200 003f 0000
+     *  0000 0000 514d 3030 3030 3520 2020 2020
+     *  2020 2020 2020 2020 0003 0200 0004 322e
+     *  322e 3120 2020 5145 4d55 2048 4152 4444
+     *  4953 4b20 2020 2020 2020 2020 2020 2020
+     *  2020 2020 2020 2020 2020 2020 2020 8010
+     *  .....
+     *
+     *  snHexStr is from 21 to 40 bytes, total 20 bytes, shown as below
+     *
+     *  .....
+     *            514d 3030 3030 3520 2020 2020
+     *  2020 2020 2020 2020
+     *  .....
+     */
     var lines = output.toString().split('\n');
     var snHexStr = lines.reduce(function (result,line) {
         if(line.length === 39) {
