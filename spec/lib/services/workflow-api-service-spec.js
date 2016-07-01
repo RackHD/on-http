@@ -14,6 +14,7 @@ describe('Http.Services.Api.Workflows', function () {
     var env;
     var workflowDefinition;
     var workflow;
+    var Promise;
 
     before('Http.Services.Api.Workflows before', function() {
         helper.setupInjector([
@@ -25,6 +26,7 @@ describe('Http.Services.Api.Workflows', function () {
         waterline = helper.injector.get('Services.Waterline');
         store = helper.injector.get('TaskGraph.Store');
         env = helper.injector.get('Services.Environment');
+        Promise = helper.injector.get('Promise');
     });
 
     beforeEach(function() {
@@ -226,7 +228,7 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
                 .to.have.been.calledWith(graph.instanceId, 'test');
-            expect(env.get).to.have.been.calledWith('config.Graph.Test', 'Graph.Test', 
+            expect(env.get).to.have.been.calledWith('config.Graph.Test', 'Graph.Test',
                 ['skuid', "global"]);
         });
     });
@@ -245,10 +247,39 @@ describe('Http.Services.Api.Workflows', function () {
         ).to.be.rejectedWith(/Unable to run multiple task graphs against a single target/);
     });
 
+    it('should throw error if the graph name is missing', function() {
+        return expect(
+            workflowApiService.createAndRunGraph({
+                options: { test: 1 },
+                context: { test: 2 },
+                domain: 'test'
+            }, 'testnodeid')
+        ).to.be.rejectedWith(Errors.BadRequestError, /Graph name is missing or in wrong format/);
+    });
+
+    it('should throw error if the graph name is in wrong format', function() {
+        return Promise.map([123, null, ''], function(name) {
+            return expect(
+                workflowApiService.createAndRunGraph({
+                    name: name,
+                    options: { test: 1 },
+                    context: { test: 2 },
+                    domain: 'test'
+                }, 'testnodeid')
+            ).to.be.rejectedWith(Errors.BadRequestError, /Graph name is missing or in wrong format/);
+        });
+    });
+
     it('should return a NotFoundError if the node was not found', function () {
         waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
-        return expect(workflowApiService.createAndRunGraph({}, 'testnodeid'))
-            .to.be.rejectedWith(Errors.NotFoundError);
+        return expect(
+            workflowApiService.createAndRunGraph({
+                name: 'graph.not.exist',
+                options: { test: 1 },
+                context: { test: 2 },
+                domain: 'test'
+            }, 'testnodeid')
+        ).to.be.rejectedWith(Errors.NotFoundError);
     });
 
     it('should return a BadRequestError on a graph creation/validation failure', function () {
@@ -260,8 +291,14 @@ describe('Http.Services.Api.Workflows', function () {
             ]
         });
 
-        return expect(workflowApiService.createAndRunGraph({}, 'testnodeid'))
-            .to.be.rejectedWith(Errors.BadRequestError,
+        return expect(
+            workflowApiService.createAndRunGraph({
+                name: 'Graph.Test',
+                options: { test: 1 },
+                context: { test: 2 },
+                domain: 'test'
+            }, 'testnodeid')
+        ).to.be.rejectedWith(Errors.BadRequestError,
                 /The task label \'duplicate\' is used more than once/);
     });
 
