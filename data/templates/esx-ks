@@ -11,7 +11,7 @@ rootpw <%=rootPlainPassword%>
 # Search the networkDevices and set the first vmnic# (if defined) up.
 # If no vmnic# device is specified in the networkDevices, then we fallback
 # to setting vmnic0 up as dhcp
-<% if( undefined !== networkDevices ) { %>
+<% if( typeof networkDevices !== 'undefined' ) { %>
   <% need_default = networkDevices.every(function(n) { %>
     <% if( n.device.substring(0,5) === 'vmnic' ) { %>
       <% if(typeof n.ipv4 !== 'undefined') { %>
@@ -79,11 +79,12 @@ esxcli system settings advanced set -o /UserVars/ESXiShellInteractiveTimeout -i 
 esxcli network firewall set --default-action false --enabled no
 
 # set hostname and domain
-# if hostname is 'localhost', domain cannot be set.
-<% if ( typeof domain !== 'undefined' ) { %>
-esxcli system hostname set --host <%=hostname%> --domain <%=domain%>
-<% } else { %>
-esxcli system hostname set --host <%=hostname%>
+<% var hostnameCmdStr=''; %>
+<% if (typeof domain === 'string') hostnameCmdStr += (' --domain ' + domain) %>
+<% if (typeof hostname === 'string') hostnameCmdStr += (' --host ' + hostname) %>
+<% if (typeof fqdn === 'string') hostnameCmdStr += (' --fqdn ' + fqdn) %>
+<% if (hostnameCmdStr.length > 0) { %>
+    esxcli system hostname set <%=hostnameCmdStr%>
 <% } %>
 
 #config root account
@@ -92,6 +93,7 @@ esxcli system hostname set --host <%=hostname%>
 <%} %>
 
 #create users
+<% if( typeof users !== 'undefined' ) { %>
 <% users.forEach(function(user) { %>
     /usr/lib/vmware/auth/bin/adduser -s /bin/sh -G root -h / -D <%=user.name%>
     echo <%=user.plainPassword%> | passwd <%=user.name%> --stdin
@@ -100,6 +102,7 @@ esxcli system hostname set --host <%=hostname%>
         echo <%=user.sshKey%> > /etc/ssh/keys-<%=user.name%>/authorized_keys
     <%} %>
 <%}) %>
+<%} %>
 
 #setup ntp
 cat > /etc/ntp.conf << __NTP_CONFIG__
@@ -116,7 +119,7 @@ esxcli system maintenanceMode set -e true
 #copy the first boot logs
 cp /var/log/hostd.log "/vmfs/volumes/datastore1/firstboot-hostd.log"
 cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.log"
-<% if( undefined !== dnsServers ) { %>
+<% if( typeof dnsServers !== 'undefined' ) { %>
   <% if ( typeof domain !== 'undefined' ) { %>
   esxcli network ip dns search add --domain=<%=domain%>
   <% } %>
@@ -141,7 +144,7 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
 <% } %>
 
 <% vmkid = 0 %>
-<% if( undefined !== networkDevices ) { %>
+<% if( typeof networkDevices !== 'undefined' ) { %>
   <% networkDevices.forEach(function(n) { %>
     <% if( undefined !== n.ipv4 ) { %>
       <% if( undefined !== n.ipv4.vlanIds ) { %>
@@ -151,7 +154,7 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
           esxcli network ip interface remove -i <%=vmkname%>
           esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>.<%=vid%>
           esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
-          esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%> 
+          esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
           esxcli network vswitch standard portgroup set -p <%=n.device%>.<%=vid%> -v <%=vid %>
           postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
         <% }); %>
@@ -161,7 +164,7 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
         esxcli network ip interface remove -i <%=vmkname%>
         esxcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
         esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
-        esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%> 
+        esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
         postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
       <% } %>
     <% } %>
@@ -208,7 +211,7 @@ sleep 60
 # %firstboot ends with a reboot, this script will run afterwards to signify completion
 # of the installer and all reboot steps.
 #
-# The approved method for adding startup commands is to write to /etc/rc.local.d/local.sh, 
+# The approved method for adding startup commands is to write to /etc/rc.local.d/local.sh,
 # which is a pre-existing file with a sticky bit set by VisorFS. You can't just create new
 # files and expect them to stick around, even if you set a sticky bit yourself.
 # The /sbin/auto-backup.sh script will ensure the changes are persisted across reboots and

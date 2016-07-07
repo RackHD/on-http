@@ -26,18 +26,20 @@ authconfig --enableshadow --passalgo=sha512 --enablefingerprint
 rootpw --iscrypted <%=rootEncryptedPassword%>
 
 #create all users
+<% if (typeof users !== 'undefined') { %>
 <% users.forEach(function(user) { %>
 <%_  if( typeof user.uid !== 'undefined' ) { _%>
         user --name=<%=user.name%> --uid=<%=user.uid%> --iscrypted --password <%=user.encryptedPassword%>
 <%_  } else { _%>
         user --name=<%=user.name%>  --iscrypted --password <%=user.encryptedPassword%>
 <%_ }}) _%>
+<% } %>
 
 # Disk Partitioning
 zerombr
 clearpart --all --drives=<%=installDisk%>
 
-<% if(installPartitions !== undefined && installPartitions.length > 0) { %>
+<% if (typeof installPartitions !== 'undefined' && installPartitions.length > 0) { %>
     <% installPartitions.forEach(function(partition) { %>
         # mountPoint and size is required
         <% if(partition.mountPoint !== undefined && partition.size !== undefined) { %>
@@ -80,7 +82,7 @@ sudo
 perl
 libselinux-python
 net-tools
-<% if( typeof kvm !== 'undefined' ) { %>
+<% if( typeof kvm !== 'undefined' && kvm ) { %>
     <% if (version === "6.5") { %>
         kvm
         virt-manager
@@ -111,6 +113,7 @@ export PATH
     echo <%=rootSshKey%> > /root/.ssh/authorized_keys
     chown -R root:root /root/.ssh
 <% } %>
+<% if (typeof users !== 'undefined') { %>
 <% users.forEach(function(user) { %>
     <% if (typeof user.sshKey !== 'undefined') { %>
         mkdir /home/<%=user.name%>/.ssh
@@ -118,13 +121,18 @@ export PATH
         chown -R <%=user.name%>:<%=user.name%> /home/<%=user.name%>/.ssh
     <% } %>
 <% }) %>
+<% } %>
 
 #set hostname
-echo <%=hostname%> > /etc/hostname
-echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/network
+<% if (typeof hostname !== 'undefined') { %>
+    echo <%=hostname%> > /etc/hostname
+    <% if (typeof domain !== 'undefined') { %>
+        echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/network
+    <% } %>
+<% } %>
 
 # Setup static network configuration
-<% if( undefined !== networkDevices ) { %>
+<% if (typeof networkDevices !== 'undefined') { %>
   <% ipv6 = 0 %>
   <% networkDevices.forEach(function(n) { %>
     <% if( undefined != n.ipv4 ) { %>
@@ -188,8 +196,10 @@ echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/ne
 <% } %>
 
 # Setup DNS servers
-<% if( undefined !== dnsServers ) { %>
-  echo "search <%=domain%>" > /etc/resolv.conf
+<% if (typeof dnsServers !== 'undefined') { %>
+  <% if (typeof domain !== 'undefined') { %>
+    echo "search <%=domain%>" > /etc/resolv.conf
+  <% } %>
   <% dnsServers.forEach(function(dns) { %>
     echo "nameserver <%=dns%>" >> /etc/resolv.conf
   <% }) %>

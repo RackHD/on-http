@@ -15,8 +15,12 @@ d-i keyboard-configuration/layoutcode string us
 # netcfg will choose an interface that has link if possible. This makes it
 # skip displaying a list if there is more than one interface.
 d-i netcfg/choose_interface select auto
+<% if (typeof hostname !== 'undefined') { %>
 d-i netcfg/get_hostname string <%=hostname%>
+<% } %>
+<% if (typeof domain !== 'undefined') { %>
 d-i netcfg/get_domain string <%=domain%>
+<%} %>
 
 
 # Disable that annoying WEP key dialog.
@@ -132,7 +136,7 @@ d-i passwd/root-password-crypted password <%=rootEncryptedPassword%>
 tasksel tasksel/first multiselect ubuntu-server
 
 # Individual additional packages to install
-<% var pkgs = (typeof kvm === 'undefined' ? '' : 'qemu-kvm virt-manager libvirt0 python-libvirt bridge-utils') -%>
+<% var pkgs = ((typeof kvm === 'undefined' || !kvm) ? '' : 'qemu-kvm virt-manager libvirt0 python-libvirt bridge-utils') -%>
 d-i pkgsel/include string openssh-server curl <%=pkgs%>
 
 # Policy for applying updates. May be "none" (no automatic updates),
@@ -179,7 +183,7 @@ xserver-xorg xserver-xorg/autodetect_monitor boolean true
 #d-i pretemplate/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 
 d-i preseed/late_command string \
-<%_ if (undefined !== networkDevices && networkDevices.length > 0) { _%>
+<%_ if (typeof networkDevices !== 'undefined' && networkDevices.length > 0) { _%>
 wget http://<%=server%>:<%=port%>/api/common/templates/ubuntu-interfaces -O /etc/network/interfaces; \
 <%_ } _%>
 in-target wget http://<%=server%>:<%=port%>/api/common/templates/post-install-ubuntu.sh -O ./post-install.sh; \
