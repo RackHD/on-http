@@ -15,6 +15,7 @@ describe('Http.Services.Api.Workflows', function () {
     var workflowDefinition;
     var workflow;
     var Promise;
+    var TaskGraph;
 
     before('Http.Services.Api.Workflows before', function() {
         helper.setupInjector([
@@ -27,6 +28,7 @@ describe('Http.Services.Api.Workflows', function () {
         store = helper.injector.get('TaskGraph.Store');
         env = helper.injector.get('Services.Environment');
         Promise = helper.injector.get('Promise');
+        TaskGraph = helper.injector.get('TaskGraph.TaskGraph');
     });
 
     beforeEach(function() {
@@ -266,7 +268,8 @@ describe('Http.Services.Api.Workflows', function () {
                     context: { test: 2 },
                     domain: 'test'
                 }, 'testnodeid')
-            ).to.be.rejectedWith(Errors.BadRequestError, /Graph name is missing or in wrong format/);
+            ).to.be.rejectedWith(Errors.BadRequestError,
+                /Graph name is missing or in wrong format/);
         });
     });
 
@@ -310,13 +313,12 @@ describe('Http.Services.Api.Workflows', function () {
 
     it('should persist a graph definition', function () {
         store.persistGraphDefinition.resolves({ injectableName: 'test' });
-        this.sandbox.stub(workflowApiService, 'createGraph').resolves();
+        this.sandbox.stub(TaskGraph, 'validateDefinition').resolves();
         return workflowApiService.defineTaskGraph(graphDefinition)
         .then(function() {
             expect(store.persistGraphDefinition).to.have.been.calledOnce;
             expect(store.persistGraphDefinition).to.have.been.calledWith(graphDefinition);
-            expect(workflowApiService.createGraph).to.have.been.calledOnce;
-            expect(workflowApiService.createGraph).to.have.been.calledWith(graphDefinition);
+            expect(TaskGraph.validateDefinition).to.have.been.calledOnce;
         });
     });
 
@@ -330,8 +332,7 @@ describe('Http.Services.Api.Workflows', function () {
         };
 
         return expect(workflowApiService.defineTaskGraph(badDefinition))
-            .to.be.rejectedWith(Errors.BadRequestError,
-                /The task label \'duplicate\' is used more than once/);
+            .to.be.rejectedWith(Errors.BadRequestError, /duplicate/);
     });
 
     it('should throw a NotFoundError if a graph definition does not exist', function() {
