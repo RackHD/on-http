@@ -9,6 +9,7 @@ _Copyright 2015, EMC, Inc._
     rm -rf node_modules
     npm install
     npm run apidoc
+    npm run taskdoc
 
 ## Running
 
