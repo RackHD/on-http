@@ -1,0 +1,7 @@
+echo Starting Photon OS <%=version%> installer for ${hostidentifier}
+set base-url <%=repo%>/isolinux
+set params initrd=initrd.img ks=<%=installScriptUri%> hostname=<%=hostname%> ksdevice=bootif BOOTIF=01-${netX/mac} console=<%=comport%>,115200n8 console=tty0
+kernel ${base-url}/vmlinuz repo=<%=repo%>/RPMS/ ${params}
+initrd ${base-url}/initrd.img
+boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell
+
