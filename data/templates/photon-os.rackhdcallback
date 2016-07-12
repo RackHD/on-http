@@ -45,10 +45,9 @@ do
         /bin/curl --max-time 1000 --connect-timeout 9 --retry-delay 1 --retry 100 http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>
 
         # Only run this once to verify the OS was installed, then stop the service and remove itself forever
-        mkdir /etc/testfolder
         systemctl disable photon-os.rackhdcallback.service
-        #rm /etc/photon-os.rackhdcallback
-        #rm /etc/systemd/system/photon-os.rackhdcallback.service
+        rm /etc/photon-os.rackhdcallback
+        rm /etc/systemd/system/photon-os.rackhdcallback.service
         exit
 	fi
 	
@@ -56,6 +55,3 @@ do
 	count=$((count + 1))
 	echo try connecting $host, count = $count, max = $max_count
 done
-
-
-
