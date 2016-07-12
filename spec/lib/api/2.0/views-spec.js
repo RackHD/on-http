@@ -14,7 +14,8 @@ describe('Http.Api.Views', function () {
             getAll: sinon.stub(),
             get: sinon.stub(),
             put: sinon.stub(),
-            unlink: sinon.stub()
+            unlink: sinon.stub(),
+            render: sinon.stub()
         };
 
         return helper.startServer([
@@ -71,6 +72,7 @@ describe('Http.Api.Views', function () {
 
         it('should fail to get non-existant view', function() {
             viewsProtocol.get.resolves();
+            viewsProtocol.render.resolves('{"message": "error"}');
             return helper.request().get('/api/2.0/views/foo')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404)

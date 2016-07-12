@@ -2,7 +2,7 @@
 /* jshint node:true */
 
 'use strict';
-var fitting = require('../../../lib/fittings/json_error_handler.js');
+var fitting = require('../../../lib/fittings/error_handler.js');
 var http = require('http');
 
 describe('Swagger error handler fitting', function() {
