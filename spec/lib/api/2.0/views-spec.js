@@ -24,7 +24,7 @@ describe('Http.Api.Views', function () {
         });
     });
 
-    beforeEach('reset stubs', function () {
+    afterEach('reset stubs', function () {
         _(viewsProtocol).methods().forEach(function (method) {
             if (_(viewsProtocol).has(method)) {
               viewsProtocol[method].reset();
@@ -101,7 +101,7 @@ describe('Http.Api.Views', function () {
 
             return helper.request().put('/api/2.0/views/foo')
                 .set('Content-Type', 'application/octet-stream')
-                .send(new Buffer('{ "message": "hello" }', 'ascii'))
+                .send('{ "message": "hello" }')
                 .expect(200)
                 .expect(function(res) {
                     expect(res.get('Content-Type')).to.match(/^application\/json/);

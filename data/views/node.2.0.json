@@ -1,30 +1,44 @@
 {
-  "autoDiscover": "<%=autoDiscover%>",
-  "createdAt": "<%=createdAt%>",
-  "id" : "<%=id%>",
-  "name": "<%=name%>",
-  <% if (hasOwnProperty("identifiers")) { %>
-"identifiers": <%- JSON.stringify(identifiers) %>,
-<% } else  {%>
-"identifiers": [],
-<% } %>
-<% if (hasOwnProperty("tags")) { %>
-"tags": <%- JSON.stringify(tags) %>,
-<% } else  {%>
-"tags": [],
-<% } %>
-<% if (hasOwnProperty("obmSettings")) { %>
-"obmSettings": <%- JSON.stringify(obmSettings) %>,
-<% } else  {%>
-"obmSettings": [],
-<% } %>
-"type": "<%=type%>",
-<% if (hasOwnProperty("sku")) { %>
-<% if (sku === null) { %>
-"sku" : null,
-<% } else  {%>
-"sku" : "<%=basepath %>/skus/<%=sku%>",
-<% } %>
-<% } %>
-"updatedAt": "<%=updatedAt%>"
+<%
+    var _ = injector.get('_');
+    var obmId = [];
+    obms.forEach( function (value, key){
+        if(value.node){
+            obmId.push(value.id);
+        }
+    });
+%>
+    "autoDiscover": "<%=autoDiscover%>",
+    "id" : "<%=id%>",
+    "name": "<%=name%>",
+    <% if (hasOwnProperty("identifiers")) { %>
+    "identifiers": <%- JSON.stringify(identifiers) %>,
+    <% } else  {%>
+    "identifiers": [],
+    <% } %>
+    <% if (hasOwnProperty("tags")) { %>
+    "tags": <%- JSON.stringify(tags) %>,
+    <% } else  {%>
+    "tags": [],
+    <% } %>
+    <% if (obms == null) { %>    
+    "obms": null,
+    <% } else { %>
+    "obms":[
+    <% obmId.forEach(function (ids, i, arr){ %>
+    {
+    "obm":"<%=basepath %>/obms/<%=ids%>"
+    }
+    <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+    <% }); %>
+    ],
+    <% } %>
+    <% if (hasOwnProperty("sku")) { %>
+    <% if (sku === null) { %>
+    "sku" : null,
+    <% } else  {%>
+    "sku" : "<%=basepath %>/skus/<%=sku%>",
+    <% } %>
+    <% } %>
+    "type": "<%=type%>"
 }

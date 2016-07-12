@@ -8,6 +8,7 @@ chown -R root:root /root/.ssh
 <% } -%>
 
 # create users and SSH key for users
+<% if (typeof users !== 'undefined') { -%>
 <% users.forEach(function(user) { -%>
     <%_ if (undefined !== user.uid) { _%>
         useradd -u <%=user.uid%> -m -p <%=user.encryptedPassword%> <%=user.name%>
@@ -20,3 +21,4 @@ echo <%=user.sshKey%> > /home/<%=user.name%>/.ssh/authorized_keys
 chown -R <%=user.name%>:<%=user.name%> /home/<%=user.name%>/.ssh
     <%_ } _%>
 <% }); -%>
+<% } -%>

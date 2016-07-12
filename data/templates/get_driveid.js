@@ -3,13 +3,63 @@
 'use strict';
 
 var exec = require('child_process').exec;
+var execSync = require('child_process').execSync;
 
 var cmdDriveWwid = 'ls -l /dev/disk/by-id';
 var cmdVdInfo = 'ls -l /dev/disk/by-path';
 var cmdScsiId = 'lsscsi';
+var cmdSataRawInfo = 'sudo hdparm --Istdout';
 var options = {
     timeout: 10000 //10 seconds
 };
+
+/**
+ * Get SATA drive's SN string.
+ * @param {String} sataDrive SATA drive's name, eg. 'sda'
+ * @return {String} SATA drive's SN string with 20 characters like 'QM00007_____________'
+ */
+function getSataSnStr(sataDrive) {
+    var output = execSync(cmdSataRawInfo + ' /dev/' + sataDrive);
+    /*  output data like below:
+     *  $ sudo hdparm --Istdout /dev/sda
+     *  dev/sda:
+     *
+     *  0040 3fff 0000 0010 7e00 0200 003f 0000
+     *  0000 0000 514d 3030 3030 3520 2020 2020
+     *  2020 2020 2020 2020 0003 0200 0004 322e
+     *  322e 3120 2020 5145 4d55 2048 4152 4444
+     *  4953 4b20 2020 2020 2020 2020 2020 2020
+     *  2020 2020 2020 2020 2020 2020 2020 8010
+     *  .....
+     *
+     *  snHexStr is from 21 to 40 bytes, total 20 bytes, shown as below
+     *
+     *  .....
+     *            514d 3030 3030 3520 2020 2020
+     *  2020 2020 2020 2020
+     *  .....
+     */
+    var lines = output.toString().split('\n');
+    var hexLineMatch = /^([0-9A-Fa-f]{4}\s+){7}[0-9A-Fa-f]{4}$/;
+    var snHexStr = lines.reduce(function (result,line) {
+        if(hexLineMatch.test(line)) {
+            result.push(line);
+        }
+        return result;
+    },[]).join(' ').split(' ').slice(10, 20).join('');
+
+    var snStr = '';
+    for(var i = 0; i < snHexStr.length; i+=2) {
+        var ascii = Number('0x' + snHexStr.charAt(i) + snHexStr.charAt(i+1));
+        var snChar = String.fromCharCode(ascii);
+        if(snChar === ' ') {
+            snStr += '_';
+        } else {
+            snStr += snChar;
+        }
+    }
+    return snStr;
+}
 
 /**
  * Parse the Drive WWID output
@@ -69,7 +119,7 @@ function parseDriveWwid(idList) {
         var headIndex = line.indexOf('-'), snIndex = line.lastIndexOf('_');
         var headStr = ['t10.', line.slice(0, headIndex).toUpperCase(), '_____'].join(''),
             vendorStr = line.slice(headIndex + 1, snIndex + 1),
-            snStr = line.slice(snIndex + 1),
+            snStr = getSataSnStr(esxiLine[0]),
             dashStr = '';
         for (var i = 0; i< requiredStrLen - vendorStr.length - snStr.length; i += 1){
             dashStr += '_';

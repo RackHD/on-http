@@ -1187,58 +1187,269 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /obms/library:
+  /obms:
     x-swagger-router-controller: obms
     get:
-      x-swagger-serializer: obms
-      operationId: getObmLib
+      #x-swagger-serializer: obms
+      operationId: obmsGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
-      x-view: obm.2.0.json
+      #x-view: obm.2.0.json
       summary: |
-        get list of possible OBM services
+        Get list of all OBM service instances
       description: |
-        get list of possible OBM services
+        Get list of all OBM service instances
+      parameters:
+        - name: query
+          in: query
+          description: query object to pass through to waterline.
+          required: false
+          type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            get list of possible OBM services
+            List of OBM service instances
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /obms/library/{identifier}:
+    put:
+      operationId: obmsPut
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: obm
+      summary: |
+        create or update a single OBM service
+      description: |
+        create or update a single OBM service
+      parameters:
+        - name: body
+          in: body
+          description: |
+            The OBM service object post to apply.
+          required: true
+          schema:
+            $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            OBM service create or update.
+          schema:
+            type: object
+        500:
+          description: |
+            OBM service creation failed.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /obms/definitions:
     x-swagger-router-controller: obms
     get:
-      x-swagger-serializer: obms
-      operationId: getObmLibById
+      operationId: obmsDefinitionsGetAll
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
-      x-view: obm.2.0.json
       summary: |
-        get a single OBM service
+        Get list of possible OBM services
       description: |
-        get a single OBM service
+        Get list of possible OBM services
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            List of possible OBM services
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /obms/definitions/{name}:
+    x-swagger-router-controller: obms
+    get:
+      operationId: obmsDefinitionsGetByName
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Get the specified OBM service definition
+      description: |
+        Get the specified OBM service definition
       parameters:
-        - name: identifier
+        - name: name
           in: path
           description: |
-            The obm service name.
+            The OBM service definition identifier.
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            return OBM service
+            List of possible OBM services
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /obms/led:
+    x-swagger-router-controller: obms
+    get:
+      operationId: unimplemented
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Fetch status of identify light on node through OBM (if supported)
+      description: |
+        Fetch status of identify light on node through OBM (if supported)
+      parameters:
+        - name: body
+          in: body
+          description: foo
+          required: true
+          schema:
+            $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: obm identity light settings
           schema:
             type: object
         404:
           description: |
-            The obm service with the identifier was not found
+            The node with the identifier was not found or has no obm settings.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      operationId: obmsPostLed
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Enable or disable identify light on node through OBM (if supported)
+      description: |
+        Enable or disable identify light on node through OBM (if supported)
+      parameters:
+        - name: body
+          in: body
+          description: foo
+          required: true
+          schema:
+            $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        201:
+          description: obm settings accepted
+        404:
+          description: |
+            The node with the identifier was not found or has no obm settings.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /obms/{identifier}:
+    x-swagger-router-controller: obms
+    get:
+      operationId: obmsGetById
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      #x-view: obm.2.0.json
+      summary: |
+        get the specified OBM service
+      description: |
+        get the specified OBM service
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The OBM service identifier.
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            get the specified OBM service
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      operationId: obmsPatchById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: obm
+      summary: |
+        patch a single OBM service
+      description: |
+        patch a single OBM service
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The OBM service identifier.
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: object patches to apply.
+          required: true
+          schema:
+                  $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            OBM service create.
+          schema:
+            type: object
+        500:
+          description: |
+            OBM service creation failed.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      operationId: obmsDeleteById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Delete the OBM service with the specified identifier
+      description: |
+        Delete the OBM service with the specified identifier
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The OBM service identifier.
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            OBM service deleted.
+          schema:
+            type: object
+        404:
+          description: |
+            The OBM service with the specified identifier was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1539,7 +1750,7 @@ paths:
   /workflows/{identifier}:
     x-swagger-router-controller: workflows
     get:
-      operationId: workflowsGetById
+      operationId: workflowsGetByInstanceId
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -1565,7 +1776,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     delete:
-      operationId: workflowsDeleteById
+      operationId: workflowsDeleteByInstanceId
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -1884,149 +2095,6 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /nodes/{identifier}/obm/identify:
-    x-swagger-router-controller: nodes
-    get:
-      operationId: unimplemented
-      x-privileges: [ 'Read' ]
-      x-authentication-type: [ 'jwt' ]
-      summary: |
-        Fetch status of identify light on node through OBM (if supported)
-      description: |
-        Fetch status of identify light on node through OBM (if supported)
-      parameters:
-        - name: identifier
-          in: path
-          description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
-          required: true
-          type: string
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: obm identity light settings
-          schema:
-            type: object
-        404:
-          description: |
-            The node with the identifier was not found or has no obm settings.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    post:
-      operationId: nodesPostObmIdById
-      x-privileges: [ 'Write' ]
-      x-authentication-type: [ 'jwt' ]
-      summary: |
-        Enable or disable identify light on node through OBM (if supported)
-      description: |
-        Enable or disable identify light on node through OBM (if supported)
-      parameters:
-        - name: identifier
-          in: path
-          description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
-          required: true
-          type: string
-        - name: content
-          in: body
-          description: foo
-          required: true
-          schema:
-            $ref: '#/definitions/generic_obj'
-      tags: [ "/api/2.0" ]
-      responses:
-        201:
-          description: obm settings accepted
-        404:
-          description: |
-            The node with the identifier was not found or has no obm settings.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
-  /nodes/{identifier}/obm:
-    x-swagger-router-controller: nodes
-    get:
-      x-swagger-serializer: nodes
-      # swagger template and schema names (not sure how to get schema in fitting)...
-      operationId: nodesGetObmById
-      x-privileges: [ 'Read' ]
-      x-authentication-type: [ 'jwt' ]
-      x-view: obm.2.0.json
-      summary: |
-        get the obm settings associated with a node.
-      description: |
-        get the obm settings associated with a node.
-      parameters:
-        - name: identifier
-          in: path
-          description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
-          required: true
-          type: string
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: obm settings
-          schema:
-            type: object
-        404:
-          description: |
-            The node with the identifier was not found or has no obm settings.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    post:
-      x-swagger-deserializer: nodes
-      # swagger template and schema names (not sure how to get schema in fitting)...
-      operationId: nodesPostObmById
-      x-privileges: [ 'Write' ]
-      x-authentication-type: [ 'jwt' ]
-      summary: |
-        set the obm settings associated with a node.
-      description: |
-        set the obm settings associated with a node.
-      parameters:
-        - name: identifier
-          in: path
-          description: |
-              node id value
-          required: true
-          type: string
-        - name: body
-          in: body
-          description: |
-            obm settings to apply.
-          required: true
-          schema:
-            $ref: '#/definitions/generic_obj'
-      tags: [ "/api/2.0" ]
-      responses:
-        201:
-          description: obm settings accepted
-        404:
-          description: |
-            The node with the identifier was not found or has no obm settings.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
   /nodes/{identifier}/ssh:
     x-swagger-router-controller: nodes
     get:
@@ -2035,6 +2103,7 @@ paths:
       operationId: nodesGetSshById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      tags: [ "/api/2.0" ]
       summary: |
         get the ssh settings associated with a node.
       description: |
@@ -2125,7 +2194,6 @@ paths:
   /nodes/{identifier}:
     x-swagger-router-controller: nodes
     get:
-      x-swagger-serializer: nodes
       # swagger template and schema names (not sure how to get schema in fitting)...
       operationId: nodesGetById
       x-privileges: [ 'Read' ]
@@ -2334,7 +2402,6 @@ paths:
   /nodes:
     x-swagger-router-controller: nodes
     get:
-      x-swagger-serializer: nodes
       x-view: node.2.0.json
       operationId: nodesGetAll
       x-privileges: [ 'Read' ]

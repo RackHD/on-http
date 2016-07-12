@@ -14,6 +14,7 @@ describe('Http.Services.Api.Workflows', function () {
     var env;
     var workflowDefinition;
     var workflow;
+    var Promise;
 
     before('Http.Services.Api.Workflows before', function() {
         helper.setupInjector([
@@ -25,6 +26,7 @@ describe('Http.Services.Api.Workflows', function () {
         waterline = helper.injector.get('Services.Waterline');
         store = helper.injector.get('TaskGraph.Store');
         env = helper.injector.get('Services.Environment');
+        Promise = helper.injector.get('Promise');
     });
 
     beforeEach(function() {
@@ -32,10 +34,10 @@ describe('Http.Services.Api.Workflows', function () {
             needByIdentifier: sinon.stub().resolves({ id: 'testnodeid' })
         };
         waterline.lookups = {
-           findOneByTerm: sinon.stub().resolves() 
+           findOneByTerm: sinon.stub().resolves()
         };
         waterline.graphobjects = {
-            needByIdentifier: sinon.stub().resolves({ id: 'testgraphid', _status: 'pending' }),
+            needOne: sinon.stub().resolves({ id: 'testgraphid', _status: 'pending' }),
             find: sinon.stub().resolves(),
             findOne: sinon.stub().resolves()
         };
@@ -155,9 +157,9 @@ describe('Http.Services.Api.Workflows', function () {
             expect(store.findActiveGraphForTarget).to.have.been.calledWith('testnodeid');
             expect(workflowApiService.createActiveGraph).to.have.been.calledOnce;
             expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
-                graphDefinition, 
-                { test: 1 }, 
-                { target: 'testnodeid', test: 2, proxy: 'proxy' }, 
+                graphDefinition,
+                { test: 1 },
+                { target: 'testnodeid', test: 2, proxy: 'proxy' },
                 'test'
             );
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
@@ -173,7 +175,7 @@ describe('Http.Services.Api.Workflows', function () {
         workflowApiService.runTaskGraph.resolves();
         store.findActiveGraphForTarget.resolves();
         waterline.nodes.needByIdentifier.resolves({ id: 'testnodeid', sku: 'skuid' });
-        env.get.withArgs('Graph.Test').resolves('Graph.Test');
+        env.get.withArgs('config.Graph.Test').resolves('Graph.Test');
 
         return workflowApiService.createAndRunGraph({
             name: 'Graph.Test',
@@ -194,7 +196,8 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
                 .to.have.been.calledWith(graph.instanceId, 'test');
-            expect(env.get).to.have.been.calledWith('Graph.Test', 'Graph.Test', ['skuid']);
+            expect(env.get).to.have.been.calledWith('config.Graph.Test', 'Graph.Test', 
+                ['skuid', "global"]);
         });
     });
 
@@ -204,7 +207,7 @@ describe('Http.Services.Api.Workflows', function () {
         workflowApiService.runTaskGraph.resolves();
         store.findActiveGraphForTarget.resolves();
         waterline.nodes.needByIdentifier.resolves({ id: 'testnodeid', sku: 'skuid' });
-        env.get.withArgs('Graph.Test').resolves('Graph.Test.skuid');
+        env.get.withArgs('config.Graph.Test').resolves('Graph.Test.skuid');
 
         return workflowApiService.createAndRunGraph({
             name: 'Graph.Test',
@@ -225,7 +228,8 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
                 .to.have.been.calledWith(graph.instanceId, 'test');
-            expect(env.get).to.have.been.calledWith('Graph.Test', 'Graph.Test', ['skuid']);
+            expect(env.get).to.have.been.calledWith('config.Graph.Test', 'Graph.Test',
+                ['skuid', "global"]);
         });
     });
 
@@ -243,10 +247,39 @@ describe('Http.Services.Api.Workflows', function () {
         ).to.be.rejectedWith(/Unable to run multiple task graphs against a single target/);
     });
 
+    it('should throw error if the graph name is missing', function() {
+        return expect(
+            workflowApiService.createAndRunGraph({
+                options: { test: 1 },
+                context: { test: 2 },
+                domain: 'test'
+            }, 'testnodeid')
+        ).to.be.rejectedWith(Errors.BadRequestError, /Graph name is missing or in wrong format/);
+    });
+
+    it('should throw error if the graph name is in wrong format', function() {
+        return Promise.map([123, null, ''], function(name) {
+            return expect(
+                workflowApiService.createAndRunGraph({
+                    name: name,
+                    options: { test: 1 },
+                    context: { test: 2 },
+                    domain: 'test'
+                }, 'testnodeid')
+            ).to.be.rejectedWith(Errors.BadRequestError, /Graph name is missing or in wrong format/);
+        });
+    });
+
     it('should return a NotFoundError if the node was not found', function () {
         waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
-        return expect(workflowApiService.createAndRunGraph({}, 'testnodeid'))
-            .to.be.rejectedWith(Errors.NotFoundError);
+        return expect(
+            workflowApiService.createAndRunGraph({
+                name: 'graph.not.exist',
+                options: { test: 1 },
+                context: { test: 2 },
+                domain: 'test'
+            }, 'testnodeid')
+        ).to.be.rejectedWith(Errors.NotFoundError);
     });
 
     it('should return a BadRequestError on a graph creation/validation failure', function () {
@@ -258,8 +291,14 @@ describe('Http.Services.Api.Workflows', function () {
             ]
         });
 
-        return expect(workflowApiService.createAndRunGraph({}, 'testnodeid'))
-            .to.be.rejectedWith(Errors.BadRequestError,
+        return expect(
+            workflowApiService.createAndRunGraph({
+                name: 'Graph.Test',
+                options: { test: 1 },
+                context: { test: 2 },
+                domain: 'test'
+            }, 'testnodeid')
+        ).to.be.rejectedWith(Errors.BadRequestError,
                 /The task label \'duplicate\' is used more than once/);
     });
 
@@ -352,7 +391,7 @@ describe('Http.Services.Api.Workflows', function () {
         var mockWorkflowError = new Errors.TaskCancellationError(
             "testid is not an active workflow"
         );
-        waterline.graphobjects.needByIdentifier.rejects(mockWorkflowError);
+        waterline.graphobjects.needOne.rejects(mockWorkflowError);
         return workflowApiService.cancelTaskGraph()
             .should.be.rejectedWith(mockWorkflowError);
     });
@@ -369,16 +408,16 @@ describe('Http.Services.Api.Workflows', function () {
         });
     });
 
-    it('should return workflow by id ', function() {
-        waterline.graphobjects.needByIdentifier.resolves(workflow);
-        return workflowApiService.getWorkflowById().then(function (workflows) {
+    it('should return workflow by instanceId ', function() {
+        waterline.graphobjects.needOne.resolves(workflow);
+        return workflowApiService.getWorkflowByInstanceId().then(function (workflows) {
             expect(workflows).to.deep.equal(workflow);
         });
     });
 
-    it('should return Not Found Error when invalid id is passed', function() {
-        waterline.graphobjects.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
-        return expect(workflowApiService.getWorkflowById())
+    it('should return Not Found Error when invalid instanceId is passed', function() {
+        waterline.graphobjects.needOne.rejects(new Errors.NotFoundError('Not Found'));
+        return expect(workflowApiService.getWorkflowByInstanceId())
                .to.be.rejectedWith(Errors.NotFoundError);
     });
 
@@ -388,6 +427,6 @@ describe('Http.Services.Api.Workflows', function () {
                                _status : 'pending'
                              };
         waterline.graphobjects.find.resolves(activeWorkflow);
-        return expect(workflowApiService.getWorkflowById()).to.become(activeWorkflow);
+        return expect(workflowApiService.getWorkflowByInstanceId()).to.become(activeWorkflow);
     });
 });

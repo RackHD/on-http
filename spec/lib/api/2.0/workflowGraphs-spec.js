@@ -24,15 +24,15 @@ describe('Http.Api.Workflows.2.0', function () {
         ]);
     });
 
-    after('stop HTTP server', function () {
-        return helper.stopServer();
-    });
-
     afterEach('set up mocks', function () {
         workflowApiService.getGraphDefinitions.reset();
         workflowApiService.workflowsGetGraphsByName.reset();
         workflowApiService.defineTaskGraph.reset();
         workflowApiService.destroyGraphDefinition.reset();
+    });
+
+    after('stop HTTP server', function () {
+        return helper.stopServer();
     });
 
     describe('workflowsGetGraphs', function () {

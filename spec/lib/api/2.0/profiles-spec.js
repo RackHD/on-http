@@ -49,7 +49,9 @@ describe('Http.Api.Profiles', function () {
         waterline = helper.injector.get('Services.Waterline');
         sinon.stub(waterline.lookups, "findOneByTerm").resolves();
 
-        return helper.injector.get('Views').load();
+        return helper.reset().then(function() {
+            return helper.injector.get('Views').load();
+        });
     });
 
     afterEach('teardown mocks', function () {
@@ -70,7 +72,9 @@ describe('Http.Api.Profiles', function () {
     });
 
     after('stop HTTP server', function () {
-        return helper.stopServer();
+        return helper.reset().then(function() {
+            return helper.stopServer();
+        });
     });
 
     var profile = [{

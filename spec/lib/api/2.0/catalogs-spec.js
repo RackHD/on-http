@@ -21,13 +21,15 @@ describe('Http.Api.Catalogs', function () {
         });
     });
 
-    after('stop HTTP server', function () {
-        return helper.stopServer();
-    });
-
-    beforeEach("reset stubs", function() {
+    afterEach("reset stubs", function() {
         stubFind.reset();
         stubNeedByIdentifier.reset();
+    });
+
+    after('stop HTTP server', function () {
+        stubFind.restore();
+        stubNeedByIdentifier.restore();
+        return helper.stopServer();
     });
 
     describe("GET /catalogs", function() {
