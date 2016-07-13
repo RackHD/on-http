@@ -412,7 +412,8 @@ describe('Services.Http.Swagger', function() {
                 headersSent: false,
                 body: {},
                 status: status,
-                set: set
+                set: set,
+                locals: "dummy"
             };
             req = {
                 swagger: {

@@ -42,7 +42,7 @@ swagger:
 
     # pipe for all swagger-node controllers
     swagger_controllers:
-      - onError: json_error_handler
+      - onError: error_handler
       - cors
       - swagger_params_parser
       - swagger_locals
