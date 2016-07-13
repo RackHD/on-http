@@ -1,5 +1,5 @@
 {
-    "hostname": "test_hostname",
+    <% if (typeof hostname !== 'undefined') { %>"hostname": "<%=hostname%>",<% } %>
     "password":
         {
             "crypted": false,
@@ -29,7 +29,7 @@
                     "sed -i 's/PermitRootLogin no/PermitRootLogin yes/g' /etc/ssh/sshd_config",
 
                     "# Signify ORA the installation completed",
-                    "curl http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub"
+                    "curl http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>"
                    ]<% if (typeof rootSshKey !== 'undefined') { %>,
     "public_key": <%=rootSshKey%><% } %>
 }

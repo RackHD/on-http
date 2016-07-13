@@ -13,18 +13,6 @@
 ### END INIT INFO
 
 
-# We can't really know when networking is actually up and running from
-# a simple "Required-Start: $network", so instead just use curl with
-# a bunch of retries and hope it works. We could use more sophisticated
-# dependency mechanisms provided by systemd, but ideally we can just use
-# a single script to service both CentOS 6.5 and CentOS 7 installs, hence
-# reasoning for using `wget --retry-connrefused` below. Using `curl --retry`
-# fails immediately because it only handles connection timeouts, not connection
-# refused cases.
-# See https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget/
-
-# Nothing wrong with set -e here since we're not doing anything complex
-# set -e
 echo "Attempting to call back to RackHD Photon OS installer"
 
 max_count=30
@@ -35,6 +23,11 @@ count=0
 
 while [ $count -lt $max_count ]
 do
+
+    # ping to make sure the host is reachable before really curl the completionURL
+    # Curl will fail and cause systemd service fail if network is not ready, that'
+    # why we need to ping before curl.
+
 	ping -c 1 $host 1>/dev/null
 	
 	if [ $? -eq 0 ]
