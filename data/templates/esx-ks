@@ -47,18 +47,18 @@ postLookup () {
   BODY=$BODY"}"
   BODYLEN=$(echo -n ${BODY} | wc -c )
   echo ${BODY} >> /vmfs/volumes/datastore1/firstboot.log
-  result=`echo -ne "POST /api/1.1/lookups HTTP/1.0\r\nHost: $2\r\nContent-Type: application/json\r\nContent-Length: ${BODYLEN}\r\n\r\n${BODY}" | nc -i 3  <%=server%> <%=port%> | grep -oE 'HTTP/1.1 [0-9]{3}' | awk '{print $2}'`
+  result=`echo -ne "POST /api/current/lookups HTTP/1.0\r\nHost: $2\r\nContent-Type: application/json\r\nContent-Length: ${BODYLEN}\r\n\r\n${BODY}" | nc -i 3  <%=server%> <%=port%> | grep -oE 'HTTP/1.1 [0-9]{3}' | awk '{print $2}'`
   if [ "$result" -ge "400" ]; then
     # Make an attempt to PATCH if we can find the node id.  This is to handle the case where the
     # ARP poller added the lookup entry when we tried to POST above causing a collision.
-    id=`wget http://<%=server%>:<%=port%>/api/1.1/lookups?q=$2 -qO - | grep -oE '\"id\":\"(.)*\"'`
+    id=`wget http://<%=server%>:<%=port%>/api/current/lookups?q=$2 -qO - | grep -oE '\"id\":\"(.)*\"'`
     if [ "$?" -eq "0" ]; then
       id=`echo $id | awk -F: '{gsub(/"/,"",$2); print $2}'`
-      result=`echo -ne "PATCH /api/1.1/lookups/$id HTTP/1.0\r\nHost: $2\r\nContent-Type: application/json\r\nContent-Length: ${BODYLEN}\r\n\r\n${BODY}" | nc -i 3 <%=server%> <%=port%> | grep -oE 'HTTP/1.1 [0-9]{3}' | awk '{print $2}'`
+      result=`echo -ne "PATCH /api/current/lookups/$id HTTP/1.0\r\nHost: $2\r\nContent-Type: application/json\r\nContent-Length: ${BODYLEN}\r\n\r\n${BODY}" | nc -i 3 <%=server%> <%=port%> | grep -oE 'HTTP/1.1 [0-9]{3}' | awk '{print $2}'`
       echo "Patch result: $result to id: $id" >> /vmfs/volumes/datastore1/firstboot.log
     fi
   fi
-  wget http://<%=server%>:<%=port%>/api/1.1/lookups?q=$2 -qO - >> /vmfs/volumes/datastore1/firstboot.log
+  wget http://<%=server%>:<%=port%>/api/current/lookups?q=$2 -qO - >> /vmfs/volumes/datastore1/firstboot.log
 }
 
 # enable VHV (Virtual Hardware Virtualization to run nested 64bit Guests + Hyper-V VM)
@@ -230,7 +230,7 @@ sleep 60
 #
 # NOTE: this script will execute right away as a result of writing it to local.sh
 # along with executing on every subsequent boot
-wget http://<%=server%>:<%=port%>/api/common/templates/<%=rackhdCallbackScript%> -O /etc/rc.local.d/local.sh
+wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%> -O /etc/rc.local.d/local.sh
 
 #backup ESXi configuration to persist it
 /sbin/auto-backup.sh

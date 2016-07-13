@@ -12,7 +12,7 @@ import sys
 from time import sleep
 
 TASK_REQUEST_PERIOD = 5
-TASKS_URI = 'http://<%=server%>:<%=port%>/api/common/tasks/<%=identifier%>'
+TASKS_URI = 'http://<%=server%>:<%=port%>/api/current/tasks/<%=identifier%>'
 
 json_content_type = {"Content-Type": "application/json"}
 

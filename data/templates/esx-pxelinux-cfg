@@ -4,4 +4,4 @@ PROMPT 0
 TIMEOUT 80
 LABEL install
   KERNEL <%=mbootFile%>
-  APPEND -c http://<%=server%>:<%=port%>/api/common/templates/<%=esxBootConfigTemplate%>
+  APPEND -c http://<%=server%>:<%=port%>/api/current/templates/<%=esxBootConfigTemplate%>
