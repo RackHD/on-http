@@ -18,6 +18,7 @@ rsync -ar ../debianstatic/on-http/ debian
 rm -rf node_modules
 npm install --cache=`pwd`
 npm run apidoc
+npm run taskdoc
 npm prune --production
 
 git log -n 1 --pretty=format:%h.%ai.%s > commitstring.txt
