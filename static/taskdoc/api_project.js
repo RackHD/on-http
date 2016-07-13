@@ -10,7 +10,5 @@ define({
   },
   "name": "RackHD Task Documentation",
   "title": "RackHD Task Documentation",
-  "url": "http://servername:8080",
-  "version": "0.0.0",
-  "sampleUrl": false
+  "version": "0.0.0"
 });

@@ -1,4 +1,10 @@
+#!/bin/bash
 # Copyright 2016, EMC, Inc.
+
+if [ ! -d './node_modules/on-tasks/' ]; then
+    echo 'on-tasks folder not found, please run npm install.'
+    exit 1
+fi
 
 # Generate task doc from task schemas
 cd ./node_modules/on-tasks/
