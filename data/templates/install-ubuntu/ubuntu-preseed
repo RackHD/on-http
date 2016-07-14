@@ -34,6 +34,7 @@ d-i mirror/http/hostname string <%=repoHostname%>
 # Get directory from repo
 <% var repoDirectory = repo.replace(/^(https?:\/\/)?([a-zA-Z0-9\.:-]+)/g,"") -%>
 d-i mirror/http/directory string <%=repoDirectory%>
+d-i preseed/early_command string umount /media || true
 d-i apt-setup/restricted boolean false
 d-i mirror/http/proxy string
 d-i apt-setup/universe boolean false
@@ -137,8 +138,12 @@ tasksel tasksel/first multiselect ubuntu-server
 
 # Individual additional packages to install
 <% var pkgs = ((typeof kvm === 'undefined' || !kvm) ? '' : 'qemu-kvm virt-manager libvirt0 python-libvirt bridge-utils') -%>
-d-i pkgsel/include string openssh-server curl <%=pkgs%>
-
+# Minimum packages (see postinstall.sh)
+d-i pkgsel/include string openssh-server wget curl ssl-cert
+d-i pkgsel/upgrade select safe-upgrade
+d-i pkgsel/update-policy select none
+d-i pkgsel/language-packs multiselect en
+d-i pkgsel/install-language-support boolean false
 # Policy for applying updates. May be "none" (no automatic updates),
 # "unattended-upgrades" (install security updates automatically), or
 # "landscape" (manage system with Landscape).

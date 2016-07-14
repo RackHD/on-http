@@ -1,6 +1,6 @@
 echo Starting Ubuntu x64 installer for ${hostidentifier}
-set base-url <%=repo%>/dists/<%=version%>/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64
+set base-url <%=repo%>/<%=baseUrl%>
 kernel ${base-url}/linux
 initrd ${base-url}/initrd.gz
-imgargs linux auto=true url=<%=installScriptUri%> hostname=<%=hostname%> log_host=<%=server%> BOOTIF=01-<%=macaddress%> interface=auto console=<%=comport%>,115200n8 console=tty0
+imgargs linux auto=true url=<%=installScriptUri%> hostname=<%=hostname%> log_host=<%=server%> BOOTIF=01-<%=macaddress%> interface=<%=interface%> console=<%=comport%>,115200n8 console=tty0 <%=kargs%>
 boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell
