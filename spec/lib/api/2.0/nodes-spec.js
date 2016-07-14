@@ -235,6 +235,114 @@ describe('2.0 Http.Api.Nodes', function () {
         });
     });
 
+    describe('GET /nodes/:identifier/relations', function() {
+
+        it('should return a list of the node\'s relations', function() {
+            waterline.nodes.needByIdentifier.resolves(node);
+            return helper.request().get('/api/2.0/nodes/1234/relations')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200, node.relations);
+        });
+
+        it('should return a 404 if the node was not found', function() {
+            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+
+            return helper.request().get('/api/2.0/nodes/1234/relations')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+    });
+
+    describe('PATCH /nodes/:identifier/relations', function() {
+        var relationUpdate;
+        beforeEach(function() {
+            sinon.stub(nodeApiService, 'editNodeRelations');
+            relationUpdate = {
+                containedBy: ['rackNodeId']
+            };
+        });
+
+        afterEach(function() {
+            nodeApiService.editNodeRelations.restore();
+        });
+
+        it('should add to and update a node\'s relations', function() {
+            var updatedRackNode = _.cloneDeep(rawNode);
+            updatedRackNode.type = 'rack';
+            updatedRackNode.id = 'rackNodeId';
+            updatedRackNode.relations = [{relationType: 'contains', targets: rawNode.id}];
+
+            var updatedComputeNode = _.cloneDeep(rawNode);
+            updatedComputeNode.relations = relations.concat({
+                relationType: 'containedBy', targets: ['rackNodeId']
+            });
+
+            nodeApiService.editNodeRelations.resolves([
+                updatedComputeNode, updatedRackNode
+            ]);
+            return helper.request().patch('/api/2.0/nodes/1234/relations')
+                .send(relationUpdate)
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function(data) {
+                    expect(data.body[0].relations).to.deep.equal(updatedComputeNode.relations);
+                    expect(data.body[1].relations).to.deep.equal(updatedRackNode.relations);
+                    expect(nodeApiService.editNodeRelations).to.be.calledWithExactly(
+                        '1234',relationUpdate, nodeApiService._addRelation
+                    );
+                });
+
+        });
+
+        it('should return a 404 if the node is not found', function() {
+            nodeApiService.editNodeRelations.rejects(new Errors.NotFoundError("Not Found"));
+            return helper.request().patch('/api/2.0/nodes/1234/relations')
+                .send(relationUpdate)
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+    });
+
+    describe('DELETE /nodes/:identifier/relations', function() {
+        var relationDeletion;
+        beforeEach(function() {
+            sinon.stub(nodeApiService, 'editNodeRelations');
+            relationDeletion = {
+                containedBy: ['rackNodeId']
+            };
+        });
+
+        afterEach(function() {
+            nodeApiService.editNodeRelations.restore();
+        });
+
+        it('should delete the given relations from a node', function() {
+            var updatedRackNode = _.cloneDeep(rawNode);
+
+            var updatedComputeNode = _.cloneDeep(rawNode);
+            nodeApiService.editNodeRelations.resolves([updatedComputeNode, updatedRackNode]);
+            return helper.request().delete('/api/2.0/nodes/1234/relations')
+                .send(relationDeletion)
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function(data) {
+                    expect(data.body[0].relations).to.deep.equal(updatedComputeNode.relations);
+                    expect(data.body[1].relations).to.deep.equal(updatedRackNode.relations);
+                    expect(nodeApiService.editNodeRelations).to.be.calledWithExactly(
+                        '1234', relationDeletion, nodeApiService._removeRelation
+                    );
+                });
+        });
+
+        it('should return a 404 if the node is not found', function() {
+            nodeApiService.editNodeRelations.rejects(new Errors.NotFoundError("Not Found"));
+            return helper.request().delete('/api/2.0/nodes/1234/relations')
+                .send(relationDeletion)
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+    });
+
     describe('GET /nodes/:identifier/ssh', function () {
         var sshNode = _.cloneDeep(node);
         sshNode.sshSettings = {
@@ -715,10 +823,10 @@ describe('2.0 Http.Api.Nodes', function () {
         it('should call masterDelTagById', function() {
             return helper.request().delete('/api/2.0/nodes/tags/name')
                 .expect(204)
-                .expect(function(res) {
+                .expect(function() {
                     expect(nodesApi.masterDelTagById).to.have.been.calledWith('name');
                 });
         });
     });
-    
+
 });

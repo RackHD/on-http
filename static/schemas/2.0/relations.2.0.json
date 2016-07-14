@@ -1,0 +1,23 @@
+{
+    "title": "Relations.2.0",
+    "definitions": {
+        "Relation": {
+            "description": "A key value set of relations",
+            "type": "object",
+            "properties": {
+                "contains": {
+                    "description": "an array of nodes contained by the rack",
+                    "type": "array"
+                },
+                "containedBy": {
+                    "description": "the rack containing the node",
+                    "type": "array"
+                }
+            },
+            "anyOf": [
+                { "required": [ "containedBy" ] },
+                { "required": [ "contains" ] }
+            ]
+        }
+    }
+}
