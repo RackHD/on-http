@@ -1,5 +1,7 @@
 {
-    <% if (typeof hostname !== 'undefined') { %>"hostname": "<%=hostname%>",<% } %>
+    <% if (typeof hostname !== 'undefined') { -%>
+    "hostname": "<%=hostname%>",
+    <% } -%>
     "password":
         {
             "crypted": false,
@@ -7,6 +9,9 @@
         },
     "disk": "<%=installDisk%>",
     "type": "<%=installType%>",
+    <% if (typeof rootSshKey !== 'undefined') { -%>
+    "public_key": "<%=rootSshKey%>",
+    <% } -%>
     "postinstall": [
                     "#!/bin/sh",
 
@@ -30,6 +35,5 @@
 
                     "# Signify ORA the installation completed",
                     "curl http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>"
-                   ]<% if (typeof rootSshKey !== 'undefined') { %>,
-    "public_key": <%=rootSshKey%><% } %>
+                   ]
 }
