@@ -300,6 +300,7 @@ paths:
       operationId: templatesMetaGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: renderable.2.0.json
       summary: |
         get list of metadata for all templates
       description: |
@@ -321,6 +322,7 @@ paths:
       operationId: templatesMetaGetByName
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: renderable.2.0.json
       summary: |
         get metadata for a specific template
       description: |
@@ -512,6 +514,7 @@ paths:
       operationId: viewsGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: renderable.2.0.json
       summary: |
         get all views
       description: |
@@ -533,6 +536,7 @@ paths:
       operationId: viewsGetById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: renderable.2.0.json
       summary: |
         get view with specified identifier
       description: |
@@ -1054,7 +1058,7 @@ paths:
       operationId: profilesGetMetadata
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
-      x-view: profiles.2.0.json
+      x-view: renderable.2.0.json
       summary: |
         get list of possible profiles from database
       description: |
@@ -1076,7 +1080,7 @@ paths:
       operationId: profilesGetMetadataByName
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
-      x-view: profiles.2.0.json
+      x-view: renderable.2.0.json
       summary: |
         get a single profile's metadata from database
       description: |
@@ -1194,7 +1198,7 @@ paths:
       operationId: obmsGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
-      #x-view: obm.2.0.json
+      x-view: obm.2.0.json
       summary: |
         Get list of all OBM service instances
       description: |
@@ -1221,6 +1225,7 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       x-swagger-schema: obm
+      x-view: obm.2.0.json
       summary: |
         create or update a single OBM service
       description: |
@@ -1364,7 +1369,7 @@ paths:
       operationId: obmsGetById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
-      #x-view: obm.2.0.json
+      x-view: obm.2.0.json
       summary: |
         get the specified OBM service
       description: |

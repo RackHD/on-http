@@ -1,13 +1,4 @@
 {
-<%
-    var _ = injector.get('_');
-    var obmId = [];
-    obms.forEach( function (value, key){
-        if(value.node){
-            obmId.push(value.id);
-        }
-    });
-%>
     "autoDiscover": "<%=autoDiscover%>",
     "id" : "<%=id%>",
     "name": "<%=name%>",
@@ -25,9 +16,10 @@
     "obms": null,
     <% } else { %>
     "obms":[
-    <% obmId.forEach(function (ids, i, arr){ %>
+    <% obms.forEach(function (value, i, arr){ %>
     {
-    "obm":"<%=basepath %>/obms/<%=ids%>"
+        "service": "<%=value.service%>",
+        "ref":"<%=basepath %>/obms/<%=value.id%>"
     }
     <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
     <% }); %>

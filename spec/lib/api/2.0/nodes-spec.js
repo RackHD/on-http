@@ -87,7 +87,10 @@ describe('2.0 Http.Api.Nodes', function () {
         name: 'name',
         identifiers: [],
         tags: [],
-        obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a' }],
+        obms: [{
+            service: 'noop-obm-service',
+            ref: '/api/2.0/obms/574dcd5794ab6e2506fd107a'
+        }],
         type: 'compute'
     };
     var rawNode = {
