@@ -19,6 +19,7 @@ Note: requires MongoDB and RabbitMQ to be running to start correctly.
 
  * http://127.0.0.1/ui -- RackHD Web UI
  * http://127.0.0.1/docs -- RackHD Docs
+ * http://127.0.0.1/taskdoc -- RackHD Task Annotation
 
 ## Config
 
