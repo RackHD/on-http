@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright 2016, EMC, Inc.
 
 if [ ! -d './node_modules/on-tasks/' ]; then
@@ -12,7 +11,7 @@ node task-annotation-generator.js
 
 # Parse task doc data json to api_data.js so that it can be `require` by template
 echo 'define({"api":' > api_data.js
-cat task_doc_data.json | python -m json.tool >> api_data.js
+cat task_doc_data.json >> api_data.js
 echo '});' >> api_data.js
 
 cd ../../
