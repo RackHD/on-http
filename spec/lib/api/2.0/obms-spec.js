@@ -4,7 +4,7 @@
 'use strict';
 
 describe('Http.Api.Obms', function () {
-    var waterline, stub, Errors, nodeApiService;
+    var waterline, stub, Errors, nodeApiService, obmsApiService;
 
     var goodData = [
         {
@@ -56,6 +56,7 @@ describe('Http.Api.Obms', function () {
             waterline = helper.injector.get('Services.Waterline');
             Errors = helper.injector.get('Errors');
             nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
+            obmsApiService = helper.injector.get('Http.Services.Api.Obms');
         });
     });
 
@@ -184,7 +185,7 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should patch an OBM instance', function () {
-            stub = sinon.stub(waterline.obms, 'updateByIdentifier').resolves(goodData[0]);
+            stub = sinon.stub(obmsApiService, 'updateObmById').resolves(goodData[0]);
 
             return helper.request().patch('/api/2.0/obms/123')
                 .send(goodData[0])
@@ -196,7 +197,7 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should 400 when patching with bad data', function () {
-            stub = sinon.stub(waterline.obms, 'updateByIdentifier');
+            stub = sinon.stub(obmsApiService, 'updateObmById');
 
             return helper.request().patch('/api/2.0/obms/123')
                 .send(badData1)
@@ -209,7 +210,7 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should delete an OBM instance', function () {
-            stub = sinon.stub(waterline.obms, 'destroyByIdentifier');
+            stub = sinon.stub(obmsApiService, 'removeObmById');
 
             return helper.request().delete('/api/2.0/obms/123')
                 .expect(200)
