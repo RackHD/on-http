@@ -207,13 +207,13 @@ export PATH
 <% } %>
 
 # Download the service to callback to RackHD after OS installation/reboot completion
-/usr/bin/wget http://<%=server%>:<%=port%>/api/common/templates/<%=rackhdCallbackScript%> -O /etc/rc.d/init.d/<%=rackhdCallbackScript%>
+/usr/bin/wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%> -O /etc/rc.d/init.d/<%=rackhdCallbackScript%>
 chmod +x /etc/rc.d/init.d/<%=rackhdCallbackScript%>
 # Enable the above service, it should auto-disable after running once
 chkconfig <%=rackhdCallbackScript%> on
 
 #signify ORA the installation completed
-/usr/bin/wget --spider http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub
+/usr/bin/wget --spider http://<%=server%>:<%=port%>/api/current/templates/renasar-ansible.pub
 
 ) 2>&1 >>/root/install-post-sh.log
 EOF

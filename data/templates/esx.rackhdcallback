@@ -8,7 +8,7 @@ echo "Attempting to call back to RackHD ESX installer"
 # sleep in between.
 for retry in $(awk 'BEGIN { for ( i=0; i<30; i++ ) { print i; } }');
 do
-    wget -s http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>
+    wget -s http://<%=server%>:<%=port%>/api/current/templates/<%=completionUri%>
     if [ "$?" -ne 0 ];
     then
         echo "Failed to connect to RackHD API callback, retrying"

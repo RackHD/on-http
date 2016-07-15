@@ -13,7 +13,7 @@
     "Actions" : {
         "Oem": {},
         "#LogService.ClearLog": {
-            "target": "/api/common/node/<%=identifier%>/workflows?name=Graph.ClearSEL.Node"
+            "target": "/api/current/node/<%=identifier%>/workflows?name=Graph.ClearSEL.Node"
         }
     },
     "Status": {},

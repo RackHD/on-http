@@ -161,7 +161,7 @@
         <!-- scripts for workflow completion -->
         <source> <![CDATA[
           #!/bin/sh
-          curl http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>
+          curl http://<%=server%>:<%=port%>/api/current/templates/<%=completionUri%>
           ]]>
         </source>
       </script>

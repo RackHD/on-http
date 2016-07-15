@@ -189,10 +189,10 @@ xserver-xorg xserver-xorg/autodetect_monitor boolean true
 
 d-i preseed/late_command string \
 <%_ if (typeof networkDevices !== 'undefined' && networkDevices.length > 0) { _%>
-wget http://<%=server%>:<%=port%>/api/common/templates/ubuntu-interfaces -O /etc/network/interfaces; \
+wget http://<%=server%>:<%=port%>/api/current/templates/ubuntu-interfaces -O /etc/network/interfaces; \
 <%_ } _%>
-in-target wget http://<%=server%>:<%=port%>/api/common/templates/post-install-ubuntu.sh -O ./post-install.sh; \
+in-target wget http://<%=server%>:<%=port%>/api/current/templates/post-install-ubuntu.sh -O ./post-install.sh; \
 in-target chmod +x ./post-install.sh; \
 in-target ./post-install.sh; \
-in-target wget http://<%=server%>:<%=port%>/api/common/templates/ubuntu-sources -O /etc/apt/sources.list; \
-in-target curl http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>
+in-target wget http://<%=server%>:<%=port%>/api/current/templates/ubuntu-sources -O /etc/apt/sources.list; \
+in-target curl http://<%=server%>:<%=port%>/api/current/templates/<%=completionUri%>
