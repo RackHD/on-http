@@ -1,0 +1,248 @@
+{
+    "title": "Skus.2.0",
+    "definitions": {
+        "SkusRules": {
+            "description": "Possible Rules a Sku can use",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "path"
+                ],
+                "additionalProperties": false,
+                "properties": {
+
+                    "empty": {
+                        "type": "string"
+                    },
+                    "notEmpty": {
+                        "type": "string"
+                    },
+                    "protected": {
+                        "type": "string"
+                    },
+                    "undefined": {
+                        "type": "string"
+                    },
+                    "object": {
+                        "type": "string"
+                    },
+                    "json": {
+                        "type": "string"
+                    },
+                    "geojson": {
+                        "type": "string"
+                    },
+                    "geometry": {
+                        "type": "string"
+                    },
+                    "mediumtext": {
+                        "type": "string"
+                    },
+                    "longtext": {
+                        "type": "string"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "string": {
+                        "type": "string"
+                    },
+                    "binary": {
+                        "type": "string"
+                    },
+                    "boolean": {
+                        "type": "string"
+                    },
+                    "array": {
+                        "type": "string"
+                    },
+                    "number": {
+                        "type": "string"
+                    },
+                    "falsey": {
+                        "type": "string"
+                    },
+                    "null": {
+                        "type": "string"
+                    },
+                    "equals": {
+                        "type": "string"
+                    },
+                    "greaterThan": {
+                        "type": "string"
+                    },
+                    "lessThan": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "after": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "alpha": {
+                        "type": "string"
+                    },
+                    "alphadashed": {
+                        "type": "string"
+                    },
+                    "alphanumeric": {
+                        "type": "string"
+                    },
+                    "alphanumericdashed": {
+                        "type": "string"
+                    },
+                    "before": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "contains": {
+                        "type": "string"
+                    },
+                    "creditcard": {
+                        "type": "string",
+                        "format": "credit-card-number"
+                    },
+                    "datetime": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "decimal": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "finite": {
+                        "type": "string"
+                    },
+                    "float": {
+                        "type": "string"
+                    },
+                    "hexadecimal": {
+                        "type": "string"
+                    },
+                    "hexColor": {
+                        "type": "string"
+                    },
+                    "in": {
+                        "type": "string"
+                    },
+                    "int": {
+                        "type": "string"
+                    },
+                    "integer": {
+                        "type": "string"
+                    },
+                    "ip": {
+                        "type": "string"
+                    },
+                    "ipv4": {
+                        "type": "string",
+                        "format": "ipv4"
+                    },
+                    "ipv6": {
+                        "type": "string"
+                    },
+                    "is": {
+                        "type": "string"
+                    },
+                    "lowercase": {
+                        "type": "string"
+                    },
+                    "max": {
+                        "type": "string"
+                    },
+                    "maxLength": {
+                        "type": "string"
+                    },
+                    "min": {
+                        "type": "string"
+                    },
+                    "minLength": {
+                        "type": "string"
+                    },
+                    "notRegex": {
+                        "type": "string"
+                    },
+                    "notContains": {
+                        "type": "string"
+                    },
+                    "notIn": {
+                        "type": "string"
+                    },
+                    "notNull": {
+                        "type": "string"
+                    },
+                    "numeric": {
+                        "type": "string"
+                    },
+                    "required": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "regex": {
+                        "type": "string"
+                    },
+                    "truthy": {
+                        "type": "string"
+                    },
+                    "uppercase": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "url"
+                    },
+                    "urlish": {
+                        "type": "string"
+                    },
+                    "uuid": {
+                        "type": "string"
+                    },
+                    "uuidv3": {
+                        "type": "string"
+                    },
+                    "uuidv4": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "SkusUpsert": {
+            "description": "A sku for RackHD",
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "rules": {
+                    "$ref": "#/definitions/SkusRules"
+                },
+                "discoveryGraphName": {
+                    "type": "string"
+                },
+                "discoveryGraphOptions": {
+                    "type": "object",
+                    "properties": {
+                        "username": {
+                            "type": "string"
+                        },
+                        "password": {
+                            "type": "string"
+                        },
+                        "hostname": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
