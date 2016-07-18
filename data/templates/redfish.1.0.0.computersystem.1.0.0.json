@@ -28,7 +28,9 @@
         <% var memsize = 0; %>
         <% dmi.data['Memory Device'].forEach(function(dev) { %>
         <%     var size = dev.Size.split(' ')[0]; %>
+        <%     var units = dev.Size.split(' ')[1]; %>
         <%     size = isNaN(size) ? 0 : size; %>
+        <%     size = (units === 'GB') ? size * 1024 : size; %>
         <%     memsize = memsize + parseInt(size); %>
         <% }); %>
         <% memsize = memsize / 1024; %>
