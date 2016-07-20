@@ -50,12 +50,12 @@
                     "#!/bin/sh",
 
                     "# Set the configuration",
-                    "/bin/curl http://<%=server%>:<%=port%>/api/common/templates/post-install-photon.sh > /tmp/post-install-photon.sh",
+                    "/bin/curl http://<%=server%>:<%=port%>/api/current/templates/post-install-photon.sh > /tmp/post-install-photon.sh",
                     "chmod +x /tmp/post-install-photon.sh",
                     "./tmp/post-install-photon.sh 2>&1 > /root/post-install-photon.log",
 
                     "# Download the service to callback to RackHD after OS installation/reboot completion",
-                    "/bin/curl http://<%=server%>:<%=port%>/api/common/templates/<%=rackhdCallbackScript%> > /etc/<%=rackhdCallbackScript%>",
+                    "/bin/curl http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%> > /etc/<%=rackhdCallbackScript%>",
                     "chmod +x /etc/<%=rackhdCallbackScript%>",
 
                     "# Generate the service file",
@@ -73,6 +73,6 @@
                     "sed -i 's/PermitRootLogin no/PermitRootLogin yes/g' /etc/ssh/sshd_config",
 
                     "# Signify ORA the installation completed",
-                    "curl http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>"
+                    "curl -X POST -H 'Content-Type:application/json' 'http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=identifier%>&type=osInstall&data=finished'"
                    ]
 }
