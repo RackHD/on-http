@@ -81,24 +81,37 @@ describe('2.0 Http.Api.Nodes', function () {
         service: "noop-obm-service"
     }];
 
+    var relations =[{
+        relationType: "enclosedBy",
+        targets: ["5678abcd5678abcd5678abcd"]
+    }];
+
     var node = {
         autoDiscover: "false",
+        catalogs:'/api/2.0/nodes/1234abcd1234abcd1234abcd/catalogs',
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
-        tags: [],
+        tags: '/api/2.0/nodes/1234abcd1234abcd1234abcd/tags',
+        pollers: '/api/2.0/nodes/1234abcd1234abcd1234abcd/pollers',
+        relations:[{
+            relationType: 'enclosedBy',
+            info: null,
+            targets: '/api/2.0/nodes/5678abcd5678abcd5678abcd'
+        }],
         obms: [{
             service: 'noop-obm-service',
             ref: '/api/2.0/obms/574dcd5794ab6e2506fd107a'
         }],
-        type: 'compute'
+        type: 'compute',
+        workflows: '/api/2.0/nodes/1234abcd1234abcd1234abcd/workflows'
     };
     var rawNode = {
         autoDiscover: "false",
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
-        tags: [],
+        relations: relations,
         obms: obm,
         type: 'compute'
     };
@@ -701,4 +714,5 @@ describe('2.0 Http.Api.Nodes', function () {
                 });
         });
     });
+    
 });
