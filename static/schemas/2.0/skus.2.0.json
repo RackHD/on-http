@@ -9,6 +9,16 @@
                 "required": [
                     "path"
                 ],
+                "oneOf": [
+                    {
+                        "maxProperties": 1,
+                        "minProperties": 1
+                    },
+                    {
+                        "maxProperties": 2,
+                        "minProperties": 2
+                    }
+                ],
                 "additionalProperties": false,
                 "properties": {
 
@@ -216,31 +226,22 @@
             "description": "A sku for RackHD",
             "type": "object",
             "required": [
-                "name"
+                "name", "rules"
             ],
             "properties": {
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                 },
                 "rules": {
                     "$ref": "#/definitions/SkusRules"
                 },
                 "discoveryGraphName": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                 },
                 "discoveryGraphOptions": {
-                    "type": "object",
-                    "properties": {
-                        "username": {
-                            "type": "string"
-                        },
-                        "password": {
-                            "type": "string"
-                        },
-                        "hostname": {
-                            "type": "string"
-                        }
-                    }
+                    "type": "object"
                 }
             }
         }
