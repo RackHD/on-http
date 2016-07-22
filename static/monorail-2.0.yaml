@@ -675,6 +675,7 @@ paths:
       operationId: skusPost
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: skus.2.0.json#/definitions/SkusUpsert
       summary: |
         create a sku
       description: |
@@ -707,6 +708,7 @@ paths:
       operationId: skusPut
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: skus.2.0.json#/definitions/SkusUpsert
       summary: |
         create or update a sku
       description: |

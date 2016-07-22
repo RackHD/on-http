@@ -1,0 +1,88 @@
+{
+    "title": "Skus.2.0",
+    "definitions": {
+        "SkusRules": {
+            "description": "Possible Rules a Sku can use",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "path"
+                ],
+                "oneOf": [
+                    {
+                        "maxProperties": 1,
+                        "minProperties": 1
+                    },
+                    {
+                        "maxProperties": 2,
+                        "minProperties": 2
+                    }
+                ],
+                "additionalProperties": false,
+                "properties": {
+
+                    "equals": {
+                        "type": "string"
+                    },
+                    "greaterThan": {
+                        "type": "number"
+                    },
+                    "lessThan": {
+                        "type": "number"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "contains": {
+                        "type": "string"
+                    },
+                    "in": {
+                        "type": "array"
+                    },
+                    "max": {
+                        "type": "number"
+                    },
+                    "min": {
+                        "type": "number"
+                    },
+                    "notRegex": {
+                        "type": "string"
+                    },
+                    "notContains": {
+                        "type": "string"
+                    },
+                    "notIn": {
+                        "type": "array"
+                    },
+                    "regex": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "SkusUpsert": {
+            "description": "A sku for RackHD",
+            "type": "object",
+            "required": [
+                "name", "rules"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "rules": {
+                    "$ref": "#/definitions/SkusRules"
+                },
+                "discoveryGraphName": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "discoveryGraphOptions": {
+                    "type": "object"
+                }
+            }
+        }
+    }
+}
