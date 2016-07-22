@@ -32,10 +32,12 @@
         <% } else { %>
         "info": <%- JSON.stringify(value.info) %>,
         <% } %>
+        "targets": [
         <% value.targets.forEach(function ( item, i, arr){ %>
-            "targets": "<%=basepath %>/nodes/<%=item %>"
+            "<%=item %>" 
         <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
         <% }); %>
+        ]
     }
     <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
     <% }); %>
