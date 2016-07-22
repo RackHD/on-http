@@ -127,16 +127,10 @@ paths:
       description: |
         post a notification
       parameters:
-        - name: nodeId
+        - name: taskId
           in: query
           description: |
             node identifier
-          required: false
-          type: string
-        - name: type
-          in: query
-          description: |
-            notification type
           required: false
           type: string
         - name: data
