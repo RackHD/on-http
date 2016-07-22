@@ -28,14 +28,14 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get list of possible library pollers
+        Get a list of possible pollers
       description: |
-        get list of possible library pollers
+        Get a list of all available poller definitions in the poller library.
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            list of all pollers
+            Successful retrieval of the list of all pollers in the library
           schema:
             type: object
         default:
@@ -49,26 +49,26 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get a single library poller
+        Get the specified poller
       description: |
-        get a single library poller
+        Get the poller definition with the specified identifier from the poller library
       parameters:
         - name: identifier
           in: path
           description: |
-            library poller identifier
+            The poller identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            single library poller
+            Successful retrieval of the specified poller
           schema:
             type: object
         404:
           description: |
-            There is no library poller with specified identifier.
+            The poller with specified identifier not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -83,14 +83,14 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-view: poller.2.0.json
       summary: |
-        get list of all pollers
+        Get a list of all active pollers
       description: |
-        get list of all pollers
+        Get list of all pollers that are currently running.
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            list of all pollers
+            Successful retrieval of the list of pollers
           schema:
             type: object
         default:
@@ -104,13 +104,18 @@ paths:
       x-swagger-schema: poller.2.0.json#/definitions/Poller
       x-view: poller.2.0.json
       summary: |
-        create a poller
+        Post a poller
       description: |
-        create a poller
+        Create and start a new poller, which will run
+        at the specified time interval.
       parameters:
       - name: content
         in: body
-        description: foo
+        description: |
+          The request body must contain the necessary information
+          to create the poller, including type, pollInterval, and command. The
+          node identifier must also be included if the poller is to be associated
+          with a node.
         required: true
         schema:
          $ref: '#/definitions/generic_obj'
@@ -118,7 +123,7 @@ paths:
       responses:
         200:
           description: |
-            poller created
+            Poller created successfully
           schema:
             type: object
         default:
@@ -133,26 +138,27 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-view: poller.2.0.json
       summary: |
-        Get specifics of the specified poller
+        Get a specific poller
       description: |
-        Get specifics of the specified poller
+        Get information associated with the specified poller, including
+        type, run interval, command, and whether the poller is paused.
       parameters:
         - name: identifier
           in: path
           description: |
-            poller identifier
+            The poller identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            Specifics of the specified poller
+            Poller information retrieved successfully
           schema:
             type: object
         404:
           description: |
-            There is no  poller with specified identifier.
+            Poller with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -166,19 +172,22 @@ paths:
       x-swagger-schema: poller.2.0.json#/definitions/PartialPoller
       x-view: poller.2.0.json
       summary: |
-        patch specifics of the specified poller
+        Patch a poller
       description: |
-        patch specifics of the specified poller
+        Modify one or more properties of the poller with the
+        specified identifier.
       parameters:
         - name: identifier
           in: path
           description: |
-            poller identifier
+            The poller identifier
           required: true
           type: string
         - name: content
           in: body
-          description: foo
+          description: |
+            The body must contain the specific properties of the
+            poller that will be modified.
           required: true
           schema:
             $ref: '#/definitions/generic_obj'
@@ -186,12 +195,12 @@ paths:
       responses:
         200:
           description: |
-            Specifics of the patched poller
+            Poller was successfully modified
           schema:
             type: object
         404:
           description: |
-            There is no poller with specified identifier.
+            Poller with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -203,24 +212,24 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        delete the specified poller
+        Delete the specified poller
       description: |
-        delete the specified poller
+        Delete the poller with the specified identifier.
       parameters:
         - name: identifier
           in: path
           description: |
-            poller identifier
+            The poller identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         204:
           description: |
-            Poller delete successfully
+            Poller was deleted successfully
         404:
           description: |
-            There is no poller with specified identifier.
+            Poller with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -234,26 +243,27 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Get data for the specific poller
+        Get output data for a poller
       description: |
-        Get data for the specific poller
+        Get the complete history of output data generated by the poller
+        with the specified identifier.
       parameters:
         - name: identifier
           in: path
           description: |
-            identifier (ip address or NodeId) for the data from a poller
+            The identifier of the poller
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            data for poller
+            Successfully retrieved poller data
           schema:
             type: object
         404:
           description: |
-            There is no poller with specified identifier.
+            Poller with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -267,26 +277,27 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Get latest data for the specific poller
+        Get latest data for a poller
       description: |
-        Get latest data for the specific poller
+        Get latest output data generated by the poller
+        poller with the specified identifier.
       parameters:
         - name: identifier
           in: path
           description: |
-            identifier (ip address or NodeId) for the data from a poller
+            The identifier of the poller
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            data for poller
+            Successfully retrieved poller data
           schema:
             type: object
         404:
           description: |
-            There is no poller with specified identifier.
+            Poller with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -302,14 +313,16 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-view: renderable.2.0.json
       summary: |
-        get list of metadata for all templates
+        Get a list of metadata for all templates
       description: |
-        get list of metadata for all templates
+        Retrieves metadata for each defined template. The metadata
+        includes the template name, and scope, not the actual
+        contents of the template.
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            list of possible templates
+            Successfully retrieved all template metadata
           schema:
             type: object
         default:
@@ -324,32 +337,33 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-view: renderable.2.0.json
       summary: |
-        get metadata for a specific template
+        Get the metadata for a specific template
       description: |
-        get metadata for a specific template
+        Get metadata for the template with the specified name.
       parameters:
         - name: name
           in: path
           description: |
-            template name
+            The file name of the template
           required: true
           type: string
         - name: scope
           in: query
           description: |
-            template scope
+            The template scope
           required: false
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            single template metadata
+            Successfully retrieved the metadata of the template
+            with the specified name
           schema:
             type: object
         404:
           description: |
-            There is no template with specified identifier.
+            Template with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -363,20 +377,20 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get a single template
+        Get a single template
       description: |
-        get a single template
+        Get the contents of a single template file.
       parameters:
         - name: name
           in: path
           description: |
-            template name
+            The file name of the template
           required: true
           type: string
         - name: scope
           in: query
           description: |
-            template scope
+            The template scope
           required: false
           type: string
           default: 'global'
@@ -384,12 +398,12 @@ paths:
       responses:
         200:
           description: |
-            single template
+            Successfully retrieved the contents of a single template
           schema:
             type: object
         404:
           description: |
-            There is no template with specified identifier.
+            The template with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -401,20 +415,20 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        put a single template
+        Put a single template
       description: |
-        put a single template
+        Create or update the metadata and the content of a single template.
       parameters:
         - name: name
           in: path
           description: |
-            objectid of template
+            The name of the template
           required: true
           type: string
         - name: scope
           in: query
           description: |
-            template scope
+            The template scope
           required: false
           type: string
           default: 'global'
@@ -425,12 +439,12 @@ paths:
       responses:
         200:
           description: |
-            return template
+            Successfully created the template
           schema:
             type: object
         404:
           description: |
-            There is no template with specified identifier.
+            The template with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -442,20 +456,20 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        delete a single template
+        Delete a single template
       description: |
-        delete a single template
+        Delete the template with the specified name.
       parameters:
         - name: name
           in: path
           description: |
-            objectid of template
+            The name of the template
           required: true
           type: string
         - name: scope
           in: query
           description: |
-            template scope
+            The template scope
           required: false
           type: string
           default: 'global'
@@ -463,10 +477,10 @@ paths:
       responses:
         204:
           description: |
-            delete template
+            Successfully deleted the specified template
         404:
           description: |
-            There is no template with specified identifier.
+            The template with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -481,26 +495,26 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get a single template
+        Get a single template
       description: |
-        get a single template
+        Get the template with the specified name.
       parameters:
         - name: name
           in: path
           description: |
-            template name
+            The name of the template
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            single template
+            Successfuly retrieved the specified template
           schema:
             type: object
         404:
           description: |
-            There is no template with specified identifier.
+            The template with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -516,14 +530,16 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-view: renderable.2.0.json
       summary: |
-        get all views
+        Get all views
       description: |
-        get all views
+        Retrieve a list of all views. Views are used to render
+        the output of various system resources, such as nodes,
+        pollers, and OBM settings.
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            all views
+            Successfully retrieved views
           schema:
             type: object
         default:
@@ -538,26 +554,26 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-view: renderable.2.0.json
       summary: |
-        get view with specified identifier
+        Get a specific view
       description: |
-        get view with specified identifier
+        Get the view with the specified file name.
       parameters:
         - name: identifier
           in: path
           description: |
-            Name of view to get
+            The view name
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            single view
+            Successfully retrieved the specified view
           schema:
             type: object
         404:
           description: |
-            There is no view with specified identifier.
+            The view with specified name was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -572,21 +588,21 @@ paths:
         - text/plain
         - application/octet-stream
       summary: |
-        put a single view
+        Put a specific view
       description: |
-        put a single view
+        Create or update a view with the specified name.
       parameters:
         - name: identifier
           in: path
           description: |
-            Name of view to create or update
+            The name of view to create or update
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            return template
+            Successfully retrieved the specified template
           schema:
             type: object
     delete:
@@ -594,26 +610,26 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        put a single view
+        Delete a specific view
       description: |
-        put a single view
+        Delete the view with the specified name.
       parameters:
         - name: identifier
           in: path
           description: |
-            Name of view to delete
+            The name of view to delete
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         204:
           description: |
-            return template
+            Successfully retrieved the specified template
           schema:
             type: object
         404:
           description: |
-            There is no view with specified identifier.
+            The view with specified name was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -630,14 +646,15 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get list of skus
+        Post a SKU Pack
       description: |
-        get list of skus
+        Create a new SKU Pack, which is used to serve a specific
+        set of files to a node during provisioning.
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-             list of skus
+             Successfully created the SKU Pack
           schema:
             type: object
         default:
@@ -651,20 +668,22 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get list of skus
+        Get list of SKUs
       description: |
-        get list of skus
+        Get list of currently defined SKUs, which are used to
+        group nodes based on matching a set of rules with information
+        present in a node's catalog.
       parameters:
         - name: query
           in: query
-          description: query object to pass through to waterline.
+          description: SKU properties to search
           required: false
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-             list of skus
+             Successfully retrieved the list of SKUs
           schema:
             type: object
         default:
@@ -677,14 +696,14 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-swagger-schema: skus.2.0.json#/definitions/SkusUpsert
       summary: |
-        create a sku
+        Post a SKU
       description: |
-        create a sku
+        Create a new SKU.
       parameters:
         - name: body
           in: body
           description: |
-            object post to apply.
+            The properties used to define the new SKU
           required: true
           schema:
                   $ref: '#/definitions/generic_obj'
@@ -692,7 +711,7 @@ paths:
       responses:
         200:
           description: |
-            sku to create
+            Successfully created the SKU
           schema:
             type: object
         500:
@@ -710,14 +729,14 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-swagger-schema: skus.2.0.json#/definitions/SkusUpsert
       summary: |
-        create or update a sku
+        Put a SKU
       description: |
-        create or update a sku
+        Create or modify a SKU.
       parameters:
         - name: body
           in: body
           description: |
-            object post to apply.
+            The properties used to define the SKU
           required: true
           schema:
             $ref: '#/definitions/generic_obj'
@@ -725,7 +744,7 @@ paths:
       responses:
         200:
           description: |
-            create or updated sku definition
+            Successfully created or updated SKU definition
           schema:
             type: object
         500:
@@ -744,26 +763,26 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get a single sku
+        Get a single SKU
       description: |
-        get a single sku
+        Get the SKU with the specified identifier.
       parameters:
         - name: identifier
           in: path
           description: |
-            objectid of sku
+            The SKU identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            return sku
+            Successfull retrieved the SKU
           schema:
             type: object
         404:
           description: |
-            There is no sku with identifier.
+            The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -775,9 +794,9 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        patch a single sku
+        Patch a SKU
       description: |
-        patch a single sku
+        Modify the SKU with the specified identifier.
       parameters:
         - name: identifier
           in: path
@@ -787,7 +806,7 @@ paths:
           type: string
         - name: body
           in: body
-          description: object patches to apply.
+          description: The SKU properties to be modified
           required: true
           schema:
             $ref: '#/definitions/generic_obj'
@@ -795,17 +814,17 @@ paths:
       responses:
         200:
           description: |
-            sku to patch
+            Successfully modified the specified SKU
           schema:
             type: object
         404:
           description: |
-            Not found, no sku with identifier.
+            The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         500:
           description: |
-            Patch failed.
+            SKU patch failed
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -817,26 +836,26 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Delete specific sku.
+        Delete a SKU
       description: |
-        Delete specific sku.
+        Delete the SKU with the specified identifier.
       parameters:
         - name: identifier
           in: path
           description: |
-            The sku objectid.
+            The SKU identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         204:
           description: |
-            return all skus
+            Successfully deleted the SKU
           schema:
             type: object
         404:
           description: |
-            sku with identifier not found, failed.
+            The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -850,26 +869,26 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get nodes for specific sku
+        Get nodes for specific SKU
       description: |
-        get nodes for specific sku
+        Get the nodes associated with the specified SKU definition.
       parameters:
         - name: identifier
           in: path
           description: |
-            The profile name.
+            The SKU identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            return nodes associated with that sku
+            Successfully retrieved the nodes associated with the specified SKU
           schema:
             type: object
         404:
           description: |
-            There is no sku with identifier.
+            The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -883,14 +902,15 @@ paths:
       x-privileges: [ 'write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        put a sku pack to specific sku
+        Put a SKU Pack to a specific SKU
       description: |
-        put a sku pack to specific sku
+        Create or modify a SKU Pack, and associate the
+        SKU Pack with the specified SKU.
       parameters:
         - name: identifier
           in: path
           description: |
-            The identifier of the sku pack.
+            The identifier of the SKU Pack
           required: true
           type: string
       tags: [ "/api/2.0" ]
@@ -899,12 +919,12 @@ paths:
       responses:
         200:
           description: |
-            return sku pack id.
+            Successfully created the SKU Pack
           schema:
             type: object
         404:
           description: |
-            There is no skupack with identifier.
+            The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -916,14 +936,14 @@ paths:
       x-privileges: [ 'write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Delete a pack for a specific sku
+        Delete a SKU Pack
       description: |
-        Delete a pack for a specific sku.
+        Delete a SKU Pack associated with the specified SKU.
       parameters:
         - name: identifier
           in: path
           description: |
-            The profile name.
+            The SKU identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
@@ -932,12 +952,12 @@ paths:
       responses:
         200:
           description: |
-            return nodes associated with that sku
+            Successfully deleted the specified SKU Pack
           schema:
             type: object
         404:
           description: |
-            There is no sku with identifier.
+            The SKU Pack with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -951,9 +971,10 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get list of possible profiles
+        Get list of profiles
       description: |
-        get list of possible profiles
+        Get the list of currently defined profiles. Profiles are scripts
+        used by RackHD to control how a node PXE boots.
       tags: [ "/api/2.0" ]
       parameters:
         - name: macs
@@ -980,7 +1001,7 @@ paths:
       responses:
         200:
           description: |
-            list of profiles for specified mac / ip
+            Successfully retrieved a list of profiles for specified mac / ip
           schema:
             type: object
         default:
@@ -994,14 +1015,15 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        create a switch error
+        Post a switch error
       description: |
-        create a switch error
+        Manually send a switch error to the log, since most switches
+        don't generate errors.
       parameters:
         - name: body
           in: body
           description: |
-            switch error.
+            The switch error to send
           required: true
           schema:
                   $ref: '#/definitions/generic_obj'
@@ -1009,12 +1031,12 @@ paths:
       responses:
         200:
           description: |
-            switch error posted.
+            Successfully posted the switch error
           schema:
             type: object
         500:
           description: |
-            Upload failed.
+            Upload failed
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1028,26 +1050,26 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get a single profile
+        Get a profile
       description: |
-        get a single profile
+        Get a profile rendered with the switch vendor name.
       parameters:
         - name: vendor
           in: path
           description: |
-            The switch vendor name.
+            The switch vendor name
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            return profile
+            Successfully returned the profile
           schema:
             type: object
         404:
           description: |
-            Profile not found.
+            Profile not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1062,14 +1084,15 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-view: renderable.2.0.json
       summary: |
-        get list of possible profiles from database
+        Get list of profile metadata
       description: |
-        get list of possible profiles from database
+        Get the list of metadata associated with all known
+        profiles.
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            list of possible profiles
+            Successfully retrieved the list of profile metadata
           schema:
             type: object
         default:
@@ -1084,31 +1107,31 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-view: renderable.2.0.json
       summary: |
-        get a single profile's metadata from database
+        Get a single profile's metadata from database
       description: |
-        get a single profile's metadata from database
+        Get the metadata associated with the specified profile.
       parameters:
         - name: name
           in: path
           description: |
-            The profile name.
+            The profile name
           required: true
           type: string
         - name: scope
           in: query
-          description: Profile scope 
+          description: The profile scope
           required: false
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            return profile
+            Successfully returned the profile
           schema:
             type: object
         404:
           description: |
-            There is no profile in the library with identifier.
+            The profile with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1122,31 +1145,31 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get a single profile's raw data
+        Get contents of a profile
       description: |
-        get a single profile's raw data
+        Get the contents of a profile specified by its name.
       parameters:
         - name: name
           in: path
           description: |
-            The profile name.
+            The profile name
           required: true
           type: string
         - name: scope
           in: query
-          description: Profile scope
+          description: The profile scope
           required: false
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            return profile
+            Successfully returned profile
           schema:
             type: object
         404:
           description: |
-            There is no profile in the library with identifier.
+            The profile with the specified name was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1158,19 +1181,19 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        put a single profile
+        Put a profile
       description: |
-        put a single profile
+        Create or modify the specified profile metadata and contents.
       parameters:
         - name: name
           in: path
           description: |
-            The profile name.
+            The profile name
           required: true
           type: string
         - name: scope
           in: query
-          description: Profile scope
+          description: The profile scope
           required: false
           type: string
       consumes:
@@ -1180,12 +1203,12 @@ paths:
       responses:
         200:
           description: |
-            profile to put
+            Successfully put the specified profile
           schema:
             type: object
         500:
           description: |
-            Upload failed.
+            Profile creation failed
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1204,18 +1227,20 @@ paths:
       summary: |
         Get list of all OBM service instances
       description: |
-        Get list of all OBM service instances
+        Get a list of all OBM settings that have been associated
+        with nodes. OBM settings allow RackHD to communicate with
+        the BMC of a node.
       parameters:
         - name: query
           in: query
-          description: query object to pass through to waterline.
+          description: Query string used to search for OBM information
           required: false
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            List of OBM service instances
+            Successfully retrieved the list of OBM service instances
           schema:
             type: object
         default:
@@ -1229,14 +1254,15 @@ paths:
       x-swagger-schema: obm
       x-view: obm.2.0.json
       summary: |
-        create or update a single OBM service
+        Put an OBM service
       description: |
-        create or update a single OBM service
+        Create or update a single OBM service, and
+        associate it with a node.
       parameters:
         - name: body
           in: body
           description: |
-            The OBM service object post to apply.
+            The OBM settings information to create
           required: true
           schema:
             $ref: '#/definitions/generic_obj'
@@ -1244,12 +1270,12 @@ paths:
       responses:
         200:
           description: |
-            OBM service create or update.
+            Successfully put the OBM service
           schema:
             type: object
         500:
           description: |
-            OBM service creation failed.
+            OBM service creation failed
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1263,14 +1289,15 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Get list of possible OBM services
+        Get list of OBM services
       description: |
-        Get list of possible OBM services
+        Get a list of OBM schemas, which define the properties
+        required to create OBM settings.
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            List of possible OBM services
+            Successfully retrieved a list of OBM schemas
           schema:
             type: object
         default:
@@ -1284,21 +1311,21 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Get the specified OBM service definition
+        Get an OBM service definition
       description: |
-        Get the specified OBM service definition
+        Get the contents of the specified OBM service schema.
       parameters:
         - name: name
           in: path
           description: |
-            The OBM service definition identifier.
+            The OBM service name
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            List of possible OBM services
+            Successfully retrieved the specified OBM shcema
           schema:
             type: object
         default:
@@ -1307,58 +1334,32 @@ paths:
             $ref: '#/definitions/Error'
   /obms/led:
     x-swagger-router-controller: obms
-    get:
-      operationId: unimplemented
-      x-privileges: [ 'Read' ]
-      x-authentication-type: [ 'jwt' ]
-      summary: |
-        Fetch status of identify light on node through OBM (if supported)
-      description: |
-        Fetch status of identify light on node through OBM (if supported)
-      parameters:
-        - name: body
-          in: body
-          description: foo
-          required: true
-          schema:
-            $ref: '#/definitions/generic_obj'
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: obm identity light settings
-          schema:
-            type: object
-        404:
-          description: |
-            The node with the identifier was not found or has no obm settings.
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
     post:
       operationId: obmsPostLed
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Enable or disable identify light on node through OBM (if supported)
+        Set identify light status
       description: |
-        Enable or disable identify light on node through OBM (if supported)
+        Enable or disable identify LED on node through OBM, if supported.
       parameters:
         - name: body
           in: body
-          description: foo
+          description: |
+            If the body contains the property value: true, the LED will be lit.
+            If the value property does not exist, the LED will be turned off.
+            The body must contain the property nodeId set to the correct node
+            identifier.
           required: true
           schema:
             $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
         201:
-          description: obm settings accepted
+          description: OBM settings accepted
         404:
           description: |
-            The node with the identifier was not found or has no obm settings.
+            The node with the identifier was not found or has no obm settings
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1373,21 +1374,21 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-view: obm.2.0.json
       summary: |
-        get the specified OBM service
+        Get an OBM service
       description: |
-        get the specified OBM service
+        Get the OBM settings associated with the specified identifier
       parameters:
         - name: identifier
           in: path
           description: |
-            The OBM service identifier.
+            The OBM service identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            get the specified OBM service
+            Successfully retrieved the specified OBM service
           schema:
             type: object
         default:
@@ -1400,19 +1401,19 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-swagger-schema: obm
       summary: |
-        patch a single OBM service
+        Patch OBM settings
       description: |
-        patch a single OBM service
+        Update the properties of the OBM settings with the specified identifier.
       parameters:
         - name: identifier
           in: path
           description: |
-            The OBM service identifier.
+            The OBM service identifier
           required: true
           type: string
         - name: body
           in: body
-          description: object patches to apply.
+          description: The OBM properties to patch
           required: true
           schema:
                   $ref: '#/definitions/generic_obj'
@@ -1420,12 +1421,12 @@ paths:
       responses:
         200:
           description: |
-            OBM service create.
+            Successfully patched the specified OBM settings
           schema:
             type: object
         500:
           description: |
-            OBM service creation failed.
+            OBM patch failed
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1437,26 +1438,26 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Delete the OBM service with the specified identifier
+        Delete OBM settings
       description: |
-        Delete the OBM service with the specified identifier
+        Delete the OBM settings with the specified identifier.
       parameters:
         - name: identifier
           in: path
           description: |
-            The OBM service identifier.
+            The OBM service identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            OBM service deleted.
+            Successfully deleted the specified OBM settings
           schema:
             type: object
         404:
           description: |
-            The OBM service with the specified identifier was not found.
+            The OBM service with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1471,14 +1472,14 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Get list of tasks possible to run in workflows
+        Get list of workflow tasks
       description: |
-        Get list of tasks possible to run in workflows
+        Get a list of all workflow tasks that can be added to a workflow.
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            List of tasks possible to run in workflows
+            Successfully retrieved workflow tasks
           schema:
             type: object
         default:
@@ -1490,13 +1491,13 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Add tasks to task library
+        Put a workflow task
       description: |
-        Add tasks to task library
+        Create or update a workflow task in the library of tasks.
       parameters:
         - name: body
           in: body
-          description: Workflow name
+          description: The workflow task properties
           required: false
           schema:
             $ref: '#/definitions/generic_obj'
@@ -1504,12 +1505,12 @@ paths:
       responses:
         200:
           description: |
-            Task created
+            Successfully updated workflow task
           schema:
             type: object
         500:
           description: |
-            Error problem was encountered, task was not written.
+            Put workflow task failed
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1524,21 +1525,21 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Get the task with the specified injectable name
+        Get a workflow task
       description: |
-        Get the task with the specified injectable name
+        Get the task with the specified value of the injectableName property.
       parameters:
         - name: injectableName
           in: path
           description: |
-            Task injectable name
+            The task injectable name
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            Task with the specified injectable name
+            Successfully retrieved the task with the specified injectable name
           schema:
             type: object
         default:
@@ -1550,21 +1551,21 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Delete the task with the specified injectable name
+        Delete a workflow task
       description: |
-        Delete the task with the specified injectable name
+        Delete the workflow task with the specified value of the injectableName property.
       parameters:
         - name: injectableName
           in: path
           description: |
-            Task injectable name
+            The task injectable name
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            Task deleted
+            Successfully deleted the specified task
           schema:
             type: object
         404:
@@ -1584,14 +1585,14 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Get list of all graphs
+        Get list of workflow graphs
       description: |
-        Get list of all graphs
+        Get a list of all workflow graphs available to run.
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            List of graphs
+            Successfully retrieved all workflow graphs
           schema:
             type: object
         default:
@@ -1603,13 +1604,13 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Add a graph to the graph library
+        Put a graph
       description: |
-        Add a graph to the graph library
+        Create or modify a workflow graph in the graph library.
       parameters:
         - name: body
           in: body
-          description: Workflow name
+          description: The workflow graph properties
           required: false
           schema:
             $ref: '#/definitions/generic_obj'
@@ -1617,12 +1618,12 @@ paths:
       responses:
         200:
           description: |
-            Graph created
+            Successfully updated workflow graph
           schema:
             type: object
         500:
           description: |
-            Error problem was encountered, graph was not written.
+            Workflow graph was not updated
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1637,21 +1638,21 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Get the graph with the specified injectable name
+        Get a workflow graph
       description: |
-        Get the graph with the specified injectable name
+        Get the workflow graph with the specified value of the injectableName property.
       parameters:
         - name: injectableName
           in: path
           description: |
-            Graph injectable name
+            The workflow graph injectable name
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            Graph with the specified injectable name
+            Successfully retrieved the workflow graph with the specified injectable name
           schema:
             type: object
         default:
@@ -1663,21 +1664,21 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Delete the graph with the specified injectable name
+        Delete a workflow graph
       description: |
-        Delete the graph with the specified injectable name
+        Delete the workflow graph with the specified value of the injectableName property.
       parameters:
         - name: injectableName
           in: path
           description: |
-            Graph injectable name
+            The workflow graph injectable name
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            Graph deleted
+            Successfully deleted the specified workflow graph
           schema:
             type: object
         404:
@@ -1696,21 +1697,21 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Get list of active and past run workflow instances
+        Get a list of workflow instances
       description: |
-        Get list of active and past run workflow instances
+        Get list workflow that have been run, or are currently running.
       tags: [ "/api/2.0" ]
       parameters:
         - name: active
           in: query
           description: |
-            Filter active workflows
+            Query string to search for specific workflow properties
           required: false
           type: boolean
       responses:
         200:
           description: |
-            Fetch workflows
+            Successfull retrieved workflows
           schema:
             type: object
         default:
@@ -1722,31 +1723,35 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Run a new workflow
+        Run a workflow
       description: |
-        Run a new workflow
+        Run a workflow by specifying a workflow graph injectable name.
+        The workflow is not associated with a node.
       parameters:
         - name: body
           in: body
-          description: Workflow name
+          description: |
+            The body must contain the name property with the
+            value set to the injectable name of the workflow
+            graph to run
           required: false
           schema:
             $ref: '#/definitions/generic_obj'
         - name: name
           in: query
-          description: Workflow name
+          description: Optionally specify the injectable name of the workflow graph to run
           required: false
           type: string
       tags: [ "/api/2.0" ]
       responses:
         201:
           description: |
-            Success
+            Successfully posted the workflow
           schema:
             type: object
         500:
           description: |
-            Error problem was encountered, workflow was not run.
+            Workflow was not run
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1761,21 +1766,21 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get a specific workflow
+        Get a workflow
       description: |
-        get a specific workflow
+        Get the workflow with the specified instance identifier.
       parameters:
         - name: identifier
           in: path
           description: |
-            Workflow identifier
+            The workflow instance identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            Specified workflow
+            Successfully retrieved the specified workflow
           schema:
             type: object
         default:
@@ -1787,26 +1792,26 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Delete the workflow with the specified ID
+        Delete a workflow
       description: |
-        Delete the workflow with the specified ID
+        Delete the workflow with the specified instance identifier.
       parameters:
         - name: identifier
           in: path
           description: |
-            Workflow ID
+            The workflow instance identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            Canceled workflows for specified node
+            Successfully deleted the specified workflow
           schema:
             type: object
         404:
           description: |
-            The workflow with the identifier was not found
+            The specified workflow was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1821,20 +1826,21 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Perform the specified action on the selected workflow
+        Perform an action on a workflow
       description: |
-        Perform the specified action on the selected workflow
+        Perform the specified action on the workflow with the specified
+        instance identifier. Currently, the cancel action is supported.
       parameters:
         - name: identifier
           in: path
           description: |
-            Workflow identifier
+            The workflow instance identifier
           required: true
           type: string
         - name: action
           in: body
           description:
-            Command to execute on selected workflow
+            The action property with the value of the desired action
           required: true
           schema:
             $ref: '#/definitions/action'
@@ -1842,7 +1848,7 @@ paths:
       responses:
         200:
           description: |
-            Specified workflow
+            Successfully performed the action on the specified workflow
           schema:
             type: object
         404:
@@ -1863,21 +1869,21 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Cancel currently running workflows for specified node
+        Perform an action on a workflow
       description: |
-        Cancel currently running workflows for specified node
+        Perform an action on a workflow associated with a node. Currently,
+        the cancel action is supported.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+            The node identifier
           required: true
           type: string
         - name: action
           in: body
           description:
-            Command to execute on selected workflow
+            The action property set to the command to execute
           required: true
           schema:
             $ref: '#/definitions/action'
@@ -1885,7 +1891,7 @@ paths:
       responses:
         200:
           description: |
-            Canceled workflows for specified node
+            Successfully performed the action on the specified workflow
           schema:
             type: object
         404:
@@ -1905,33 +1911,33 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Fetch all workflows for specified node
+        Get all workflows for a node
       description: |
-        Fetch all workflows for specified node
+        Get a list of all workflows that have run against the specified node, or
+        are currently running against the node.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+            The node identifier
           required: true
           type: string
         - name: active
           in: query
           description: |
-            Filter active workflows
+            A query string to specify workflow properties to search for
           required: false
           type: boolean
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            all workflows for specified node, empty object if none exist.
+            Successfully retrieved the workflows for specified node
           schema:
             type: object
         404:
           description: |
-            The node with the identifier was not found
+            The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1943,29 +1949,30 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        create workflow for specified node
+        Post workflow for the node
       description: |
-        create workflow for specified node
+        Run a workflow against for the specified node.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+            The node identifier
           required: true
           type: string
         - name: body
           in: body
-          description: Workflow name
+          description: The name property set to the injectableName property of the workflow graph
           required: false
           schema:
             $ref: '#/definitions/generic_obj'
         - name: name
           in: query
-          description: Workflow name
+          description: The optional name of the workflow graph to run
           required: false
           type: string
-# The OpenAPI Specification 2.0 does not allow type:object for a parameter in a query.  We will use the express req.query to decode
+
+# The OpenAPI Specification 2.0 does not allow type:object for a parameter in a query.
+# We will use the express req.query to decode
 #        - name: options
 #          in: query
 #          description: options
@@ -1976,12 +1983,12 @@ paths:
       responses:
         200:
           description: |
-            the workflow that was created
+            Successfully started the specified workflow
           schema:
             type: object
         404:
           description: |
-            The node with the identifier was not found
+            The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1997,27 +2004,26 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Fetch all pollers for specified node
+        Get the pollers for a node
       description: |
-        Fetch all pollers for specified node
+        Get a list of all of the pollers for the specified node.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+            The node identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            all pollers of specified node, empty object if none exist.
+            Successfully retrieved the pollers of specified node
           schema:
             type: object
         404:
           description: |
-            The node with the identifier was not found
+            The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2032,34 +2038,33 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Fetch catalog of specified node for given source
+        Get the catalogs for a node
       description: |
-        Fetch catalog of specified node for given source
+        Get a list of all of the catalogs for the specified node,
+        containing the specified value of the source catalog property.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+            The node identifier
           required: true
           type: string
         - name: source
           in: path
           description: |
-            Source catalog name to fetch
+            The source catalog name to fetch
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            specific source catalog of specified node, |
-            empty object if none exist.
+            Successfully retrieved specific source catalog of specified node
           schema:
             type: object
         404:
           description: |
-            The node with the identifier was not found
+            The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2074,27 +2079,26 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Fetch catalog of specified node
+        Get the catalogs for a node
       description: |
-        Fetch catalog of specified node
+        Get a list of all of the catalogs for the specified node.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+            The node identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            all catalogs of specified node, empty object if none exist.
+            Successfully retrieved catalogs of specified node
           schema:
             type: object
         404:
           description: |
-            The node with the identifier was not found
+            The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2106,25 +2110,24 @@ paths:
     x-swagger-router-controller: nodes
     get:
       x-swagger-serializer: nodes
-      # swagger template and schema names (not sure how to get schema in fitting)...
       operationId: nodesGetSshById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       tags: [ "/api/2.0" ]
       summary: |
-        get the ssh settings associated with a node.
+        Get the ssh settings for a node
       description: |
-        get the ssh settings associated with a node.
+        Get all of the ssh settings associated with a node.
       parameters:
         - name: identifier
           in: path
           description: |
-              node id value
+            The node identifier
           required: true
           type: string
       responses:
         200:
-          description: ssh settings
+          description: Successfully retrieved the ssh settings
           schema:
             type: object
         404:
@@ -2138,36 +2141,34 @@ paths:
             $ref: '#/definitions/Error'
     post:
       x-swagger-deserializer: nodes
-      # swagger template and schema names (not sure how to get schema in fitting)...
       operationId: nodesPostSshById
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        set the ssh settings associated with a node.
+        Post ssh settings
       description: |
-        set the ssh settings associated with a node.
+        Create the ssh settings associated with a node.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+            The node identifier
           required: true
           type: string
         - name: body
           in: body
           description: |
-            ssh settings to apply.
+            The ssh properties to create
           required: true
           schema:
             $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
         201:
-          description: ssh settings accepted
+          description: Successfull created ssh settings
         404:
           description: |
-            The node with the identifier was not found or has no ssh settings.
+            The specified node was not found or has no ssh settings.
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2182,7 +2183,7 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Delete specified tag from all nodes.
+        Delete tags nodes
       description: |
         Delete specified tag from all nodes.
       parameters:
@@ -2194,40 +2195,38 @@ paths:
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: Delete successful
+          description: Successfully deleted tags
         404:
-          description: The tag name identifier was not found.
+          description: The tag name identifier was not found
 
   /nodes/{identifier}:
     x-swagger-router-controller: nodes
     get:
-      # swagger template and schema names (not sure how to get schema in fitting)...
       operationId: nodesGetById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       x-view: node.2.0.json
       summary: |
-        List of all nodes or if there are none an empty object
+        Get nodes
       description: |
-        List of all nodes or if there are none an empty object
+        Get a list of all nodes currently stored.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+            The node identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: array of all
+          description: Successfully retrieved the list of nodes
           schema:
             type: array
             items:
               type: object
         404:
-          description: The node with the identifier was not found.
+          description: The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2239,23 +2238,22 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Delete specified node.
+        Delete a node
       description: |
-        Delete specified node.
+        Delete the specified node.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+            The node identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: Delete successful
+          description: Successfully deleted the node
         404:
-          description: The node with the identifier was not found.
+          description: The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2264,37 +2262,35 @@ paths:
             $ref: '#/definitions/Error'
     patch:
       x-swagger-deserializer: nodes
-      # swagger template and schema names (not sure how to get schema in fitting)...
       operationId: nodesPatchById
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Patch specified node
+        Patch a node
       description: |
-        Patch specified node
+        Modify the properties of the specified node.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses and unique aliases to identify the node by, |
-            expect a string or an array of strings.
+            The node identifier
           required: true
           type: string
         - name: body
           in: body
           description: |
-            object patches to apply.
+            The node properties to modify
           required: true
           schema:
            $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: patch succeeded
+          description: Successfully modified the specified node
           schema:
             type: object
         404:
-          description: Not found
+          description: The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2309,26 +2305,26 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        List of all tags on the node or an empty object if there are none
+        Get node tags
       description: |
-        List of all tags on the node or an empty object if there are none
+        Get a list of all tags association with the specified node.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses or unique aliases to identify the node by
+            The node identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: array of all
+          description: Successfully retrieved node tags
           schema:
             type: array
             items:
               type: object
         404:
-          description: The node with the identifier was not found.
+          description: The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2341,31 +2337,31 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-swagger-schema: node.2.0.json#/definitions/PartialNode
       summary: |
-        Patch tags onto specified node
+        Patch node tags
       description: |
-        Patch tags onto specified node
+        Modify the tags associated with a node.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses or unique aliases to identify the node by
+            The node identifier
           required: true
           type: string
         - name: body
           in: body
           description: |
-            object patches to apply.
+            The tag properties to patch
           required: true
           schema:
             $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: patch succeeded
+          description: Successfully modified tags
           schema:
             type: object
         404:
-          description: Not found
+          description: The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2379,14 +2375,14 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Delete a tag from the specified node.
+        Delete a tag from node
       description: |
         Delete a tag from the specified node.
       parameters:
         - name: identifier
           in: path
           description: |
-            Mac addresses or unique aliases to identify the node by
+            The node identifier
           required: true
           type: string
         - name: tagName
@@ -2397,9 +2393,9 @@ paths:
       tags: [ "/api/2.0" ]
       responses:
         204:
-          description: Delete successful
+          description: Successfully deleted tag
         404:
-          description: The node with the identifier was not found.
+          description: The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2414,19 +2410,19 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        List of all nodes or if there are none an empty object
+        Get a list of nodes
       description: |
-        List of all nodes or if there are none an empty object
+        Get a list of all currently stored nodes.
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: array of all
+          description: Successfully retrieved the list of nodes
           schema:
             type: array
             items:
               type: object
         400:
-          description: invalidAttributes - 1 attribute is invalid
+          description: Bad Request
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2440,22 +2436,21 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        post
+        Post a node
       description: |
-        post
+        Create and store a new node manually.
       parameters:
       - name: identifiers
         in: body
         description: |
-          Mac addresses and unique aliases to identify the node by, |
-          expect a string or an array of strings.
+          The properties of the new node
         required: true
         schema:
          $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
         201:
-          description: waterline response
+          description: Successfully created node
           schema:
             type: object
         default:
@@ -2470,19 +2465,20 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        find all
+        Get a list of lookups
       description: |
-        find all
+        Get a list of all lookups currently stored. Lookups
+        relate mac addresses to ip addresses.
       parameters:
       - name: q
         in: query
-        description: query object to pass through to waterline.
+        description: Query string specifying properties to search for
         required: false
         type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: array of all
+          description: Successfully retrieved the list of lookups
           schema:
             type: array
             items:
@@ -2497,20 +2493,20 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-swagger-schema: Lookups.2.0.json#/definitions/LookupPost
       summary: |
-        find all
+        Post a lookup
       description: |
-        put all
+        Create and store a new lookup.
       parameters:
       - name: body
         in: body
-        description: lookup record to create
+        description: The properties of the lookup
         required: true
         schema:
          $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: waterline response
+          description: Successfully created new lookup
           schema:
             type: object
         default:
@@ -2524,19 +2520,19 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        lookup id
+        Get a lookup
       description: |
-        lookup id
+        Get a lookup by specifying its identifier.
       parameters:
         - name: id
           in: path
-          description: id of thing to lookup
+          description: The lookup identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: array of all
+          description: Successfully retrieved the lookup
           schema:
             type: array
             items:
@@ -2550,22 +2546,59 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        Delete specified lookup details.
+        Delete a lookup
       description: |
-        Delete specified lookup details.
+        Delete the specified lookup.
       parameters:
         - name: id
           in: path
           description: |
-            id of the lookup record to delete
+            The identifier of the lookup to delete
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: Delete successful
+          description: Successfully deleted lookup
         404:
-          description: The lookup with the identifier was not found.
+          description: The specified lookup was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      operationId: lookupsPatchById
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: Lookups.2.0.json#/definitions/LookupBase
+      summary: |
+        Patch a lookup
+      description: |
+        Modify the properties of a lookup.
+      parameters:
+        - name: id
+          in: path
+          description: |
+            The id of the lookup to patch
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            The lookup properties to be modified
+          required: true
+          schema:
+           $ref: '#/definitions/generic_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: Successfully modified the lookup
+          schema:
+            type: object
+        404:
+          description: The specified lookup was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2573,43 +2606,6 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-    patch:
-      operationId: lookupsPatchById
-      x-privileges: [ 'Write' ]
-      x-authentication-type: [ 'jwt' ]
-      x-swagger-schema: Lookups.2.0.json#/definitions/LookupBase
-      summary: |
-        Patch specified lookup record
-      description: |
-        Patch specified lookup record
-      parameters:
-        - name: id
-          in: path
-          description: |
-            id of the lookup record to patch.
-          required: true
-          type: string
-        - name: body
-          in: body
-          description: |
-            object patches to apply.
-          required: true
-          schema:
-           $ref: '#/definitions/generic_obj'
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: patch succeeded
-          schema:
-            type: object
-        404:
-          description: Not found
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
   /files/{fileidentifier}:
     x-swagger-router-controller: files
     get:
@@ -2617,13 +2613,13 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get file based on uuid or file name
+        Get a file
       description: |
         Get file based on uuid or file name.
       parameters:
         - name: fileidentifier
           in: path
-          description: uuid or file name of a file as provided when you originally stored it.
+          description: The uuid or file name of a file as provided when you originally stored it
           required: true
           type: string
       tags: [ "/api/2.0" ]
@@ -2632,15 +2628,15 @@ paths:
 # describe the return of a file easily today until jsonspec and swagger
 # are "fixed"
         200:
-          description: The file requested
+          description: Successfully retrieved specified file
           schema:
             type: file
         404:
-          description: File not found.
+          description: File not found
           schema:
             $ref: '#/definitions/Error'
         500:
-          description: Failed to serve file request.
+          description: Failed to serve file request
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2653,13 +2649,13 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-view: file.2.0.json
       summary: |
-        put file based on filename
+        Put a file
       description: |
-        Put file based on filename, returns the uuid of the stored file.
+        Put file based on its filename. Returns the uuid of the stored file.
       parameters:
         - name: fileidentifier
           in: path
-          description: filename of the file you want to store
+          description: The filename of the file you want to store
           required: true
           type: string
 # https://github.com/swagger-api/swagger-spec/issues/326 does not yet accept files
@@ -2677,11 +2673,11 @@ paths:
         - application/x-www-form-urlencoded
       responses:
         200:
-          description: Ready.
+          description: Successfully stored file
           schema:
             type: string
         500:
-          description: Failure serving file request.
+          description: Failure serving file request
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2693,7 +2689,7 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        delete file based on uuid
+        Delete a file
       description: |
         Delete a file based on uuid.
       parameters:
@@ -2705,13 +2701,13 @@ paths:
       tags: [ "/api/2.0" ]
       responses:
         204:
-          description: File successfully deleted.
+          description: File successfully deleted
         404:
           description: File not found.
           schema:
             $ref: '#/definitions/Error'
         500:
-          description: Error deleting file from the database.
+          description: Error deleting file from the database
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2725,27 +2721,27 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get md5sum based on file name
+        Get md5sum of file
       description: |
         Get md5sum based on file name.
       parameters:
         - name: filename
           in: path
-          description: File name of a file as provided when you originally stored it.
+          description: File name of a file as provided when you originally stored it
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: The file requested
+          description: Successfully retrieved the md5sum of the specified file
           schema:
             type: object
         404:
-          description: File not found.
+          description: File not found
           schema:
             $ref: '#/definitions/Error'
         500:
-          description: Failed to serve file request.
+          description: Failed to serve file request
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2760,27 +2756,27 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-view: file.2.0.json
       summary: |
-        get file metadata by file name
+        Get file metadata
       description: |
-        Get file metadata by file name
+        Get file metadata by file name.
       parameters:
         - name: filename
           in: path
-          description: name of a file as provided when you originally stored it.
+          description: The name of a file as provided when you originally stored it
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: The file requested
+          description: Successfully retrieved the specified file
           schema:
             type: object
         404:
-          description: File not found.
+          description: File not found
           schema:
             $ref: '#/definitions/Error'
         500:
-          description: Failed to serve file request.
+          description: Failed to serve file request
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2794,17 +2790,17 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get all available files
+        Get all files
       description: |
-        Get all available files
+        Get a list of all files currently stored.
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: The file requested
+          description: Successfully retrieved the files
           schema:
             type: object
         500:
-          description: Failed to serve file request.
+          description: Failed to serve file request
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2818,13 +2814,13 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get server configuration
+        Get server configuration
       description: |
-        Get server configuration.
+        Get the RackHD server configuration properties.
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: An array of configuration objects
+          description: Successfully retrieved the configuration
           schema:
             type: object
         default:
@@ -2836,22 +2832,22 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        patch/update server configuration
+        Patch server configuration
       description: |
-        Patch/update server configuration and then return the patched configuration.
+        Modify the RackHD server configuration.
       tags: [ "/api/2.0" ]
       consumes:
         - application/json
       parameters:
         - name: config
           in: body
-          description: Updated config fields
+          description: The configuration properties to be modified
           required: true
           schema:
             $ref: '#/definitions/generic_obj'
       responses:
         200:
-          description: An array of configuration objects
+          description: Successfully modified the configuration
           schema:
             type: object
         default:
@@ -2865,20 +2861,19 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get list of all catalogs
+        Get all catalogs
       description: |
-        The catalogs endpoint returns json data that represent the catalogs of
-        all hardware in the system.
+        Get an array of catalog data describing all hardware in the system.
       parameters:
         - name: query
           in: query
-          description: query object to pass through to waterline.
+          description: A query string containing catalog properties to search
           required: false
           type: string
       tags: [ "/api/2.0" ]
       responses:
         "200":
-          description: Success
+          description: Successfully retrieved a list of catalogs
           schema:
             # a pointer to a definition
             $ref: "#/definitions/VersionsResponse"
@@ -2894,119 +2889,47 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get list of all catalogs
+        Get a catalog
       description: |
-        The catalogs endpoint returns json data that represent the catalogs of
-        all hardware in the system.
+        Get a catalog based on its catalog identifier.
       parameters:
         - name: identifier
           in: path
-          description: identifier of a catalog
+          description: The catalog identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         "200":
-          description: Success
+          description: Successfully retrieved the catalog
           schema:
-            # a pointer to a definition
             $ref: "#/definitions/VersionsResponse"
-        # responses may fall through to errors
         default:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /dhcp:
-    x-swagger-router-controller: unimplemented
-    get:
-      operationId: unimplemented
-      x-privileges: [ 'Read' ]
-      x-authentication-type: [ 'jwt' ]
-      summary: |
-        get DHCP lease table
-      description: |
-        Fetch the dhcp leases.
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: |
-            A list of all DHCP leases registered with this instance of the service.
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/lease'
-        default:
-          description: NotFound error
-  /dhcp/lease/{mac}:
-    x-swagger-router-controller: unimplemented
-    get:
-      operationId: unimplemented
-      x-privileges: [ 'Read' ]
-      x-authentication-type: [ 'jwt' ]
-      summary: |
-        fetch lease information for the mac specified
-      description: |
-        Fetch lease information for the mac specified.
-      parameters:
-        - name: mac
-          in: path
-          description: identifier of a mac address
-          required: true
-          type: string
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: A single lease
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/lease'
-        default:
-          description: NotFound error
-    delete:
-      operationId: unimplemented
-      x-privileges: [ 'Write' ]
-      x-authentication-type: [ 'jwt' ]
-      summary: get list of all catalogs
-      description: |
-        Delete the lease for the mac specified and return information about deleted lease.
-      parameters:
-        - name: mac
-          in: path
-          description: identifier of a mac address
-          required: true
-          type: string
-      tags: [ "/api/2.0" ]
-      responses:
-        200:
-          description: A single lease
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/lease'
-        default:
-          description: NotFound error
+
   /tags:
     x-swagger-router-controller: tags
     get:
       operationId: getAllTags
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
-      summary: Retrieve information about all tags
+      summary: Get all tags
       description: |
-        Retrieve information about all tags
+        Get a list of all tags currently stored.
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            An array of all tags
+            Successfully retrieved all tags
           schema:
             type: array
             items: 
               type: object
         404:
           description: |
-            The tag name identifier was not found
+            Not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -3017,13 +2940,13 @@ paths:
       operationId: createTag
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
-      summary: Create a new tag
+      summary: Post a tag
       description: |
-        Create a new tag
+        Create a new tag.
       parameters:
         - name: body
           in: body
-          description: tag creation options
+          description: The tag properties
           required: true
           schema:
             $ref: '#/definitions/generic_obj'
@@ -3031,7 +2954,7 @@ paths:
       responses:
         201:
           description: |
-            The created tag
+            Successfully created the tag
           schema:
             type: object
         500:
@@ -3049,9 +2972,9 @@ paths:
       operationId: getTag
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
-      summary: Retrieve information about the tag
+      summary: Get a tag
       description: |
-        Retrieve information about the tag
+        Get the data associated with the specified tag.
       parameters:
         - name: tagName
           in: path
@@ -3062,7 +2985,7 @@ paths:
       responses:
         200:
           description: |
-            The information about the specified tag
+            Successfully retrieved information about the specified tag
           schema:
             type: object
         404:
@@ -3078,9 +3001,9 @@ paths:
       operationId: deleteTag
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
-      summary: Delete the specified tag
+      summary: Delete a tag
       description: |
-        Delete the specified tag
+        Delete the specified tag.
       parameters:
         - name: tagName
           in: path
@@ -3091,7 +3014,7 @@ paths:
       responses:
         204:
           description: |
-            No content
+            Successfully deleted the tag
           schema:
             type: object
         404:
@@ -3109,9 +3032,9 @@ paths:
       operationId: getNodesByTag
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
-      summary: Retrieve nodes with the specified tag
+      summary: Get nodes with the specified tag
       description: |
-        Retrieve nodes with the specified tag
+        Get a list of nodes with the specified tag.
       parameters:
         - name: tagName
           in: path
@@ -3122,14 +3045,14 @@ paths:
       responses:
         200:
           description: |
-            The list of nodes with the specified tag
+            Successfully retrieved the list of nodes with the specified tag
           schema:
             type: array
             items:
               type: object
         404:
           description: |
-            The node with the identifier was not found
+            The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -3144,9 +3067,9 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        create workflow for nodes with the specified tag
+        Post workflow to node by tag
       description: |
-        create workflow for nodes with the specified tag
+        Start a workflow against all nodes with the specified tag.
       parameters:
         - name: tagName
           in: path
@@ -3155,31 +3078,34 @@ paths:
           type: string
         - name: body
           in: body
-          description: Workflow options
+          description: The workflow options to post
           required: false
           schema:
             $ref: '#/definitions/generic_obj'
         - name: name
           in: query
-          description: Workflow name
+          description: Query string specifying the optional workflow injectable name
           required: false
           type: string
-# The OpenAPI Specification 2.0 does not allow type:object for a parameter in a query.  We will use the express req.query to decode
+
+# The OpenAPI Specification 2.0 does not allow type:object for a parameter in a query.
+# We will use the express req.query to decode
 #        - name: options
 #          in: query
 #          description: options
 #          required: false
 #          type: object
+
       tags: [ "/api/2.0" ]
       responses:
         202:
           description: |
-            the workflow has been accepted
+            Successfully posted workflows
           schema:
             type: object
         404:
           description: |
-            The node with the identifier was not found
+            The specified tag was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -3193,14 +3119,14 @@ paths:
       x-authentication-type: [ 'jwt' ]
       operationId: listUsers
       summary: |
-        Retrieve a list of users
+        Get the list of users
       description: |
-        Retrieve a list of users
+        Get the list of users currently stored in the system.
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            A list of users
+            Successfully retrieved the list of users
           schema:
             type: array
             items:
@@ -3222,13 +3148,13 @@ paths:
       x-authentication-type: [ 'jwt', 'anonymous' ]
       operationId: addUser
       summary: |
-        Add a new user
+        Post a new user
       description: |
-        Add a new user
+        Create a new user and store it.
       parameters:
         - name: body
           in: body
-          description: User information
+          description: The user information
           required: true
           schema:
             $ref: '#/definitions/user_obj'
@@ -3236,7 +3162,7 @@ paths:
       responses:
         201:
           description: |
-            the user has been created
+            Successfully created the user
           schema:
             type: object
         401:
@@ -3258,18 +3184,18 @@ paths:
       x-authentication-type: [ 'jwt' ]
       operationId: modifyUser
       summary: |
-        Update properties on a user
+        Patch a user
       description: |
-        Update properties on a user
+        Modify the properties of a user.
       parameters:
         - name: name
           in: path
-          description: username
+          description: The username
           required: true
           type: string
         - name: body
           in: body
-          description: User information
+          description: The user information
           required: true
           schema:
             $ref: '#/definitions/user_obj'
@@ -3277,7 +3203,7 @@ paths:
       responses:
         200:
           description: |
-            the user has been updated
+            Successfully modified the user
           schema:
             type: object
         401:
@@ -3297,20 +3223,20 @@ paths:
       x-authentication-type: [ 'jwt' ]
       operationId: getUser
       summary: |
-        Get information about a user
+        Get a user
       description: |
-        Get information about a user
+        Get information about the specified user.
       parameters:
         - name: name
           in: path
-          description: username
+          description: The username
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            the user has been updated
+            Successfully retrieved the specified user
           schema:
             $ref: '#/definitions/user_obj'
         401:
@@ -3332,18 +3258,18 @@ paths:
       summary: |
         Delete a user
       description: |
-        Delete a user
+        Delete the specified user.
       parameters:
         - name: name
           in: path
-          description: username
+          description: The username
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            the user has been deleted
+            Successfully deleted the specified user
         401:
           description: Unauthorized
           schema:
@@ -3363,19 +3289,19 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get a schema by specifying its identifier
+        Get a schema
       description: |
-        Gets a schema by identifier.
+        Get the specified schema.
       parameters:
         - name: identifier
           in: path
-          description: identifier of a schema
+          description: The identifier of the schema
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         "200":
-          description: Success
+          description: Successfully retrieved the schema
           schema:
             type: object
         default:
@@ -3389,13 +3315,13 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
-        get list of all schemas
+        Get all schemas
       description: |
-        Get a list of all schemas.
+        Get a list of all schemas currently stored in the system.
       tags: [ "/api/2.0" ]
       responses:
         "200":
-          description: Success
+          description: Successfully retrieved the list of schemas
           schema:
             type: object
         default:
@@ -3409,23 +3335,21 @@ paths:
 #      x-swagger-template: 'bootstrap.js'
       operationId: getBootstrap
       summary: |
-        get tasks bootstrap.js
+        Get tasks bootstrap.js
       description: |
-        used internally by the system - get tasks bootstrap.js
+        Used internally by the system - get tasks bootstrap.js
       parameters:
         - name: macAddress
           in: query
-          description: query object to pass through to waterline.
+          description: Query string containing the mac address
           required: false
           type: string
       tags: [ "/api/2.0" ]
       responses:
         "200":
-          description: Success
+          description: Successfully retrieved bootstrap.js
           schema:
-            # a pointer to a definition
             $ref: "#/definitions/VersionsResponse"
-        # responses may fall through to errors
         default:
           description: Error
           schema:
@@ -3440,26 +3364,26 @@ paths:
       x-authentication-type: [ 'jwt' ]
 
       summary: |
-        get specific task
+        Get a task
       description: |
-        get specific task
+        Get the specified task.
       parameters:
         - name: identifier
           in: path
           description: |
-            task identifier
+            The task identifier
           required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
           description: |
-            single task
+            Successfully retrieved a single task
           schema:
             type: object
         404:
           description: |
-            There is no task with specified identifier.
+            There specified task was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -3473,20 +3397,20 @@ paths:
       x-authentication-type: [ 'jwt' ]
       x-view: tasks.2.0.json
       summary: |
-        post specific task
+        Post a task
       description: |
-        post specific task
+        Start the specified task
       parameters:
         - name: identifier
           in: path
           description: |
-            poller identifier
+            The task identifier
           required: true
           type: string
         - name: body
           in: body
           description: |
-            obm settings to apply.
+            The obm settings to apply
           required: true
           schema:
             $ref: '#/definitions/generic_obj'
@@ -3494,12 +3418,12 @@ paths:
       responses:
         200:
           description: |
-            Specifics of the specified task
+            Successfully posted the specified task
           schema:
             type: object
         404:
           description: |
-            There is no  task with specified identifier.
+            The specified task was not found
           schema:
             $ref: '#/definitions/Error'
         default:
