@@ -12,6 +12,7 @@ describe('Redfish Chassis Root', function () {
     var fs;
     var validator;
     var env;
+    var nodeApi;
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -33,10 +34,13 @@ describe('Redfish Chassis Root', function () {
             sinon.stub(taskProtocol);
 
             env = helper.injector.get('Services.Environment');
-            sinon.stub(env, "get").resolves();
+            sinon.stub(env, "get").resolves({});
 
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
+
+            nodeApi = helper.injector.get('Http.Services.Api.Nodes');
+            sinon.stub(nodeApi, "getAllNodes");
         });
 
     });
@@ -60,6 +64,8 @@ describe('Redfish Chassis Root', function () {
         resetStubs(waterline.catalogs);
         resetStubs(waterline.workitems);
         resetStubs(taskProtocol);
+
+        nodeApi.getAllNodes.resolves([enclosure]);
     });
 
     afterEach('tear down mocks', function () {
@@ -70,7 +76,8 @@ describe('Redfish Chassis Root', function () {
         validator.validate.restore();
         redfish.render.restore();
         env.get.restore();
-        
+        nodeApi.getAllNodes.restore();
+
         function restoreStubs(obj) {
             _(obj).methods().forEach(function (method) {
                 if (obj[method] && obj[method].restore) {

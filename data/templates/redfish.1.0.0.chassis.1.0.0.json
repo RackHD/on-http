@@ -6,7 +6,7 @@
     "Id": "<%= identifier %>",
     "Description": "",
     "Name": "Chassis",
-    "ChassisType": "<%= chassisType %>",
+    "ChassisType": "<%= _.get(env, 'redfish.computeType', chassisType); %>",
     "AssetTag" : "<%= ohai.data.dmi.chassis.asset_tag %>",
     "Manufacturer": "<%= ohai.data.dmi.chassis.manufacturer %>",
     "Model": "<%= ohai.data.dmi.system.product_name %>",
