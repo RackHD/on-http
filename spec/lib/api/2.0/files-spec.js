@@ -22,7 +22,7 @@ describe('Http.Api.Internal.Files', function () {
             return helper.request().put('/api/2.0/files/mockfile')
                 .set('Content-Type', 'application/octet-stream')
                 .send('hello')
-                .expect(200)
+                .expect(201)
                 .expect(function (res) {
                     uuid = res.body.uuid;
                 });
@@ -68,7 +68,7 @@ describe('Http.Api.Internal.Files', function () {
             return helper.request().put('/api/2.0/files/mockfile')
                 .set('Content-Type', 'application/octet-stream')
                 .send('PUT /files works!')
-                .expect(200)
+                .expect(201)
                 .expect(function (res) {
                     newUuid = res.body.uuid;
                     expect(newUuid).to.equal(uuid);

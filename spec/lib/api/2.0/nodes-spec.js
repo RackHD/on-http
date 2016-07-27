@@ -220,8 +220,7 @@ describe('2.0 Http.Api.Nodes', function () {
             nodeApiService.removeNode.resolves(node);
 
             return helper.request().delete('/api/2.0/nodes/1234')
-                .expect('Content-Type', /^application\/json/)
-                .expect(200, node)
+                .expect(204)
                 .expect(function () {
                     expect(nodeApiService.removeNode).to.have.been.calledOnce;
                 });
@@ -696,8 +695,7 @@ describe('2.0 Http.Api.Nodes', function () {
 
         it('should call removeTagsById', function() {
             return helper.request().delete('/api/2.0/nodes/123/tags/name')
-                .expect('Content-Type', /^application\/json/)
-                .expect(200)
+                .expect(204)
                 .expect(function() {
                     expect(nodesApi.removeTagsById).to.have.been.calledWith('123', 'name');
                 });
@@ -705,12 +703,9 @@ describe('2.0 Http.Api.Nodes', function () {
 
         it('should call masterDelTagById', function() {
             return helper.request().delete('/api/2.0/nodes/tags/name')
-                .expect('Content-Type', /^application\/json/)
-                .expect(200)
+                .expect(204)
                 .expect(function(res) {
                     expect(nodesApi.masterDelTagById).to.have.been.calledWith('name');
-                    expect(res.body).to.deep.equal
-                    (['1234abcd1234abcd1234abcd','5678efgh5678efgh5678efgh']);
                 });
         });
     });

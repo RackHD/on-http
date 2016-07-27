@@ -163,8 +163,7 @@ describe('Http.Api.Lookup 2.0', function () {
         describe('DELETE', function () {
             it('should call waterline.lookups.destroyOneById with 123', function() {
                 return helper.request().delete('/api/2.0/lookups/123')
-                    .expect('Content-Type', /^application\/json/)
-                    .expect(200)
+                    .expect(204)
                     .expect(function () {
                         expect(destroyOneById).to.have.been.calledWith('123');
                     });

@@ -156,7 +156,7 @@ describe('Http.Api.Templates', function () {
         it('should PUT new mockfile', function () {
             return helper.request().put('/api/2.0/templates/library/testTemplate')
                 .send('test\n')
-                .expect(200)
+                .expect(201)
                 .expect(function(){
                     expect(templates.put).to.have.been.calledOnce;
                     expect(templates.put).to.have.been.calledWith('testTemplate');
