@@ -109,14 +109,14 @@
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <Order>2</Order>
-                    <CommandLine>powershell -Command "curl http://<%=server%>:<%=port%>/api/2.0/templates/post-windows-install.ps1" -Outfile post-windows-install.ps1 </CommandLine>
-                    <Description>flag the end of the setup</Description>
+                    <CommandLine>powershell -Command "curl http://<%=server%>:<%=port%>/api/1.1/templates/post-windows-install.ps1" -Outfile post-windows-install.ps1 </CommandLine>
+                    <Description>setup any the VLAN IDs and trigger the end of the install workflow</Description>
                     <RequiresUserInput>false</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <Order>3</Order>
                     <CommandLine>powershell -ExecutionPolicy ByPass -File post-windows-install.ps1</CommandLine>
-                    <Description>flag the end of the setup</Description>
+                    <Description>run the script</Description>
                     <RequiresUserInput>false</RequiresUserInput>
                 </SynchronousCommand>
             </FirstLogonCommands>
@@ -164,13 +164,7 @@
             <% gateWay  =n.ipv4.gateway %>
             <% } %>
 
-            <% if( undefined != n.ipv4.vlanIds ) { %>
-            <!--
-            VLanID::<%=n.device%>,<%=n.ipv4.vlanIds%>
-             -->
-            <% } %>
-
-            <% } %>
+           <% } %>
 
 
             <% if( undefined != n.ipv6 ) { %>

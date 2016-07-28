@@ -1,49 +1,30 @@
-curl http://<%=server%>:<%=port%>/templates/unattend_server2012.xml -Outfile unattend_server2012.xml
+<% if ( typeof networkDevices !== 'undefined' ) { %>
+            <% networkDevices.forEach(function(n) { %>
+                  <% if(   typeof n.ipv4.vlanIds !== 'undefined') { %>
+                        Get-NetAdapterAdvancedProperty <%= n.device%> -RegistryKeyword "VlanID"
+                        If($? -eq "0") #Make sure that VLAN is supported  on a the specified Ethernet port
 
-$vlanEntries = Get-Content -Path C:\temp\unattend_server2012.xml  | Where-Object {$_ -like "*VLan*"}
-$vlansArray = New-Object System.Collections.ArrayList
+                            {
+                                Write-Host "Vlan is supported on <%= n.device%> Ethernet port"
+                                IF(<%=n.ipv4.vlanIds[0]%> -ge 0 -Or <%=n.ipv4.vlanIds[0]%> -le 4095)
+                                    {
+                                        Set-NetAdapterAdvancedProperty <%= n.device%> -RegistryKeyword "VlanID" -DisplayValue <%=n.ipv4.vlanIds[0]%>
+                                    }
+                                Else
+                                    {
+                                        Write-Host "Vlan value should with the 0-4095 range"
+                                    }
+                            }
+                        Else
+                            {
+                                Write-Host "Vlan is NOT supported on <%= n.device%> Ethernet port"
+                            }
 
-#Removing the 'VLAN::ID" tag from the unattend_server2012.xml file
-foreach ($vlanEntry in $vlanEntries)
-	{
-		$line= $vlanEntry | out-String
-		$cleanedline= $line.split("::")
-		$vlanItem= $cleanedline[2]
-		$vlansArray.add($vlanItem)
-		$vlansArray
+                   <% }%>
 
-	}
-$ethPort
-$tempArray
-
-foreach ($entry in $vlansArray)
-	{
-
-		$tempArray= $entry.split(",")#The first element of the tempArray is the name of the Ethernet port, the second element is the value of the VLAND ID to be assigned to the Ethernet port
-		$ethPort = $tempArray[0]
-		Get-NetAdapterAdvancedProperty $ethPort -RegistryKeyword "VlanID"
-		If($? -eq "0") #Make sure that VLAN is supported  on a the specified Ethernet port
-
-			{
-				Write-Host "Vlan is supported on" $ethPort "Ethernet port"
-				[string]$vlanValue = $tempArray[1]
-				$vlanValue =$vlanValue -replace "`t|`n|`r","" #remove the carriage returns
-				IF($vlanValue -le 4096)
-					{
-						Set-NetAdapterAdvancedProperty $ethPort -RegistryKeyword "VlanID" -DisplayValue $vlanValue
-					}
-				Else
-					{
-						Write-Host "Vlan value should with the 0-4096 range"
-					}
-			}
-		Else
-			{
-				Write-Host "Vlan is NOT supported on" $ethPort "Ethernet port"
-			}
-
-	}
+           <%});%>
+<% } %>
 
 
-#crul the renasar-ansible.pub to indicate that windows install workflow has completed
+#curl the renasar-ansible.pub to indicate that windows install workflow has completed
 curl http://<%=server%>:<%=port%>/api/2.0/templates/renasar-ansible.pub -Outfile renasar-ansible.pub
