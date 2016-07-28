@@ -154,11 +154,11 @@ describe('Http.Api.Skus.2.0', function() {
                 });
         });
 
-        it('should 200 reputting the same sku', function() {
+        it('should 201 reputting the same sku', function() {
             skuApiService.upsertSku.resolves(input);
             return helper.request().put('/api/2.0/skus')
                 .send(input)
-                .expect(200)
+                .expect(201)
                 .then(function () {
                     expect(skuApiService.upsertSku).to.have.been.called;
                 });
@@ -222,7 +222,7 @@ describe('Http.Api.Skus.2.0', function() {
             beforeEach('DELETE /skus/:id', function () {
                 skuApiService.deleteSkuById.resolves();
                 return helper.request().delete('/api/2.0/skus/' + sku.id)
-                    .expect(200)
+                    .expect(204)
                     .then(function () {
                         expect(skuApiService.deleteSkuById).to.have.been.called;
                     });

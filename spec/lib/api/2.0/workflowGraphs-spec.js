@@ -80,8 +80,7 @@ describe('Http.Api.Workflows.2.0', function () {
             workflowApiService.destroyGraphDefinition.resolves(graph);
 
             return helper.request().delete('/api/2.0/workflows/graphs/' + graph.name)
-            .expect('Content-Type', /^application\/json/)
-            .expect(200, graph)
+            .expect(204)
             .expect(function() {
                 expect(workflowApiService.destroyGraphDefinition).to.have.been.calledOnce;
                 expect(workflowApiService.destroyGraphDefinition)

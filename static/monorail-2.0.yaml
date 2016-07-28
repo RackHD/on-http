@@ -121,7 +121,7 @@ paths:
          $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
             Poller created successfully
           schema:
@@ -261,6 +261,11 @@ paths:
             Successfully retrieved poller data
           schema:
             type: object
+        204:
+          description: |
+            Successfully processed the request and did not return any data
+          schema:
+            type: object
         404:
           description: |
             Poller with specified identifier was not found
@@ -293,6 +298,11 @@ paths:
         200:
           description: |
             Successfully retrieved poller data
+          schema:
+            type: object
+        204:
+          description: |
+            Successfully processed the request and did not return any data
           schema:
             type: object
         404:
@@ -437,7 +447,7 @@ paths:
         - application/x-www-form-urlencoded
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
             Successfully created the template
           schema:
@@ -600,9 +610,9 @@ paths:
           type: string
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
-            Successfully retrieved the specified template
+            Successfully created the specified template
           schema:
             type: object
     delete:
@@ -652,7 +662,7 @@ paths:
         set of files to a node during provisioning.
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
              Successfully created the SKU Pack
           schema:
@@ -709,7 +719,7 @@ paths:
                   $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
             Successfully created the SKU
           schema:
@@ -742,7 +752,7 @@ paths:
             $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
             Successfully created or updated SKU definition
           schema:
@@ -917,7 +927,7 @@ paths:
       consumes:
         - application/x-www-form-urlencoded
       responses:
-        200:
+        201:
           description: |
             Successfully created the SKU Pack
           schema:
@@ -950,7 +960,7 @@ paths:
       consumes:
         - application/x-www-form-urlencoded
       responses:
-        200:
+        204:
           description: |
             Successfully deleted the specified SKU Pack
           schema:
@@ -1029,7 +1039,7 @@ paths:
                   $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
             Successfully posted the switch error
           schema:
@@ -1201,7 +1211,7 @@ paths:
         - application/x-www-form-urlencoded
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
             Successfully put the specified profile
           schema:
@@ -1268,7 +1278,7 @@ paths:
             $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
             Successfully put the OBM service
           schema:
@@ -1450,7 +1460,7 @@ paths:
           type: string
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        204:
           description: |
             Successfully deleted the specified OBM settings
           schema:
@@ -1503,7 +1513,7 @@ paths:
             $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
             Successfully updated workflow task
           schema:
@@ -1563,7 +1573,7 @@ paths:
           type: string
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        204:
           description: |
             Successfully deleted the specified task
           schema:
@@ -1616,7 +1626,7 @@ paths:
             $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
             Successfully updated workflow graph
           schema:
@@ -1676,7 +1686,7 @@ paths:
           type: string
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        204:
           description: |
             Successfully deleted the specified workflow graph
           schema:
@@ -1804,7 +1814,7 @@ paths:
           type: string
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        204:
           description: |
             Successfully deleted the specified workflow
           schema:
@@ -1846,7 +1856,7 @@ paths:
             $ref: '#/definitions/action'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        202:
           description: |
             Successfully performed the action on the specified workflow
           schema:
@@ -1889,7 +1899,7 @@ paths:
             $ref: '#/definitions/action'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        202:
           description: |
             Successfully performed the action on the specified workflow
           schema:
@@ -1981,7 +1991,7 @@ paths:
 
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
             Successfully started the specified workflow
           schema:
@@ -2194,7 +2204,7 @@ paths:
           type: string
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        204:
           description: Successfully deleted tags
         404:
           description: The tag name identifier was not found
@@ -2250,7 +2260,7 @@ paths:
           type: string
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        204:
           description: Successfully deleted the node
         404:
           description: The specified node was not found
@@ -2505,7 +2515,7 @@ paths:
          $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: Successfully created new lookup
           schema:
             type: object
@@ -2558,7 +2568,7 @@ paths:
           type: string
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        204:
           description: Successfully deleted lookup
         404:
           description: The specified lookup was not found
@@ -2672,7 +2682,7 @@ paths:
         - application/octet-stream
         - application/x-www-form-urlencoded
       responses:
-        200:
+        201:
           description: Successfully stored file
           schema:
             type: string
@@ -3267,7 +3277,7 @@ paths:
           type: string
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        204:
           description: |
             Successfully deleted the specified user
         401:
@@ -3416,7 +3426,7 @@ paths:
             $ref: '#/definitions/generic_obj'
       tags: [ "/api/2.0" ]
       responses:
-        200:
+        201:
           description: |
             Successfully posted the specified task
           schema:
