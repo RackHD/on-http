@@ -130,14 +130,14 @@ paths:
         - name: taskId
           in: query
           description: |
-            node identifier
-          required: false
+            task instance identifier
+          required: true
           type: string
         - name: data
           in: query
           description: |
-            node identifier
-          required: false
+            notification data
+          required: true
           type: string
       tags: [ "/api/2.0" ]
       responses:
@@ -149,11 +149,6 @@ paths:
         400:
           description: |
             bad request parameter passed or no active task or taskgraph.
-          schema:
-            $ref: '#/definitions/Error'
-        404:
-          description: |
-            Node not found.
           schema:
             $ref: '#/definitions/Error'
         default:
