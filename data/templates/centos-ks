@@ -26,22 +26,24 @@ authconfig --enableshadow --passalgo=sha512 --enablefingerprint
 rootpw --iscrypted <%=rootEncryptedPassword%>
 
 #create all users
+<% if (typeof users !== 'undefined') { %>
 <% users.forEach(function(user) { %>
 <%_  if( typeof user.uid !== 'undefined' ) { _%>
         user --name=<%=user.name%> --uid=<%=user.uid%> --iscrypted --password <%=user.encryptedPassword%>
 <%_  } else { _%>
         user --name=<%=user.name%>  --iscrypted --password <%=user.encryptedPassword%>
 <%_ }}) _%>
+<% } %>
 
 # Disk Partitioning
 zerombr
 clearpart --all --drives=<%=installDisk%>
 
-<% if(installPartitions !== undefined && installPartitions.length > 0) { %>
+<% if (typeof installPartitions !== 'undefined' && installPartitions.length > 0) { %>
     <% installPartitions.forEach(function(partition) { %>
         # mountPoint and size is required
-        <% if(partition.mountPoint !== undefined && partition.size !== undefined) { %>
-            <% if(partition.fsType !== undefined) { %>
+        <% if(typeof partition.mountPoint !== 'undefined' && typeof partition.size !== 'undefined') { %>
+            <% if(typeof partition.fsType !== 'undefined') { %>
                 <% if(partition.size === 'auto') { %>
                     partition <%=partition.mountPoint%> --grow --fstype=<%=partition.fsType%>
                 <% } else { %>
@@ -80,7 +82,7 @@ sudo
 perl
 libselinux-python
 net-tools
-<% if( typeof kvm !== 'undefined' ) { %>
+<% if( typeof kvm !== 'undefined' && kvm ) { %>
     <% if (version === "6.5") { %>
         kvm
         virt-manager
@@ -111,6 +113,7 @@ export PATH
     echo <%=rootSshKey%> > /root/.ssh/authorized_keys
     chown -R root:root /root/.ssh
 <% } %>
+<% if (typeof users !== 'undefined') { %>
 <% users.forEach(function(user) { %>
     <% if (typeof user.sshKey !== 'undefined') { %>
         mkdir /home/<%=user.name%>/.ssh
@@ -118,18 +121,23 @@ export PATH
         chown -R <%=user.name%>:<%=user.name%> /home/<%=user.name%>/.ssh
     <% } %>
 <% }) %>
+<% } %>
 
 #set hostname
-echo <%=hostname%> > /etc/hostname
-echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/network
+<% if (typeof hostname !== 'undefined') { %>
+    echo <%=hostname%> > /etc/hostname
+    <% if (typeof domain !== 'undefined') { %>
+        echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/network
+    <% } %>
+<% } %>
 
 # Setup static network configuration
-<% if( undefined !== networkDevices ) { %>
+<% if( 'undefined' !== typeof networkDevices ) { %>
   <% if (networkDevices.length > 0) { %>
     <% ipv6 = 0 %>
     <% networkDevices.forEach(function(n) { %>
-      <% if( undefined != n.ipv4 ) { %>
-        <% if( undefined != n.ipv4.vlanIds ) { %>
+      <% if( 'undefined' != typeof n.ipv4 ) { %>
+        <% if( 'undefined' != typeof n.ipv4.vlanIds ) { %>
           <% n.ipv4.vlanIds.forEach(function(vid) { %>
             echo "Configuring vlan <%=vid%> on <%=n.device%>"
             sed -i '/^BOOTPROTO=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
@@ -155,8 +163,8 @@ echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/ne
           echo "GATEWAY=<%=n.ipv4.gateway%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         <% } %>
       <% } %>
-      <% if( undefined != n.ipv6 ) { %>
-        <% if( undefined != n.ipv6.vlanIds ) { %>
+      <% if( 'undefined' != typeof n.ipv6 ) { %>
+        <% if( 'undefined' != typeof n.ipv6.vlanIds ) { %>
           <% n.ipv6.vlanIds.forEach(function(vid) { %>
             echo "Configuring vlan <%=vid%> on <%=n.device%>"
             sed -i '/^BOOTPROTO=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>.<%=vid%>
@@ -203,8 +211,10 @@ echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/ne
 <% } %>
 
 # Setup DNS servers
-<% if( undefined !== dnsServers ) { %>
-  echo "search <%=domain%>" > /etc/resolv.conf
+<% if (typeof dnsServers !== 'undefined') { %>
+  <% if (typeof domain !== 'undefined') { %>
+    echo "search <%=domain%>" > /etc/resolv.conf
+  <% } %>
   <% dnsServers.forEach(function(dns) { %>
     echo "nameserver <%=dns%>" >> /etc/resolv.conf
   <% }) %>
@@ -212,13 +222,13 @@ echo -e "NETWORKING=yes\nHOSTNAME=<%=hostname%>.<%=domain%>" > /etc/sysconfig/ne
 <% } %>
 
 # Download the service to callback to RackHD after OS installation/reboot completion
-/usr/bin/wget http://<%=server%>:<%=port%>/api/common/templates/<%=rackhdCallbackScript%> -O /etc/rc.d/init.d/<%=rackhdCallbackScript%>
+/usr/bin/wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%> -O /etc/rc.d/init.d/<%=rackhdCallbackScript%>
 chmod +x /etc/rc.d/init.d/<%=rackhdCallbackScript%>
 # Enable the above service, it should auto-disable after running once
 chkconfig <%=rackhdCallbackScript%> on
 
 #signify ORA the installation completed
-/usr/bin/wget --spider http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub
+/usr/bin/wget --spider http://<%=server%>:<%=port%>/api/current/templates/renasar-ansible.pub
 
 ) 2>&1 >>/root/install-post-sh.log
 %end
