@@ -1,38 +1,47 @@
 {
-<%
-    var _ = injector.get('_');
-    var obmId = [];
-    obms.forEach( function (value, key){
-        if(value.node){
-            obmId.push(value.id);
-        }
-    });
-%>
     "autoDiscover": "<%=autoDiscover%>",
+    "catalogs": "<%=basepath %>/nodes/<%=id%>/catalogs",
     "id" : "<%=id%>",
-    "name": "<%=name%>",
     <% if (hasOwnProperty("identifiers")) { %>
     "identifiers": <%- JSON.stringify(identifiers) %>,
     <% } else  {%>
     "identifiers": [],
     <% } %>
-    <% if (hasOwnProperty("tags")) { %>
-    "tags": <%- JSON.stringify(tags) %>,
-    <% } else  {%>
-    "tags": [],
-    <% } %>
+    "name": "<%=name%>",
     <% if (obms == null) { %>    
     "obms": null,
     <% } else { %>
     "obms":[
-    <% obmId.forEach(function (ids, i, arr){ %>
+    <% obms.forEach(function (value, i, arr){ %>
     {
-    "obm":"<%=basepath %>/obms/<%=ids%>"
+        "service": "<%=value.service%>",
+        "ref":"<%=basepath %>/obms/<%=value.id%>"
     }
     <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
     <% }); %>
     ],
     <% } %>
+    "tags": "<%=basepath %>/nodes/<%=id%>/tags",
+    "pollers": "<%=basepath %>/nodes/<%=id%>/pollers",
+    "relations" :[
+    <% relations.forEach(function (value, i, arr){ %>
+    {
+        "relationType": "<%=value.relationType%>",
+        <% if (value.info == null) { %>
+        "info": null,
+        <% } else { %>
+        "info": <%- JSON.stringify(value.info) %>,
+        <% } %>
+        "targets": [
+        <% value.targets.forEach(function ( item, i, arr){ %>
+            "<%=item %>" 
+        <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+        ]
+    }
+    <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+    <% }); %>
+    ],
     <% if (hasOwnProperty("sku")) { %>
     <% if (sku === null) { %>
     "sku" : null,
@@ -40,5 +49,6 @@
     "sku" : "<%=basepath %>/skus/<%=sku%>",
     <% } %>
     <% } %>
-    "type": "<%=type%>"
+    "type": "<%=type%>",
+    "workflows": "<%=basepath %>/nodes/<%=id%>/workflows" 
 }

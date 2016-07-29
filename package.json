@@ -7,7 +7,8 @@
     "doc": "./node_modules/.bin/jsdoc lib/api/1.1/northbound -r -d docs",
     "test": "./node_modules/.bin/mocha $(find spec -name '*-spec.js') -R spec --require spec/helper.js",
     "install": "./install-web-ui.sh && ./install-swagger-ui.sh",
-    "apidoc": "./node_modules/.bin/apidoc -i lib/api/1.1/northbound -f '.*\\.js$' -o build/apidoc"
+    "apidoc": "./node_modules/.bin/apidoc -i lib/api/1.1/northbound -f '.*\\.js$' -o build/apidoc",
+    "taskdoc": "./install-task-doc.sh"
   },
   "repository": {
     "type": "git",
@@ -51,7 +52,8 @@
     "url-parse": "~1.1.1",
     "validator": "^5.2.0",
     "ws": "^0.8.0",
-    "fs-extra": "~0.30.0"
+    "fs-extra": "~0.30.0",
+    "express-urlrewrite": "~1.2.0"
   },
   "devDependencies": {
     "apidoc": "^0.12.1",

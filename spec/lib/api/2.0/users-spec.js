@@ -246,7 +246,7 @@ describe('Http.Api.Users', function () {
             });
     });
 
-    it('should 200 a user delete with auth tokens', function() {
+    it('should 204 a user delete with auth tokens', function() {
         accountService.removeUserByName.resolves({username: 'admin'});
         return helper.request().post('/login')
             .send({username: "admin", password: "admin123"})
@@ -256,8 +256,7 @@ describe('Http.Api.Users', function () {
             }).then(function(token) {
                 return helper.request().delete('/api/2.0/users/admin')
                     .set("authorization", 'JWT ' + token)
-                    .expect('Content-Type', /^application\/json/)
-                    .expect(200)
+                    .expect(204)
                     .then(function() {
                         expect(accountService.removeUserByName).to.have.been.calledWith('admin');
                     });

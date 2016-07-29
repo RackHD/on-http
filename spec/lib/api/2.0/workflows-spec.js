@@ -10,6 +10,7 @@ describe('Http.Api.Workflows.2.0', function () {
     var arpCache = {
         getCurrent: sinon.stub().resolves([])
     };
+    var views;
 
     before('start HTTP server', function () {
         var self = this;
@@ -37,6 +38,9 @@ describe('Http.Api.Workflows.2.0', function () {
             self.sandbox.stub(workflowApiService, 'getWorkflowByInstanceId').resolves();
             self.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves();
             self.sandbox.stub(workflowApiService, 'deleteTaskGraph').resolves();
+
+            views = helper.injector.get('Views');
+            self.sandbox.stub(views, 'render').resolves();
         });
     });
 
@@ -83,6 +87,7 @@ describe('Http.Api.Workflows.2.0', function () {
 
         it('should return 404 if not found ', function () {
             workflowApiService.getAllWorkflows.rejects(new Errors.NotFoundError('test'));
+            views.render.resolves('{"message": "error"}');
 
             return helper.request().get('/api/2.0/workflows')
                 .expect('Content-Type', /^application\/json/)
@@ -128,6 +133,7 @@ describe('Http.Api.Workflows.2.0', function () {
 
         it('should return a 404 if not found', function () {
             workflowApiService.getWorkflowByInstanceId.rejects(new Errors.NotFoundError('test'));
+            views.render.resolves('{"message": "error"}');
 
             return helper.request().get('/api/2.0/workflows/12345')
                 .expect('Content-Type', /^application\/json/)
@@ -146,7 +152,7 @@ describe('Http.Api.Workflows.2.0', function () {
             return helper.request().put('/api/2.0/workflows/56e6ef601c3a31638be765fc/action')
                 .set('Content-Type', 'application/json')
                 .send(action)
-                .expect(200)
+                .expect(202)
                 .expect(function() {
                     expect(workflowApiService.cancelTaskGraph).to.have.been.calledOnce;
                     expect(workflowApiService.cancelTaskGraph)
@@ -169,7 +175,7 @@ describe('Http.Api.Workflows.2.0', function () {
 
         it('should delete the Task with DELETE /workflows/id', function () {
             return helper.request().delete('/api/2.0/workflows/'+ workflow.id)
-                .expect(200)
+                .expect(204)
                 .expect(function() {
                     expect(workflowApiService.deleteTaskGraph).to.have.been.calledOnce;
                     expect(workflowApiService.deleteTaskGraph)

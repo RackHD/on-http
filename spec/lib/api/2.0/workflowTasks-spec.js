@@ -9,7 +9,8 @@ describe('Http.Api.workflowTasks.2.0', function () {
     var arpCache = { 
         getCurrent: sinon.stub().resolves([])
     };
-    
+    var views;
+
     before('start HTTP server', function () {
         var self = this;
         this.timeout(5000);
@@ -33,6 +34,9 @@ describe('Http.Api.workflowTasks.2.0', function () {
             self.sandbox.stub(workflowApiService, 'getTaskDefinitions').resolves();
             self.sandbox.stub(workflowApiService, 'getWorkflowsTasksByName').resolves();
             self.sandbox.stub(workflowApiService, 'deleteWorkflowsTasksByName').resolves();
+
+            views = helper.injector.get('Views');
+            self.sandbox.stub(views, 'render').resolves();
         });
     });
 
@@ -145,6 +149,7 @@ describe('Http.Api.workflowTasks.2.0', function () {
             var badGraphName = 'invalidName';
             var Errors = helper.injector.get('Errors');
             workflowApiService.getWorkflowsTasksByName.rejects(new Errors.NotFoundError('test'));
+            views.render.resolves('{"message": "error"}');
             return helper.request().get('/api/2.0/workflows/tasks/'+badGraphName)
             .expect('Content-Type', /^application\/json/)
             .expect(404);
@@ -171,7 +176,7 @@ describe('Http.Api.workflowTasks.2.0', function () {
 
         it('should delete the Task with DELETE /workflows/tasks/injectableName', function () {
             return helper.request().delete('/api/2.0/workflows/tasks/'+ workflowTask.injectableName)
-                .expect(200);
+                .expect(204);
         });
     });
 });

@@ -4,9 +4,9 @@
 'use strict';
 
 describe('Http.Api.Obms', function () {
-    var waterline, stub, Errors, nodeApiService;
+    var waterline, stub, Errors, nodeApiService, obmsApiService;
 
-    var goodData = [
+    var goodSendData = [
         {
             nodeId: '12345678',
             service: 'ipmi-obm-service',
@@ -18,6 +18,29 @@ describe('Http.Api.Obms', function () {
         },
         {
             nodeId: '12345678',
+            service: 'ipmi-obm-service',
+            config: {
+                host: '2.1.1.1',
+                user: 'user',
+                password: 'passw'
+            }
+        }
+    ];
+
+    var goodData = [
+        {
+            id: '12341234',
+            node: '12345678',
+            service: 'ipmi-obm-service',
+            config: {
+                host: '1.1.1.1',
+                user: 'user',
+                password: 'passw'
+            }
+        },
+        {
+            id: '56785678',
+            node: '12345678',
             service: 'ipmi-obm-service',
             config: {
                 host: '2.1.1.1',
@@ -56,6 +79,7 @@ describe('Http.Api.Obms', function () {
             waterline = helper.injector.get('Services.Waterline');
             Errors = helper.injector.get('Errors');
             nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
+            obmsApiService = helper.injector.get('Http.Services.Api.Obms');
         });
     });
 
@@ -118,7 +142,9 @@ describe('Http.Api.Obms', function () {
                 .expect(function (res) {
                     expect(stub).to.have.been.called.once;
                     expect(res.body).to.be.an.instanceOf(Array);
-                    expect(res.body).to.deep.equal(goodData);
+                    expect(res.body.service).to.equal(goodData.service);
+                    expect(res.body.node).to.equal(goodData.node);
+                    expect(res.body.config).to.deep.equal(goodData.config);
                 });
         });
 
@@ -126,7 +152,7 @@ describe('Http.Api.Obms', function () {
             stub = sinon.stub(waterline.obms, 'upsertByNode').resolves(goodData[0]);
 
             return helper.request().put('/api/2.0/obms')
-                .send(goodData[0])
+                .send(goodSendData[0])
                 .expect('Content-Type', /^application\/json/)
                 .expect(201)
                 .expect(function () {
@@ -164,14 +190,15 @@ describe('Http.Api.Obms', function () {
 
     describe('/api/2.0/obms/:id', function () {
         it('should get an OBM instance', function () {
-            stub = sinon.stub(waterline.obms, 'needByIdentifier').resolves(goodData);
+            stub = sinon.stub(waterline.obms, 'needByIdentifier').resolves(goodData[0]);
 
             return helper.request().get('/api/2.0/obms/123')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function (res) {
                     expect(stub).to.have.been.called.once;
-                    expect(res.body).to.deep.equal(goodData);
+                    expect(res.body.service).to.equal(goodData[0].service);
+                    expect(res.body.node).to.equal('/api/2.0/nodes/'+goodData[0].node);
                 });
         });
 
@@ -184,10 +211,10 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should patch an OBM instance', function () {
-            stub = sinon.stub(waterline.obms, 'updateByIdentifier').resolves(goodData[0]);
+            stub = sinon.stub(obmsApiService, 'updateObmById').resolves(goodData[0]);
 
             return helper.request().patch('/api/2.0/obms/123')
-                .send(goodData[0])
+                .send(goodSendData[0])
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function () {
@@ -196,7 +223,7 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should 400 when patching with bad data', function () {
-            stub = sinon.stub(waterline.obms, 'updateByIdentifier');
+            stub = sinon.stub(obmsApiService, 'updateObmById');
 
             return helper.request().patch('/api/2.0/obms/123')
                 .send(badData1)
@@ -209,10 +236,10 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should delete an OBM instance', function () {
-            stub = sinon.stub(waterline.obms, 'destroyByIdentifier');
+            stub = sinon.stub(obmsApiService, 'removeObmById');
 
             return helper.request().delete('/api/2.0/obms/123')
-                .expect(200)
+                .expect(204)
                 .expect(function () {
                     expect(stub).to.have.been.called.once;
                 });
@@ -225,7 +252,7 @@ describe('Http.Api.Obms', function () {
 
             return helper.request().post('/api/2.0/obms/led')
                 .send(goodLedData)
-                .expect(200)
+                .expect(201)
                 .expect(function () {
                     expect(stub).to.have.been.called.once;
                 });

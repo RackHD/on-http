@@ -26,6 +26,8 @@
       <user_password><%=rootEncryptedPassword%></user_password>
       <username>root</username>
     </user>
+
+<% if( typeof users !== 'undefined' ) { %>
 <% users.forEach(function(user) { %>
     <user>
       <encrypted config:type="boolean">true</encrypted>
@@ -37,6 +39,7 @@
       <username><%=user.name%></username>
     </user>
 <% }) %>
+<% } %>
   </users>
 
   <networking>
@@ -44,10 +47,14 @@
     <dns>
       <dhcp_hostname config:type="boolean">true</dhcp_hostname>
       <dhcp_resolv config:type="boolean">true</dhcp_resolv>
+      <% if( typeof domain !== 'undefined') { %>
       <domain><%=domain%></domain>
+      <% } %>
+      <% if( typeof hostname !== 'undefined') { %>
       <hostname><%=hostname%></hostname>
+      <% } %>
       <write_hostname config:type="boolean">true</write_hostname>
-<% if( undefined !== dnsServers ) { %>
+<% if( typeof dnsServers !== 'undefined' ) { %>
       <nameservers config:type="list">
   <% dnsServers.forEach(function(dns) { %>
         <nameserver><%=dns%></nameserver>
@@ -57,8 +64,8 @@
     </dns>
 
   <interfaces config:type="list">
-<% if( undefined !== networkDevices ) { %>
   <% ipv6 = 0 %>
+<% if( typeof networkDevices !== 'undefined') { %>
   <% networkDevices.forEach(function(n) { %>
     <% if( undefined != n.ipv4 ) { %>
       <% if( undefined != n.ipv4.vlanIds ) { %>
@@ -124,7 +131,7 @@
   <software>
     <packages config:type="list">
       <package>openssh</package>
-<% if( typeof kvm !== 'undefined' ) { %>
+<% if( typeof kvm !== 'undefined' && kvm ) { %>
   <% if (version === "11") { %>
       <package>kvm</package>
   <% } else { %>
@@ -147,20 +154,20 @@
   </services-manager>
 
   <scripts>
-    <chroot-scripts config:type="list"> 
+    <chroot-scripts config:type="list">
       <script>
         <chrooted config:type="boolean">true</chrooted>
         <interpreter>shell</interpreter>
         <!-- scripts for workflow completion -->
         <source> <![CDATA[
           #!/bin/sh
-          curl http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>
+          curl http://<%=server%>:<%=port%>/api/current/templates/<%=completionUri%>
           ]]>
         </source>
       </script>
     </chroot-scripts>
 
-    <post-scripts config:type="list"> 
+    <post-scripts config:type="list">
       <script>
         <interpreter>shell</interpreter>
         <chrooted config:type="boolean">true</chrooted>
@@ -177,13 +184,15 @@
           <% } %>
 
           # Set users ssh key
+          <% if (typeof users !== 'undefined') { %>
           <% users.forEach(function(user) { %>
             <% if (typeof user.sshKey !== 'undefined') { %>
-                mkdir /home/<%=user.name%>/.ssh 
+                mkdir /home/<%=user.name%>/.ssh
                 echo <%=user.sshKey%> > /home/<%=user.name%>/.ssh/authorized_keys
                 chown -R <%=user.name%>:users /home/<%=user.name%>/.ssh
             <% } %>
           <% }) %>
+          <% } %>
           ]]>
         </source>
       </script>

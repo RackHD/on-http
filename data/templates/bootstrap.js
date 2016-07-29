@@ -9,7 +9,7 @@ var http = require('http'),
     exec = childProcess.exec,
     server = '<%=server%>',
     port = '<%=port%>',
-    tasksPath = '/api/common/tasks/<%=identifier%>',
+    tasksPath = '/api/current/tasks/<%=identifier%>',
     MAX_BUFFER = 1000 * 1024,
     RETRIES = 5;
 

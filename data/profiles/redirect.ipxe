@@ -7,4 +7,4 @@ set macs ${macs}&macs=${net${i}/mac:hex}
 inc i
 iseq ${i} 100 || goto loop
 :done
-chain http://<%=server%>:<%=port%>/api/common/profiles?macs=${macs}
+chain http://<%=server%>:<%=port%>/api/current/profiles?macs=${macs}
