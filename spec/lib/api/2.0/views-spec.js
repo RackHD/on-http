@@ -130,7 +130,7 @@ describe('Http.Api.Views', function () {
                 .set('Content-Type', 'text/plain')
                 .send('{ "message": "hello" }')
                 .expect('Content-Type', /^application\/json/)
-                .expect(200)
+                .expect(201)
                 .expect(function(res) {
                     expect(res.body).to.deep.equal(view);
                     expect(viewsProtocol.put).to.have.been.calledOnce;
@@ -144,7 +144,7 @@ describe('Http.Api.Views', function () {
             return helper.request().put('/api/2.0/views/foo')
                 .set('Content-Type', 'application/octet-stream')
                 .send('{ "message": "hello" }')
-                .expect(200)
+                .expect(201)
                 .expect(function(res) {
                     expect(res.get('Content-Type')).to.match(/^application\/json/);
                     expect(res.body).to.deep.equal(view);

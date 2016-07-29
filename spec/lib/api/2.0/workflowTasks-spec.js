@@ -176,7 +176,7 @@ describe('Http.Api.workflowTasks.2.0', function () {
 
         it('should delete the Task with DELETE /workflows/tasks/injectableName', function () {
             return helper.request().delete('/api/2.0/workflows/tasks/'+ workflowTask.injectableName)
-                .expect(200);
+                .expect(204);
         });
     });
 });

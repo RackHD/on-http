@@ -3,7 +3,7 @@
   "@odata.type": "#RoleCollection.RoleCollection",
   "Oem": {},
   "Members@odata.navigationLink": {
-    "@odata.id": "<%= basepath %>/Roles"
+    "@odata.id": "<%= basepath %>/AccountService/Roles"
   },
   "Members@odata.count": <%= (roles.length) %>,
   "Members":[

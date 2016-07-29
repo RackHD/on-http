@@ -239,7 +239,7 @@ describe('Http.Api.Obms', function () {
             stub = sinon.stub(obmsApiService, 'removeObmById');
 
             return helper.request().delete('/api/2.0/obms/123')
-                .expect(200)
+                .expect(204)
                 .expect(function () {
                     expect(stub).to.have.been.called.once;
                 });
@@ -252,7 +252,7 @@ describe('Http.Api.Obms', function () {
 
             return helper.request().post('/api/2.0/obms/led')
                 .send(goodLedData)
-                .expect(200)
+                .expect(201)
                 .expect(function () {
                     expect(stub).to.have.been.called.once;
                 });

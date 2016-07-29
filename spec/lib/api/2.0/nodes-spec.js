@@ -81,24 +81,37 @@ describe('2.0 Http.Api.Nodes', function () {
         service: "noop-obm-service"
     }];
 
+    var relations =[{
+        relationType: "enclosedBy",
+        targets: [ "5678abcd5678abcd5678abcd" ]
+    }];
+
     var node = {
         autoDiscover: "false",
+        catalogs:'/api/2.0/nodes/1234abcd1234abcd1234abcd/catalogs',
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
-        tags: [],
+        tags: '/api/2.0/nodes/1234abcd1234abcd1234abcd/tags',
+        pollers: '/api/2.0/nodes/1234abcd1234abcd1234abcd/pollers',
+        relations:[{
+            relationType: 'enclosedBy',
+            info: null,
+            targets: [ '5678abcd5678abcd5678abcd' ]
+        }],
         obms: [{
             service: 'noop-obm-service',
             ref: '/api/2.0/obms/574dcd5794ab6e2506fd107a'
         }],
-        type: 'compute'
+        type: 'compute',
+        workflows: '/api/2.0/nodes/1234abcd1234abcd1234abcd/workflows'
     };
     var rawNode = {
         autoDiscover: "false",
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
-        tags: [],
+        relations: relations,
         obms: obm,
         type: 'compute'
     };
@@ -207,8 +220,7 @@ describe('2.0 Http.Api.Nodes', function () {
             nodeApiService.removeNode.resolves(node);
 
             return helper.request().delete('/api/2.0/nodes/1234')
-                .expect('Content-Type', /^application\/json/)
-                .expect(200, node)
+                .expect(204)
                 .expect(function () {
                     expect(nodeApiService.removeNode).to.have.been.calledOnce;
                 });
@@ -683,8 +695,7 @@ describe('2.0 Http.Api.Nodes', function () {
 
         it('should call removeTagsById', function() {
             return helper.request().delete('/api/2.0/nodes/123/tags/name')
-                .expect('Content-Type', /^application\/json/)
-                .expect(200)
+                .expect(204)
                 .expect(function() {
                     expect(nodesApi.removeTagsById).to.have.been.calledWith('123', 'name');
                 });
@@ -692,13 +703,11 @@ describe('2.0 Http.Api.Nodes', function () {
 
         it('should call masterDelTagById', function() {
             return helper.request().delete('/api/2.0/nodes/tags/name')
-                .expect('Content-Type', /^application\/json/)
-                .expect(200)
+                .expect(204)
                 .expect(function(res) {
                     expect(nodesApi.masterDelTagById).to.have.been.calledWith('name');
-                    expect(res.body).to.deep.equal
-                    (['1234abcd1234abcd1234abcd','5678efgh5678efgh5678efgh']);
                 });
         });
     });
+    
 });

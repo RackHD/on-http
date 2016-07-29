@@ -152,7 +152,7 @@ describe('Http.Api.Workflows.2.0', function () {
             return helper.request().put('/api/2.0/workflows/56e6ef601c3a31638be765fc/action')
                 .set('Content-Type', 'application/json')
                 .send(action)
-                .expect(200)
+                .expect(202)
                 .expect(function() {
                     expect(workflowApiService.cancelTaskGraph).to.have.been.calledOnce;
                     expect(workflowApiService.cancelTaskGraph)
@@ -175,7 +175,7 @@ describe('Http.Api.Workflows.2.0', function () {
 
         it('should delete the Task with DELETE /workflows/id', function () {
             return helper.request().delete('/api/2.0/workflows/'+ workflow.id)
-                .expect(200)
+                .expect(204)
                 .expect(function() {
                     expect(workflowApiService.deleteTaskGraph).to.have.been.calledOnce;
                     expect(workflowApiService.deleteTaskGraph)
