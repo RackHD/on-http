@@ -2088,6 +2088,7 @@ paths:
       operationId: nodesGetCatalogById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: catalogs.2.0.json
       summary: |
         Get the catalogs for a node
       description: |
@@ -2876,6 +2877,7 @@ paths:
       operationId: catalogsGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: catalogs.2.0.json
       summary: |
         Get all catalogs
       description: |
@@ -2904,6 +2906,7 @@ paths:
       operationId: catalogsIdGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: catalogs.2.0.json
       summary: |
         Get a catalog
       description: |
