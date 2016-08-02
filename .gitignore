@@ -53,7 +53,7 @@ build/
 
 # HWIMO-BUILD artifacts
 on-http_*.dsc
-on-http_*.tar.gz
+on-http_*.tar.[gx]z
 on-http_*.build
 on-http_*.changes
 on-http_*.deb
