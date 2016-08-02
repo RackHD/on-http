@@ -328,14 +328,17 @@ describe("SKU Pack Service", function() {
     describe('should delete sku by ID', function(){
         before(function(){
             sinon.stub(skuService, 'regenerateSkus');
+            sinon.stub(skuService, 'deletePack');
         });
         after(function(){
             skuService.regenerateSkus.restore();
+            skuService.deletePack.restore();
         });
         it('should delete sku by ID', function(){
             var emptySku = [];
             waterline.skus.destroyByIdentifier.resolves(emptySku);
             skuService.regenerateSkus.resolves();
+            skuService.deletePack.resolves();
             return skuService.deleteSkuById().then(function(sku){
                 expect(sku).to.deep.equal(emptySku);
                 expect(waterline.skus.destroyByIdentifier).to.have.been.called;
