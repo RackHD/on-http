@@ -2423,6 +2423,12 @@ paths:
         Get a list of nodes
       description: |
         Get a list of all currently stored nodes.
+      parameters:
+        - name: type
+          in: query
+          description: node type
+          required: false
+          type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -3292,6 +3298,57 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /schemas/tasks/{identifier}:
+    x-swagger-router-controller: schemas2
+    get:
+      operationId: taskSchemasIdGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Get a task schema
+      description: |
+        Get the specified task schema.
+      parameters:
+        - name: identifier
+          in: path
+          description: The identifier of the task schema
+          required: true
+          type: string
+        - name: resolveRef
+          in: query
+          description: The reference resolve flag
+          required: false
+          type: boolean
+      tags: [ "/api/2.0" ]
+      responses:
+        "200":
+          description: Successfully retrieved the task schema
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /schemas/tasks:
+    x-swagger-router-controller: schemas2
+    get:
+      operationId: taskSchemasGet
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Get all task schemas
+      description: |
+        Get a list of all task schemas currently stored in the system.
+      tags: [ "/api/2.0" ]
+      responses:
+        "200":
+          description: Successfully retrieved the list of task schemas
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /schemas/{identifier}:
     x-swagger-router-controller: schemas2
     get:
