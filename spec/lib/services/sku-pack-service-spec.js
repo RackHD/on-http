@@ -468,7 +468,8 @@ describe("SKU Pack Service", function() {
                 workflowApiService.defineTaskGraph.should.have.been.calledWith({
                     injectableName: 'Graph.ABC::a'
                 });
-                Env.set.should.have.been.calledWith('config', _.merge({}, skuAData.skuConfig, { Graph: { ABC : 'Graph.ABC::a'}}), 'a');
+                Env.set.should.have.been.calledWith('config', _.merge({}, skuAData.skuConfig,
+                                                   {Graph: { ABC : 'Graph.ABC::a'}}), 'a');
             });
         });
 
@@ -538,7 +539,8 @@ describe("SKU Pack Service", function() {
             httpTemplateRoot: 'templates',
         };
         fs.readdirAsync.withArgs('./valid').resolves(['static']);
-        return skuService.validatePack(JSON.stringify(data), './valid').should.be.rejectedWith(Errors.BadRequestError);
+        return skuService.validatePack(JSON.stringify(data), './valid')
+            .should.be.rejectedWith(Errors.BadRequestError);
     });
 
     it('should install a pack', function() {
@@ -575,10 +577,6 @@ describe("SKU Pack Service", function() {
     });
 
     it('should delete a pack', function() {
-        var data = {
-            httpStaticRoot: 'static',
-            httpTemplateRoot: 'templates'
-        };
         fs.readdirAsync.withArgs('./root/skuid/templates').resolves([]);
         return skuService.start('./root').then(function() {
             skuService.skuHandlers.skuid = {};

@@ -322,7 +322,7 @@ describe('Services.Http.Swagger', function() {
                 body: mockData
             };
             var res = {};
-            var mockError = new Error('deserializer error');
+            mockError = new Error('deserializer error');
 
             expect(deserializer).to.be.a('function');
             MockSerializable.prototype.validate.rejects(mockError);
@@ -342,7 +342,7 @@ describe('Services.Http.Swagger', function() {
                 body: mockData
             };
             var res = {};
-            var mockError = new Error('deserializer error');
+            mockError = new Error('deserializer error');
 
             expect(deserializer).to.be.a('function');
             MockSerializable.prototype.validate.resolves(mockData);
@@ -531,4 +531,4 @@ describe('Services.Http.Swagger', function() {
             });
         });
     });
-});;
+});

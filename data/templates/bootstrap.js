@@ -11,7 +11,7 @@ var http = require('http'),
     port = '<%=port%>',
     tasksPath = '/api/current/tasks/<%=identifier%>',
     MAX_BUFFER = 1000 * 1024,
-    MAX_RETRY_TIMEOUT = 60 * 1000
+    MAX_RETRY_TIMEOUT = 60 * 1000;
 /**
  * Synchronous each loop from caolan/async.
  * @private
