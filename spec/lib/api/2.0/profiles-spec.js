@@ -233,20 +233,22 @@ describe('Http.Api.Profiles', function () {
                 .expect(500);
         });
 
-        it("should send down error.ipxe for a known node with no active graph", function() {
+        it("should send a 400 for a known node with no active graph", function() {
             profileApiService.createNodeAndRunDiscovery.resolves({});
             profileApiService.getNode.resolves({});
             workflowApiService.findActiveGraphForTarget.resolves(null);
 
+            var errorMsg = "Error: Unable to locate active workflow or there are no bootSettings";
+
             return helper.request().get('/api/2.0/profiles')
                 .query({ macs: '00:00:de:ad:be:ef' })
-                .expect(200)
-                .expect(function() {
-                    expect(profiles.get).to.have.been.calledWith('error.ipxe');
+                .expect(400)
+                .then(function(resp) {
+                    expect(resp.body.message).to.equal(errorMsg);
                 });
         });
 
-        it("should send down error.ipxe on failing to retrieve workflow properties", function() {
+        it("should send a 503 on failing to retrieve workflow properties", function() {
             profileApiService.createNodeAndRunDiscovery.resolves({});
             profileApiService.getNode.resolves({});
             workflowApiService.findActiveGraphForTarget.resolves({});
@@ -255,9 +257,9 @@ describe('Http.Api.Profiles', function () {
 
             return helper.request().get('/api/2.0/profiles')
                 .query({ macs: '00:00:de:ad:be:ef' })
-                .expect(200)
-                .expect(function() {
-                    expect(profiles.get).to.have.been.calledWith('error.ipxe');
+                .expect(503)
+                .then(function(resp) {
+                    expect(resp.body.message).to.equal('Error: Unable to retrieve workflow properties');
                 });
         });
 
@@ -323,11 +325,16 @@ describe('Http.Api.Profiles', function () {
             profileApiService.getNode.resolves({ type: 'switch' });
             workflowApiService.findActiveGraphForTarget.resolves(null);
 
+            var errorMsg = "Error: Unable to locate active workflow or there are no bootSettings";
+
             return helper.request().get('/api/2.0/profiles/switch/testswitchvendor')
-                .expect(400, /Unable to locate active workflow/);
+                .expect( 400)
+                .then(function(resp) {
+                    expect(resp.body.message).to.equal(errorMsg);
+                });
         });
 
-        it("should return a 500 on failing to retrieve workflow properties", function() {
+        it("should return a 503 on failing to retrieve workflow properties", function() {
             waterline.lookups.findOneByTerm.resolves({macAddress: '11:11:11:11:11:11'});
             profileApiService.getNode.resolves({ type: 'switch' });
             workflowApiService.findActiveGraphForTarget.resolves({});
@@ -335,7 +342,10 @@ describe('Http.Api.Profiles', function () {
             taskProtocol.requestProperties.rejects(new Error('Test workflow properties error'));
 
             return helper.request().get('/api/2.0/profiles/switch/testswitchvendor')
-                .expect(500, /Unable.*properties/);
+                .expect(503)
+                .then(function(resp) {
+                    expect(resp.body.message).to.equal('Error: Unable to retrieve workflow properties');
+                });
         });
 
         it("should return a task specific profile for a switch with an active task", function() {

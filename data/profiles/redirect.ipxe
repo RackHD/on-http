@@ -7,4 +7,31 @@ set macs ${macs}&macs=${net${i}/mac:hex}
 inc i
 iseq ${i} 100 || goto loop
 :done
-chain http://<%=server%>:<%=port%>/api/current/profiles?macs=${macs}
+
+# Profile request retries
+set getProfileAttempt:int8 0
+set getProfileAttemptMax:int8 5
+set getProfileRetryDelay:int8 3
+
+goto getProfile
+
+:getProfileRetry
+inc getProfileAttempt
+iseq ${getProfileAttempt} ${getProfileAttemptMax} || goto getProfileRetryContinue
+
+echo Exceeded max retries chainloading boot profile
+echo Exiting in ${rebootInterval} seconds...
+# rebootInterval defined in boilerplate.ipxe
+sleep ${rebootInterval}
+goto complete
+
+:getProfileRetryContinue
+echo Failed to download profile, retrying in ${getProfileRetryDelay} seconds
+sleep ${getProfileRetryDelay}
+
+:getProfile
+echo Chainloading next profile
+chain http://<%=server%>:<%=port%>/api/current/profiles?macs=${macs} || goto getProfileRetry
+
+:complete
+exit
