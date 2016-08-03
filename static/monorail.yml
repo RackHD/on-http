@@ -650,34 +650,12 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /workflows/library:
-    get:
-      summary: |
-        List all workflows available to run
-      description: |
-        List all workflows available to run
-      tags:
-        - workflow
-        - get
-      responses:
-        200:
-          description: |
-            List all workflows available to run
-          schema:
-            type: array
-            items:
-              type: object
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-
   /workflows/library/{injectableName}:
     get:
       summary: |
-        List all workflows available to run
+        Get a workflow definition
       description: |
-        List all workflows available to run
+        Get a workflow definition. To list all available workflows, use the '*' as a wildcard for the name.
       parameters:
         - name: injectableName
           in: path
