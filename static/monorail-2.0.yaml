@@ -1479,6 +1479,7 @@ paths:
     x-swagger-router-controller: workflowTasks
     get:
       operationId: workflowsGetAllTasks
+      x-view: workflowTasks.2.0.json
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -1532,6 +1533,7 @@ paths:
     x-swagger-router-controller: workflowTasks
     get:
       operationId: workflowsGetTasksByName
+      x-view: workflowTasks.2.0.json
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
