@@ -1,0 +1,22 @@
+{
+    <% if (hasOwnProperty("friendlyName")) { %>
+    "friendlyName": "<%=friendlyName%>",
+    <% }%>
+    <% if (hasOwnProperty("injectableName")) { %>
+    "injectableName": "<%=injectableName%>",
+    <% }%>
+    <% if (hasOwnProperty("implementsTask")) { %>
+    "implementsTask" : "<%=implementsTask%>",
+    <% }%>
+    <% if (hasOwnProperty("options")) { %>
+    "options": <%- JSON.stringify(options) %>,
+    <% } else  {%>
+    "options": {},
+    <% } %>
+    <% if (hasOwnProperty("properties")) { %>
+    "properties": <%- JSON.stringify(properties) %>
+    <% } else  {%>
+    "properties": {}
+    <% } %>
+
+}
