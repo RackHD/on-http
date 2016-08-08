@@ -2426,12 +2426,6 @@ paths:
         Get a list of nodes
       description: |
         Get a list of all currently stored nodes.
-      parameters:
-        - name: type
-          in: query
-          description: node type
-          required: false
-          type: string
       tags: [ "/api/2.0" ]
       responses:
         200:
