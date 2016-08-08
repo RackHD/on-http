@@ -352,10 +352,11 @@ describe('2.0 Http.Api.Nodes', function () {
     describe('GET /nodes/:identifier/catalogs', function() {
         it('should get a list of catalogs', function () {
             var node = {
-                id: '123',
+
+                id: '1234',
                 catalogs: [
-                    {
-                        node: '123',
+                    {   id: '123',
+                        node: '1234',
                         source: 'dummysource',
                         data: {
                             foo: 'bar'
@@ -367,9 +368,19 @@ describe('2.0 Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves(node);
             waterline.catalogs.find.resolves(node.catalogs);
 
-            return helper.request().get('/api/2.0/nodes/123/catalogs')
+            return helper.request().get('/api/2.0/nodes/1234/catalogs')
                 .expect('Content-Type', /^application\/json/)
-                .expect(200, node.catalogs);
+                .expect(200)
+                .expect(function(res){
+                    expect(res.body[0])
+                        .to.have.property('node').that.equals('/api/2.0/nodes/1234');
+                    expect(res.body[0])
+                        .to.have.property('id').that.equals('123');
+                    expect(res.body[0])
+                        .to.have.property('source').that.equals('dummysource');
+                    expect(res.body[0].data)
+                        .to.deep.equal( {foo:'bar'} );
+                });
         });
 
         it('should return a 404 if the node was not found', function () {

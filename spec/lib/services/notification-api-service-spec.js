@@ -13,7 +13,7 @@ describe('Http.Api.Notification', function () {
 
      var activeTask = {
          taskId: notificationMessage.taskId,
-     }
+     };
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -52,7 +52,7 @@ describe('Http.Api.Notification', function () {
                 + notificationMessage.data)
             .set('Content-Type', 'application/json')
             .expect('Content-Type', /^application\/json/)
-            .expect(201, notificationMessage)
+            .expect(201, notificationMessage);
         });
 
         it('should fail with no taskId in query parameter', function () {
@@ -63,7 +63,7 @@ describe('Http.Api.Notification', function () {
                 + notificationMessage.data)
             .set('Content-Type', 'application/json')
             .expect('Content-Type', /^application\/json/)
-            .expect(400, { message: 'Missing task ID in query or body' })
+            .expect(400, { message: 'Missing task ID in query or body' });
         });
 
         it('should fail with no data in query parameter', function () {
@@ -73,7 +73,7 @@ describe('Http.Api.Notification', function () {
                 + notificationMessage.taskId)
             .set('Content-Type', 'application/json')
             .expect('Content-Type', /^application\/json/)
-            .expect(400, { message: 'Missing notification data in query or body' })
+            .expect(400, { message: 'Missing notification data in query or body' });
         });
 
         it('should fail with invalid task ID in query parameter', function () {
@@ -85,7 +85,7 @@ describe('Http.Api.Notification', function () {
                 + notificationMessage.data)
             .set('Content-Type', 'application/json')
             .expect('Content-Type', /^application\/json/)
-            .expect(400, { message: 'Invalid taskId, uuid expected' })
+            .expect(400, { message: 'Invalid taskId, uuid expected' });
         });
 
         it('should pass with taskId in query body', function () {
@@ -93,7 +93,7 @@ describe('Http.Api.Notification', function () {
             .post('/api/current/notification?data=' + notificationMessage.data)
             .send({taskId: notificationMessage.taskId})
             .expect('Content-Type', /^application\/json/)
-            .expect(201, notificationMessage)
+            .expect(201, notificationMessage);
         });
 
         it('should pass with data in query body', function () {
@@ -101,19 +101,19 @@ describe('Http.Api.Notification', function () {
             .post('/api/current/notification?taskId=' + notificationMessage.taskId)
             .send({data: notificationMessage.data})
             .expect('Content-Type', /^application\/json/)
-            .expect(201, notificationMessage)
+            .expect(201, notificationMessage);
         });
 
         it('should pass with data as an object in query body', function () {
             var mockDataObj = {
                 taskId: notificationMessage.taskId,
                 data: { type: "I_am_the_type", data: "I_am_the_data"} 
-            }
+            };
             return helper.request()
             .post('/api/current/notification?taskId=' + notificationMessage.taskId)
             .send(mockDataObj)
             .expect('Content-Type', /^application\/json/)
-            .expect(201, mockDataObj)
+            .expect(201, mockDataObj);
         });
 
     });
