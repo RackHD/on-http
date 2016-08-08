@@ -8,6 +8,9 @@
     <% if (hasOwnProperty("implementsTask")) { %>
     "implementsTask" : "<%=implementsTask%>",
     <% }%>
+    <% if (hasOwnProperty("schemaRef")) { %>
+    "schemaRef" : "<%=schemaRef%>",
+    <% }%>
     <% if (hasOwnProperty("options")) { %>
     "options": <%- JSON.stringify(options) %>,
     <% } else  {%>
