@@ -1007,7 +1007,7 @@ paths:
         - workflow
         - post
       responses:
-        200:
+        201:
           description: |
             the workflow that was created
           schema:
