@@ -89,6 +89,7 @@ paths:
           in: path
           required: true
           type: string
+          x-param-handler: skuChassis
       responses:
         200:
           description: Success
@@ -119,6 +120,7 @@ paths:
           in: path
           required: true
           type: string
+          x-param-handler: skuChassis
       responses:
         200:
           description: Success
@@ -149,6 +151,7 @@ paths:
           in: path
           required: true
           type: string
+          x-param-handler: skuChassis
       responses:
         200:
           description: Success
