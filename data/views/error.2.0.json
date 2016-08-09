@@ -1,5 +1,12 @@
 {
     "message": "<%=message%>",
-    "status": "<%=status%>",
-    "stack": "<%=stack%>"
+    "status": "<%=status%>"
+    <% if (hasOwnProperty("stack")) { %>
+    ,"stack": [
+    <% stack.forEach(function ( item, i, arr){ %>
+    "<%=item %>"
+    <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+    <% }); %>
+    ]
+    <% } %>
 }
