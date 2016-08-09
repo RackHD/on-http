@@ -41,7 +41,7 @@ postLookup () {
   BODY="{"
   BODY=$BODY"\"macAddress\": \"$mac\","
   BODY=$BODY"\"ipAddress\": \"$2\","
-  BODY=$BODY"\"node\": \"<%=task.nodeId%>\""
+  BODY=$BODY"\"node\": \"<%=nodeId%>\""
   BODY=$BODY"}"
   BODYLEN=$(echo -n ${BODY} | wc -c )
   echo ${BODY} >> /vmfs/volumes/datastore1/firstboot.log
