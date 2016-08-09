@@ -11,16 +11,18 @@ describe('Http.Api.Notification', function () {
     };
 
     before('start HTTP server', function () {
+        helper.setupInjector([
+             helper.require("/lib/services/notification-api-service.js"),
+
+        ]);
         this.timeout(5000);
-        return helper.startServer([]);
-    });
+        return helper.startServer([]).then(function () {
+            notificationApiService = helper.injector.get('Http.Services.Api.Notification');
+            sinon.stub(notificationApiService, 'postNotification').resolves(notificationMessage);
+        });
 
-    beforeEach('set up mocks', function () {
-        notificationApiService = helper.injector.get('Http.Services.Api.Notification');
-        sinon.stub(notificationApiService, 'postNotification').resolves(notificationMessage);
     });
-
-    afterEach('teardown mocks', function () {
+    after('stop HTTP server', function () {
         function resetMocks(obj) {
             _(obj).methods().forEach(function (method) {
                 if (typeof obj[method].restore === 'function') {
@@ -29,9 +31,6 @@ describe('Http.Api.Notification', function () {
             }).value();
         }
         resetMocks(notificationApiService);
-    });
-
-    after('stop HTTP server', function () {
         return helper.stopServer();
     });
 
@@ -40,7 +39,7 @@ describe('Http.Api.Notification', function () {
             return helper.request()
             .post(
                 '/api/2.0/notification?taskId='
-                + notificationMessage.taskId 
+                + notificationMessage.taskId
                 + '&data='
                 + notificationMessage.data)
             .set('Content-Type', 'application/json')
@@ -51,5 +50,29 @@ describe('Http.Api.Notification', function () {
                 expect(notificationApiService.postNotification).to.have.been.calledWith(notificationMessage);
             });
         });
+        it('should pass with taskId in query body', function () {
+            return helper.request()
+            .post('/api/2.0/notification?data=' + notificationMessage.data)
+            .send({ taskId: notificationMessage.taskId })
+            .expect('Content-Type', /^application\/json/)
+            .expect(201, notificationMessage)
+        });
+
+        it('should pass with data in query body', function () {
+            return helper.request()
+            .post('/api/2.0/notification?taskId=' + notificationMessage.taskId)
+            .send({ data: notificationMessage.data })
+            .expect('Content-Type', /^application\/json/)
+            .expect(201, notificationMessage)
+        });
+
+        it('should pass with data as an object in query body', function () {
+            return helper.request()
+            .post('/api/2.0/notification?taskId=' + notificationMessage.taskId)
+            .send(notificationMessage)
+            .expect('Content-Type', /^application\/json/)
+            .expect(201, notificationMessage)
+        });
+
     });
 });

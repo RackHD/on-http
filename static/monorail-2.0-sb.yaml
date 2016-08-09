@@ -131,13 +131,13 @@ paths:
           in: query
           description: |
             task instance identifier
-          required: true
+          required: false
           type: string
         - name: data
           in: query
           description: |
             notification data
-          required: true
+          required: false
           type: string
       tags: [ "/api/2.0" ]
       responses:
