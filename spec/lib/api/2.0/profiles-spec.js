@@ -233,19 +233,14 @@ describe('Http.Api.Profiles', function () {
                 .expect(500);
         });
 
-        it("should send a 400 for a known node with no active graph", function() {
+        it("should send a 200 for a known node with no active graph", function() {
             profileApiService.createNodeAndRunDiscovery.resolves({});
             profileApiService.getNode.resolves({});
             workflowApiService.findActiveGraphForTarget.resolves(null);
 
-            var errorMsg = "Error: Unable to locate active workflow or there are no bootSettings";
-
             return helper.request().get('/api/2.0/profiles')
                 .query({ macs: '00:00:de:ad:be:ef' })
-                .expect(400)
-                .then(function(resp) {
-                    expect(resp.body.message).to.equal(errorMsg);
-                });
+                .expect(200);
         });
 
         it("should send a 503 on failing to retrieve workflow properties", function() {
@@ -325,13 +320,8 @@ describe('Http.Api.Profiles', function () {
             profileApiService.getNode.resolves({ type: 'switch' });
             workflowApiService.findActiveGraphForTarget.resolves(null);
 
-            var errorMsg = "Error: Unable to locate active workflow or there are no bootSettings";
-
             return helper.request().get('/api/2.0/profiles/switch/testswitchvendor')
-                .expect( 400)
-                .then(function(resp) {
-                    expect(resp.body.message).to.equal(errorMsg);
-                });
+                .expect(200);
         });
 
         it("should return a 503 on failing to retrieve workflow properties", function() {

@@ -238,7 +238,7 @@ describe("Http.Services.Api.Profiles", function () {
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
             this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
 
-            var promise = profileApiService.renderProfileFromTaskOrNode(node);
+            var promise = profileApiService.getProfileFromTaskOrNode(node);
 
             return expect(promise).to.be.rejectedWith('Unable to retrieve valid node bootSettings')
             .then(function() {
@@ -261,7 +261,7 @@ describe("Http.Services.Api.Profiles", function () {
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
             this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
 
-            return profileApiService.renderProfileFromTaskOrNode(node)
+            return profileApiService.getProfileFromTaskOrNode(node)
             .then(function(result) {
                 expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
                 expect(taskProtocol.requestProperties).to.not.be.called;
@@ -269,19 +269,23 @@ describe("Http.Services.Api.Profiles", function () {
             });
         });
 
-        it("render profile fail due to no active graph or there are no bootSettings", function() {
+        it("render profile pass when no active graph and bootSettings", function() {
             var node = { id: 'test', type: 'compute' };
 
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
             this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
 
-            var promise = profileApiService.renderProfileFromTaskOrNode(node);
-            return expect(promise)
-            .to.be.rejectedWith('Unable to locate active workflow or there are no bootSettings')
-            .then(function() {
+            return profileApiService.getProfileFromTaskOrNode(node)
+            .then(function(result) {
                 expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
                 expect(taskProtocol.requestProperties).to.not.be.called;
-                expect(promise.reason().status).to.equal(400);
+                expect(result).to.deep.equal({
+                    context: undefined,
+                    profile: 'ipxe-info.ipxe',
+                    options: { message:
+                        'No active workflow and bootSettings, continue to boot' }
+                });
+
             });
         });
 
@@ -293,7 +297,7 @@ describe("Http.Services.Api.Profiles", function () {
             this.sandbox.stub(taskProtocol, 'requestProfile').resolves('profile');
             this.sandbox.stub(taskProtocol, 'requestProperties').resolves({});
 
-            return profileApiService.renderProfileFromTaskOrNode(node)
+            return profileApiService.getProfileFromTaskOrNode(node)
             .then(function(result) {
                 expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
                 expect(taskProtocol.requestProfile).to.have.been.calledOnce;
@@ -313,7 +317,7 @@ describe("Http.Services.Api.Profiles", function () {
             this.sandbox.stub(taskProtocol, 'requestProfile').resolves('profile');
             this.sandbox.stub(taskProtocol, 'requestProperties').rejects(new Error(''));
 
-            var promise = profileApiService.renderProfileFromTaskOrNode(node);
+            var promise = profileApiService.getProfileFromTaskOrNode(node);
 
             return expect(promise).to.be.rejectedWith('Unable to retrieve workflow properties')
             .then(function() {
