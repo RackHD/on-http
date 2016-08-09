@@ -675,6 +675,7 @@ paths:
     x-swagger-router-controller: skus
     get:
       operationId: skusGet
+      x-view: sku-2.0.json
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
@@ -770,6 +771,7 @@ paths:
     x-swagger-router-controller: skus
     get:
       operationId: skusIdGet
+      x-view: sku-2.0.json
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
