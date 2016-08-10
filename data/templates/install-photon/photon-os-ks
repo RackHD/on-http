@@ -73,6 +73,6 @@
                     "sed -i 's/PermitRootLogin no/PermitRootLogin yes/g' /etc/ssh/sshd_config",
 
                     "# Signify ORA the installation completed",
-                    "curl -X POST -H 'Content-Type:application/json' 'http://<%=server%>:<%=port%>/api/1.1/notification?nodeId=<%=nodeId%>'"
+                    "curl -X POST -H 'Content-Type:application/json' 'http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>'"
                    ]
 }

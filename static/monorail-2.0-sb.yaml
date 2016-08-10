@@ -127,18 +127,19 @@ paths:
       description: |
         post a notification
       parameters:
-        - name: taskId
+        - name: nodeId
           in: query
+          description: |
+            Node instance identifier
+          required: false
+          type: string
+        - name: notification_body
+          in: body
           description: |
             task instance identifier
           required: false
-          type: string
-        - name: data
-          in: query
-          description: |
-            notification data
-          required: false
-          type: string
+          schema:
+            $ref: '#/definitions/notification_obj'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -155,7 +156,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
   /swagger:
     x-swagger-pipe: swagger_raw
 
@@ -182,6 +182,11 @@ definitions:
       message:
         type: string
       fields:
+        type: string
+
+  notification_obj:
+    properties:
+      nodeId:
         type: string
 
   generic_obj:
