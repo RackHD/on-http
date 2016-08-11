@@ -2548,7 +2548,7 @@ paths:
       operationId: lookupsPost
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
-      x-swagger-schema: Lookups.2.0.json#/definitions/LookupPost
+      x-swagger-schema: lookups.2.0.json#/definitions/LookupPost
       summary: |
         Post a lookup
       description: |
@@ -2629,7 +2629,7 @@ paths:
       operationId: lookupsPatchById
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
-      x-swagger-schema: Lookups.2.0.json#/definitions/LookupBase
+      x-swagger-schema: lookups.2.0.json#/definitions/LookupBase
       summary: |
         Patch a lookup
       description: |

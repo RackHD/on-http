@@ -85,7 +85,7 @@ describe('Http.Api.Skus.2.0', function() {
         sku: '0987'
     };
 
-    var input = {
+    var record = {
         name: 'my test sku',
         rules: [
             {
@@ -116,48 +116,56 @@ describe('Http.Api.Skus.2.0', function() {
         var sku;
 
         it('should create a sku', function(){
-            skuApiService.postSku.resolves(input);
+            skuApiService.postSku.resolves(_.assign({}, record));
             return helper.request().post('/api/2.0/skus')
-                .send(input)
+                .send(_.omit(record, 'id'))
                 .expect('Content-Type', /^application\/json/)
                 .expect(201)
                 .then(function (req) {
                     sku = req.body;
-                    expect(sku).to.have.property('name').that.equals(input.name);
-                    expect(sku).to.have.property('rules').that.deep.equals(input.rules);
+                    expect(sku).to.have.property('name').that.equals(record.name);
+                    expect(sku).to.have.property('rules').that.deep.equals(record.rules);
                     expect(sku).to.have.property('discoveryGraphName')
-                        .that.equals(input.discoveryGraphName);
+                        .that.equals(record.discoveryGraphName);
                     expect(sku).to.have.property('discoveryGraphOptions')
-                        .that.deep.equals(input.discoveryGraphOptions);
+                        .that.deep.equals(record.discoveryGraphOptions);
                 });
         });
 
         it('should contain the new sku in GET /skus', function () {
-            skuApiService.getSkus.resolves([input]);
+            skuApiService.getSkus.resolves([_.assign({}, record)]);
             return helper.request().get('/api/2.0/skus')
                 .expect('Content-Type', /^application\/json/)
-                .expect(200, [sku])
-                .then(function () {
+                .expect(200)
+                .then(function (res) {
                     expect(skuApiService.getSkus).to.have.been.called;
+                    var checkSku = res.body;
+                    expect(res.body).to.have.lengthOf(1);
+                    expect(res.body[0]).to.have.property('name').that.equals(record.name);
+                    expect(res.body[0]).to.have.property('rules').that.deep.equals(record.rules);
+                    expect(res.body[0]).to.have.property('discoveryGraphName')
+                        .that.equals(record.discoveryGraphName);
+                    expect(res.body[0]).to.have.property('discoveryGraphOptions')
+                        .that.deep.equals(record.discoveryGraphOptions);
             });
         });
 
         it('should return the same sku from GET /skus/:id', function () {
-            skuApiService.getSkusById.resolves(input);
+            skuApiService.getSkusById.resolves(_.assign({}, record));
             return helper.request().get('/api/2.0/skus/' + sku.id)
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .then(function (res) {
                     expect(skuApiService.getSkusById).to.have.been.called;
                     var checkSku = res.body;
-                    expect(checkSku).to.have.property('name').that.equals(input.name);
+                    expect(checkSku).to.have.property('name').that.equals(record.name);
                 });
         });
 
         it('should 201 reputting the same sku', function() {
-            skuApiService.upsertSku.resolves(input);
+            skuApiService.upsertSku.resolves(_.assign({}, record));
             return helper.request().put('/api/2.0/skus')
-                .send(input)
+                .send(_.omit(record, 'id'))
                 .expect(201)
                 .then(function () {
                     expect(skuApiService.upsertSku).to.have.been.called;
@@ -191,7 +199,7 @@ describe('Http.Api.Skus.2.0', function() {
                 sku.name = 'updated sku name';
                 skuApiService.patchSku.resolves(updatedInput);
                 return helper.request().patch('/api/2.0/skus/0987')
-                    .send(input)
+                    .send(_.omit(record, 'id'))
                     .expect('Content-Type', /^application\/json/)
                     .expect(200)
                     .then(function (res) {

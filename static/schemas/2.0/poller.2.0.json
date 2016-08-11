@@ -22,7 +22,8 @@
                     "description": "Poller configuration object",
                     "type": "object"
                 }
-            }
+            },
+            "additionalProperties": false
         },
         "Poller": {
             "allOf": [

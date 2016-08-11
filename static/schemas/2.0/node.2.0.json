@@ -5,6 +5,10 @@
             "description": "A node discovered by RackHD",
             "type": "object",
             "properties": {
+                "autoDiscover": {
+                    "description": "Enable automatic discovery",
+                    "type": "string"
+                },
                 "name": {
                     "description": "Name of the node",
                     "type": "string"
@@ -29,8 +33,16 @@
                 "sshSettings": {
                     "description": "SSH settings",
                     "type": "object"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "uniqueItems": true
+                    }
                 }
-            }
+            },
+            "additionalProperties": false
         },
         "Node": {
             "allOf": [
