@@ -193,7 +193,7 @@ describe('Http.Api.Profiles', function () {
 
         it("should call getNode with a compute node type", function() {
             return helper.request().get('/api/2.0/profiles')
-                .query({ macs: [ '00:01:02:03:04:05' ] })
+                .query({ macs: [ '00:01:02:03:04:05' ], ips: [ '172.31.128.5' ] })
                 .expect(200)
                 .expect(function() {
                     expect(profileApiService.getNode).to.have.been.calledWith(
@@ -218,7 +218,7 @@ describe('Http.Api.Profiles', function () {
             profileApiService.createNodeAndRunDiscovery.restore();
 
             return helper.request().get('/api/2.0/profiles')
-                .query({ macs: '00:00:de:ad:be:ef' })
+                .query({ macs: '00:00:de:ad:be:ef', ips: '172.31.128.5' })
                 .expect(200)
                 .expect(function() {
                     expect(profiles.get).to.have.been.calledWith('redirect.ipxe');
@@ -229,7 +229,7 @@ describe('Http.Api.Profiles', function () {
             profileApiService.getNode.rejects(new Error('asdf'));
 
             return helper.request().get('/api/2.0/profiles')
-                .query({ macs: '00:00:de:ad:be:ef' })
+                .query({ macs: '00:00:de:ad:be:ef', ips: '172.31.128.5' })
                 .expect(500);
         });
 
@@ -239,7 +239,7 @@ describe('Http.Api.Profiles', function () {
             workflowApiService.findActiveGraphForTarget.resolves(null);
 
             return helper.request().get('/api/2.0/profiles')
-                .query({ macs: '00:00:de:ad:be:ef' })
+                .query({ macs: '00:00:de:ad:be:ef', ips: '172.31.128.5' })
                 .expect(200);
         });
 
@@ -251,7 +251,7 @@ describe('Http.Api.Profiles', function () {
             taskProtocol.requestProperties.rejects(new Error('Test workflow properties error'));
 
             return helper.request().get('/api/2.0/profiles')
-                .query({ macs: '00:00:de:ad:be:ef' })
+                .query({ macs: '00:00:de:ad:be:ef', ips: '172.31.128.5' })
                 .expect(503)
                 .then(function(resp) {
                     expect(resp.body.message).to.equal('Error: Unable to retrieve workflow properties');
@@ -266,7 +266,7 @@ describe('Http.Api.Profiles', function () {
             taskProtocol.requestProperties.resolves({});
 
             return helper.request().get('/api/2.0/profiles')
-                .query({ macs: '00:00:de:ad:be:ef' })
+                .query({ macs: '00:00:de:ad:be:ef', ips: '172.31.128.5' })
                 .expect(200)
                 .expect(function() {
                     expect(profiles.get).to.have.been.calledWith('test.profile');

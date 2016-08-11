@@ -84,6 +84,20 @@ describe("Http.Services.Api.Profiles", function () {
             }
         };
 
+        var profileReq = {
+            query: {
+                'ips': ['ip1', 'ip2'],
+                'macs': ['mac1', 'mac2']
+            }
+        };
+
+        var profileReq1 = {
+            query: {
+                'ips': ['ip1', ''],
+                'macs': ['mac1', 'mac2']
+            }
+        };
+
         it("setLookup should add IP lookup entry for new node", function() {
             this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
             this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress')
@@ -135,6 +149,24 @@ describe("Http.Services.Api.Profiles", function () {
                 expect(lookupService.setIpAddress).to.not.be.called;
                 expect(waterline.lookups.upsertProxyToMacAddress).to.not.be.called;
                 expect(result).to.be.undefined;
+            });
+        });
+
+        it("setLookup should set lookup when macs and ips exists in query", function() {
+            this.sandbox.stub(lookupService, 'setIpAddress').resolves();
+
+            return profileApiService.setLookup(profileReq)
+            .then(function(result) {
+                expect(lookupService.setIpAddress).to.be.calledTwice;
+            });
+        });
+
+        it("setLookup should not set lookup if one ip is null in query", function() {
+            this.sandbox.stub(lookupService, 'setIpAddress').resolves();
+
+            return profileApiService.setLookup(profileReq1)
+            .then(function(result) {
+                expect(lookupService.setIpAddress).to.be.calledOnce;
             });
         });
 
