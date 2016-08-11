@@ -136,7 +136,7 @@ paths:
         - name: notification_body
           in: body
           description: |
-            task instance identifier
+            notification data
           required: false
           schema:
             $ref: '#/definitions/notification_obj'

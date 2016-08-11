@@ -6,7 +6,8 @@ describe('Http.Api.Notification', function () {
     var notificationApiService;
 
     var nodeNotificationMessage = {
-        nodeId: '57a86b5c36ec578876878294'
+        nodeId: '57a86b5c36ec578876878294',
+        randomData: 'random data'
     };
 
     var broadcastNotificationMessage = {
@@ -42,7 +43,9 @@ describe('Http.Api.Notification', function () {
         it('should return node notification detail', function () {
             return helper.request()
             .post('/api/2.0/notification?nodeId='
-                + nodeNotificationMessage.nodeId)
+                + nodeNotificationMessage.nodeId
+                + '&randomData='
+                + nodeNotificationMessage.randomData)
             .set('Content-Type', 'application/json')
             .expect('Content-Type', /^application\/json/)
             .expect(201, nodeNotificationMessage)
