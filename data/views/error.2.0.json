@@ -1,6 +1,7 @@
 {
     "message": "<%=message%>",
-    "status": "<%=status%>"
+    "status": "<%=status%>",
+    "UUID": "<%=uuid%>"
     <% if (hasOwnProperty("stack")) { %>
     ,"stack": [
     <% stack.forEach(function ( item, i, arr){ %>
