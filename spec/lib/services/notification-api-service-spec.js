@@ -8,6 +8,8 @@ describe('Http.Api.Notification', function () {
     var waterline;
     var _;
     var needByIdentifier;
+    var postNodeNotification;
+    var postBroadcastNotification;
 
     var nodeNotificationMessage = {
         nodeId: "57a86b5c36ec578876878294",
@@ -35,7 +37,9 @@ describe('Http.Api.Notification', function () {
         sinon.stub(eventProtocol, 'publishBroadcastNotification').resolves();
 
         needByIdentifier = sinon.stub(waterline.nodes, 'needByIdentifier');
-        needByIdentifier.resolves(node)
+        needByIdentifier.resolves(node);
+        postNodeNotification = sinon.spy(notificationApiService, 'postNodeNotification');
+        postBroadcastNotification = sinon.spy(notificationApiService, 'postBroadcastNotification');
     });
 
     after('Reset mocks', function () {
@@ -50,6 +54,20 @@ describe('Http.Api.Notification', function () {
     });
 
     describe('POST /notification', function () {
+        it('should call postNodeNotification', function () {
+            return notificationApiService.postNotification(nodeNotificationMessage)
+            .then(function () {
+                expect(postNodeNotification).to.have.been.calledOnce;
+            });
+        });
+
+        it('should call postBroadcastNotification', function () {
+            return notificationApiService.postNotification({})
+            .then(function () {
+                expect(postBroadcastNotification).to.have.been.calledOnce;
+            });
+        });
+
         it('should return node notification detail', function () {
             return notificationApiService.postNodeNotification(nodeNotificationMessage)
             .then(function (resp) {

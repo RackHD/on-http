@@ -133,7 +133,7 @@ paths:
             Node instance identifier
           required: false
           type: string
-        - name: notification_body
+        - name: data
           in: body
           description: |
             notification data
