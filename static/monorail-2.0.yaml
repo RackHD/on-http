@@ -3135,6 +3135,7 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       operationId: listUsers
+      x-view: users.2.0.json
       summary: |
         Get the list of users
       description: |
@@ -3164,6 +3165,7 @@ paths:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt', 'anonymous' ]
       operationId: addUser
+      x-view: users.2.0.json
       summary: |
         Post a new user
       description: |
@@ -3200,6 +3202,7 @@ paths:
       x-privileges: [ 'ConfigureUsers', 'ConfigureSelf' ]
       x-authentication-type: [ 'jwt' ]
       operationId: modifyUser
+      x-view: users.2.0.json
       summary: |
         Patch a user
       description: |
@@ -3239,6 +3242,7 @@ paths:
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       operationId: getUser
+      x-view: users.2.0.json
       summary: |
         Get a user
       description: |

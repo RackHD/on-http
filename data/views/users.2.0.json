@@ -1,0 +1,15 @@
+{
+    <% if (hasOwnProperty("id")) { %>
+    "id": "<%=id%>",
+    <% }%>
+    "username": "<%=username%>",
+    "role": "<%=role%>"
+    <% if (hasOwnProperty("id")) { %>
+    ,"privileges": [
+        <% privileges.forEach(function ( item, i, arr){ %>
+        "<%=item %>"
+        <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+    <% }%>
+}
