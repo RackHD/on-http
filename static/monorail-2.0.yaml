@@ -3163,6 +3163,7 @@ paths:
     post:
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt', 'anonymous' ]
+      x-swagger-schema: user.2.0.json#/definitions/User
       operationId: addUser
       summary: |
         Post a new user
@@ -3199,6 +3200,7 @@ paths:
     patch:
       x-privileges: [ 'ConfigureUsers', 'ConfigureSelf' ]
       x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: user.2.0.json#/definitions/PartialUser
       operationId: modifyUser
       summary: |
         Patch a user
