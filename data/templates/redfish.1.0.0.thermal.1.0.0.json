@@ -13,12 +13,12 @@
 			{
 				"Oem": {},
 				"Name": "<%= sdr['sensorId'] %>",
-				"ReadingCelsius": <%= parseFloat(sdr['sensorReading']) || 'null' %>,
-				"UpperThresholdNonCritical": <%= parseFloat(sdr['upperNonCritical']) || 'null' %>,
-				"UpperThresholdCritical": <%= parseFloat(sdr['upperCritical']) || 'null' %>,
+				"ReadingCelsius": <%= _.isNaN(parseFloat(sdr['sensorReading'])) ? 'null' : parseFloat(sdr['sensorReading']) %>,
+				"UpperThresholdNonCritical": <%= _.isNaN(parseFloat(sdr['upperNonCritical'])) ? 'null' : parseFloat(sdr['upperNonCritical']) %>,
+				"UpperThresholdCritical": <%= _.isNaN(parseFloat(sdr['upperCritical'])) ? 'null' : parseFloat(sdr['upperCritical']) %>,
 				"UpperThresholdFatal": null,
-				"LowerThresholdNonCritical": <%= parseFloat(sdr['lowerNonCritical']) || 'null' %>,
-				"LowerThresholdCritical": <%= parseFloat(sdr['lowerCritical']) || 'null' %>,
+				"LowerThresholdNonCritical": <%= _.isNaN(parseFloat(sdr['lowerNonCritical'])) ? 'null' : parseFloat(sdr['lowerNonCritical']) %>,
+				"LowerThresholdCritical": <%= _.isNaN(parseFloat(sdr['lowerCritical'])) ? 'null' : parseFloat(sdr['lowerCritical']) %>,
 				"LowerThresholdFatal": null
 			}
 			<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
@@ -30,12 +30,12 @@
 			{
 				"Oem": {},
 				"FanName": "<%= sdr['sensorId'] %>",
-				"ReadingRPM": <%= parseFloat(sdr['sensorReading']) || 'null' %>,
-				"UpperThresholdNonCritical": <%= parseFloat(sdr['upperNonCritical']) || 'null' %>,
-				"UpperThresholdCritical": <%= parseFloat(sdr['upperCritical']) || 'null' %>,
+				"ReadingRPM": <%= _.isNaN(parseFloat(sdr['sensorReading'])) ? 'null' : parseFloat(sdr['sensorReading']) %>,
+				"UpperThresholdNonCritical": <%= _.isNaN(parseFloat(sdr['upperNonCritical'])) ? 'null' : parseFloat(sdr['upperNonCritical']) %>,
+				"UpperThresholdCritical": <%= _.isNaN(parseFloat(sdr['upperCritical'])) ? 'null' : parseFloat(sdr['upperCritical']) %>,
 				"UpperThresholdFatal": null,
-				"LowerThresholdNonCritical": <%= parseFloat(sdr['lowerNonCritical']) || 'null' %>,
-				"LowerThresholdCritical": <%= parseFloat(sdr['lowerCritical']) || 'null' %>,
+				"LowerThresholdNonCritical": <%= _.isNaN(parseFloat(sdr['lowerNonCritical'])) ? 'null' : parseFloat(sdr['lowerNonCritical']) %>,
+				"LowerThresholdCritical": <%= _.isNaN(parseFloat(sdr['lowerCritical'])) ? 'null' : parseFloat(sdr['lowerCritical']) %>,
 				"LowerThresholdFatal": null
 			}
 			<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
