@@ -13,34 +13,46 @@ describe('Redfish Chassis Root', function () {
     var validator;
     var env;
     var nodeApi;
+    var Errors;
 
     before('start HTTP server', function () {
+        var self = this;
         this.timeout(5000);
+        this.sandbox = sinon.sandbox.create();
+
         return helper.startServer([]).then(function () {
             redfish = helper.injector.get('Http.Api.Services.Redfish');
-            sinon.spy(redfish, 'render');
+            self.sandbox.spy(redfish, 'render');
 
             validator = helper.injector.get('Http.Api.Services.Schema');
-            sinon.spy(validator, 'validate');
+            self.sandbox.spy(validator, 'validate');
 
             waterline = helper.injector.get('Services.Waterline');
-            sinon.stub(waterline.nodes);
-            sinon.stub(waterline.catalogs);
-            sinon.stub(waterline.workitems);
+            self.sandbox.stub(waterline.nodes);
+            waterline.nodes.findByIdentifier.withArgs('4567efgh4567efgh4567efgh').resolves(enclosure);
+            waterline.nodes.findByIdentifier.withArgs('1234abcd1234abcd1234abcd').resolves(system);
+            waterline.nodes.findByIdentifier.resolves();
 
             Promise = helper.injector.get('Promise');
+            Errors = helper.injector.get('Errors');
 
             taskProtocol = helper.injector.get('Protocol.Task');
-            sinon.stub(taskProtocol);
+            self.sandbox.stub(taskProtocol);
 
             env = helper.injector.get('Services.Environment');
-            sinon.stub(env, "get").resolves({});
+            self.sandbox.stub(env, "get").resolves({});
 
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
 
             nodeApi = helper.injector.get('Http.Services.Api.Nodes');
-            sinon.stub(nodeApi, "getAllNodes");
+            self.sandbox.stub(nodeApi, "getAllNodes");
+            self.sandbox.stub(nodeApi, "getNodeCatalogSourceById");
+            self.sandbox.stub(nodeApi, "getPollersByNodeId");
+            self.sandbox.stub(nodeApi, "getNodeById");
+            nodeApi.getNodeById.withArgs('4567efgh4567efgh4567efgh').resolves(enclosure);
+            nodeApi.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(system);
+            nodeApi.getNodeById.rejects(new Errors.NotFoundError('Not Found'));
         });
 
     });
@@ -49,22 +61,7 @@ describe('Redfish Chassis Root', function () {
         tv4 = require('tv4');
         sinon.spy(tv4, "validate");
 
-        validator.validate.reset();
-        redfish.render.reset();
-
-        function resetStubs(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (obj[method] && obj[method].reset) {
-                  obj[method].reset();
-                }
-            }).value();
-        }
-
-        resetStubs(waterline.nodes);
-        resetStubs(waterline.catalogs);
-        resetStubs(waterline.workitems);
-        resetStubs(taskProtocol);
-
+        this.sandbox.reset();
         nodeApi.getAllNodes.resolves([enclosure]);
     });
 
@@ -73,23 +70,7 @@ describe('Redfish Chassis Root', function () {
     });
 
     after('stop HTTP server', function () {
-        validator.validate.restore();
-        redfish.render.restore();
-        env.get.restore();
-        nodeApi.getAllNodes.restore();
-
-        function restoreStubs(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (obj[method] && obj[method].restore) {
-                  obj[method].restore();
-                }
-            }).value();
-        }
-
-        restoreStubs(waterline.nodes);
-        restoreStubs(waterline.catalogs);
-        restoreStubs(waterline.workitems);
-        restoreStubs(taskProtocol);
+        this.sandbox.restore();
         return helper.stopServer();
     });
 
@@ -146,7 +127,7 @@ describe('Redfish Chassis Root', function () {
     };
 
     it('should return a valid chassis root', function () {
-        waterline.nodes.find.resolves([enclosure]);   
+        nodeApi.getAllNodes.resolves([enclosure]);
         return helper.request().get('/redfish/v1/Chassis')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -154,25 +135,21 @@ describe('Redfish Chassis Root', function () {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
-                expect(res.body['Members@odata.count']).to.equal(2);
+                expect(res.body['Members@odata.count']).to.equal(1);
                 expect(res.body.Members[0]['@odata.id'])
                     .to.equal('/redfish/v1/Chassis/' + enclosure.id);
-                expect(res.body.Members[1]['@odata.id'])
-                    .to.equal('/redfish/v1/Chassis/ABCDEFG');
             });
     });
 
     it('should return valid chassis and related targets', function() {
-        waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve(enclosure));
-        waterline.nodes.findByIdentifier.resolves(Promise.resolve(system));
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+        nodeApi.getPollersByNodeId.resolves()
+        nodeApi.getNodeCatalogSourceById.resolves({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
             data: catalogData
-        }));
+        });
 
-        waterline.workitems.findPollers.resolves([{
+        nodeApi.getPollersByNodeId.resolves([{
             config: { command: 'chassis' }
         }]);
 
@@ -190,37 +167,8 @@ describe('Redfish Chassis Root', function () {
             });
     });
 
-    it('should return valid chassis and related targets by serial number', function() {
-        waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
-        waterline.nodes.needByIdentifier.resolves(Promise.resolve(enclosure));
-        waterline.nodes.findByIdentifier.resolves(Promise.resolve(system));
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: '1234abcd1234abcd1234abcd',
-            source: 'dummysource',
-            data: catalogData
-        }));
-
-        waterline.workitems.findPollers.resolves([{
-            config: { command: 'chassis' }
-        }]);
-
-        taskProtocol.requestPollerCache.resolves([{
-            chassis: { power: "Unknown", uid: "Reserved"}
-        }]);
-
-        return helper.request().get('/redfish/v1/Chassis/ABCDEFG')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function(res) {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
-            });
-    });
-
     it('should return a valid thermal object', function () {
-        waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
-        waterline.workitems.findPollers.resolves([{
+        nodeApi.getPollersByNodeId.resolves([{
             config: { command: 'sdr', inCondition: {} }
         }]);
 
@@ -236,7 +184,8 @@ describe('Redfish Chassis Root', function () {
                 "Sensor Reading Units": "% RPM",
                 "Sensor Type": "Fan",
                 "Upper critical": "",
-                "Upper non-critical": ""
+                "Upper non-critical": "",
+                "entityId": "6.2"
             },
             {
                 "Lower critical": "",
@@ -249,7 +198,8 @@ describe('Redfish Chassis Root', function () {
                 "Sensor Reading Units": "% degrees C",
                 "Sensor Type": "Temperature",
                 "Upper critical": "55.000",
-                "Upper non-critical": "50.000"
+                "Upper non-critical": "50.000",
+                "entityId": "6.2"
             }]
         }]);
 
@@ -264,8 +214,7 @@ describe('Redfish Chassis Root', function () {
     });
 
     it('should return a valid power object', function () {
-        waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
-        waterline.workitems.findPollers.resolves([{
+        nodeApi.getPollersByNodeId.resolves([{
             config: { command: 'sdr', inCondition: {} }
         }]);
 
@@ -281,7 +230,8 @@ describe('Redfish Chassis Root', function () {
                 "Sensor Reading Units": "% Volts",
                 "Sensor Type": "Voltage",
                 "Upper critical": "12.600",
-                "Upper non-critical": ""
+                "Upper non-critical": "",
+                "entityId": "6.2"
             },
             {
                 "Lower critical": "0.000",
@@ -294,7 +244,8 @@ describe('Redfish Chassis Root', function () {
                 "Sensor Reading Units": "Watts",
                 "Sensor Type": "Current",
                 "Upper critical": "",
-                "Upper non-critical": ""
+                "Upper non-critical": "",
+                "entityId": "6.2"
             }]
         }]);
 
@@ -308,98 +259,7 @@ describe('Redfish Chassis Root', function () {
             });
     });
 
-    it('should return a valid thermal object by serial number', function () {
-        waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
-        waterline.workitems.findPollers.resolves([{
-            config: { command: 'sdr', inCondition: {} }
-        }]);
-
-        taskProtocol.requestPollerCache.resolves([{
-            sdr: [{
-                "lowerCritical": "100.00",
-                "lowerNonCritical": "",
-                "nominalReading": "",
-                "normalMaximum": "",
-                "normalMinimum": "",
-                "sensorId": "Fan_1",
-                "sensorReading": "1000",
-                "sensorReadingUnits": "% RPM",
-                "sensorType": "Fan",
-                "upperCritical": "",
-                "upperNonCritical": ""
-            },
-            {
-                "lowerCritical": "",
-                "lowerNonCritical": "",
-                "nominalReading": "",
-                "normalMaximum": "",
-                "normalMinimum": "",
-                "sensorId": "Temp1",
-                "sensorReading": "24",
-                "sensorReadingUnits": "% degrees C",
-                "sensorType": "Temperature",
-                "upperCritical": "55.000",
-                "upperNonCritical": "50.000"
-            }]
-        }]);
-
-        return helper.request().get('/redfish/v1/Chassis/ABCDEFG/Thermal')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function(res) {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
-            });
-    });
-
-    it('should return a valid power object by serial number', function () {
-        waterline.nodes.findOne.resolves(Promise.resolve(enclosure));
-        waterline.workitems.findPollers.resolves([{
-            config: { command: 'sdr', inCondition: {} }
-        }]);
-
-        taskProtocol.requestPollerCache.resolves([{
-            sdr: [{
-                "lowerCritical": "10.00",
-                "lowerNonCritical": "",
-                "nominalReading": "",
-                "normalMaximum": "",
-                "normalMinimum": "",
-                "sensorId": "Volt12V",
-                "sensorReading": "12",
-                "sensorReadingUnits": "% Volts",
-                "sensorType": "Voltage",
-                "upperCritical": "12.600",
-                "upperNonCritical": ""       
-            },
-            {
-                "lowerCritical": "0.000",
-                "lowerNonCritical": "",
-                "nominalReading": "",
-                "normalMaximum": "",
-                "normalMinimum": "",
-                "sensorId": "Input",
-                "sensorReading": "27",
-                "sensorReadingUnits": "Watts",
-                "sensorType": "Current",
-                "upperCritical": "",
-                "upperNonCritical": ""
-            }]
-        }]);
-
-        return helper.request().get('/redfish/v1/Chassis/ABCDEFG/Power')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
-            });
-    });
-
     it('should 404 an invalid chassis object', function() {
-        waterline.nodes.findOne.resolves();
         return helper.request().get('/redfish/v1/Chassis/ABCDEFG')
             .expect('Content-Type', /^application\/json/)
             .expect(404)
@@ -409,7 +269,6 @@ describe('Redfish Chassis Root', function () {
     });
 
     it('should 404 an invalid chassis thermal object', function() {
-        waterline.nodes.findOne.resolves();
         return helper.request().get('/redfish/v1/Chassis/ABCDEFG/Thermal')
             .expect('Content-Type', /^application\/json/)
             .expect(404)
@@ -419,7 +278,6 @@ describe('Redfish Chassis Root', function () {
     });
 
     it('should 404 an invalid chassis power object', function() {
-        waterline.nodes.findOne.resolves();
         return helper.request().get('/redfish/v1/Chassis/ABCDEFG/Power')
             .expect('Content-Type', /^application\/json/)
             .expect(404)
