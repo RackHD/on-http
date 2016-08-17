@@ -59,23 +59,18 @@ describe("Http.Services.Api.Profiles", function () {
     });
 
     describe("setLookup", function() {
-        var node;
-        var proxy;
-        var nodeRes = {
-            id: 'id',
-            ip: 'ip',
-            mac: 'mac'
+        var proxy = '12.1.1.1';
+
+        var res = {
+            locals: {
+                ipAddress: 'ip1'
+            }
         };
-        var proxyRes = {
-            id: 'id',
-            ip: 'ip',
-            mac: 'mac',
-            proxy: 'proxy'
-        };
-        var req = {
+
+        var profileReq = {
             query: {
-                'ip':'ip',
-                'mac':'mac'
+                'ips': ['ip1', 'ip2'],
+                'macs': ['mac1', 'mac2']
             },
             get: function(header) {
                 if(header === Constants.HttpHeaders.ApiProxyIp) {
@@ -84,89 +79,53 @@ describe("Http.Services.Api.Profiles", function () {
             }
         };
 
-        var profileReq = {
-            query: {
-                'ips': ['ip1', 'ip2'],
-                'macs': ['mac1', 'mac2']
-            }
-        };
-
         var profileReq1 = {
             query: {
-                'ips': ['ip1', ''],
+                'ips': ['', ''],
                 'macs': ['mac1', 'mac2']
+            },
+            get: function(header) {
+                if(header === Constants.HttpHeaders.ApiProxyIp) {
+                    return proxy;
+                }
             }
         };
 
-        it("setLookup should add IP lookup entry for new node", function() {
-            this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
-            this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress')
-                .resolves(proxyRes);
-            this.sandbox.stub(lookupService, 'setIpAddress').resolves(nodeRes);
-
-            return profileApiService.setLookup(req)
-            .then(function(result) {
-                expect(lookupService.setIpAddress).to.be.calledOnce;
-                expect(waterline.lookups.upsertProxyToMacAddress).to.not.be.called;
-                expect(result).to.deep.equal(nodeRes);
-            });
-        });
-
-        it("setLookup should add IP lookup entry and proxy for new node", function() {
-            proxy = '12.1.1.1';
-            this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
-            this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress')
-                .resolves(proxyRes);
-            this.sandbox.stub(lookupService, 'setIpAddress').resolves(nodeRes);
-            return profileApiService.setLookup(req)
-            .then(function(result) {
-                expect(lookupService.setIpAddress).to.be.calledOnce;
-                expect(waterline.lookups.upsertProxyToMacAddress).to.be.calledOnce;
-                expect(result).to.deep.equal(proxyRes);
-            });
-        });
-
-        it("setLookup does not add IP lookup entry for existing node", function() {
-            node = {
-                discovered: true
-            };
-            this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
-            this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress').resolves();
+        it("setLookup should add IP lookup entry and proxy", function() {
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
-            return profileApiService.setLookup(req)
+            this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress').resolves();
+            return profileApiService.setLookup(profileReq, res)
             .then(function(result) {
-                expect(lookupService.setIpAddress).to.not.be.called;
-                expect(waterline.lookups.upsertProxyToMacAddress).to.not.be.called;
-                expect(result).to.be.undefined;
+                expect(lookupService.setIpAddress).to.be.calledWithExactly('ip1', 'mac1');
+                expect(waterline.lookups.upsertProxyToMacAddress).to.be.calledOnce;
             });
         });
 
         it("setLookup does not lookup node on missing required query string", function() {
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
             this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress').resolves();
-            return profileApiService.setLookup({query: {macs:'macs'}})
+            return profileApiService.setLookup({query: {macs:'macs'}}, res)
             .then(function(result) {
                 expect(lookupService.setIpAddress).to.not.be.called;
                 expect(waterline.lookups.upsertProxyToMacAddress).to.not.be.called;
-                expect(result).to.be.undefined;
             });
         });
 
-        it("setLookup should set lookup when macs and ips exists in query", function() {
+        it("setLookup should set request IP and MAC lookup for query macs and ips", function() {
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
 
-            return profileApiService.setLookup(profileReq)
+            return profileApiService.setLookup(profileReq, res)
             .then(function(result) {
-                expect(lookupService.setIpAddress).to.be.calledTwice;
+                expect(lookupService.setIpAddress).to.be.calledWithExactly('ip1', 'mac1');
             });
         });
 
-        it("setLookup should not set lookup if one ip is null in query", function() {
+        it("setLookup should not set lookup if IP is null in query", function() {
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
 
-            return profileApiService.setLookup(profileReq1)
+            return profileApiService.setLookup(profileReq1, res)
             .then(function(result) {
-                expect(lookupService.setIpAddress).to.be.calledOnce;
+                expect(lookupService.setIpAddress).to.not.be.called;
             });
         });
 
