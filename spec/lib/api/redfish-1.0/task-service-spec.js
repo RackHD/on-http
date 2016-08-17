@@ -102,6 +102,8 @@ describe('Redfish TaskService', function () {
 
     it('should return a valid task service root', function () {
         waterline.graphobjects.find.resolves([graph]);
+        waterline.nodes.findByIdentifier.resolves({ id: 'abcdefg'});
+
         return helper.request().get('/redfish/v1/TaskService')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
