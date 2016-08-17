@@ -1,0 +1,32 @@
+{
+    "title": "User.2.0",
+    "definitions": {
+        "PartialUser": {
+            "description": "A RackHD local user",
+            "type": "object",
+            "properties": {
+                "username": {
+                    "description": "The username of the user",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "The password of the user",
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 50
+                },
+                "role": {
+                    "description": "The role of the user",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
+        "User": {
+            "allOf": [
+                { "$ref": "#/definitions/PartialUser" },
+                { "required": [ "username", "password" ] }
+            ]
+        }
+    }
+}
