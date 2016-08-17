@@ -1,9 +1,0 @@
-#!/usr/bin/Cli -p2
-enable
-echo
-echo "Renasar: Error occurred while preparing your zerotouch profile:"
-echo
-<% error.split('\n').forEach(function (line) { %>
-	echo "<%=line%>"
-<% }); %>
-echo

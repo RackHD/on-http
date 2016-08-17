@@ -998,6 +998,15 @@ paths:
           items:
             type: string
           collectionFormat: multi
+        - name: ips
+          in: query
+          description: |
+            List of IP addresses to lookup
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
         - name: mac
           in: query
           description: |

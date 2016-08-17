@@ -8,6 +8,9 @@ set syslog <%=server%>
 # Interface that requested an IP originally.
 set interface <%=macaddress%>
 
+# If macaddress is null, don't need to find boot interface
+isset ${interface} || goto ifConfigured
+
 # Reboot Interval
 set rebootInterval:int8 5
 
