@@ -614,7 +614,7 @@ describe('Redfish Systems Root', function () {
                                     '/Actions/ComputerSystem.Reset')
             .send({ reset_type: "ForceRestart"})
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(202)
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
@@ -656,7 +656,7 @@ describe('Redfish Systems Root', function () {
                                         '/Actions/RackHD.BootImage')
                 .send( _.merge(minimumValidBody, {osName: osName}) )
                 .expect('Content-Type', /^application\/json/)
-                .expect(201)
+                .expect(202)
                 .expect(function(res) {
                     expect(tv4.validate.called).to.be.true;
                     expect(validator.validate.called).to.be.true;
