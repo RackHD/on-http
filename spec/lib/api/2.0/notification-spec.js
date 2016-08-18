@@ -5,9 +5,13 @@
 describe('Http.Api.Notification', function () {
     var notificationApiService;
 
-    var notificationMessage = {
-        taskId: '1234abcd5678effe9012dcba',
-        data: 'dummy data'
+    var nodeNotificationMessage = {
+        nodeId: '57a86b5c36ec578876878294',
+        randomData: 'random data'
+    };
+
+    var broadcastNotificationMessage = {
+        data: 'test data'
     };
 
     before('start HTTP server', function () {
@@ -18,7 +22,8 @@ describe('Http.Api.Notification', function () {
         this.timeout(5000);
         return helper.startServer([]).then(function () {
             notificationApiService = helper.injector.get('Http.Services.Api.Notification');
-            sinon.stub(notificationApiService, 'postNotification').resolves(notificationMessage);
+            sinon.stub(notificationApiService, 'postNodeNotification').resolves(nodeNotificationMessage);
+            sinon.stub(notificationApiService, 'postBroadcastNotification').resolves(broadcastNotificationMessage);
         });
 
     });
@@ -35,44 +40,46 @@ describe('Http.Api.Notification', function () {
     });
 
     describe('POST /notification', function () {
-        it('should return notification detail', function () {
+        it('should return node notification detail', function () {
             return helper.request()
-            .post(
-                '/api/2.0/notification?taskId='
-                + notificationMessage.taskId
-                + '&data='
-                + notificationMessage.data)
+            .post('/api/2.0/notification?nodeId='
+                + nodeNotificationMessage.nodeId
+                + '&randomData='
+                + nodeNotificationMessage.randomData)
             .set('Content-Type', 'application/json')
             .expect('Content-Type', /^application\/json/)
-            .expect(201, notificationMessage)
+            .expect(201, nodeNotificationMessage)
             .then(function () {
-                expect(notificationApiService.postNotification).to.have.been.calledOnce;
-                expect(notificationApiService.postNotification).to.have.been.calledWith(notificationMessage);
+                expect(notificationApiService.postNodeNotification).to.have.been.calledOnce;
+                expect(notificationApiService.postNodeNotification).to.have.been.calledWith(nodeNotificationMessage);
             });
         });
-        it('should pass with taskId in query body', function () {
+        it('should return broadcast notification detail', function () {
             return helper.request()
-            .post('/api/2.0/notification?data=' + notificationMessage.data)
-            .send({ taskId: notificationMessage.taskId })
+            .post('/api/2.0/notification')
+            .send(broadcastNotificationMessage)
+            .set('Content-Type', 'application/json')
             .expect('Content-Type', /^application\/json/)
-            .expect(201, notificationMessage)
+            .expect(201, broadcastNotificationMessage)
+            .then(function () {
+                expect(notificationApiService.postBroadcastNotification).to.have.been.calledOnce;
+                expect(notificationApiService.postBroadcastNotification).to.have.been.calledWith(broadcastNotificationMessage);
+            });
+        });
+        it('should pass with nodeId in query body', function () {
+            return helper.request()
+            .post('/api/2.0/notification')
+            .send({ nodeId: nodeNotificationMessage.nodeId })
+            .expect('Content-Type', /^application\/json/)
+            .expect(201, nodeNotificationMessage)
         });
 
-        it('should pass with data in query body', function () {
+        it('should pass with nodeId in query body', function () {
             return helper.request()
-            .post('/api/2.0/notification?taskId=' + notificationMessage.taskId)
-            .send({ data: notificationMessage.data })
+            .post('/api/2.0/notification')
+            .send(nodeNotificationMessage)
             .expect('Content-Type', /^application\/json/)
-            .expect(201, notificationMessage)
+            .expect(201, nodeNotificationMessage)
         });
-
-        it('should pass with data as an object in query body', function () {
-            return helper.request()
-            .post('/api/2.0/notification?taskId=' + notificationMessage.taskId)
-            .send(notificationMessage)
-            .expect('Content-Type', /^application\/json/)
-            .expect(201, notificationMessage)
-        });
-
     });
 });
