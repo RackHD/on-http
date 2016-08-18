@@ -3,8 +3,6 @@
 
 'use strict';
 
-var ws = require('ws');
-
 describe('Auth.Service', function () {
     var server;
     var sandbox = sinon.sandbox.create();
@@ -64,7 +62,6 @@ describe('Auth.Service', function () {
     helper.before(function () {
         return [
             dihelper.simpleWrapper(require('swagger-express-mw'), 'swagger'),
-            dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
             dihelper.simpleWrapper({}, 'TaskGraph.TaskGraph'),
             dihelper.simpleWrapper({}, 'TaskGraph.Store'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),

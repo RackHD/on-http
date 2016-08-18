@@ -2989,7 +2989,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   /files/{filename}/md5:
-    x-swagger-router-controller: files 
+    x-swagger-router-controller: files
     get:
       operationId: filesMd5Get
       x-privileges: [ 'Read' ]
@@ -3202,7 +3202,7 @@ paths:
             Successfully retrieved all tags
           schema:
             type: array
-            items: 
+            items:
               type: object
         404:
           description: |

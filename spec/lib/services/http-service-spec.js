@@ -2,7 +2,6 @@
 
 'use strict';
 
-var ws = require('ws');
 var express = require('express');
 
 describe('Http.Server', function () {
@@ -17,7 +16,6 @@ describe('Http.Server', function () {
             dihelper.simpleWrapper(require('express')(), 'express-app'),
             dihelper.simpleWrapper(require('swagger-express-mw'),
                 'swagger', undefined, __dirname),
-            dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
             onHttpContext.helper.simpleWrapper({}, 'TaskGraph.TaskGraph'),
             onHttpContext.helper.simpleWrapper({}, 'TaskGraph.Store'),
@@ -281,6 +279,102 @@ describe('Http.Server', function () {
             //Should reset the configureation for other feature unit tests
             helper.injector.get('Services.Configuration')
                 .set('httpProxies', []);
+        });
+    });
+
+    describe('Patching the swagger config yaml', function () {
+        var di,
+            parsedYamlJson,
+            result,
+            swaggerConfig;
+        function returns(obj) { return function () { return obj; }; }
+        function setupDi() {
+            parsedYamlJson = {name: 'swagger-config-json'};
+            di = {
+                fs: {
+                    readFileSync: sinon.spy(returns('raw-swagger-config-yaml')),
+                    writeFileSync: sinon.spy()
+                },
+                logger: { error: sinon.spy() },
+                Promise: {
+                    resolve: sinon.spy(returns('resolved-promise')),
+                    reject: sinon.spy(returns('rejected-promise'))
+                },
+                yaml: {
+                    safeLoad: sinon.spy(returns(parsedYamlJson)),
+                    safeDump: sinon.spy(returns('raw-swagger-config-yaml-patched'))
+                }
+            };
+        }
+        function invokePatchYamlConfig(httpsEnabled) {
+            var patchYamlConfig = HttpService.prototype.patchYamlConfig;
+            swaggerConfig = {swagger: 'swagger-config-yaml-file-path.yaml'};
+            result = patchYamlConfig(
+                {httpsEnabled: httpsEnabled},
+                swaggerConfig,
+                di);
+        }
+        describe('(http) when it works', function () {
+            beforeEach(function() {
+                setupDi();
+                invokePatchYamlConfig(false);
+            });
+            it('should read the swagger config yaml file', function () {
+                expect(di.fs.readFileSync).to.have.been.calledOnce;
+                expect(di.fs.readFileSync).to.have.been.calledWith(
+                    'swagger-config-yaml-file-path.yaml',
+                    'utf8');
+            });
+            it('should parse the yaml into json', function () {
+                expect(di.yaml.safeLoad).to.have.been.calledOnce;
+                expect(di.yaml.safeLoad).to.have.been.calledWith(
+                    'raw-swagger-config-yaml');
+            });
+            it('should update the swager config json schemes', function () {
+                expect(swaggerConfig.swagger).to.equal(
+                    'swagger-config-yaml-file-path-patch.yaml');
+                expect(parsedYamlJson.schemes).to.eql(['http']);
+            });
+            it('should convert json to yaml', function () {
+                expect(di.yaml.safeDump).to.have.been.calledOnce;
+                expect(di.yaml.safeDump).to.have.been.calledWith(parsedYamlJson);
+            });
+            it('should write the yaml to a patched yaml file', function () {
+                expect(di.fs.writeFileSync).to.have.been.calledOnce;
+                expect(di.fs.writeFileSync).to.have.been.calledWith(
+                    'swagger-config-yaml-file-path-patch.yaml',
+                    'raw-swagger-config-yaml-patched');
+            });
+            it('should return a resolved promise', function () {
+                expect(di.Promise.resolve).to.have.been.calledOnce;
+                expect(di.Promise.resolve).to.have.been.calledWith(swaggerConfig);
+                expect(result).to.equal('resolved-promise');
+            });
+        });
+        describe('(https) when it fails', function () {
+            setupDi();
+            var error = 'error',
+                originalWriteFileSync = di.fs.writeFileSync;
+            beforeEach(function () {
+                setupDi();
+                di.fs.writeFileSync = function () {throw error;};
+                invokePatchYamlConfig(true);
+            });
+            afterEach(function () {
+                di.fs.writeFileSync = originalWriteFileSync;
+            });
+            it('should update the swager config json schemes', function () {
+                expect(parsedYamlJson.schemes).to.eql(['https']);
+            });
+            it('should log the error', function () {
+                expect(di.logger.error).to.have.been.calledOnce;
+                expect(di.logger.error).to.have.been.calledWith('error');
+            });
+            it('should return a rejected promise', function () {
+                expect(di.Promise.reject).to.have.been.calledOnce;
+                expect(di.Promise.reject).to.have.been.calledWith('error');
+                expect(result).to.equal('rejected-promise');
+            });
         });
     });
 });
