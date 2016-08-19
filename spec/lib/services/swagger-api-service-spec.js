@@ -404,13 +404,14 @@ describe('Services.Http.Swagger', function() {
             // Initialize stubs
             mockNext = sinon.stub();
             send = sinon.stub();
-            status = sinon.stub().returns({send: send});
+            status = sinon.stub();
             set = sinon.stub();
 
             // Mock request and response objects
             res = {
                 headersSent: false,
                 body: {},
+                send: send,
                 status: status,
                 set: set,
                 locals: "dummy"
@@ -529,6 +530,160 @@ describe('Services.Http.Swagger', function() {
             function(err) {
                 expect(err).to.be.undefined;
             });
+        });
+    });
+
+    describe('addLinkHeader()', function() {
+        var addLinksHeader;
+
+        before(function() {
+            addLinksHeader = swaggerService.addLinksHeader;
+        });
+
+        it('should not add links without $skip or $top', function() {
+            var req = {
+                url: '/api/2.0/things',
+                swagger: { query: { } }
+            };
+            var res = {};
+
+            addLinksHeader(req, res, 10);
+            expect(res.links).to.be.undefined;
+        });
+
+        it('should not add links if object count is less than $top', function() {
+            var req = {
+                url: '/api/2.0/things?$top=10',
+                swagger: { query: { $top: 10} }
+            };
+            var res = {};
+            addLinksHeader(req, res, 8);
+            expect(res.links).to.be.undefined;
+        });
+
+        it('should not add links if object count is equal to $top', function() {
+            var req = {
+                url: '/api/2.0/things?$top=10',
+                swagger: { query: { $top: 10} }
+            };
+            var res = {};
+            addLinksHeader(req, res, 10);
+            expect(res.links).to.be.undefined;
+        });
+
+        it('should add links with $top', function() {
+            var req = {
+                url: '/api/2.0/things?$top=10',
+                swagger: { query: { $top: 10} }
+            };
+            var res = {};
+            addLinksHeader(req, res, 40);
+            expect(res.links).to.have.property('first')
+                .and.to.equal('/api/2.0/things?$skip=0&$top=10');
+            expect(res.links).to.have.property('next')
+                .and.to.equal('/api/2.0/things?$skip=10&$top=10');
+            expect(res.links).not.to.have.property('prev')
+            expect(res.links).to.have.property('last')
+                .and.to.equal('/api/2.0/things?$skip=30&$top=10');
+        });
+
+        it('should add links with $skip and $top', function() {
+            var req = {
+                url: '/api/2.0/things?$top=10',
+                swagger: { query: { $skip: 8, $top: 9} }
+            };
+            var res = {};
+            addLinksHeader(req, res, 37);
+            expect(res.links).to.have.property('first')
+                .and.to.equal('/api/2.0/things?$skip=0&$top=8');
+            expect(res.links).to.have.property('next')
+                .and.to.equal('/api/2.0/things?$skip=17&$top=9');
+            expect(res.links).to.have.property('prev')
+                .and.to.equal('/api/2.0/things?$skip=0&$top=8');
+            expect(res.links).to.have.property('last')
+                .and.to.equal('/api/2.0/things?$skip=36&$top=9');
+        });
+
+        it('should add links with $skip', function() {
+            var req = {
+                url: '/api/2.0/things?$skip=10',
+                swagger: { query: { $skip: 10} }
+            };
+            var res = {};
+            addLinksHeader(req, res, 40);
+            expect(res.links).to.have.property('first')
+                .and.to.equal('/api/2.0/things?$skip=0&$top=10');
+            expect(res.links).not.to.have.property('next')
+            expect(res.links).to.have.property('prev')
+                .and.to.equal('/api/2.0/things?$skip=0&$top=10');
+            expect(res.links).to.have.property('last')
+                .and.to.equal('/api/2.0/things?$skip=10&$top=30');
+        });
+
+        it('should add links with $skip and $top', function() {
+            var req = {
+                url: '/api/2.0/things?$top=10',
+                swagger: { query: { $skip: 20, $top: 10} }
+            };
+            var res = {};
+            addLinksHeader(req, res, 40);
+            expect(res.links).to.have.property('first')
+                .and.to.equal('/api/2.0/things?$skip=0&$top=10');
+            expect(res.links).to.have.property('next')
+                .and.to.equal('/api/2.0/things?$skip=30&$top=10');
+            expect(res.links).to.have.property('prev')
+                .and.to.equal('/api/2.0/things?$skip=10&$top=10');
+            expect(res.links).to.have.property('last')
+                .and.to.equal('/api/2.0/things?$skip=30&$top=10');
+        });
+
+        it('should add links with $skip and $top', function() {
+            var req = {
+                url: '/api/2.0/things?$top=10',
+                swagger: { query: { $skip: 5, $top: 10} }
+            };
+            var res = {};
+            addLinksHeader(req, res, 40);
+            expect(res.links).to.have.property('first')
+                .and.to.equal('/api/2.0/things?$skip=0&$top=5');
+            expect(res.links).to.have.property('next')
+                .and.to.equal('/api/2.0/things?$skip=15&$top=10');
+            expect(res.links).to.have.property('prev')
+                .and.to.equal('/api/2.0/things?$skip=0&$top=5');
+            expect(res.links).to.have.property('last')
+                .and.to.equal('/api/2.0/things?$skip=30&$top=10');
+        });
+
+        it('should add links with $skip and $top', function() {
+            var req = {
+                url: '/api/2.0/things?$top=10',
+                swagger: { query: { $skip: 0, $top: 8} }
+            };
+            var res = {};
+            addLinksHeader(req, res, 37);
+            expect(res.links).to.have.property('first')
+                .and.to.equal('/api/2.0/things?$skip=0&$top=8');
+            expect(res.links).to.have.property('next')
+                .and.to.equal('/api/2.0/things?$skip=8&$top=8');
+            expect(res.links).not.to.have.property('prev')
+            expect(res.links).to.have.property('last')
+                .and.to.equal('/api/2.0/things?$skip=32&$top=8');
+        });
+
+        it('should add links with $skip and $top', function() {
+            var req = {
+                url: '/api/2.0/things?$top=10',
+                swagger: { query: { $skip: 30, $top: 10} }
+            };
+            var res = {};
+            addLinksHeader(req, res, 40);
+            expect(res.links).to.have.property('first')
+                .and.to.equal('/api/2.0/things?$skip=0&$top=10');
+            expect(res.links).not.to.have.property('next')
+            expect(res.links).to.have.property('prev')
+                .and.to.equal('/api/2.0/things?$skip=20&$top=10');
+            expect(res.links).to.have.property('last')
+                .and.to.equal('/api/2.0/things?$skip=30&$top=10');
         });
     });
 });
