@@ -117,21 +117,34 @@ describe('Http.Api.Tags', function () {
         it('should get tags', function() {
             return helper.request().get('/api/2.0/tags')
                 .expect('Content-Type', /^application\/json/)
-                .expect(200, [input]);
+                .expect(200)
+                .then(function (res) {
+                    var tag = res.body[0];
+                    expect(tag).to.have.property('name').that.equals(input.name);
+                    expect(tag).to.have.property('rules').that.deep.equals(input.rules);
+                });
         });
 
         it('should return a tag from GET /tags/:id', function () {
             return helper.request().get('/api/2.0/tags/tag-name')
                 .expect('Content-Type', /^application\/json/)
-                .expect(200, input);
+                .expect(200)
+                .then(function(res) {
+                    var tag = res.body;
+                    expect(tag).to.have.property('name').that.equals(input.name);
+                    expect(tag).to.have.property('rules').that.deep.equals(input.rules);
+                });
         });
 
         it('should return a tag from GET /tags/:id with special characters', function () {
             return helper.request().get('/api/2.0/tags/tag name')
                 .expect('Content-Type', /^application\/json/)
-                .expect(200, input)
-                .then(function() {
+                .expect(200)
+                .then(function(res) {
+                    var tag = res.body;
                     expect(tagsApi.getTag).to.have.been.calledWith('tag name');
+                    expect(tag).to.have.property('name').that.equals(input.name);
+                    expect(tag).to.have.property('rules').that.deep.equals(input.rules);
                 });
         });
 
