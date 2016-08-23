@@ -223,13 +223,13 @@ describe('Http.Api.Tags', function () {
                     });
             });
 
-            it('should 400 if tag name is not existing', function() {
+            it('should 404 if tag name is not existing', function() {
                 sandbox.stub(nodesApi, 'getNodesByTag').withArgs('tag001')
-                    .rejects(new Error('fail to find tag with name tag001'));
+                    .rejects(new Errors.NotFoundError('fail to find tag with name tag001'));
                 return helper.request()
                     .post('/api/2.0/tags/tag001/nodes/workflows')
                     .send({ name: 'Graph.test', options: { test: true} })
-                    .expect(400);
+                    .expect(404);
             });
 
             it('should 400 if run workflow fails for first node', function() {
