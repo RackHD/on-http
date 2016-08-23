@@ -69,7 +69,7 @@ describe('Http.Api.Obms', function () {
 
     var goodLedData = {
         nodeId: '12345678',
-        value: 'lit'
+        value: true
     };
     var badLedData = {};
 
@@ -167,8 +167,7 @@ describe('Http.Api.Obms', function () {
                 .send(badData1)
                 .expect('Content-Type', /^application\/json/)
                 .expect(400)
-                .expect(function (res) {
-                    expect(res.body.message).to.include('not loaded');
+                .expect(function () {
                     expect(stub).not.to.have.been.called;
                 });
         });
@@ -180,8 +179,7 @@ describe('Http.Api.Obms', function () {
                 .send(badData2)
                 .expect('Content-Type', /^application\/json/)
                 .expect(400)
-                .expect(function (res) {
-                    expect(res.body.message).to.include('Missing required property');
+                .expect(function () {
                     expect(stub).not.to.have.been.called;
                 });
         });
@@ -229,8 +227,7 @@ describe('Http.Api.Obms', function () {
                 .send(badData1)
                 .expect('Content-Type', /^application\/json/)
                 .expect(400)
-                .expect(function (res) {
-                    expect(res.body.message).to.include('not loaded');
+                .expect(function () {
                     expect(stub).not.to.have.been.called;
                 });
         });

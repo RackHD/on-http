@@ -140,7 +140,7 @@ describe('2.0 Http.Api.Nodes', function () {
             nodeApiService.postNode.resolves(node);
 
             return helper.request().post('/api/2.0/nodes')
-                .send(node)
+                .send(rawNode)
                 .expect('Content-Type', /^application\/json/)
                 .expect(201, node)
                 .expect(function () {
@@ -181,7 +181,7 @@ describe('2.0 Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves(node);
             waterline.nodes.updateByIdentifier.resolves(node);
             return helper.request().patch('/api/2.0/nodes/1234')
-                .send(node)
+                .send(rawNode)
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, node)
                 .expect(function () {
@@ -197,7 +197,7 @@ describe('2.0 Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
             return helper.request().patch('/api/2.0/nodes/1234')
-                .send(node)
+                .send(rawNode)
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
