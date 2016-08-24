@@ -1,0 +1,23 @@
+{
+    "id": "tags.2.0",
+    "title": "Tags.2.0",
+    "definitions": {
+        "TagsPost": {
+	    "additionalProperties": false,
+            "description": "Categorize Nodes by rules or manually",
+            "type": "object",
+            "required": [
+                "name", "rules"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "rules": {
+                    "$ref": "skus.2.0.json#/definitions/SkusRules"
+                }
+            }
+        }
+    }
+}

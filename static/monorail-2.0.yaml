@@ -2941,6 +2941,7 @@ paths:
       operationId: getAllTags
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: tags.2.0.json
       summary: Get all tags
       description: |
         Get a list of all tags currently stored.
@@ -2966,6 +2967,7 @@ paths:
       operationId: createTag
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: tags.2.0.json
       summary: Post a tag
       description: |
         Create a new tag.
@@ -2998,6 +3000,7 @@ paths:
       operationId: getTag
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: tags.2.0.json
       summary: Get a tag
       description: |
         Get the data associated with the specified tag.
