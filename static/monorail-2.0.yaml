@@ -1607,6 +1607,7 @@ paths:
       operationId: workflowsGetGraphs
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: workflowGraphs.2.0.json
       summary: |
         Get list of workflow graphs
       description: |
@@ -1660,6 +1661,7 @@ paths:
       operationId: workflowsGetGraphsByName
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: workflowGraphs.2.0.json
       summary: |
         Get a workflow graph
       description: |
