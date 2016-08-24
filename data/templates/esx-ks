@@ -138,7 +138,7 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
     esxcli network vswitch standard add -v "<%=n.switchName%>"
     <% if( undefined !== n.uplinks ) { %>
       <% n.uplinks.forEach(function(s) { %>
-        currdev = <%=s%>
+        currdev=<%=s%>
         <% if (s.substring(0,5) !== 'vmnic') { %>
           currdev=`esxcli network nic list | grep <%=s%> | cut -d ' ' -f 1`
         <% } %>
@@ -155,7 +155,7 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
 <% vmkid = 0 %>
 <% if( typeof networkDevices !== 'undefined' ) { %>
   <% networkDevices.forEach(function(n) { %>
-    currdev = <%=n.device%>
+    currdev=<%=n.device%>
     <% if (n.device.substring(0,5) != 'vmnic') { %>
        currdev=`esxcli network nic list | grep <%=n.device%> | cut -d ' ' -f 1`
     <% } %>
