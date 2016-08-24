@@ -2328,7 +2328,6 @@ paths:
       operationId: nodesGetTagsById
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
- #     x-view: tags.2.0.json
       summary: |
         Get node tags
       description: |
