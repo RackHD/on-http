@@ -7,6 +7,7 @@ describe('Http.Api.Views', function () {
     var Promise;
     var viewsProtocol;
     var _;
+    var ejs;
 
     before('start HTTP server', function () {
         this.timeout(10000);
@@ -14,6 +15,7 @@ describe('Http.Api.Views', function () {
         ]).then(function() {
             _ = helper.injector.get('_');
             viewsProtocol = helper.injector.get('Views');
+            ejs = helper.injector.get('ejs');
             Promise = helper.injector.get('Promise');
             sinon.stub(viewsProtocol, 'load');
             sinon.stub(viewsProtocol, 'getAll');
@@ -58,10 +60,17 @@ describe('Http.Api.Views', function () {
                         return Promise.resolve();
                 };
             });
+            sinon.stub(ejs, 'render', function(template, options) {
+                return Promise.resolve(
+                    JSON.stringify(_.omit(options, '_', 'Constants', 'basepath'))
+                );
+            });
         });
 
         after(function() {
             viewsProtocol.render.restore();
+            viewsProtocol.get.reset();
+            ejs.render.restore();
         });
 
         it('should get all views', function() {
@@ -69,6 +78,7 @@ describe('Http.Api.Views', function () {
                 {name: 'foo', scope: 'global', id: '1', hash: '1234'},
                 {name: 'bar', scope: 'global', id: '2', hash: '5678'}
             ];
+            viewsProtocol.get.resolves(views[0]);
             viewsProtocol.getAll.resolves(views);
             return helper.request().get('/api/2.0/views')
                 .expect('Content-Type', /^application\/json/)

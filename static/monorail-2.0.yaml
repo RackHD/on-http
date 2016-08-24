@@ -87,12 +87,12 @@ paths:
       description: |
         Get list of all pollers that are currently running.
       parameters:
-      - name: $skip 
+      - name: $skip
         in: query
         description: Query string specifying properties to search for
         required: false
-        type: integer 
-      - name: $top 
+        type: integer
+      - name: $top
         in: query
         description: Query string specifying properties to search for
         required: false
@@ -1745,12 +1745,12 @@ paths:
           Query string to search for specific workflow properties
         required: false
         type: boolean
-      - name: $skip 
+      - name: $skip
         in: query
         description: Query string specifying properties to search for
         required: false
-        type: integer 
-      - name: $top 
+        type: integer
+      - name: $top
         in: query
         description: Query string specifying properties to search for
         required: false
@@ -2463,12 +2463,12 @@ paths:
       description: |
         Get a list of all currently stored nodes.
       parameters:
-      - name: $skip 
+      - name: $skip
         in: query
         description: Query string specifying properties to search for
         required: false
-        type: integer 
-      - name: $top 
+        type: integer
+      - name: $top
         in: query
         description: Query string specifying properties to search for
         required: false
