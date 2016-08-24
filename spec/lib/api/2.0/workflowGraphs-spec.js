@@ -5,7 +5,7 @@
 
 describe('Http.Api.Workflows.2.0', function () {
     var workflowApiService;
-    var arpCache = { 
+    var arpCache = {
         getCurrent: sinon.stub().resolves([])
     };
 
@@ -37,8 +37,7 @@ describe('Http.Api.Workflows.2.0', function () {
 
     describe('workflowsGetGraphs', function () {
         it('should retrieve the workflow Graphs', function () {
-            var graph = 
-            {
+            var graph = {
                 "friendlyName": "Dummy Pollers",
                 "injectableName": "Dummy.Poller.Create",
                 "tasks": [
@@ -47,7 +46,7 @@ describe('Http.Api.Workflows.2.0', function () {
                         "taskName": "Task.Pollers.CreateDefault"
                     }
                 ]
-           };
+            };
 
             workflowApiService.getGraphDefinitions.resolves([graph]);
 
@@ -68,8 +67,7 @@ describe('Http.Api.Workflows.2.0', function () {
         });
 
         it('should retrieve the workflow Graphs with inline task', function () {
-            var graph =
-            {
+            var graph ={
                 "friendlyName": "Dummy Pollers",
                 "injectableName": "Dummy.Poller.Create",
                 "tasks": [
@@ -135,7 +133,7 @@ describe('Http.Api.Workflows.2.0', function () {
                         "taskName": "Task.Pollers.CreateDefault"
                     }
                 ]
-           };
+            };
 
             workflowApiService.getGraphDefinitions.resolves(graph);
 
