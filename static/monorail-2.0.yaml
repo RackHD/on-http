@@ -86,6 +86,18 @@ paths:
         Get a list of all active pollers
       description: |
         Get list of all pollers that are currently running.
+      parameters:
+      - name: $skip 
+        in: query
+        description: Query string specifying properties to search for
+        required: false
+        type: integer 
+      - name: $top 
+        in: query
+        description: Query string specifying properties to search for
+        required: false
+        type: integer
+        #default: 4
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -1727,12 +1739,23 @@ paths:
         Get list workflow that have been run, or are currently running.
       tags: [ "/api/2.0" ]
       parameters:
-        - name: active
-          in: query
-          description: |
-            Query string to search for specific workflow properties
-          required: false
-          type: boolean
+      - name: active
+        in: query
+        description: |
+          Query string to search for specific workflow properties
+        required: false
+        type: boolean
+      - name: $skip 
+        in: query
+        description: Query string specifying properties to search for
+        required: false
+        type: integer 
+      - name: $top 
+        in: query
+        description: Query string specifying properties to search for
+        required: false
+        type: integer
+        #default: 4
       responses:
         200:
           description: |
@@ -2439,6 +2462,18 @@ paths:
         Get a list of nodes
       description: |
         Get a list of all currently stored nodes.
+      parameters:
+      - name: $skip 
+        in: query
+        description: Query string specifying properties to search for
+        required: false
+        type: integer 
+      - name: $top 
+        in: query
+        description: Query string specifying properties to search for
+        required: false
+        type: integer
+        #default: 4
       tags: [ "/api/2.0" ]
       responses:
         200:

@@ -14,7 +14,7 @@ describe('2.0 Http.Api.Nodes', function () {
     var nodesApi;
 
     before('start HTTP server', function () {
-        this.timeout(5000);
+        this.timeout(10000);
         return helper.startServer([
         ]).then(function () {
             configuration = helper.injector.get('Services.Configuration');
@@ -119,6 +119,7 @@ describe('2.0 Http.Api.Nodes', function () {
     describe('2.0 GET /nodes', function () {
         it('should return a list of nodes', function () {
             waterline.nodes.find.resolves([rawNode]);
+            waterline.nodes.count.resolves(1);
             nodeApiService.getAllNodes.resolves(rawNode);
 
             return helper.request().get('/api/2.0/nodes')

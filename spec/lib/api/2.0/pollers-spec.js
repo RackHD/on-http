@@ -6,7 +6,7 @@
 describe('Http.Api.Pollers', function () {
     var taskProtocol;
     before('start HTTP server', function () {
-        this.timeout(5000);
+        this.timeout(10000);
         taskProtocol = {
             requestPollerCache: sinon.stub()
         };

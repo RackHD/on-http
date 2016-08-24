@@ -34,7 +34,7 @@ describe("Http.Services.Api.Pollers", function () {
     describe("getPollers", function() {
         it("should expose the appropriate methods", function() {
             pollerService.should.have.property("getPollers")
-                .that.is.a("function").with.length(1);
+                .that.is.a("function").with.length(2);
         });
 
         it("Run getPollers", function() {
