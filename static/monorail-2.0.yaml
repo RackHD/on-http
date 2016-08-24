@@ -531,6 +531,37 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+    head:
+      operationId: templatesGetByName
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        Get a single template
+      description: |
+        Get the template with the specified name.
+      parameters:
+        - name: name
+          in: path
+          description: |
+            The name of the template
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            Successfuly retrieved the specified template
+          schema:
+            type: object
+        404:
+          description: |
+            The template with specified identifier was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
   /views:
     x-swagger-router-controller: views
