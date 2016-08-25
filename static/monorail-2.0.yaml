@@ -2341,7 +2341,7 @@ paths:
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: Successfully retrieved the node's reltions
+          description: Successfully retrieved the node's relations
           schema:
             type: array
             items:
@@ -2362,7 +2362,7 @@ paths:
       summary: |
         Remove relations from nodes
       description: |
-        Edit the relations fields of a nodes to remove specific relationships
+        Edit the relations fields of nodes to remove specific relationships
       parameters:
         - name: identifier
           in: path
@@ -2391,7 +2391,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-    patch:
+    put:
       x-swagger-schema: relations.2.0.json#/definitions/Relation
       operationId: nodesAddRelations
       x-privileges: [ 'Write' ]
@@ -2399,7 +2399,7 @@ paths:
       summary: |
         Add relationships between nodes
       description: |
-        Patch the relations fields of nodes to add realtionships
+        Edit the relations fields of nodes to add realtionships
       parameters:
         - name: identifier
           in: path
@@ -2419,7 +2419,7 @@ paths:
       tags: [ "/api/2.0" ]
       responses:
         200:
-          description: patch succeeded
+          description: update succeeded
           schema:
             type: object
         404:

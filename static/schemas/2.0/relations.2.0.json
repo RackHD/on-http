@@ -7,11 +7,21 @@
             "properties": {
                 "contains": {
                     "description": "an array of nodes contained by the rack",
-                    "type": "array"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
                 },
                 "containedBy": {
                     "description": "the rack containing the node",
-                    "type": "array"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
                 }
             },
             "anyOf": [

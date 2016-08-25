@@ -16,6 +16,7 @@ describe("Http.Services.Api.Nodes", function () {
     var rackNode;
     var _;
     var eventsProtocol;
+    var Promise;
 
     before("Http.Services.Api.Nodes before", function() {
         helper.setupInjector([
@@ -31,6 +32,7 @@ describe("Http.Services.Api.Nodes", function () {
         waterline = helper.injector.get('Services.Waterline');
         _ = helper.injector.get('_');
         eventsProtocol = helper.injector.get('Protocol.Events');
+        Promise = helper.injector.get('Promise');
         waterline.nodes = {
             create: function() {},
             needByIdentifier: function() {},
@@ -564,10 +566,10 @@ describe("Http.Services.Api.Nodes", function () {
 
         it("should do nothing if arguments are missing", function() {
             var argList = [rackNode, "contains", [computeNode]];
-            _.forEach(argList, function(arg, index) {
+            return Promise.map(argList, function(arg, index) {
                 var argsCopy = [].concat(argList);
                 argsCopy[index] = undefined;
-                nodeApiService._addRelation(argsCopy[0], argsCopy[1], argsCopy[2])
+                return nodeApiService._addRelation(argsCopy[0], argsCopy[1], argsCopy[2])
                 .then(function() {
                     expect(updateByIdentifier).to.not.be.called;
                 });
@@ -583,6 +585,7 @@ describe("Http.Services.Api.Nodes", function () {
                 });
             }).then(function() {
                 rackNode.relations = [{relationType: 'contains', targets: [computeNode.id]}];
+                updateByIdentifier.reset();
                 return nodeApiService._addRelation(rackNode, 'contains', [computeNode2.id]);
             }).then(function() {
                 expect(updateByIdentifier).to.be.calledWithExactly(rackNode.id, {relations:
@@ -599,7 +602,7 @@ describe("Http.Services.Api.Nodes", function () {
             waterline.nodes.needByIdentifier.resolves(computeNode);
             return nodeApiService.getNodeRelations(computeNode.id)
             .then(function(relations) {
-                expect(relations).to.equal(computeNode.relations);
+                expect(relations).to.deep.equal(computeNode.relations);
                 expect(waterline.nodes.needByIdentifier).to.be.calledOnce;
             });
         });

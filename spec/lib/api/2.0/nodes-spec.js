@@ -253,7 +253,7 @@ describe('2.0 Http.Api.Nodes', function () {
         });
     });
 
-    describe('PATCH /nodes/:identifier/relations', function() {
+    describe('PUT /nodes/:identifier/relations', function() {
         var relationUpdate;
         beforeEach(function() {
             sinon.stub(nodeApiService, 'editNodeRelations');
@@ -280,7 +280,7 @@ describe('2.0 Http.Api.Nodes', function () {
             nodeApiService.editNodeRelations.resolves([
                 updatedComputeNode, updatedRackNode
             ]);
-            return helper.request().patch('/api/2.0/nodes/1234/relations')
+            return helper.request().put('/api/2.0/nodes/1234/relations')
                 .send(relationUpdate)
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
@@ -296,7 +296,7 @@ describe('2.0 Http.Api.Nodes', function () {
 
         it('should return a 404 if the node is not found', function() {
             nodeApiService.editNodeRelations.rejects(new Errors.NotFoundError("Not Found"));
-            return helper.request().patch('/api/2.0/nodes/1234/relations')
+            return helper.request().put('/api/2.0/nodes/1234/relations')
                 .send(relationUpdate)
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
