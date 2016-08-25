@@ -16,7 +16,7 @@
                 "type": {
                     "description": "Type of node",
                     "type": "string",
-                    "enum": ["compute", "switch", "dae", "pdu", "mgmt", "enclosure"]
+                    "enum": ["compute", "switch", "dae", "pdu", "mgmt", "enclosure", "rack"]
                 },
                 "obmSettings": {
                     "description": "OBM settings",
@@ -29,6 +29,10 @@
                 "bootSettings": {
                     "description": "Default ipxe profile settings",
                     "type": "object"
+                },
+                "relations": {
+                        "description": "Node relations",
+                        "type": "array"
                 },
                 "sshSettings": {
                     "description": "SSH settings",
