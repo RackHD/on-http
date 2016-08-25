@@ -118,7 +118,7 @@ paths:
           with a node.
         required: true
         schema:
-         $ref: '#/definitions/generic_obj'
+         $ref: '#/definitions/poller.2.0_PartialPoller'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -190,7 +190,7 @@ paths:
             poller that will be modified.
           required: true
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/poller.2.0_PartialPoller'
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -748,7 +748,7 @@ paths:
             The properties used to define the new SKU
           required: true
           schema:
-                  $ref: '#/definitions/generic_obj'
+                  $ref: '#/definitions/skus.2.0_SkusUpsert'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -781,7 +781,7 @@ paths:
             The properties used to define the SKU
           required: true
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/skus.2.0_SkusUpsert'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -852,7 +852,7 @@ paths:
           description: The SKU properties to be modified
           required: true
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/skus.2.0_SkusUpsert'
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -1317,7 +1317,7 @@ paths:
             The OBM settings information to create
           required: true
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/ipmi-obm-service_Obm'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -1404,7 +1404,7 @@ paths:
             identifier.
           required: true
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/obm_led'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -1468,7 +1468,7 @@ paths:
           description: The OBM properties to patch
           required: true
           schema:
-                  $ref: '#/definitions/generic_obj'
+                  $ref: '#/definitions/ipmi-obm-service_Obm'
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -1553,7 +1553,7 @@ paths:
           description: The workflow task properties
           required: false
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/workflow_task'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -1668,7 +1668,7 @@ paths:
           description: The workflow graph properties
           required: false
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/workflow_graph'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -1792,7 +1792,7 @@ paths:
             graph to run
           required: false
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/post_workflow'
         - name: name
           in: query
           description: Optionally specify the injectable name of the workflow graph to run
@@ -2020,7 +2020,7 @@ paths:
           description: The name property set to the injectableName property of the workflow graph
           required: false
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/post_node_workflow'
         - name: name
           in: query
           description: The optional name of the workflow graph to run
@@ -2218,7 +2218,7 @@ paths:
             The ssh properties to create
           required: true
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/ssh_settings'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -2339,7 +2339,7 @@ paths:
             The node properties to modify
           required: true
           schema:
-           $ref: '#/definitions/generic_obj'
+           $ref: '#/definitions/node.2.0_PartialNode'
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -2410,7 +2410,7 @@ paths:
             The tag properties to patch
           required: true
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/post_tags'
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -2503,7 +2503,7 @@ paths:
           The properties of the new node
         required: true
         schema:
-         $ref: '#/definitions/generic_obj'
+         $ref: '#/definitions/node.2.0_PartialNode'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -2559,7 +2559,7 @@ paths:
         description: The properties of the lookup
         required: true
         schema:
-         $ref: '#/definitions/generic_obj'
+         $ref: '#/definitions/Lookups.2.0_LookupBase'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -2647,7 +2647,7 @@ paths:
             The lookup properties to be modified
           required: true
           schema:
-           $ref: '#/definitions/generic_obj'
+           $ref: '#/definitions/Lookups.2.0_LookupBase'
       tags: [ "/api/2.0" ]
       responses:
         200:
@@ -3010,7 +3010,7 @@ paths:
           description: The tag properties
           required: true
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/post_tags'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -3143,7 +3143,7 @@ paths:
           description: The workflow options to post
           required: false
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/post_node_workflow'
         - name: name
           in: query
           description: Query string specifying the optional workflow injectable name
@@ -3535,7 +3535,7 @@ paths:
             The obm settings to apply
           required: true
           schema:
-            $ref: '#/definitions/generic_obj'
+            $ref: '#/definitions/post_tasks'
       tags: [ "/api/2.0" ]
       responses:
         201:
@@ -3581,139 +3581,237 @@ definitions:
       fields:
         type: string
 
-  catalog:
+  generic_obj:
     type: object
-    properties:
-      id:
-        type: string
-      source:
-        type: string
-      node:
-        $ref: '#/definitions/node'
-      data:
-        type: object
-        description: arbitrary json object
-    required:
-    - id
-    - source
-    - node
 
-  node:
+  poller.2.0_PartialPoller:
+    description: A poller for periodic collection of telemetry data
+    properties:
+      config:
+        description: Poller configuration object
+        type: object
+      paused:
+        description: Asserted if poller is paused
+        type: boolean
+      pollInterval:
+        description: Interval at which poller will run
+        type: number
+      type:
+        description: Type of poller
+        enum:
+        - ipmi
+        - snmp
+        - redfish
+        type: string
     type: object
-    properties:
-      id:
-        type: string
-      profile:
-        type: string
-      name:
-        type: string
-      obmSettings:
-        type: object
-      ipAddresses:
-        type: object
-      workflows:
-        type: array
-        items:
-          $ref: '#/definitions/graphobject'
-      catalogs:
-        type: array
-        items:
-          $ref: '#/definitions/catalog'
-      sku:
-        $ref: '#/definitions/sku'
-    required:
-    - profile
-    - name
 
-  graphobject:
+  skus.2.0_SkusUpsert:
+    description: A sku for RackHD
     properties:
-      id:
-        type: string
-      instanceid:
-        type: string
-      context:
-        type: object
-      definition:
-        type: object
-      tasks:
-        type: object
-      node:
-        $ref: '#/definitions/node'
-
-  sku:
-    properties:
-      id:
-        type: string
-      name:
-        type: string
-      rules:
-        type: object
-      nodes:
-        type: array
-        items:
-          $ref: '#/definitions/node'
       discoveryGraphName:
+        minLength: 1
         type: string
       discoveryGraphOptions:
         type: object
+      name:
+        minLength: 1
+        type: string
+      rules:
+        description: Possible Rules a Sku can use
+        type: array
+        items:
+          $ref: '#/definitions/tag_rule'
+    type: object
 
-  lease:
+  ipmi-obm-service_Obm:
+    description: IPMI OBM settings
     properties:
-      mac:
+      config:
+        properties:
+          host:
+            description: BMC address
+            type: string
+          password:
+            description: IPMI password
+            type: string
+          user:
+            description: IPMI username
+            type: string
+        required:
+        - host
+        - user
+        - password
+        type: object
+      nodeId:
         type: string
-      ipAddress:
+      service:
         type: string
-      reservationTimer:
-        type: integer
-        format: int32
-      reservationExpiresAt:
-        type: integer
-        format: int64
-      renewalTimer:
-        type: integer
-        format: int32
-      rebindingTimer:
-        type: integer
-        format: int32
-      expirationTimer:
-        type: integer
-        format: int32
-      renewalExpiresAt:
-        type: integer
-        format: int64
-      rebindExpiresAt:
-        type: integer
-        format: int64
-      leaseExpiresAt:
-        type: integer
-        format: int64
-      boundFlag:
-        type: boolean
-      reservedFlag:
-        type: boolean
-      reserveTimer:
-        type: string
-        format: int64
-
-    example:
-      mac: 08:00:27:52:d2:a4
-      ipAddress: 10.1.1.2
-      reservationTimer: 30
-      renewalTimer: 21600
-      rebindingTimer: 4320
-      expirationTimer: 86400
-      renewalExpiresAt: 1424149074811
-      rebindExpiresAt: 1424131794811
-      leaseExpiresAt: 1424213874811
-      boundFlag: true
-      reservedFlag: false
-
     required:
-    - mac
-    - ipAddress
+    - nodeId
+    - service
+    - config
+    type: object
 
-  generic_obj:
-   type: object
+  node.2.0_PartialNode:
+    description: Post a node in RackHD
+    properties:
+      name:
+        description: Name of the node
+        type: string
+      autoDiscover:
+        type: string
+      type:
+        description: Type of node
+        enum:
+        - compute
+        - switch
+        - dae
+        - pdu
+        - mgmt
+        - enclosure
+        type: string
+    type: object
+
+  ssh_settings:
+    description: SSH settings
+    type: object
+    properties:
+      host:
+        type: string
+      user:
+        type: string
+      password:
+         type: string
+    required:
+    - host
+    - user
+
+  Lookups.2.0_LookupBase:
+    description: A lookup record
+    properties:
+      ipAddress:
+        format: ipv4
+        type: string
+      macAddress:
+        pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
+        type: string
+      node:
+        type: string
+    type: object
+
+  obm_led:
+    properties:
+      nodeId:
+        type: string
+      value:
+        type: boolean
+
+  workflow_task:
+    type: object
+    properties:
+      friendlyName:
+        type: string
+      injectableName:
+        type: string
+      implementsTask:
+        type: string
+      options:
+        type: object
+      properties:
+        type: object
+
+  workflow_graph:
+    type: object
+    properties:
+      friendlyName:
+        type: string
+      injectableName:
+        type: string
+      tasks:
+        type: array
+        items:
+          $ref: '#/definitions/workflow_task'
+
+  post_workflow:
+    type: object
+    properties:
+      name:
+        type: string
+      options:
+        type: object
+        properties:
+          default:
+            type: object
+            properties:
+              graphOptions:
+                type: object
+              nodeId:
+                type: string
+
+  post_node_workflow:
+    type: object
+    properties:
+      name:
+        type: string
+      options:
+        type: object
+        properties:
+          default:
+            type: object
+
+  post_tasks:
+    type: object
+    properties:
+      identifier:
+        type: string
+      tasks:
+        type: array
+        items:
+          $ref: '#/definitions/workflow_task'
+
+  post_tags:
+    type: object
+    properties:
+      name:
+        type: string
+      rules:
+        type: array
+        items:
+          $ref: '#/definitions/tag_rule'
+
+  tag_rule:
+    type: object
+    properties:
+      contains:
+        type: string
+      equals:
+        type: string
+      greaterThan:
+        type: number
+      in:
+        type: array
+        items:
+          type: string
+      lessThan:
+        type: number
+      max:
+        type: number
+      min:
+        type: number
+      notContains:
+        type: string
+      notIn:
+        type: array
+        items:
+          type: string
+      notRegex:
+        type: string
+      path:
+        type: string
+      regex:
+        type: string
+    required:
+      - path
 
   user_obj:
     properties:

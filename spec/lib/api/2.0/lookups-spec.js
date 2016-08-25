@@ -121,7 +121,6 @@ describe('Http.Api.Lookup 2.0', function () {
                     return helper.request().post('/api/2.0/lookups')
                         .send(data)
                         .expect(400)
-                        .expect(/ValidationError: /);
                 });
             });
         });
@@ -155,7 +154,6 @@ describe('Http.Api.Lookup 2.0', function () {
                     return helper.request().post('/api/2.0/lookups')
                         .send(data)
                         .expect(400)
-                        .expect(/ValidationError: /);
                 });
             });
         });
