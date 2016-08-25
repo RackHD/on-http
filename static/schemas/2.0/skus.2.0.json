@@ -83,7 +83,8 @@
                 "discoveryGraphOptions": {
                     "type": "object"
                 }
-            }
+            },
+            "additionalProperties": false
         }
     }
 }

@@ -14,7 +14,7 @@ describe('2.0 Http.Api.Nodes', function () {
     var nodesApi;
 
     before('start HTTP server', function () {
-        this.timeout(5000);
+        this.timeout(10000);
         return helper.startServer([
         ]).then(function () {
             configuration = helper.injector.get('Services.Configuration');
@@ -106,6 +106,12 @@ describe('2.0 Http.Api.Nodes', function () {
         type: 'compute',
         workflows: '/api/2.0/nodes/1234abcd1234abcd1234abcd/workflows'
     };
+
+    var postNode = {
+        name: 'name',
+        type: 'compute'
+    };
+
     var rawNode = {
         autoDiscover: "false",
         id: '1234abcd1234abcd1234abcd',
@@ -140,13 +146,13 @@ describe('2.0 Http.Api.Nodes', function () {
             nodeApiService.postNode.resolves(node);
 
             return helper.request().post('/api/2.0/nodes')
-                .send(rawNode)
+                .send(postNode)
                 .expect('Content-Type', /^application\/json/)
                 .expect(201, node)
                 .expect(function () {
                     expect(nodeApiService.postNode).to.have.been.calledOnce;
                     expect(nodeApiService.postNode.firstCall.args[0])
-                        .to.have.property('id').that.equals(node.id);
+                        .to.have.property('name').that.equals(node.name);
                 });
         });
     });
