@@ -213,6 +213,21 @@ describe("Http.Services.Api.Nodes", function () {
                 );
             });
         });
+
+        it('should publish a node added event if the node is a rack', function() {
+            var rackNode = {
+                id: 'someNodeId',
+                type: 'rack',
+                name: 'rackNode'
+            };
+            waterline.nodes.create.resolves(rackNode);
+            return nodeApiService.postNode({})
+            .then(function() {
+                expect(eventsProtocol.publishNodeEvent).to.be.calledWithExactly(
+                    rackNode, 'added'
+                );
+            });
+        });
     });
 
     describe('setNodeWorkflow/setNodeWorkflowById', function() {
