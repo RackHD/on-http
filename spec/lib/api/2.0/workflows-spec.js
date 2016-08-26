@@ -52,7 +52,8 @@ describe('Http.Api.Workflows.2.0', function () {
             find: sinon.stub().resolves([]),
             findOne: sinon.stub().resolves(),
             findByIdentifier: sinon.stub().resolves(),
-            needByIdentifier: sinon.stub().resolves()
+            needByIdentifier: sinon.stub().resolves(),
+            count: sinon.stub().resolves()
         };
         waterline.lookups = {
             // This method is for lookups only and it

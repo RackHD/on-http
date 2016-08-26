@@ -125,6 +125,7 @@ describe('2.0 Http.Api.Nodes', function () {
     describe('2.0 GET /nodes', function () {
         it('should return a list of nodes', function () {
             waterline.nodes.find.resolves([rawNode]);
+            waterline.nodes.count.resolves(1);
             nodeApiService.getAllNodes.resolves(rawNode);
 
             return helper.request().get('/api/2.0/nodes')

@@ -36,7 +36,10 @@ describe('Http.Api.workflowTasks.2.0', function () {
             self.sandbox.stub(workflowApiService, 'deleteWorkflowsTasksByName').resolves();
 
             views = helper.injector.get('Views');
+            self.sandbox.stub(views, 'get').resolves({});
             self.sandbox.stub(views, 'render').resolves('{"friendlyName": "dummy", "injectableName": "dummyName", "options": {"oids": "SNMPv2-MIB::sysDescr"}}');
+            self.sandbox.stub(helper.injector.get('ejs'), 'render')
+            .resolves('{"friendlyName": "dummy", "injectableName": "dummyName", "options": {"oids": "SNMPv2-MIB::sysDescr"}}');
         });
     });
 
