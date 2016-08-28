@@ -10,7 +10,6 @@ describe('Http.Api.Workflows.2.0', function () {
     var arpCache = {
         getCurrent: sinon.stub().resolves([])
     };
-    var views;
 
     before('start HTTP server', function () {
         var self = this;
@@ -26,8 +25,6 @@ describe('Http.Api.Workflows.2.0', function () {
         this.sandbox = sinon.sandbox.create();
 
         return helper.startServer([
-            dihelper.simpleWrapper(waterline, 'Services.Waterline'),
-            dihelper.simpleWrapper(arpCache, 'ARPCache')
         ])
         .then(function() {
             Errors = helper.injector.get('Errors');
@@ -39,8 +36,6 @@ describe('Http.Api.Workflows.2.0', function () {
             self.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves();
             self.sandbox.stub(workflowApiService, 'deleteTaskGraph').resolves();
 
-            views = helper.injector.get('Views');
-            self.sandbox.stub(views, 'render').resolves();
         });
     });
 
@@ -62,6 +57,8 @@ describe('Http.Api.Workflows.2.0', function () {
             // to logging.
             findOneByTerm: sinon.stub().rejects()
         };
+        return helper.injector.get('Views').load();
+
     });
 
     afterEach('clean up mocks', function () {
@@ -75,23 +72,67 @@ describe('Http.Api.Workflows.2.0', function () {
 
     describe('workflowsGet', function () {
         it('should return a list of persisted graph objects', function () {
-            var graph = { name: 'foobar' };
+            var graph = {
+                            "id": "foobar",
+                            "_status": "running",
+                            "tasks": {
+                                "77444ae5-3232-47b9-b5e6-693ef3dfd11e": {
+                                    "friendlyName": "Redfish requester",
+                                    "ignoreFailure": false,
+                                    "implementsTask": "Task.Base.Redfish",
+                                    "injectableName": "Task.Inline.Redfish",
+                                    "instanceId": "77444ae5-3232-47b9-b5e6-693ef3dfd11e",
+                                    "label": "redfish",
+                                    "name": "Task.Inline.Redfish",
+                                    "properties": {},
+                                    "runJob": "Job.Redfish",
+                                    "state": "pending",
+                                    "taskStartTime": "2016-08-25T08:22:45.943Z",
+                                    "terminalOnStates": [
+                                    "succeeded",
+                                    "timeout",
+                                    "cancelled",
+                                    "failed"
+                                            ],
+                                    "waitingOn": {}
+                                }
+                            }
+            };
+            var outputWorkflow =
+                {
+                    "status": 'running',
+                    "id": 'foobar',
+                    "tasks":[{
+                        "label": 'redfish',
+                        "instanceId": '77444ae5-3232-47b9-b5e6-693ef3dfd11e',
+                        "runJob": 'Job.Redfish',
+                        "state": 'pending',
+                        "taskStartTime": '2016-08-25T08:22:45.943Z',
+                        "terminalOnStates":[
+                            "succeeded",
+                            "timeout",
+                            "cancelled",
+                            "failed"
+                        ] ,
+                        "waitingOn": {}
+                       }]
+                };
+
             workflowApiService.getAllWorkflows.resolves([graph]);
 
             return helper.request().get('/api/2.0/workflows')
                 .expect('Content-Type', /^application\/json/)
-                .expect(200, [graph])
-                .expect(function () {
+                .expect(200)
+                .expect(function (res) {
                     expect(workflowApiService.getAllWorkflows).to.have.been.calledOnce;
+                    expect(res.body).to.deep.equal([outputWorkflow]);
                 });
         });
 
         it('should return 404 if not found ', function () {
             workflowApiService.getAllWorkflows.rejects(new Errors.NotFoundError('test'));
-            views.render.resolves('{"message": "error"}');
 
             return helper.request().get('/api/2.0/workflows')
-                .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
     });
@@ -119,25 +160,70 @@ describe('Http.Api.Workflows.2.0', function () {
 
     describe('workflowsGetById', function () {
         it('should return a single persisted graph', function () {
-            var graph = { id: 'foobar' };
+            var graph = {
+                            "id": "foobar",
+                            "_status": "running",
+                            "tasks": {
+                                "77444ae5-3232-47b9-b5e6-693ef3dfd11e": {
+                                    "friendlyName": "Redfish requester",
+				    "ignoreFailure": false,
+				    "implementsTask": "Task.Base.Redfish",
+				    "injectableName": "Task.Inline.Redfish",
+				    "instanceId": "77444ae5-3232-47b9-b5e6-693ef3dfd11e",
+				    "label": "redfish",
+				    "name": "Task.Inline.Redfish",
+				    "properties": {},
+				    "runJob": "Job.Redfish",
+				    "state": "pending",
+				    "taskStartTime": "2016-08-25T08:22:45.943Z",
+				    "terminalOnStates": [
+				    "succeeded",
+				    "timeout",
+				    "cancelled",
+				    "failed"
+					    ],
+				    "waitingOn": {}
+				}
+			    }
+	    };
+            var outputWorkflow =
+                {
+                    "status": 'running',
+                    "id": 'foobar',
+                    "tasks":[{
+                        "label": 'redfish',
+                        "instanceId": '77444ae5-3232-47b9-b5e6-693ef3dfd11e',
+                        "runJob": 'Job.Redfish',
+                        "state": 'pending',
+                        "taskStartTime": '2016-08-25T08:22:45.943Z',
+                        "terminalOnStates":[
+                            "succeeded",
+                            "timeout",
+                            "cancelled",
+                            "failed"
+                        ] ,
+                        "waitingOn": {}
+                       }]
+                };
+
             workflowApiService.getWorkflowByInstanceId.resolves(graph);
 
             return helper.request().get('/api/2.0/workflows/foobar')
                 .expect('Content-Type', /^application\/json/)
-                .expect(200, graph)
-                .expect(function () {
+                .expect(200)
+                .expect(function (res) {
                     expect(workflowApiService.getWorkflowByInstanceId).to.have.been.calledOnce;
                     expect(workflowApiService.getWorkflowByInstanceId)
                         .to.have.been.calledWith('foobar');
+                    expect(res.body).to.deep.equal(outputWorkflow);
+
                 });
         });
 
         it('should return a 404 if not found', function () {
             workflowApiService.getWorkflowByInstanceId.rejects(new Errors.NotFoundError('test'));
-            views.render.resolves('{"message": "error"}');
 
             return helper.request().get('/api/2.0/workflows/12345')
-                .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
     });

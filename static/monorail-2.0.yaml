@@ -1764,6 +1764,7 @@ paths:
       operationId: workflowsGet
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: workflows.2.0.json
       summary: |
         Get a list of workflow instances
       description: |
@@ -1844,6 +1845,7 @@ paths:
       operationId: workflowsGetByInstanceId
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
+      x-view: workflows.2.0.json
       summary: |
         Get a workflow
       description: |
