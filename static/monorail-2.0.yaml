@@ -1670,6 +1670,7 @@ paths:
       operationId: workflowsPutGraphs
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: workflowGraphs.2.0.json#/definitions/workflowGraphsPut
       summary: |
         Put a graph
       description: |

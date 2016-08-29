@@ -1,0 +1,63 @@
+{
+    "title": "workflowGraphs.2.0",
+    "definitions": {
+
+        "tasks": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "label"
+                ],
+                "oneOf": [
+                    {"required": ["taskName"]},
+                    {"required": ["taskDefinition"]}
+                ],
+                "properties": {
+                    "label": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "taskName": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "taskDefinition": {
+                        "type": "object"
+                    },
+                    "ignoreFailure": {
+                        "type": "boolean"
+                    },
+                    "waitOn": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+
+        "workflowGraphsPut": {
+            "description": "schema for adding or modiftying a workflow graph",
+            "required": [
+                "friendlyName", "injectableName"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "friendlyName": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "injectableName": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "options": {
+                    "type": "object"
+                },
+                "tasks": {
+                    "$ref": "#/definitions/tasks"
+                }
+            }
+        }
+    }
+}
