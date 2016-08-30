@@ -6,9 +6,6 @@
             "items": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": [
-                    "label"
-                ],
                 "oneOf": [
                     {"required": ["taskName"]},
                     {"required": ["taskDefinition"]}
