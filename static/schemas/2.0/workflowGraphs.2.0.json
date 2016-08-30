@@ -1,7 +1,6 @@
 {
     "title": "workflowGraphs.2.0",
     "definitions": {
-
         "tasks": {
             "type": "array",
             "items": {
