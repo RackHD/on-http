@@ -26,7 +26,7 @@
                     "required": ["host", "password"]
                 }
             },
-            "required": ["nodeId", "service", "config"]
+            "required": ["service", "config"]
         }
     }
 }

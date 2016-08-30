@@ -9,8 +9,11 @@ describe("Http.Services.Api.Nodes", function () {
     var waterline;
     var updateByIdentifier;
     var create;
+    var getNodeById;
     var needByIdentifier;
     var findActiveGraphForTarget;
+    var findAllByNode;
+    var upsertByNode;
     var computeNode;
     var enclosureNode;
     var rackNode;
@@ -35,6 +38,7 @@ describe("Http.Services.Api.Nodes", function () {
         Promise = helper.injector.get('Promise');
         waterline.nodes = {
             create: function() {},
+            getNodeById: function() {},
             needByIdentifier: function() {},
             updateByIdentifier: function() {},
             destroy: function() {}
@@ -47,6 +51,10 @@ describe("Http.Services.Api.Nodes", function () {
         };
         waterline.lookups = {
             update: function() {}
+        };
+        waterline.obms = {
+            findAllByNode: function() {},
+            upsertByNode: function() {}
         };
         this.sandbox = sinon.sandbox.create();
     });
@@ -84,10 +92,13 @@ describe("Http.Services.Api.Nodes", function () {
         };
 
         create = this.sandbox.stub(waterline.nodes, 'create');
+        getNodeById = this.sandbox.stub(waterline.nodes, 'getNodeById');
         needByIdentifier = this.sandbox.stub(waterline.nodes, 'needByIdentifier');
         updateByIdentifier = this.sandbox.stub(waterline.nodes, 'updateByIdentifier');
         findActiveGraphForTarget = this.sandbox.stub(
                 workflowApiService, 'findActiveGraphForTarget');
+        findAllByNode = this.sandbox.stub(waterline.obms, 'findAllByNode');
+        upsertByNode = this.sandbox.stub(waterline.obms, 'upsertByNode');
         this.sandbox.stub(eventsProtocol, 'publishNodeEvent').resolves({});
 
     });
@@ -1034,5 +1045,82 @@ describe("Http.Services.Api.Nodes", function () {
                     expect(waterline.nodes.remTags).to.have.been.calledWith(node1.id,tagName);
                 });
         });
+    });
+
+    describe('Obms', function() {
+        
+        var node = {
+            id: '1234abcd1234abcd1234abcd',
+            name: 'name',
+            type: 'compute',
+            obmSettings: [
+                {
+                    service: 'ipmi-obm-service',
+                    config: {
+                        host: '1.2.3.4',
+                        user: 'myuser',
+                        password: 'mypass'
+                    }
+                }
+            ]
+        };
+
+        var obm = {
+            id: '5678efgh5678efgh5678efgh',
+            node: '/api/2.0/nodes/1234abcd1234abcd1234abcd',
+            service: 'ipmi-obm-service',
+            config: {
+                host: '1.2.3.4',
+                user: 'myuser',
+                password: 'mypass'
+            }
+        };
+
+
+        it('should add an OBM to a node', function () {
+            waterline.nodes.getNodeById.resolves(node);
+            waterline.obms.upsertByNode.resolves();
+            return nodeApiService.putObmsByNodeId(node.id, obm)
+                .then(function() {
+                    expect(waterline.nodes.getNodeById).to.have.been.calledOnce;
+                    expect(
+                        waterline.nodes.getNodeById.firstCall.args[0]
+                    ).to.equal(node.id);
+                    expect(waterline.obms.upsertByNode).to.have.been.calledOnce;
+                    expect(waterline.obms.upsertByNode.firstCall.args[0]).to.equal(node.id);
+                    expect(waterline.obms.upsertByNode.firstCall.args[1]).to.deep.equal(obm);
+
+                });
+
+        });
+
+        it('should report node not found for PUT', function () {
+            waterline.nodes.getNodeById.resolves();
+
+            return expect(nodeApiService.putObmsByNodeId(node.id))
+                .to.be.rejectedWith(Errors.NotFoundError);
+
+        });
+
+        it('should look up the OBMs for a node', function () {
+            waterline.nodes.getNodeById.resolves(node);
+            waterline.obms.findAllByNode.resolves(obm);
+            return nodeApiService.getObmsByNodeId(node.id)
+                .then(function(ret) {
+                    expect(waterline.nodes.getNodeById).to.have.been.calledOnce;
+                    expect(
+                        waterline.nodes.getNodeById.firstCall.args[0]
+                    ).to.equal(node.id);
+                    expect(ret).to.deep.equal(obm);
+                });
+        });
+
+        it('should report node not found for GET', function () {
+            waterline.nodes.getNodeById.resolves();
+
+            return expect(nodeApiService.getObmsByNodeId(node.id))
+                .to.be.rejectedWith(Errors.NotFoundError);
+        });
+
     });
 });

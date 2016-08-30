@@ -857,4 +857,54 @@ describe('2.0 Http.Api.Nodes', function () {
         });
     });
 
+    describe('OBM support', function() {
+
+        var obm = {
+            service: 'noop-obm-service',
+            config: {
+                host: '1.2.3.4',
+                user: 'myuser',
+                password: 'mypass'
+            }
+        };
+
+        var obmRes = {
+            id: "57c5e319c466ff9435d27fb3",
+            node: "",
+            service: "noop-obm-service",
+            config: {
+                host: "1.2.3.4",
+                user: "myuser"
+            }
+        };
+
+        after(function() {
+            nodesApi.getObmsByNodeId.restore();
+            nodesApi.putObmsByNodeId.restore();
+        });
+
+        it('should call getObmsByNodeId', function() {
+            sinon.stub(nodesApi, 'getObmsByNodeId').resolves([obmRes]);
+
+            return helper.request().get('/api/2.0/nodes/123/obm')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function(res) {
+                    expect(nodesApi.getObmsByNodeId).to.have.been.calledWith('123');
+                    expect(res.body[0].id).to.equal(obmRes.id);
+                });
+        });
+
+        it('should call putObmsByNodeId', function() {
+            sinon.stub(nodesApi, 'putObmsByNodeId').resolves([]);
+
+            return helper.request().put('/api/2.0/nodes/123/obm')
+                .send(obm)
+                .expect('Content-Type', /^application\/json/)
+                .expect(201)
+                .expect(function() {
+                    expect(nodesApi.putObmsByNodeId).to.have.been.calledWith('123',obm);
+                });
+        });
+    });
 });

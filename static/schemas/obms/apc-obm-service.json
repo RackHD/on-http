@@ -30,7 +30,7 @@
                     "required": ["host", "community", "port"]
                 }
             },
-            "required": ["nodeId", "service", "config"]
+            "required": ["service", "config"]
         }
     }
 }

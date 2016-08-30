@@ -2590,6 +2590,77 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+
+  /nodes/{identifier}/obm:
+    x-swagger-router-controller: nodes
+    get:
+      operationId: nodesGetObmsByNodeId
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      x-view: obm.2.0.json
+      summary: |
+        Get all OBM services
+      description: |
+        Get all the OBM settings for the specified node.
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The Node identifier
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: |
+            Successfully retrieved the specified OBM service
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      operationId: nodesPutObmsByNodeId
+      x-privileges: [ 'Write' ]
+      x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: obm
+      x-view: obm.2.0.json
+      summary: |
+        Put an OBM service
+      description: |
+        Create or update a single OBM service with the associated Node ID
+      parameters:
+        - name: identifier
+          in: path
+          description: |
+            The Node identifier
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: |
+            The OBM settings information to create
+          required: true
+          schema:
+            $ref: '#/definitions/nodes_post_obm_by_id'
+      tags: [ "/api/2.0" ]
+      responses:
+        201:
+          description: |
+            Successfully put the OBM service
+          schema:
+            type: object
+        500:
+          description: |
+            OBM service creation failed
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /nodes:
     x-swagger-router-controller: nodes
     get:
@@ -3766,8 +3837,20 @@ definitions:
           $ref: '#/definitions/tag_rule'
     type: object
 
-  ipmi-obm-service_Obm:
+  nodes_post_obm_by_id:
     description: IPMI OBM settings
+    properties:
+      config:
+        type: object
+      service:
+        type: string
+    required:
+    - service
+    - config
+    type: object
+
+  ipmi-obm-service_Obm:
+    description: OBM settings
     properties:
       config:
         properties:
@@ -3780,10 +3863,6 @@ definitions:
           user:
             description: IPMI username
             type: string
-        required:
-        - host
-        - user
-        - password
         type: object
       nodeId:
         type: string
@@ -3794,6 +3873,7 @@ definitions:
     - service
     - config
     type: object
+
 
   node.2.0_PartialNode:
     description: Post a node in RackHD

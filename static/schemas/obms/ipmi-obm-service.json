@@ -30,7 +30,7 @@
                     "required": ["host", "user", "password"]
                 }
             },
-            "required": ["nodeId", "service", "config"]
+            "required": ["service", "config"]
         }
     }
 }
