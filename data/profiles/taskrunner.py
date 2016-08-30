@@ -8,7 +8,8 @@ import json
 import sys
 from time import sleep
 
-class Cisco(object):
+
+class _Urllib2(object):
 
     def __init__(self):
         pass
@@ -49,7 +50,7 @@ class Cisco(object):
         urllib2.urlopen(_req)
 
 
-class Brocade(object):
+class _Requests(object):
 
     def __init__(self):
         pass
@@ -117,11 +118,11 @@ def poc_log_close():
 
 try:
     import requests
-    switch_class = Brocade()
+    switch_class = _Requests()
     log_filename = ""
 except:
     import urllib2
-    switch_class = Cisco()
+    switch_class = _Urllib2()
     log_filename = "/bootflash/poap.log"
 
 
