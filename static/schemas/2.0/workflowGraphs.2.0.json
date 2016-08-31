@@ -10,6 +10,7 @@
                     {"required": ["taskName"]},
                     {"required": ["taskDefinition"]}
                 ],
+                "minItems": 1,
                 "properties": {
                     "label": {
                         "type": "string",
@@ -20,7 +21,7 @@
                         "minLength": 1
                     },
                     "taskDefinition": {
-                        "type": "object"
+                        "$ref": "#/definitions/taskDefinition"
                     },
                     "ignoreFailure": {
                         "type": "boolean"
@@ -32,10 +33,41 @@
             }
         },
 
-        "workflowGraphsPut": {
-            "description": "schema for adding or modiftying a workflow graph",
+        "taskDefinition": {
+            "type": "object",
+            "additionalProperties": false,
             "required": [
-                "friendlyName", "injectableName"
+                "friendlyName", "injectableName", "implementsTask", "options", "properties"
+            ],
+            "properties": {
+                "friendlyName": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "injectableName": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "implementsTask": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "options": {
+                    "type": "object"
+                },
+                "properties": {
+                    "type": "object"
+                },
+                "schemaRef": {
+                    "type": "string"
+                }
+            }
+        },
+
+        "workflowGraphsPut": {
+            "description": "schema for adding or modifying a workflow graph",
+            "required": [
+                "friendlyName", "injectableName", "tasks"
             ],
             "additionalProperties": false,
             "properties": {
