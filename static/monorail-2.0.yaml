@@ -3812,6 +3812,7 @@ definitions:
         - pdu
         - mgmt
         - enclosure
+        - rack
         type: string
     type: object
 
