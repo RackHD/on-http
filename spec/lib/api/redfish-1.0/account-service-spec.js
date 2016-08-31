@@ -185,11 +185,26 @@ describe('Redfish Account Service', function () {
         accountService.modifyUserByName.resolves(userObj);
         return helper.request().patch('/redfish/v1/AccountService/Accounts/admin')
             .auth('admin', 'admin123')
-            .send({UserName: 'admin2', Password: 'admin123', RoleId: 'Administrator'})
+            .send({UserName: 'admin2', Password: 'admin456', RoleId: 'Administrator'})
             .expect('Content-Type', /^application\/json/)
             .expect(202)
             .then(function() {
-                expect(accountService.modifyUserByName).to.have.been.called;
+                expect(accountService.modifyUserByName)
+                    .to.have.been.calledWith('admin', {password:'admin456', role: 'Administrator'});
+            });
+    });
+
+    it('should 202 a user patch attempt with auth', function() {
+        accountService.getUserByName.resolves(readOnlyObj);
+        accountService.modifyUserByName.resolves(readOnlyObj);
+        return helper.request().patch('/redfish/v1/AccountService/Accounts/readonly')
+            .auth('readonly', 'read123')
+            .send({UserName: 'readonly', Password: 'read456', RoleId: 'Administrator'})
+            .expect('Content-Type', /^application\/json/)
+            .expect(202)
+            .then(function() {
+                expect(accountService.modifyUserByName)
+                    .to.have.been.calledWith('readonly', {password:'read456'});
             });
     });
 
