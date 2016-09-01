@@ -5,6 +5,9 @@
             "type": "array",
             "items": {
                 "type": "object",
+                "required": [
+                    "label"
+                ],
                 "additionalProperties": false,
                 "oneOf": [
                     {"required": ["taskName"]},
