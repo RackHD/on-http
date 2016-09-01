@@ -72,35 +72,38 @@ describe('Http.Api.Workflows.2.0', function () {
 
     describe('workflowsGet', function () {
         it('should return a list of persisted graph objects', function () {
-            var graph = {
-                            "id": "foobar",
-                            "_status": "running",
-                            "tasks": {
-                                "77444ae5-3232-47b9-b5e6-693ef3dfd11e": {
-                                    "friendlyName": "Redfish requester",
-                                    "ignoreFailure": false,
-                                    "implementsTask": "Task.Base.Redfish",
-                                    "injectableName": "Task.Inline.Redfish",
-                                    "instanceId": "77444ae5-3232-47b9-b5e6-693ef3dfd11e",
-                                    "label": "redfish",
-                                    "name": "Task.Inline.Redfish",
-                                    "properties": {},
-                                    "runJob": "Job.Redfish",
-                                    "state": "pending",
-                                    "taskStartTime": "2016-08-25T08:22:45.943Z",
-                                    "terminalOnStates": [
-                                    "succeeded",
-                                    "timeout",
-                                    "cancelled",
-                                    "failed"
-                                            ],
-                                    "waitingOn": {}
-                                }
-                            }
-            };
+            var graph = 
+                {
+                    "id": "foobar",
+		    "injectableName": "foobar",
+		    "_status": "running",
+		    "tasks": {
+                        "77444ae5-3232-47b9-b5e6-693ef3dfd11e": {
+                            "friendlyName": "Redfish requester",
+			    "ignoreFailure": false,
+			    "implementsTask": "Task.Base.Redfish",
+			    "injectableName": "Task.Inline.Redfish",
+			    "instanceId": "77444ae5-3232-47b9-b5e6-693ef3dfd11e",
+			    "label": "redfish",
+			    "name": "Task.Inline.Redfish",
+			    "properties": {},
+			    "runJob": "Job.Redfish",
+			    "state": "pending",
+			    "taskStartTime": "2016-08-25T08:22:45.943Z",
+			    "terminalOnStates": [
+			    "succeeded",
+			    "timeout",
+			    "cancelled",
+			    "failed"
+				    ],
+			    "waitingOn": {}
+			}
+		    }
+		};
             var outputWorkflow =
                 {
                     "status": 'running',
+                    "injectableName": "foobar",
                     "id": 'foobar',
                     "tasks":[{
                         "label": 'redfish',
@@ -160,35 +163,38 @@ describe('Http.Api.Workflows.2.0', function () {
 
     describe('workflowsGetById', function () {
         it('should return a single persisted graph', function () {
-            var graph = {
-                            "id": "foobar",
-                            "_status": "running",
-                            "tasks": {
-                                "77444ae5-3232-47b9-b5e6-693ef3dfd11e": {
-                                    "friendlyName": "Redfish requester",
-				    "ignoreFailure": false,
-				    "implementsTask": "Task.Base.Redfish",
-				    "injectableName": "Task.Inline.Redfish",
-				    "instanceId": "77444ae5-3232-47b9-b5e6-693ef3dfd11e",
-				    "label": "redfish",
-				    "name": "Task.Inline.Redfish",
-				    "properties": {},
-				    "runJob": "Job.Redfish",
-				    "state": "pending",
-				    "taskStartTime": "2016-08-25T08:22:45.943Z",
-				    "terminalOnStates": [
-				    "succeeded",
-				    "timeout",
-				    "cancelled",
-				    "failed"
-					    ],
-				    "waitingOn": {}
-				}
-			    }
-	    };
+            var graph =
+                {
+                    "id": "foobar",
+                    "injectableName": "foobar",
+                    "_status": "running",
+                    "tasks": {
+                        "77444ae5-3232-47b9-b5e6-693ef3dfd11e": {
+                            "friendlyName": "Redfish requester",
+                            "ignoreFailure": false,
+                            "implementsTask": "Task.Base.Redfish",
+                            "injectableName": "Task.Inline.Redfish",
+                            "instanceId": "77444ae5-3232-47b9-b5e6-693ef3dfd11e",
+                            "label": "redfish",
+                            "name": "Task.Inline.Redfish",
+                            "properties": {},
+                            "runJob": "Job.Redfish",
+                            "state": "pending",
+                            "taskStartTime": "2016-08-25T08:22:45.943Z",
+                            "terminalOnStates": [
+                            "succeeded",
+                            "timeout",
+                            "cancelled",
+                            "failed"
+                                    ],
+                            "waitingOn": {}
+                        }
+                    }
+                };
             var outputWorkflow =
                 {
                     "status": 'running',
+                    "injectableName": "foobar",
                     "id": 'foobar',
                     "tasks":[{
                         "label": 'redfish',

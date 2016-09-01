@@ -18,9 +18,7 @@
     <% if (hasOwnProperty("id")) { %>
     "id": "<%=id%>",
     <% } %>
-    <% if (hasOwnProperty("injectableName")) { %>
     "injectableName": "<%=injectableName%>",
-    <% } %>
     <% if (hasOwnProperty("instanceId")) { %>
     "instanceId": "<%=instanceId%>",
     <% } %>
