@@ -544,7 +544,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     head:
-      operationId: templatesGetByName
+      operationId: templatesHeadByName
       x-privileges: [ 'Read' ]
       x-authentication-type: [ 'jwt' ]
       summary: |
