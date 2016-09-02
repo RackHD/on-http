@@ -51,7 +51,7 @@
                     "required": ["host", "user", "password", "root", "uri", "protocol"]
                 }
             },
-            "required": ["nodeId", "service", "config"]
+            "required": ["service", "config"]
         }
     }
 }

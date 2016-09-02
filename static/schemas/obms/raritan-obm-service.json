@@ -34,7 +34,7 @@
                     "required": ["host", "user", "password", "port"]
                 }
             },
-            "required": ["nodeId", "service", "config"]
+            "required": ["service", "config"]
         }
     }
 }

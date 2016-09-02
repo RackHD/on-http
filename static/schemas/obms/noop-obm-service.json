@@ -15,7 +15,7 @@
                     "type": "object"
                 }
             },
-            "required": ["nodeId", "service", "config"]
+            "required": ["service", "config"]
         }
     }
 }
