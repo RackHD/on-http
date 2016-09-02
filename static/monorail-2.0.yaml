@@ -1670,6 +1670,7 @@ paths:
       operationId: workflowsPutGraphs
       x-privileges: [ 'Write' ]
       x-authentication-type: [ 'jwt' ]
+      x-swagger-schema: workflowGraphs.2.0.json#/definitions/workflowGraphsPut
       summary: |
         Put a graph
       description: |
@@ -3946,6 +3947,18 @@ definitions:
       properties:
         type: object
 
+  workflow_graph_task:
+    type: object
+    properties:
+      taskName:
+        type: string
+      label:
+        type: string
+      ignoreFailure:
+        type: boolean
+      waitOn:
+        type: object
+
   workflow_graph:
     type: object
     properties:
@@ -3953,10 +3966,12 @@ definitions:
         type: string
       injectableName:
         type: string
+      options:
+        type: object
       tasks:
         type: array
         items:
-          $ref: '#/definitions/workflow_task'
+          $ref: '#/definitions/workflow_graph_task'
 
   post_workflow:
     type: object

@@ -151,7 +151,17 @@ describe('Http.Api.Workflows.2.0', function () {
 
    describe('workflowsPutGraphs', function () {
         it('should persist a graph', function () {
-            var graph = { name: 'foobar' };
+            var graph =
+            {
+                "friendlyName": "Dummy Pollers",
+                "injectableName": "Dummy.Poller.Create",
+                "tasks": [
+                    {
+                        "label": "create-redfish-pollers",
+                        "taskName": "Task.Pollers.CreateDefault"
+                    }
+                ]
+            };
             workflowApiService.defineTaskGraph.resolves(graph);
 
             return helper.request().put('/api/2.0/workflows/graphs')
@@ -163,15 +173,25 @@ describe('Http.Api.Workflows.2.0', function () {
 
    describe('workflowsDeleteGraphsByName', function () {
         it('should delete Graph by name', function () {
-            var graph = { name: 'Destroy.Me' };
+            var graph =
+            {
+                "injectableName": "Graph.Example.RackHD",
+                "friendlyName": "Test.Graph",
+                "tasks": [
+                    {
+                        "label": "noop-1",
+                        "taskName": "Task.noop"
+                    }
+                ]
+            };
             workflowApiService.destroyGraphDefinition.resolves(graph);
 
-            return helper.request().delete('/api/2.0/workflows/graphs/' + graph.name)
+            return helper.request().delete('/api/2.0/workflows/graphs/' + graph.injectableName)
             .expect(204)
             .expect(function() {
                 expect(workflowApiService.destroyGraphDefinition).to.have.been.calledOnce;
                 expect(workflowApiService.destroyGraphDefinition)
-                    .to.have.been.calledWith('Destroy.Me');
+                    .to.have.been.calledWith('Graph.Example.RackHD');
             });
         });
     });
