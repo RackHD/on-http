@@ -89,7 +89,7 @@ describe('Http.Api.Tags', function () {
                     name: 'Graph.GenerateTags',
                     options: {
                         'generate-tag': {
-                            nodeId: node.id
+                            nodeIds: [ node.id ]
                         }
                     }
                 });
@@ -126,7 +126,7 @@ describe('Http.Api.Tags', function () {
             expect(waterline.tags.findOne).to.have.been.calledWith({ name: 'tag ^name^' });
         });
     });
-    
+
     it('should 404 an invalid tag from GET /tags/:id', function () {
         waterline.tags.findOne.resolves();
         return helper.request().get('/api/1.1/tags/bad-tag-name')
