@@ -26,9 +26,9 @@ paths:
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic', 'anonymous' ]
-      summary: retrieve list of root-level resources 
+      summary: retrieve list of root-level resources
       description: >
-        This object represents the root Redfish service.  All values for resources described 
+        This object represents the root Redfish service.  All values for resources described
         by this schema shall comply to the requirements as described in the Redfish specification.
         This object represents the root Redfish service.
       operationId: getServiceRoot
@@ -80,7 +80,7 @@ paths:
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve specific information for a physical component
       description: >
-        Retrieves a detailed information catalog for the physical component 
+        Retrieves a detailed information catalog for the physical component
         specified by identifier
       operationId: getChassis
       tags: [ "/redfish/v1" ]
@@ -198,8 +198,8 @@ paths:
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve information for a specific computer systems (physical and/or virtual)
       description: >
-        defines a computer system and its respective properties.  A computer system represents a 
-        machine (physical or virtual) and the local resources such as memory, cpu and other 
+        defines a computer system and its respective properties.  A computer system represents a
+        machine (physical or virtual) and the local resources such as memory, cpu and other
         devices that can be accessed from that machine.
       operationId: getSystem
       tags: [ "/redfish/v1" ]
@@ -615,7 +615,7 @@ paths:
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: install a boot image on a node
       description: >
-        Perform the boot image installation specified in the post data arguments on 
+        Perform the boot image installation specified in the post data arguments on
         the system described by identifier
       operationId: doBootImage
       tags: [ "/redfish/v1" ]
@@ -824,7 +824,7 @@ paths:
         403:
           $ref: "#/responses/status_403"
         501:
-          $ref: "#/responses/status_501"  
+          $ref: "#/responses/status_501"
     post:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
@@ -847,7 +847,7 @@ paths:
         403:
           $ref: "#/responses/status_403"
         501:
-          $ref: "#/responses/status_501"  
+          $ref: "#/responses/status_501"
   /EventService/Subscriptions/{index}:
     x-swagger-router-controller: event-service
     get:
@@ -871,7 +871,7 @@ paths:
         403:
           $ref: "#/responses/status_403"
         501:
-          $ref: "#/responses/status_501"    
+          $ref: "#/responses/status_501"
     delete:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
@@ -891,7 +891,7 @@ paths:
         403:
           $ref: "#/responses/status_403"
         501:
-          $ref: "#/responses/status_501"   
+          $ref: "#/responses/status_501"
   /EventService/Actions/EventService.SubmitTestEvent:
     x-swagger-router-controller: event-service
     post:
@@ -914,7 +914,7 @@ paths:
         403:
           $ref: "#/responses/status_403"
         501:
-          $ref: "#/responses/status_501"        
+          $ref: "#/responses/status_501"
   /AccountService/Accounts/{name}:
     x-swagger-router-controller: account-service
     get:
@@ -1730,27 +1730,27 @@ paths:
 responses:
   status_201:
     description: >
-      A request that created a new resource completed successfully. The Location header shall 
-      be set to the canonical URI for the newly created resource. A representation of the newly 
+      A request that created a new resource completed successfully. The Location header shall
+      be set to the canonical URI for the newly created resource. A representation of the newly
       created resource may be included in the response body.
   status_202:
     description: >
-      The request has been accepted for processing, but the processing has not been completed. 
-      The Location header shall be set to the URI of a Task resource that can later be queried 
-      to determine the status of the operation. A representation of the Task resource may be 
+      The request has been accepted for processing, but the processing has not been completed.
+      The Location header shall be set to the URI of a Task resource that can later be queried
+      to determine the status of the operation. A representation of the Task resource may be
       included in the response body.
   status_400:
     description: >
-      The request could not be processed because it contains missing or invalid information 
-      (such as validation error on an input field, a missing required value, and so on). 
-      An extended error shall be returned in the response body, as defined in section Extended 
+      The request could not be processed because it contains missing or invalid information
+      (such as validation error on an input field, a missing required value, and so on).
+      An extended error shall be returned in the response body, as defined in section Extended
       Error Handling.
   status_401:
     description: >
       The authentication credentials included with this request are missing or invalid.
   status_403:
     description: >
-      The server recognized the credentials in the request, but those credentials do not 
+      The server recognized the credentials in the request, but those credentials do not
       possess authorization to perform this request.
   status_404:
     description: >
@@ -1761,8 +1761,8 @@ responses:
       identified by the Request-URI.
   status_501:
     description: >
-      The server does not (currently) support the functionality required to fulfill the request. 
-      This is the appropriate response when the server does not recognize the request method 
+      The server does not (currently) support the functionality required to fulfill the request.
+      This is the appropriate response when the server does not recognize the request method
       and is not capable of supporting the method for any resource.
 definitions:
   AccountService.1.0.0_AccountService:
@@ -5918,4 +5918,3 @@ definitions:
         type: string
   testEvent:
     type: object
-
