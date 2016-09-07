@@ -156,7 +156,7 @@ describe('Http.Api.Users', function () {
             });
     });
 
-    it('should 200 a less privileged user modification attempt with auth tokens', function() {
+    it('should 400 a less privileged user modification attempt with auth tokens', function() {
         accountService.getUserByName.resolves(readOnlyObj);
         accountService.modifyUserByName.resolves(readOnlyObj);
         return helper.request().post('/login')
@@ -169,12 +169,12 @@ describe('Http.Api.Users', function () {
                     .set("authorization", 'JWT ' + token)
                     .send({password: 'admin456', role: 'Administrator'})
                     .expect('Content-Type', /^application\/json/)
-                    .expect(200)
+                    .expect(400)
                     .then(function() {
                         expect(accountService.getUserByName)
                             .to.have.been.calledWith('readonly');
                         expect(accountService.modifyUserByName)
-                            .to.have.been.calledWith('readonly', {password:'admin456'});
+                            .to.not.have.been.called;
                     });
             });
     });

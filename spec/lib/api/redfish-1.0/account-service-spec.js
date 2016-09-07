@@ -185,7 +185,7 @@ describe('Redfish Account Service', function () {
         accountService.modifyUserByName.resolves(userObj);
         return helper.request().patch('/redfish/v1/AccountService/Accounts/admin')
             .auth('admin', 'admin123')
-            .send({UserName: 'admin2', Password: 'admin456', RoleId: 'Administrator'})
+            .send({Password: 'admin456', RoleId: 'Administrator'})
             .expect('Content-Type', /^application\/json/)
             .expect(202)
             .then(function() {
@@ -199,12 +199,26 @@ describe('Redfish Account Service', function () {
         accountService.modifyUserByName.resolves(readOnlyObj);
         return helper.request().patch('/redfish/v1/AccountService/Accounts/readonly')
             .auth('readonly', 'read123')
-            .send({UserName: 'readonly', Password: 'read456', RoleId: 'Administrator'})
+            .send({Password: 'read456'})
             .expect('Content-Type', /^application\/json/)
             .expect(202)
             .then(function() {
                 expect(accountService.modifyUserByName)
                     .to.have.been.calledWith('readonly', {password:'read456'});
+            });
+    });
+
+    it('should 400 a user patch attempt with auth', function() {
+        accountService.getUserByName.resolves(readOnlyObj);
+        accountService.modifyUserByName.resolves(readOnlyObj);
+        return helper.request().patch('/redfish/v1/AccountService/Accounts/readonly')
+            .auth('readonly', 'read123')
+            .send({UserName: 'readonly', Password: 'read456', RoleId: 'Administrator'})
+            .expect('Content-Type', /^application\/json/)
+            .expect(400)
+            .then(function() {
+                expect(accountService.modifyUserByName)
+                    .to.not.have.been.called;
             });
     });
 
