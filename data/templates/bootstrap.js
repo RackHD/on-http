@@ -10,7 +10,9 @@ var http = require('http'),
     server = '<%=server%>',
     port = '<%=port%>',
     tasksPath = '/api/current/tasks/<%=identifier%>',
-    MAX_BUFFER = 1000 * 1024,
+    // Set the buffer size to ~5MB to accept all output in flashing bios
+    // Otherwise the process will be killed if exceeds the buffer size
+    MAX_BUFFER = 5000 * 1024,
     MAX_RETRY_TIMEOUT = 60 * 1000;
 /**
  * Synchronous each loop from caolan/async.
