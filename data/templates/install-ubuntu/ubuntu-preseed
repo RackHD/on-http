@@ -195,4 +195,4 @@ in-target wget http://<%=server%>:<%=port%>/api/current/templates/post-install-u
 in-target chmod +x ./post-install.sh; \
 in-target ./post-install.sh; \
 in-target wget http://<%=server%>:<%=port%>/api/current/templates/ubuntu-sources -O /etc/apt/sources.list; \
-in-target curl http://<%=server%>:<%=port%>/api/current/templates/<%=completionUri%>
+in-target curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
