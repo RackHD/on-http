@@ -99,9 +99,12 @@ function updateTasks(data, timeout, retry, retries) {
 
     // Call error.toString() on certain errors so when it is JSON.stringified
     // it doesn't end up as '{}' before we send it back to the server.
-    if (data.error && !data.error.code) {
-        data.error = data.error.toString();
-    }
+    data.tasks.forEach(function(task) {
+        if (task.error && !task.error.code) {
+            task.error = task.error.toString();
+        }
+    });
+
     request.write(JSON.stringify(data));
     request.write("\n");
     request.end();
