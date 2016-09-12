@@ -32,7 +32,6 @@ do
 	
 	if [ $? -eq 0 ]
     	then
-        echo http://<%=server%>:<%=port%>/api/current/templates/<%=completionUri%>
         # Retry 100 times, delay between retry set to 1 second, total operation limits
         # to 1000 seconds, each connection fail at 9 seconds
         /bin/curl -X POST -H 'Content-Type:application/json' --max-time 1000 --connect-timeout 9 --retry-delay 1 --retry 100 http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>

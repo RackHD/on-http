@@ -26,6 +26,6 @@
 # Nothing wrong with set -e here since we're not doing anything complex
 set -e
 echo "Attempting to call back to RackHD CentOS installer"
-wget --retry-connrefused --waitretry=1 -t 300 http://<%=server%>:<%=port%>/api/current/templates/<%=completionUri%>
+wget --retry-connrefused --waitretry=1 -t 300 --post-data '{"nodeId":"<%=nodeId%>"}' --header='Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification
 # Only run this once to verify the OS was installed, then disable it forever
 chkconfig centos.rackhdcallback off
