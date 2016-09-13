@@ -18,7 +18,7 @@
     <% } else { %>
     "lastStarted": null,
     <% } %>
-    <% if (node !== null) { %>
+    <% if (lastFinished !== null) { %>
     "lastFinished": "<%=lastFinished%>",
     <% } else { %>
     "lastFinished": null,
