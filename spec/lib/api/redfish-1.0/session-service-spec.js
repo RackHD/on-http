@@ -10,14 +10,14 @@ describe('Redfish Session Service', function () {
     var waterline;
     var Promise;
     var Constants;
-    var template;
+    var view;
     var fs;
     var env;
     var accountService;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
-        return fs.readFileAsync(__dirname + '/../../../../data/templates/' + entry, 'utf-8')
+        return fs.readFileAsync(__dirname + '/../../../../data/views/redfish-1.0/' + entry, 'utf-8')
             .then(function(contents) {
                 return { contents: contents };
             });
@@ -29,8 +29,8 @@ describe('Redfish Session Service', function () {
         return helper.startServer([], { authEnabled: true }).then(function () {
             Constants = helper.injector.get('Constants');
 
-            template = helper.injector.get('Templates');
-            sinon.stub(template, "get", redirectGet);
+            view = helper.injector.get('Views');
+            sinon.stub(view, "get", redirectGet);
 
             redfish = helper.injector.get('Http.Api.Services.Redfish');
             sinon.spy(redfish, 'render');
@@ -96,7 +96,7 @@ describe('Redfish Session Service', function () {
     after('stop HTTP server', function () {
         validator.validate.restore();
         redfish.render.restore();
-        template.get.restore();
+        view.get.restore();
         env.get.restore();
 
         function restoreStubs(obj) {

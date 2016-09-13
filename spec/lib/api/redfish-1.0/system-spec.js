@@ -10,14 +10,17 @@ describe('Redfish Systems Root', function () {
     var waterline;
     var Promise;
     var taskProtocol;
-    var template;
+    var view;
     var fs;
     var nodeApi;
     var Errors;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
-        return fs.readFileAsync(__dirname + '/../../../../data/templates/' + entry, 'utf-8')
+        if( entry !== 'error.2.0.json') {
+            entry = 'redfish-1.0/' + entry;
+        }
+        return fs.readFileAsync(__dirname + '/../../../../data/views/' + entry, 'utf-8')
             .then(function(contents) {
                 return { contents: contents };
             });
@@ -26,8 +29,8 @@ describe('Redfish Systems Root', function () {
     before('start HTTP server', function () {
         this.timeout(5000);
         return helper.startServer([]).then(function () {
-            template = helper.injector.get('Templates');
-            sinon.stub(template, "get", redirectGet);
+            view = helper.injector.get('Views');
+            sinon.stub(view, "get", redirectGet);
 
             redfish = helper.injector.get('Http.Api.Services.Redfish');
             sinon.spy(redfish, 'render');
@@ -95,7 +98,7 @@ describe('Redfish Systems Root', function () {
     after('stop HTTP server', function () {
         validator.validate.restore();
         redfish.render.restore();
-        template.get.restore();
+        view.get.restore();
         nodeApi.setNodeWorkflowById.restore();
         
         function restoreStubs(obj) {
@@ -605,7 +608,7 @@ describe('Redfish Systems Root', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
-                expect(template.get.called).to.be.true;
+                expect(view.get.called).to.be.true;
             });
     });
 
@@ -636,7 +639,7 @@ describe('Redfish Systems Root', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
-                expect(template.get.called).to.be.true;
+                expect(view.get.called).to.be.true;
             });
     });
 
