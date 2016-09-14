@@ -183,7 +183,7 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
 
 <% if( typeof postInstallCommands !== 'undefined' ) { %>
   <% postInstallCommands.forEach(function(n) { %>
-    <%=n%>
+    <%-n%>
   <% }); %>
 <% } %>
 
