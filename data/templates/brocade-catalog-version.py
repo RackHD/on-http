@@ -8,7 +8,7 @@ def main():
 
     try:
         output = CLI('show version', do_print=False).get_output()
-        data = output[2]
+        data = output[5]
     except:
         pass
 
