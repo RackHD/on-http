@@ -94,14 +94,6 @@ describe('Services.Http.Swagger', function() {
                             },
                             value: 'HD'
                         },
-                        middleName: {
-                            parameterObject: {
-                                in: 'query',
-                                type: 'string',
-                                definition: { name: 'middleName' }
-                            },
-                            value:'John+Paul+George'
-                        },
                         undefinedName: {
                             parameterObject: {
                                 in: 'query',
@@ -135,8 +127,6 @@ describe('Services.Http.Swagger', function() {
                     .and.to.equal('Rack');
                 expect(req.swagger.query).to.have.property('lastName')
                     .and.to.equal('HD');
-                expect(req.swagger.query).to.have.property('middleName')
-                    .and.to.deep.equal(['John', 'Paul', 'George']);
                 expect(req.swagger.query).not.to.have.property('inBody');
                 expect(req.swagger.query).not.to.have.property('undefinedName');
             });
