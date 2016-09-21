@@ -33,6 +33,33 @@ reboot
 
 %firstboot --interpreter=busybox
 
+postLookup () {
+  echo "Attempting postLookup operation on $1" >> /vmfs/volumes/datastore1/firstboot.log
+  mac=`esxcli --debug --formatter=csv network ip interface list | grep $1 | awk -F, '{print $3}'`
+  if [ "<%=version%>" == "5.5" ]; then
+    mac=`esxcli --debug --formatter=csv network ip interface list | grep $1 | awk -F, '{print $2}'`
+  fi
+  BODY="{"
+  BODY=$BODY"\"macAddress\": \"$mac\","
+  BODY=$BODY"\"ipAddress\": \"$2\","
+  BODY=$BODY"\"node\": \"<%=nodeId%>\""
+  BODY=$BODY"}"
+  BODYLEN=$(echo -n ${BODY} | wc -c )
+  echo ${BODY} >> /vmfs/volumes/datastore1/firstboot.log
+  result=`echo -ne "POST /api/current/lookups HTTP/1.0\r\nHost: $2\r\nContent-Type: application/json\r\nContent-Length: ${BODYLEN}\r\n\r\n${BODY}" | nc -i 3  <%=server%> <%=port%> | grep -oE 'HTTP/1.1 [0-9]{3}' | awk '{print $2}'`
+  if [ "$result" -ge "400" ]; then
+    # Make an attempt to PATCH if we can find the node id.  This is to handle the case where the
+    # ARP poller added the lookup entry when we tried to POST above causing a collision.
+    id=`wget http://<%=server%>:<%=port%>/api/current/lookups?q=$2 -qO - | grep -oE '\"id\":\"(.)*\"'`
+    if [ "$?" -eq "0" ]; then
+      id=`echo $id | awk -F: '{gsub(/"/,"",$2); print $2}'`
+      result=`echo -ne "PATCH /api/current/lookups/$id HTTP/1.0\r\nHost: $2\r\nContent-Type: application/json\r\nContent-Length: ${BODYLEN}\r\n\r\n${BODY}" | nc -i 3 <%=server%> <%=port%> | grep -oE 'HTTP/1.1 [0-9]{3}' | awk '{print $2}'`
+      echo "Patch result: $result to id: $id" >> /vmfs/volumes/datastore1/firstboot.log
+    fi
+  fi
+  wget http://<%=server%>:<%=port%>/api/current/lookups?q=$2 -qO - >> /vmfs/volumes/datastore1/firstboot.log
+}
+
 # enable VHV (Virtual Hardware Virtualization to run nested 64bit Guests + Hyper-V VM)
 grep -i "vhv.enable" /etc/vmware/config || echo "vhv.enable = \"TRUE\"" >> /etc/vmware/config
 
@@ -143,6 +170,7 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
           esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
           esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
           esxcli network vswitch standard portgroup set -p $currdev.<%=vid%> -v <%=vid %>
+          postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
         <% }); %>
       <% } else { %>
         <% vmkname = 'vmk' + vmkid++ %>
@@ -151,6 +179,7 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
         esxcli network ip interface add -i <%=vmkname%> -p $currdev
         esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
         esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
+        postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
       <% } %>
     <% } %>
     <% if( undefined !== n.ipv6 ) { %>
