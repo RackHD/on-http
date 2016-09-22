@@ -1789,12 +1789,6 @@ paths:
 
         '
       operationId: obmsGet
-      parameters:
-      - description: Query string used to search for OBM information
-        in: query
-        name: query
-        required: false
-        type: string
       responses:
         200:
           description: 'Successfully retrieved the list of OBM service instances
