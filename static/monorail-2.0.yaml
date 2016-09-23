@@ -312,6 +312,12 @@ paths:
         name: query
         required: false
         type: string
+      - name: sort
+        in: query
+        description: Query string specifying properties to sort with
+        required: false
+        type: string
+        pattern: '[- +]{0,1}(name|id)'
       responses:
         '200':
           description: Successfully retrieved a list of catalogs
@@ -850,6 +856,12 @@ paths:
         name: $top
         required: false
         type: integer
+      - name: sort
+        in: query
+        description: Query string specifying properties to sort with
+        required: false
+        type: string
+        pattern: '[- +]{0,1}(name|id)'
       responses:
         200:
           description: Successfully retrieved the list of nodes
@@ -2110,6 +2122,12 @@ paths:
         name: $top
         required: false
         type: integer
+      - name: sort
+        in: query
+        description: Query string specifying properties to sort with
+        required: false
+        type: string
+        pattern: '[- +]{0,1}(id)'
       responses:
         200:
           description: 'Successful retrieval of the list of pollers
@@ -3574,6 +3592,13 @@ paths:
 
         '
       operationId: getAllTags
+      parameters:
+      - name: sort
+        in: query
+        description: Query string specifying properties to sort with
+        required: false
+        type: string
+        pattern: '[- +]{0,1}(name|id)'
       responses:
         200:
           description: 'Successfully retrieved all tags
@@ -4082,6 +4107,13 @@ paths:
 
         '
       operationId: templatesMetaGet
+      parameters:
+      - name: sort
+        in: query
+        description: Query string specifying properties to sort with
+        required: false
+        type: string
+        pattern: '[- +]{0,1}(name|id)'
       responses:
         200:
           description: 'Successfully retrieved all template metadata
@@ -4244,6 +4276,13 @@ paths:
 
         '
       operationId: listUsers
+      parameters:
+      - name: sort
+        in: query
+        description: Query string specifying properties to sort with
+        required: false
+        type: string
+        pattern: '[- +]{0,1}(name|id)'
       responses:
         200:
           description: 'Successfully retrieved the list of users
@@ -4624,6 +4663,12 @@ paths:
         name: $top
         required: false
         type: integer
+      - name: sort
+        in: query
+        description: Query string specifying properties to sort with
+        required: false
+        type: string
+        pattern: '[- +]{0,1}(name|id)'
       responses:
         200:
           description: 'Successfull retrieved workflows

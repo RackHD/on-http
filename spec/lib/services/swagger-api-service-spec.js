@@ -41,7 +41,15 @@ describe('Services.Http.Swagger', function() {
         });
 
         it('should call controller callback', function() {
-            var req = { swagger: {} };
+            var req = {
+                swagger: {
+                    params: {
+                        sort: {
+                        }
+                    }
+                },
+                query: {}
+            };
             var res = {
                 headersSent: false
             };
@@ -56,7 +64,16 @@ describe('Services.Http.Swagger', function() {
         });
 
         it('should process options', function() {
-            var req = { swagger: {} };
+            var req = {
+                swagger: {
+                    params: {
+                        sort: {
+                        }
+                    }
+                },
+                query: {}
+            };
+
             var res = {
                 headersSent: false
             };
@@ -78,6 +95,8 @@ describe('Services.Http.Swagger', function() {
                 query: {},
                 swagger: {
                     params: {
+                        sort: {
+                        },
                         firstName: {
                             parameterObject: {
                                 in: 'query',
@@ -132,8 +151,85 @@ describe('Services.Http.Swagger', function() {
             });
         });
 
+        it('should process sort query', function() {
+            var req = {
+                query:{
+                    sort:"id"
+                },
+                swagger: {
+                    params: {
+                        sort: {
+                            raw: "id"
+                        }
+                    }
+                }
+            };
+            var res = {
+                headersSent: false
+            };
+            var mockData = [
+                {
+                    id: '1234',
+                    name: 'dummy'
+                },
+                {
+                    id: '5679',
+                    name: 'dummy2'
+                }];
+            var optController = swaggerService.controller(mockController);
+
+            expect(optController).to.be.a('function');
+            mockController.resolves(mockData);
+            return optController(req, res, mockNext).then(function() {
+                expect(req.swagger.params.sort).to.have.property('raw');
+                expect(res.body).to.deep.equal(mockData);
+                expect(mockNext).to.be.called.once;
+
+            });
+        });
+
+        it('should not process sort function, when not present', function() {
+            var req = {
+                query:{
+                    id:"1234"
+                },
+                swagger: {
+                    params: {
+                        sort: {
+                        }
+                    }
+                }
+            };
+            var res = {
+                headersSent: false
+            };
+            var mockData = [
+                {
+                    id: '1234',
+                    name: 'dummy'
+                }];
+            var optController = swaggerService.controller(mockController);
+
+            expect(optController).to.be.a('function');
+            mockController.resolves(mockData);
+            return optController(req, res, mockNext).then(function() {
+                expect(res.body).to.deep.equal(mockData);
+                expect(mockNext).to.be.called.once;
+
+            });
+        });
+
         it('should not call next after sending headers', function() {
-            var req = { swagger: {} };
+            var req = {
+                swagger: {
+                    params: {
+                        sort: {
+                        }
+                    }
+                },
+                query: {}
+            };
+
             var res = {
                 headersSent: true
             };
@@ -148,7 +244,16 @@ describe('Services.Http.Swagger', function() {
         });
 
         it('should call next if an error occurs', function() {
-            var req = { swagger: {} };
+            var req = {
+                swagger: {
+                    params: {
+                        sort: {
+                        }
+                    }
+                },
+                query: {}
+            };
+
             var res = {
                 headersSent: false
             };
