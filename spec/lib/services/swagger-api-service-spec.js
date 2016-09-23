@@ -41,14 +41,14 @@ describe('Services.Http.Swagger', function() {
         });
 
         it('should call controller callback', function() {
-            var req = { 
+            var req = {
                 swagger: {
                     params: {
                         sort: {
-			}
-		    }
-		}, 
-                query: {} 
+                        }
+                    }
+                },
+                query: {}
             };
             var res = {
                 headersSent: false
@@ -179,8 +179,8 @@ describe('Services.Http.Swagger', function() {
             };
             var mockData = [
                 {
-                id: '1234',
-                name: 'dummy'
+                    id: '1234',
+                    name: 'dummy'
                 },
                 {
                     id: '5679',
@@ -215,8 +215,8 @@ describe('Services.Http.Swagger', function() {
             };
             var mockData = [
                 {
-                id: '1234',
-                name: 'dummy'
+                    id: '1234',
+                    name: 'dummy'
                 }];
             var optController = swaggerService.controller(mockController);
 
