@@ -8,8 +8,6 @@
     "Name": "User Account",
     "UserName": "<%= user.username %>",
     "RoleId": "<%= user.role %>",
-    "Enabled": true,
-    "Locked": false,
     "Links": {
         "Role": {
             "@odata.id": "<%=basepath%>/AccountService/Roles/<%=user.role%>"
