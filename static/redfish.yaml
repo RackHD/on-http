@@ -4655,11 +4655,10 @@ definitions:
       version:
         type: string
     required:
-    - domain
-    - hostname
+    - version
+    - repo
     - osName
     - rootPassword
-    - dnsServers
   RackHD.BootImage_BootImageList:
     properties:
       osName:
@@ -4678,8 +4677,14 @@ definitions:
         type: string
       netmask:
         type: string
-      vlanId:
-        type: string
+      vlanIds:
+        type: array
+        items:
+          type: number
+    required:
+    - ipAddr
+    - netmask
+    - gateway
   RackHD.BootImage_NetworkDevice:
     properties:
       device:
@@ -4688,6 +4693,8 @@ definitions:
         $ref: '#/definitions/RackHD.BootImage_NetworkAddress'
       ipv6:
         $ref: '#/definitions/RackHD.BootImage_NetworkAddress'
+    required:
+    - device
   RackHD.BootImage_Users:
     properties:
       name:
@@ -4698,6 +4705,9 @@ definitions:
         type: string
       uid:
         type: number
+    required:
+    - name
+    - password
   RackHD.ResetAction_ResetAction:
     description: This is the base type for the reset action.
     properties:
