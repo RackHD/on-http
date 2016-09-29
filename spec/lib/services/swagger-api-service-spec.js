@@ -11,7 +11,7 @@ describe('Services.Http.Swagger', function() {
     function MockSchemaService() {}
     var mockWaterlineService = {
         test: {}
-    }
+    };
 
     before('inject swagger service', function() {
         helper.setupInjector(_.flattenDeep([
@@ -632,6 +632,81 @@ describe('Services.Http.Swagger', function() {
         });
     });
 
+    describe('makeRenderableOptions()', function() {
+        var makeRenderableOptions;
+        var config;
+        var env;
+        var configGetStub;
+        var envGetStub;
+        var res;
+        var req;
+
+        before(function() {
+            makeRenderableOptions = swaggerService.makeRenderableOptions;
+            config = helper.injector.get('Services.Configuration');
+            env = helper.injector.get('Services.Environment');
+            envGetStub = sinon.stub(env, 'get');
+            res = {
+                locals: {
+                    scope: ['global']
+                }
+            };
+            req = {
+                swagger: {
+                    options: {},
+                    operation:{
+                        api:{
+                            basePath: 'nothing'
+                        }
+                    }
+                }
+            };
+        });
+
+        afterEach(function() {
+            configGetStub.restore();
+        });
+
+        it('should return file.server when configuring fileServerAddress', function() {
+            configGetStub = sinon.stub(config, 'get', function(key, defaults) {
+                var obj = {
+                    apiServerAddress: '10.1.1.1',
+                    apiServerPort: 80,
+                    fileServerAddress: '10.1.1.2',
+                    fileServerPort: 8080,
+                    fileServerPath: '/static'
+                };
+                if (obj.hasOwnProperty(key)) {
+                    return obj[key];
+                } else {
+                    return defaults;
+                }
+            });
+            return makeRenderableOptions(req, res, {}, true)
+            .then(function(options) {
+               expect(options.file.server).to.equal('http://10.1.1.2:8080/static');
+            });
+        });
+
+        it('should return file.server when not configuring fileServerAddress', function() {
+            configGetStub = sinon.stub(config, 'get', function(key, defaults) {
+                var obj = {
+                    apiServerAddress: '10.1.1.1',
+                    apiServerPort: 80
+                };
+                if (obj.hasOwnProperty(key)) {
+                    return obj[key];
+                } else {
+                    return defaults;
+                }
+            });
+            return makeRenderableOptions(req, res, {}, true)
+            .then(function(options) {
+               expect(options.file.server).to.equal('http://10.1.1.1:80');
+            });
+        });
+    });
+
     describe('addLinkHeader()', function() {
         var addLinksHeader;
 
@@ -645,7 +720,7 @@ describe('Services.Http.Swagger', function() {
 
         beforeEach(function() {
             res.links.reset();
-        })
+        });
 
         it('should not add links without $skip or $top', function() {
             var req = {
