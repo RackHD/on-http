@@ -195,7 +195,8 @@ export PATH
     <% if( ipv6 ) { %>
       grep -q -F 'NETWORKING_IPV6=yes' /etc/sysconfig/network || echo "NETWORKING_IPV6=yes" >> /etc/sysconfig/network
     <% } %>
-  <% } else { %>
+  <% } %>
+<% } else { %>
 
 # Setting all network devices to dhcp on boot
 
@@ -207,8 +208,7 @@ export PATH
     find /etc/sysconfig/network-scripts/ -name "ifcfg-*" ! -name "ifcfg-lo"\
      -exec bash -c "echo 'BOOTPROTO=dhcp' >> {}" \; \
      -exec bash -c "echo 'ONBOOT=yes' >> {}" \;
-  <% } %>
-<% } %>
+ <% } %>
 
 # Setup DNS servers
 <% if (typeof dnsServers !== 'undefined') { %>

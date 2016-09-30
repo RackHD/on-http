@@ -8,24 +8,22 @@ accepteula
 <% } %>
 rootpw <%=rootPlainPassword%>
 
-# Search the networkDevices and set the first vmnic# (if defined) up.
-# If no vmnic# device is specified in the networkDevices, then we fallback
-# to setting vmnic0 up as dhcp
-<% if( undefined !== networkDevices ) { %>
+# Search the networkDevices and set the first device (if defined) up.
+# If no device is specified in the networkDevices, then we fallback
+# to setting 'vmnic0' up as DHCP. The device can be specified with a
+# MAC address or device name ('vmnic0' for example)
+<% if( typeof networkDevices !== 'undefined' ) { %>
   <% need_default = networkDevices.every(function(n) { %>
-    <% if( n.device.substring(0,5) === 'vmnic' ) { %>
-      <% if(typeof n.ipv4 !== 'undefined') { %>
-        <% ipopts = '--ip=' + n.ipv4.ipAddr + ' --gateway=' + n.ipv4.gateway + ' --netmask=' + n.ipv4.netmask %>
-        <% if (typeof n.ipv4.vlanIds !== 'undefined' ) { %>
-          <% ipopts += ' --vlandid=' + n.ipv4.vlanIds[0] %>
-        <% } %>
-        network --bootproto=static --device=<%=n.device%> <%=ipopts%>
-      <% } else { %>
-        network --bootproto=dhcp --device=<%=n.device%>
+    <% if(typeof n.ipv4 !== 'undefined') { %>
+      <% ipopts = '--ip=' + n.ipv4.ipAddr + ' --gateway=' + n.ipv4.gateway + ' --netmask=' + n.ipv4.netmask %>
+      <% if (typeof n.ipv4.vlanIds !== 'undefined' ) { %>
+        <% ipopts += ' --vlandid=' + n.ipv4.vlanIds[0] %>
       <% } %>
-      <% return false; %>
+      network --bootproto=static --device=<%=n.device%> <%=ipopts%>
+    <% } else { %>
+      network --bootproto=dhcp --device=<%=n.device%>
     <% } %>
-    <% return true; %>
+    <% return false; %>
   <% }); %>
   <% if (need_default) { %>
     network --bootproto=dhcp --device=vmnic0
@@ -123,7 +121,13 @@ esxcli system settings advanced set -o /UserVars/ESXiShellInteractiveTimeout -i 
 esxcli network firewall set --default-action false --enabled no
 
 # set hostname and domain
-esxcli system hostname set --domain <%=domain%> --host <%=hostname%>
+<% hostnameCmdStr = '' %>
+<% if (typeof domain === 'string') hostnameCmdStr += (' --domain ' + domain) %>
+<% if (typeof hostname === 'string') hostnameCmdStr += (' --host ' + hostname) %>
+<% if (typeof fqdn === 'string') hostnameCmdStr += (' --fqdn ' + fqdn) %>
+<% if (hostnameCmdStr.length > 0) { %>
+    esxcli system hostname set <%=hostnameCmdStr%>
+<% } %>
 
 #config root account
 <% if (typeof rootSshKey !== 'undefined') { %>
@@ -131,6 +135,7 @@ esxcli system hostname set --domain <%=domain%> --host <%=hostname%>
 <%} %>
 
 #create users
+<% if( typeof users !== 'undefined' ) { %>
 <% users.forEach(function(user) { %>
     /usr/lib/vmware/auth/bin/adduser -s /bin/sh -G root -h / -D <%=user.name%>
     echo <%=user.plainPassword%> | passwd <%=user.name%> --stdin
@@ -139,13 +144,17 @@ esxcli system hostname set --domain <%=domain%> --host <%=hostname%>
         echo <%=user.sshKey%> > /etc/ssh/keys-<%=user.name%>/authorized_keys
     <%} %>
 <%}) %>
+<%} %>
 
 #setup ntp
 cat > /etc/ntp.conf << __NTP_CONFIG__
 restrict default kod nomodify notrap noquerynopeer
 restrict 127.0.0.1 kkl,lkl
-server 0.vmware.pool.ntp.org
-server 1.vmware.pool.ntp.org
+<% if( typeof ntpServers !== 'undefined' ) { %>
+   <% ntpServers.forEach(function(ntp) { %>
+      server <%= ntp %>
+   <% }); %>
+<% } %>
 __NTP_CONFIG__
 /sbin/chkconfig ntpd on
 
@@ -169,8 +178,10 @@ postLookup () {
   python /vmfs/volumes/datastore1/postLookup.py $mac $2
 }
 
-<% if( undefined !== dnsServers ) { %>
-  localcli network ip dns search add <%=domain%>
+<% if( typeof dnsServers !== 'undefined' ) { %>
+  <% if ( typeof domain !== 'undefined' ) { %>
+  esxcli network ip dns search add --domain=<%=domain%>
+  <% } %>
   <% dnsServers.forEach(function(dns) { %>
     localcli network ip dns server add --server=<%= dns %>
   <% }); %>
@@ -179,7 +190,7 @@ postLookup () {
 <% if ( typeof switchDevices !== 'undefined' ) { %>
   <% switchDevices.forEach(function(n) { %>
     localcli network vswitch standard add -v "<%=n.switchName%>"
-    <% if( undefined !== n.uplinks ) { %>
+    <% if( typeof n.uplinks !== 'undefined' ) { %>
       <% n.uplinks.forEach(function(s) { %>
         currsw=`localcli --debug --formatter=csv network vswitch standard list | grep <%=s%> | awk -F, '{print $9}'`
         if [ "$currsw" != "" ]; then
@@ -192,12 +203,12 @@ postLookup () {
 <% } %>
 
 <% vmkid = 0 %>
-<% if( undefined !== networkDevices ) { %>
+<% if( typeof networkDevices !== 'undefined' ) { %>
   <% if( networkDevices.length > 0 ) { %>
 
     <% networkDevices.forEach(function(n) { %>
-      <% if( undefined !== n.ipv4 ) { %>
-        <% if( undefined !== n.ipv4.vlanIds ) { %>
+      <% if( typeof n.ipv4 !== 'undefined' ) { %>
+        <% if( typeof n.ipv4.vlanIds !== 'undefined' ) { %>
           <% n.ipv4.vlanIds.forEach(function(vid) { %>
             <% vmkname = 'vmk' + vmkid++ %>
             localcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v "<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>"
@@ -218,8 +229,8 @@ postLookup () {
           postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
         <% } %>
       <% } %>
-      <% if( undefined !== n.ipv6 ) { %>
-        <% if( undefined !== n.ipv6.vlanIds ) { %>
+      <% if( typeof n.ipv6 !== 'undefined' ) { %>
+        <% if( typeof n.ipv6.vlanIds !== 'undefined' ) { %>
           <% n.ipv6.vlanIds.forEach(function(vid) { %>
             <% vmkname = 'vmk' + vmkid++ %>
             localcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
@@ -236,7 +247,7 @@ postLookup () {
           localcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
         <% } %>
       <% } %>
-      <% if( (undefined === n.ipv6) && (undefined === n.ipv4) ) { %>
+      <% if( (typeof n.ipv6 === 'undefined') && (typeof n.ipv4 === 'undefined') ) { %>
         <% vmkname = 'vmk' + vmkid++ %>
         localcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
         localcli network ip interface remove -i <%=vmkname%>
@@ -244,7 +255,8 @@ postLookup () {
         localcli network ip interface ipv4 set -i <%=vmkname%> -t dhcp
       <% } %>
     <% }); %>
-  <% } else { %>
+<% } %>
+<% } else { %>
     for nic in $(localcli network nic list | grep vmnic | awk '{print $1}'); do
       localcli network vswitch standard add -v vSwitch${nic#vmnic*}
       localcli network vswitch standard uplink add -v vSwitch${nic#vmnic*} -u ${nic}
@@ -255,7 +267,6 @@ postLookup () {
       postLookup vmk${nic#vmnic*}
 
     done
-  <% } %>
 <% } %>
 
 #signify ORA the installation completed
