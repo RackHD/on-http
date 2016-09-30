@@ -12,6 +12,7 @@ describe('Redfish Account Service', function () {
     var view;
     var fs;
     var accountService;
+    var Errors;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -48,6 +49,7 @@ describe('Redfish Account Service', function () {
             fs = Promise.promisifyAll( helper.injector.get('fs') );
             tv4 = require('tv4');
             accountService = helper.injector.get('Http.Services.Api.Account');
+            Errors = helper.injector.get('Errors');
 
             self.sandbox.stub(view, "get", redirectGet);
             self.sandbox.spy(redfish, 'render');
@@ -160,6 +162,17 @@ describe('Redfish Account Service', function () {
             .expect(201);
     });
 
+    it('should 400 a user post attempt with invalid password requirements', function() {
+        accountService.listUsers.resolves([ userObj ]);
+        accountService.createUser.rejects(new Errors.BadRequestError());
+        accountService.getUserByName.resolves(userObj);
+        return helper.request().post('/redfish/v1/AccountService/Accounts')
+            .auth('admin', 'admin123')
+            .send({UserName: 'admin2', Password: 'admin', RoleId: 'Administrator'})
+            .expect('Content-Type', /^application\/json/)
+            .expect(400);
+    });
+
     it('should 403 a user post without access', function() {
         accountService.listUsers.resolves([ userObj ]);
         accountService.createUser.resolves();
@@ -245,8 +258,7 @@ describe('Redfish Account Service', function () {
         accountService.removeUserByName.resolves(userObj);
         return helper.request().delete('/redfish/v1/AccountService/Accounts/admin')
             .auth('admin', 'admin123')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
+            .expect(204)
             .then(function() {
                 expect(accountService.removeUserByName).to.have.been.calledWith('admin');
             });
@@ -261,5 +273,6 @@ describe('Redfish Account Service', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(403);
     });
+
 });
 
