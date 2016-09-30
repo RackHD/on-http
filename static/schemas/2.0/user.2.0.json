@@ -17,7 +17,8 @@
                 },
                 "role": {
                     "description": "The role of the user",
-                    "type": "string"
+                    "type": "string",
+                    "enum": ["Administrator", "ReadOnly"]
                 }
             },
             "additionalProperties": false
