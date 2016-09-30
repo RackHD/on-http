@@ -804,8 +804,6 @@ paths:
           $ref: "#/responses/status_401"
         403:
           $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
   /EventService/Subscriptions:
     x-swagger-router-controller: event-service
     get:
@@ -823,8 +821,6 @@ paths:
           $ref: "#/responses/status_401"
         403:
           $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
     post:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
@@ -846,8 +842,8 @@ paths:
           $ref: "#/responses/status_401"
         403:
           $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
+        409:
+          $ref: "#/responses/status_409"
   /EventService/Subscriptions/{index}:
     x-swagger-router-controller: event-service
     get:
@@ -870,8 +866,6 @@ paths:
           $ref: "#/responses/status_401"
         403:
           $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
     delete:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
@@ -884,14 +878,12 @@ paths:
           required: true
           type: string
       responses:
-        200:
+        204:
           description: Success
         401:
           $ref: "#/responses/status_401"
         403:
           $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
   /EventService/Actions/EventService.SubmitTestEvent:
     x-swagger-router-controller: event-service
     post:
@@ -907,14 +899,13 @@ paths:
           schema:
             $ref: "#/definitions/testEvent"
       responses:
-        200:
+        202:
           description: Success
+          $ref: "#/responses/status_202"
         401:
           $ref: "#/responses/status_401"
         403:
           $ref: "#/responses/status_403"
-        501:
-          $ref: "#/responses/status_501"
   /AccountService/Accounts/{name}:
     x-swagger-router-controller: account-service
     get:
@@ -1234,10 +1225,8 @@ paths:
           $ref: "#/responses/status_403"
         404:
           $ref: "#/responses/status_404"
-        500:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+        501:
+          $ref: "#/responses/status_501"
   /Managers/{identifier}/SerialInterfaces/{index}:
     x-swagger-router-controller: unimplemented
     get:
@@ -1268,10 +1257,8 @@ paths:
           $ref: "#/responses/status_403"
         404:
           $ref: "#/responses/status_404"
-        500:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+        501:
+          $ref: "#/responses/status_501"
   /Registries:
     x-swagger-router-controller: registry
     get:
@@ -1759,6 +1746,10 @@ responses:
     description: >
       The method specified in the Request-Line is not allowed for the resource
       identified by the Request-URI.
+  status_409:
+    description: >
+      The request could not be completed due to a conflict with the current state
+      of the target resource.
   status_501:
     description: >
       The server does not (currently) support the functionality required to fulfill the request.

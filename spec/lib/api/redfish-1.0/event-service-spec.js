@@ -165,7 +165,7 @@ describe('Redfish Event Service', function () {
             '/redfish/v1/EventService/Actions/EventService.SubmitTestEvent'
         )
         .send({})
-        .expect(200)
+        .expect(202)
         .expect(function() {
             expect(tv4.validate.called).to.be.true;
         });
@@ -198,7 +198,7 @@ describe('Redfish Event Service', function () {
     it('should delete a valid subscription', function() {    
         return helper.request()
         .delete('/redfish/v1/EventService/Subscriptions/' + identifier)
-        .expect(200);
+        .expect(204);
     });
     
     it('should fail to delete an ivalid subscription', function() {    
