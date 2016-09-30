@@ -138,10 +138,10 @@ describe('Redfish TaskService', function () {
             });
     });
 
-    it('should 500 an invalid task', function () {
+    it('should 404 an invalid task', function () {
         waterline.graphobjects.find.resolves([graph]);
         return helper.request().get('/redfish/v1/TaskService/Tasks/' + graph.id + 'invalid')
-            .expect(500);
+            .expect(404);
     });
 
     it('should return a valid task from a system', function () {
