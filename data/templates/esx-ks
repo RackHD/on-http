@@ -245,7 +245,8 @@ wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%
 esxcli system shutdown reboot -d 10 -r "Rebooting after first boot host configuration"
 
 %post --interpreter=busybox
-
+#disable firewall
+localcli network firewall set --enabled no
 #signify ORA the installation completed
 BODY="{"
 BODY=$BODY"\"nodeId\": \"<%=nodeId%>\""
