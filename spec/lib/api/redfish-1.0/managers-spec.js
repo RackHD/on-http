@@ -69,7 +69,13 @@ describe('Redfish Managers', function () {
             id: '1234abcd1234abcd1234abcd',
             name: '1234abcd1234abcd1234abcd'
         }));
+        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd')
+        .resolves(Promise.resolve({
+            id: '1234abcd1234abcd1234abcd',
+            name: '1234abcd1234abcd1234abcd'
+        }));
         waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+        waterline.nodes.getNodeById.resolves([]);
         waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
     });
 
@@ -99,16 +105,16 @@ describe('Redfish Managers', function () {
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         type: 'compute',
-        obmSettings: [
-            {
-                service: 'ipmi-obm-service',
-                config: {
-                    host: '1.2.3.4',
-                    user: 'myuser',
-                    password: 'mypass'
-                }
-            }
-        ],
+        obms: [{
+            id: "574dcd5794ab6e2506fd107a",
+            node: "1234abcd1234abcd1234abcd",
+            service: 'ipmi-obm-service',
+            config: {
+                host: '1.2.3.4',
+                user: 'myuser',
+                password: 'mypass'
+           }
+        }],
         relations: [
             {
                 relationType: 'enclosedBy',
@@ -143,6 +149,7 @@ describe('Redfish Managers', function () {
 
     it('should return a valid manager', function() {
         waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd').resolves(node);
+        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(node);
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
@@ -167,6 +174,7 @@ describe('Redfish Managers', function () {
 
     it('should return a valid manager ethernet interface collection', function() {
         waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd').resolves(node);
+        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(node);
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
@@ -191,6 +199,7 @@ describe('Redfish Managers', function () {
 
     it('should return a valid manager ethernet interface', function() {
         waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd').resolves(node);
+        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(node);
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
