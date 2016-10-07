@@ -89,7 +89,13 @@ describe('Redfish Systems Root', function () {
             id: '1234abcd1234abcd1234abcd',
             name: '1234abcd1234abcd1234abcd'
         }));
+        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd')
+        .resolves(Promise.resolve({
+            id: '1234abcd1234abcd1234abcd',
+            name: '1234abcd1234abcd1234abcd'
+        }));
         waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+        waterline.nodes.getNodeById.resolves([]);
         waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
         nodeApi.setNodeWorkflowById.resolves({instanceId: 'abcdef'});
     });
