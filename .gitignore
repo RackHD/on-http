@@ -49,6 +49,12 @@ static/tftp/
 static/web-ui/
 static/swagger-ui/
 static/*-patch.yaml
+static/taskdoc
+
+# skupack.d
+!skupack.d
+skupack.d/*
+!skupack.d/README.md
 
 build/
 
