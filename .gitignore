@@ -50,6 +50,7 @@ static/web-ui/
 static/swagger-ui/
 static/*-patch.yaml
 static/taskdoc
+static/upnp/upnp-device-description.xml
 
 # skupack.d
 !skupack.d
