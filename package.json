@@ -8,7 +8,8 @@
     "test": "./node_modules/.bin/mocha $(find spec -name '*-spec.js') -R spec --require spec/helper.js",
     "install": "./install-web-ui.sh && ./install-swagger-ui.sh",
     "apidoc": "./node_modules/.bin/apidoc -i lib/api/1.1/northbound -f '.*\\.js$' -o build/apidoc",
-    "taskdoc": "./install-task-doc.sh"
+    "taskdoc": "./install-task-doc.sh",
+    "swaggerdoc": "node extra/swagger-doc.js"
   },
   "repository": {
     "type": "git",
@@ -80,7 +81,10 @@
     "sinon-as-promised": "^2.0.3",
     "sinon-chai": "^2.7.0",
     "supertest": "^1.2.0",
-    "xunit-file": "0.0.6"
+    "xunit-file": "0.0.6",
+    "bootprint-swagger": "~0.13.1",
+    "bootprint": "~0.8.5",
+    "html-pdf": "~2.1.0"
   },
   "apidoc": {
     "name": "RackHD API Documentation",
