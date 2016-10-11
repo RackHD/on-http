@@ -416,56 +416,44 @@ describe("Http.Services.Api.Nodes", function () {
     });
 
     describe("_removeRelation", function() {
-        before("_removeRelation before", function() {
-        });
 
         beforeEach(function() {
             updateByIdentifier.resolves();
         });
 
         it("_removeRelation should return undefined if target node is null", function() {
-            return nodeApiService._removeRelation(null, 'encloses', computeNode.id)
-            .then(function() {
-                expect(updateByIdentifier).to.not.be.called;
-            });
+            expect(nodeApiService._removeRelation(null, 'encloses', computeNode))
+            .to.equal(undefined);
         });
 
         it("_removeRelation should fail if relation type is null", function() {
-            var enclNodes = [
-                {
-                    id: '1234abcd1234abcd1234abcd',
-                    type: 'enclNode'
-                }
-            ];
+            var enclNode = {
+                id: '1234abcd1234abcd1234abcd',
+                type: 'enclNode'
+            };
 
-            return nodeApiService._removeRelation(enclNodes, 'encloses', computeNode.id)
-            .then(function() {
-                expect(updateByIdentifier).to.not.be.called;
-            });
+            expect(nodeApiService._removeRelation(enclNode, null, computeNode))
+            .to.equal(undefined);
         });
 
         it("_removeRelation should fail if relationType is incorrect", function() {
-            var enclNodes = [
-                {
+            var enclNode = {
                     id: '1234abcd1234abcd1234abcd',
-                    type: 'compute',
+                    type: 'enclosure',
                     relations: [
                         {
                             "relationType": "enclosedBy",
+                            "targets": [computeNode.id]
                         }
                     ]
-                }
-            ];
+                };
 
-            return nodeApiService._removeRelation(enclNodes, 'encloses', computeNode.id)
-            .then(function() {
-                expect(updateByIdentifier).to.not.be.called;
-            });
+            expect(nodeApiService._removeRelation(enclNode, 'encloses', computeNode))
+            .to.equal(undefined);
         });
 
         it("_removeRelation should fail if don't have targets", function() {
-            var enclNodes = [
-                {
+            var enclNode = {
                     id: '1234abcd1234abcd1234abcd',
                     type: 'enclosure',
                     relations: [
@@ -473,25 +461,18 @@ describe("Http.Services.Api.Nodes", function () {
                             "relationType": "encloses"
                         }
                     ]
-                }
-            ];
+                };
 
-            return nodeApiService._removeRelation(enclNodes, 'encloses', computeNode.id)
-            .then(function () {
-                expect(updateByIdentifier).to.not.have.been.called;
-            });
+            expect(nodeApiService._removeRelation(enclNode, 'encloses', computeNode))
+            .to.equal(undefined);
         });
 
         it("_removeRelation should remove related id", function() {
            var enclRelationAfter = _.cloneDeep(enclosureNode.relations);
             _.pull(enclRelationAfter[0].targets, computeNode.id);
 
-            return nodeApiService._removeRelation(enclosureNode, 'encloses', computeNode.id)
-            .then(function () {
-                expect(updateByIdentifier).to.have.been
-                    .calledWith(enclosureNode.id,
-                                {relations: enclRelationAfter});
-            });
+            expect(nodeApiService._removeRelation(enclosureNode, 'encloses', computeNode).relations)
+            .to.deep.equal(enclRelationAfter);
         });
 
         it("_removeRelation should remove one relation when no target", function() {
@@ -515,12 +496,8 @@ describe("Http.Services.Api.Nodes", function () {
             };
             var enclRelationAfter = _.cloneDeep(enclNode.relations);
             _.pull(enclRelationAfter, enclRelationAfter[0]);
-            return nodeApiService._removeRelation(enclNode, 'encloses', computeNode.id)
-            .then(function () {
-                expect(updateByIdentifier)
-                   .to.have.been.calledWith(enclNode.id,
-                                            {relations: enclRelationAfter});
-            });
+            expect(nodeApiService._removeRelation(enclNode, 'encloses', computeNode).relations)
+            .to.deep.equal(enclRelationAfter);
         });
 
         it("_removeRelation should remain empty relation field when no relation", function() {
@@ -537,23 +514,8 @@ describe("Http.Services.Api.Nodes", function () {
                 ]
             };
             var enclRelationAfter = [];
-            return nodeApiService._removeRelation(enclNode, 'encloses', computeNode.id)
-            .then(function () {
-                expect(updateByIdentifier)
-                    .to.have.been.calledWith(enclNode.id,
-                                             {relations: enclRelationAfter});
-            });
-        });
-
-        it("should delete component nodes", function() {
-            this.sandbox.stub(nodeApiService, 'removeNode').resolves();
-            return nodeApiService._removeRelation(
-                computeNode, 'enclosedBy', "1234abcd1234abcd1234abcf"
-            ).then(function() {
-                expect(nodeApiService.removeNode).to.be.calledWithExactly(
-                    computeNode, 'enclosedBy'
-                );
-            });
+            expect(nodeApiService._removeRelation(enclNode, 'encloses', computeNode).relations)
+            .to.deep.equal(enclRelationAfter);
         });
     });
 
@@ -577,32 +539,42 @@ describe("Http.Services.Api.Nodes", function () {
 
         it("should do nothing if arguments are missing", function() {
             var argList = [rackNode, "contains", [computeNode]];
-            return Promise.map(argList, function(arg, index) {
+            expect(_.map(argList, function(arg, index) {
                 var argsCopy = [].concat(argList);
                 argsCopy[index] = undefined;
-                return nodeApiService._addRelation(argsCopy[0], argsCopy[1], argsCopy[2])
-                .then(function() {
-                    expect(updateByIdentifier).to.not.be.called;
-                });
-            });
+                return nodeApiService._addRelation(argsCopy[0], argsCopy[1], argsCopy[2]);
+            })
+            ).to.deep.equal([undefined, undefined, undefined]);
         });
 
-        it("should return a promise for an update to the relations field of a node", function() {
-            return nodeApiService._addRelation(
-                rackNode, 'contains', [computeNode.id, computeNode2.id]
-            ).then(function() {
-                expect(updateByIdentifier).to.be.calledWithExactly(rackNode.id, {relations:
-                    [{relationType: 'contains', targets: [computeNode.id, computeNode2.id]}]
-                });
-            }).then(function() {
-                rackNode.relations = [{relationType: 'contains', targets: [computeNode.id]}];
-                updateByIdentifier.reset();
-                return nodeApiService._addRelation(rackNode, 'contains', [computeNode2.id]);
-            }).then(function() {
-                expect(updateByIdentifier).to.be.calledWithExactly(rackNode.id, {relations:
-                    [{relationType: 'contains', targets: [computeNode.id, computeNode2.id]}]
-                });
-            });
+        it("should return the node updated with new relations", function() {
+            expect(nodeApiService._addRelation(
+                rackNode, 'contains', [computeNode, computeNode2]).relations)
+            .to.deep.equal(
+                [{relationType: 'contains', targets: [computeNode.id, computeNode2.id]}]
+            );
+
+            rackNode.relations = [{relationType: 'contains', targets: [computeNode.id]}];
+            expect(nodeApiService._addRelation(rackNode, 'contains', [computeNode2]).relations)
+            .to.deep.equal(
+                [{relationType: 'contains', targets: [computeNode.id, computeNode2.id]}]
+            );
+        });
+
+        it('should fail to relate a node to itself', function() {
+            expect(function() {
+                return nodeApiService._addRelation(rackNode, 'contains', rackNode.id);
+            }).to.throw("Node cannot have relationship contains with itself");
+        });
+
+        it('should fail to set a node as containedBy two other nodes', function() {
+            var rackNode2 = _.cloneDeep(rackNode);
+            rackNode2.id = 'secondRackNodeId';
+            expect(function() {
+                return nodeApiService._addRelation(
+                    computeNode, 'containedBy', [rackNode.id, rackNode2.id]
+                );
+            }).to.throw("Node "+computeNode.id+" can only be contained by one node");
         });
     });
 
@@ -646,6 +618,7 @@ describe("Http.Services.Api.Nodes", function () {
             error = new Errors.NotFoundError();
             this.sandbox.stub(nodeApiService, "_needTargetNodes");
             waterline.nodes.needByIdentifier.resolves(rackNode);
+            waterline.nodes.updateByIdentifier.resolves();
         });
 
         afterEach(function() {
@@ -657,13 +630,13 @@ describe("Http.Services.Api.Nodes", function () {
             return nodeApiService.editNodeRelations(rackNode.id, body, handler)
             .then(function() {
                 expect(handler).to.be.calledWithExactly(
-                    rackNode, 'contains', [computeNode.id, computeNode2.id]
+                    rackNode, 'contains', [computeNode, computeNode2]
                 );
                 expect(handler).to.be.calledWithExactly(
-                    computeNode, 'containedBy', rackNode.id
+                    computeNode, 'containedBy', rackNode
                 );
                 expect(handler).to.be.calledWithExactly(
-                    computeNode2, 'containedBy', rackNode.id
+                    computeNode2, 'containedBy', rackNode
                 );
             });
         });
@@ -824,6 +797,8 @@ describe("Http.Services.Api.Nodes", function () {
             var computeNode2After = _.cloneDeep(computeNode2);
             delete computeNodeAfter.relations;
             delete computeNode2After.relations;
+            this.sandbox.stub(nodeApiService, '_findTargetNodes')
+            .resolves([computeNode, computeNode2]);
 
             findActiveGraphForTarget.resolves('');
             needByIdentifier.withArgs(computeNode.id).resolves(computeNode);
@@ -884,7 +859,6 @@ describe("Http.Services.Api.Nodes", function () {
             needByIdentifier.withArgs(computeNode2.id).resolves(computeNode2);
             needByIdentifier.withArgs(pduNode.id).resolves(pduNode);
             updateByIdentifier.withArgs(pduNode.id).resolves(pduNodeAfter);
-
             return nodeApiService.removeNode(enclosureNode)
             .then(function (node){
                 expect(node).to.equal(enclosureNode);
@@ -1048,7 +1022,7 @@ describe("Http.Services.Api.Nodes", function () {
     });
 
     describe('Obms', function() {
-        
+
         var node = {
             id: '1234abcd1234abcd1234abcd',
             name: 'name',
