@@ -22,6 +22,8 @@ DATESTRING=$(date -d "$GITCOMMITDATE" -u +"%Y%m%d%H%M%SZ")
 BRANCH="${BRANCH}-${DATESTRING}"
 
 npm prune --production
+
+if [ -d swagger-codegen ]; then rm -rf swagger-codegen/; fi
 git clone --branch v2.1.5 https://github.com/swagger-api/swagger-codegen.git
 pushd ./swagger-codegen && mvn package && popd
 java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar generate -i static/monorail.yml -o on-http-api1.1 -l python --additional-properties packageName=on_http_api1_1
