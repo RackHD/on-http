@@ -9,12 +9,17 @@ describe("Http.Services.Api.Nodes", function () {
     var waterline;
     var updateByIdentifier;
     var create;
+    var getNodeById;
     var needByIdentifier;
     var findActiveGraphForTarget;
+    var findAllByNode;
+    var upsertByNode;
     var computeNode;
     var enclosureNode;
+    var rackNode;
     var _;
     var eventsProtocol;
+    var Promise;
 
     before("Http.Services.Api.Nodes before", function() {
         helper.setupInjector([
@@ -30,8 +35,10 @@ describe("Http.Services.Api.Nodes", function () {
         waterline = helper.injector.get('Services.Waterline');
         _ = helper.injector.get('_');
         eventsProtocol = helper.injector.get('Protocol.Events');
+        Promise = helper.injector.get('Promise');
         waterline.nodes = {
             create: function() {},
+            getNodeById: function() {},
             needByIdentifier: function() {},
             updateByIdentifier: function() {},
             destroy: function() {}
@@ -44,6 +51,10 @@ describe("Http.Services.Api.Nodes", function () {
         };
         waterline.lookups = {
             update: function() {}
+        };
+        waterline.obms = {
+            findAllByNode: function() {},
+            upsertByNode: function() {}
         };
         this.sandbox = sinon.sandbox.create();
     });
@@ -74,12 +85,20 @@ describe("Http.Services.Api.Nodes", function () {
                 }
             ]
         };
+        rackNode = {
+            id: '1234abcd1234abcd1234abcc',
+            type: 'rack',
+            relations: []
+        };
 
         create = this.sandbox.stub(waterline.nodes, 'create');
+        getNodeById = this.sandbox.stub(waterline.nodes, 'getNodeById');
         needByIdentifier = this.sandbox.stub(waterline.nodes, 'needByIdentifier');
         updateByIdentifier = this.sandbox.stub(waterline.nodes, 'updateByIdentifier');
         findActiveGraphForTarget = this.sandbox.stub(
                 workflowApiService, 'findActiveGraphForTarget');
+        findAllByNode = this.sandbox.stub(waterline.obms, 'findAllByNode');
+        upsertByNode = this.sandbox.stub(waterline.obms, 'upsertByNode');
         this.sandbox.stub(eventsProtocol, 'publishNodeEvent').resolves({});
 
     });
@@ -213,6 +232,21 @@ describe("Http.Services.Api.Nodes", function () {
                 );
             });
         });
+
+        it('should publish a node added event if the node is a rack', function() {
+            var rackNode = {
+                id: 'someNodeId',
+                type: 'rack',
+                name: 'rackNode'
+            };
+            waterline.nodes.create.resolves(rackNode);
+            return nodeApiService.postNode({})
+            .then(function() {
+                expect(eventsProtocol.publishNodeEvent).to.be.calledWithExactly(
+                    rackNode, 'added'
+                );
+            });
+        });
     });
 
     describe('setNodeWorkflow/setNodeWorkflowById', function() {
@@ -331,21 +365,21 @@ describe("Http.Services.Api.Nodes", function () {
         });
 
         it("_findTargetNodes should find related target nodes", function() {
-            needByIdentifier.resolves(enclosureNode);
+            waterline.nodes.needByIdentifier.resolves(enclosureNode);
 
-            return nodeApiService._findTargetNodes(computeNode, 'enclosedBy')
+            return nodeApiService._findTargetNodes(computeNode.relations, 'enclosedBy')
             .then(function (nodes) {
-                expect(needByIdentifier).to.have.been.calledOnce;
+                expect(waterline.nodes.needByIdentifier).to.have.been.calledOnce;
                 expect(nodes[0]).to.equal(enclosureNode);
             });
         });
 
         it("_findTargetNodes should return nothing if cannot find target node", function() {
-            needByIdentifier.rejects(Errors.NotFoundError(''));
+            waterline.nodes.needByIdentifier.rejects(Errors.NotFoundError(''));
 
-            return nodeApiService._findTargetNodes(computeNode, 'enclosedBy')
+            return nodeApiService._findTargetNodes(computeNode.relations, 'enclosedBy')
             .then(function (nodes) {
-                expect(needByIdentifier).to.have.been.calledOnce;
+                expect(waterline.nodes.needByIdentifier).to.have.been.calledOnce;
                 expect(nodes[0]).to.equal(undefined);
             });
         });
@@ -372,6 +406,15 @@ describe("Http.Services.Api.Nodes", function () {
 
     });
 
+    describe("_needTargetNodes", function() {
+        it("should fail if any target nodes cannot be found", function() {
+            var error = new Errors.NotFoundError();
+            waterline.nodes.needByIdentifier.rejects(error);
+            return expect(nodeApiService._needTargetNodes(computeNode.relations, 'enclosedBy')
+            ).to.be.rejectedWith(error);
+        });
+    });
+
     describe("_removeRelation", function() {
         before("_removeRelation before", function() {
         });
@@ -380,14 +423,14 @@ describe("Http.Services.Api.Nodes", function () {
             updateByIdentifier.resolves();
         });
 
-        it("_removeRelation should fail if target node is null", function() {
+        it("_removeRelation should return undefined if target node is null", function() {
             return nodeApiService._removeRelation(null, 'encloses', computeNode.id)
-            .then(function () {
-                expect(updateByIdentifier).to.not.have.been.called;
+            .then(function() {
+                expect(updateByIdentifier).to.not.be.called;
             });
         });
 
-        it("_removeRelation should fail if relation type of target node is null", function() {
+        it("_removeRelation should fail if relation type is null", function() {
             var enclNodes = [
                 {
                     id: '1234abcd1234abcd1234abcd',
@@ -396,8 +439,8 @@ describe("Http.Services.Api.Nodes", function () {
             ];
 
             return nodeApiService._removeRelation(enclNodes, 'encloses', computeNode.id)
-            .then(function () {
-                expect(updateByIdentifier).to.not.have.been.called;
+            .then(function() {
+                expect(updateByIdentifier).to.not.be.called;
             });
         });
 
@@ -415,8 +458,8 @@ describe("Http.Services.Api.Nodes", function () {
             ];
 
             return nodeApiService._removeRelation(enclNodes, 'encloses', computeNode.id)
-            .then(function () {
-                expect(updateByIdentifier).to.not.have.been.called;
+            .then(function() {
+                expect(updateByIdentifier).to.not.be.called;
             });
         });
 
@@ -440,7 +483,7 @@ describe("Http.Services.Api.Nodes", function () {
         });
 
         it("_removeRelation should remove related id", function() {
-            var enclRelationAfter = _.cloneDeep(enclosureNode.relations);
+           var enclRelationAfter = _.cloneDeep(enclosureNode.relations);
             _.pull(enclRelationAfter[0].targets, computeNode.id);
 
             return nodeApiService._removeRelation(enclosureNode, 'encloses', computeNode.id)
@@ -499,6 +542,149 @@ describe("Http.Services.Api.Nodes", function () {
                 expect(updateByIdentifier)
                     .to.have.been.calledWith(enclNode.id,
                                              {relations: enclRelationAfter});
+            });
+        });
+
+        it("should delete component nodes", function() {
+            this.sandbox.stub(nodeApiService, 'removeNode').resolves();
+            return nodeApiService._removeRelation(
+                computeNode, 'enclosedBy', "1234abcd1234abcd1234abcf"
+            ).then(function() {
+                expect(nodeApiService.removeNode).to.be.calledWithExactly(
+                    computeNode, 'enclosedBy'
+                );
+            });
+        });
+    });
+
+    describe("_addRelation", function() {
+        var computeNode2;
+        beforeEach(function() {
+            computeNode2 = {
+                id: '1234abcd1234abcd1234abcx',
+                type: 'compute',
+                relations: [
+                    {
+                        "relationType": "enclosedBy",
+                        "targets": [
+                            "1234abcd1234abcd1234abcf"
+                        ]
+                    }
+                ]
+            };
+            updateByIdentifier.resolves();
+        });
+
+        it("should do nothing if arguments are missing", function() {
+            var argList = [rackNode, "contains", [computeNode]];
+            return Promise.map(argList, function(arg, index) {
+                var argsCopy = [].concat(argList);
+                argsCopy[index] = undefined;
+                return nodeApiService._addRelation(argsCopy[0], argsCopy[1], argsCopy[2])
+                .then(function() {
+                    expect(updateByIdentifier).to.not.be.called;
+                });
+            });
+        });
+
+        it("should return a promise for an update to the relations field of a node", function() {
+            return nodeApiService._addRelation(
+                rackNode, 'contains', [computeNode.id, computeNode2.id]
+            ).then(function() {
+                expect(updateByIdentifier).to.be.calledWithExactly(rackNode.id, {relations:
+                    [{relationType: 'contains', targets: [computeNode.id, computeNode2.id]}]
+                });
+            }).then(function() {
+                rackNode.relations = [{relationType: 'contains', targets: [computeNode.id]}];
+                updateByIdentifier.reset();
+                return nodeApiService._addRelation(rackNode, 'contains', [computeNode2.id]);
+            }).then(function() {
+                expect(updateByIdentifier).to.be.calledWithExactly(rackNode.id, {relations:
+                    [{relationType: 'contains', targets: [computeNode.id, computeNode2.id]}]
+                });
+            });
+        });
+    });
+
+
+    describe("getNodeRelations", function() {
+        it("should return the relations field of the requested node", function() {
+            computeNode.relations = [{relationType: "enclosedBy", targets:[enclosureNode]}];
+            waterline.nodes.needByIdentifier.resolves(computeNode);
+            return nodeApiService.getNodeRelations(computeNode.id)
+            .then(function(relations) {
+                expect(relations).to.deep.equal(computeNode.relations);
+                expect(waterline.nodes.needByIdentifier).to.be.calledOnce;
+            });
+        });
+    });
+
+    describe("editNodeRelations", function() {
+        var body,
+            handler,
+            error,
+            computeNode2;
+        beforeEach(function() {
+            computeNode2 = {
+                id: '1234abcd1234abcd1234abcx',
+                type: 'compute',
+                relations: [
+                    {
+                        "relationType": "enclosedBy",
+                        "targets": [
+                            "1234abcd1234abcd1234abcf"
+                        ]
+                    }
+                ]
+            };
+
+            body = {
+                contains: [computeNode.id, computeNode2.id]
+            };
+
+            handler = this.sandbox.stub().resolves();
+            error = new Errors.NotFoundError();
+            this.sandbox.stub(nodeApiService, "_needTargetNodes");
+            waterline.nodes.needByIdentifier.resolves(rackNode);
+        });
+
+        afterEach(function() {
+            this.sandbox.restore();
+        });
+
+        it("should delegate node updates to a handler", function() {
+            nodeApiService._needTargetNodes.resolves([computeNode, computeNode2]);
+            return nodeApiService.editNodeRelations(rackNode.id, body, handler)
+            .then(function() {
+                expect(handler).to.be.calledWithExactly(
+                    rackNode, 'contains', [computeNode.id, computeNode2.id]
+                );
+                expect(handler).to.be.calledWithExactly(
+                    computeNode, 'containedBy', rackNode.id
+                );
+                expect(handler).to.be.calledWithExactly(
+                    computeNode2, 'containedBy', rackNode.id
+                );
+            });
+        });
+
+        it("should fail if any target nodes do not exist", function() {
+            nodeApiService._needTargetNodes.rejects(error);
+            return nodeApiService.editNodeRelations(rackNode.id, body, handler)
+            .then(function() {
+                throw new Error("expected function to fail");
+            }).catch(function(e) {
+                expect(e).to.equal(error);
+            });
+        });
+
+        it("should fail if the node given by id does not exist", function() {
+            waterline.nodes.needByIdentifier.rejects(error);
+            return nodeApiService.editNodeRelations(rackNode.id, body, handler)
+            .then(function() {
+                throw new Error("expected function to fail");
+            }).catch(function(e) {
+                expect(e).to.equal(error);
             });
         });
     });
@@ -737,7 +923,7 @@ describe("Http.Services.Api.Nodes", function () {
             updateByIdentifier.withArgs(computeNode.id).resolves(computeNodeAfter);
             updateByIdentifier.withArgs(computeNode2.id).resolves(computeNode2After);
 
-            return nodeApiService.removeNode(enclosureNode)
+            nodeApiService.removeNode(enclosureNode)
             .then(function() {
                 done(new Error("Expected job to fail"));
             })
@@ -859,5 +1045,82 @@ describe("Http.Services.Api.Nodes", function () {
                     expect(waterline.nodes.remTags).to.have.been.calledWith(node1.id,tagName);
                 });
         });
+    });
+
+    describe('Obms', function() {
+        
+        var node = {
+            id: '1234abcd1234abcd1234abcd',
+            name: 'name',
+            type: 'compute',
+            obmSettings: [
+                {
+                    service: 'ipmi-obm-service',
+                    config: {
+                        host: '1.2.3.4',
+                        user: 'myuser',
+                        password: 'mypass'
+                    }
+                }
+            ]
+        };
+
+        var obm = {
+            id: '5678efgh5678efgh5678efgh',
+            node: '/api/2.0/nodes/1234abcd1234abcd1234abcd',
+            service: 'ipmi-obm-service',
+            config: {
+                host: '1.2.3.4',
+                user: 'myuser',
+                password: 'mypass'
+            }
+        };
+
+
+        it('should add an OBM to a node', function () {
+            waterline.nodes.getNodeById.resolves(node);
+            waterline.obms.upsertByNode.resolves();
+            return nodeApiService.putObmsByNodeId(node.id, obm)
+                .then(function() {
+                    expect(waterline.nodes.getNodeById).to.have.been.calledOnce;
+                    expect(
+                        waterline.nodes.getNodeById.firstCall.args[0]
+                    ).to.equal(node.id);
+                    expect(waterline.obms.upsertByNode).to.have.been.calledOnce;
+                    expect(waterline.obms.upsertByNode.firstCall.args[0]).to.equal(node.id);
+                    expect(waterline.obms.upsertByNode.firstCall.args[1]).to.deep.equal(obm);
+
+                });
+
+        });
+
+        it('should report node not found for PUT', function () {
+            waterline.nodes.getNodeById.resolves();
+
+            return expect(nodeApiService.putObmsByNodeId(node.id))
+                .to.be.rejectedWith(Errors.NotFoundError);
+
+        });
+
+        it('should look up the OBMs for a node', function () {
+            waterline.nodes.getNodeById.resolves(node);
+            waterline.obms.findAllByNode.resolves(obm);
+            return nodeApiService.getObmsByNodeId(node.id)
+                .then(function(ret) {
+                    expect(waterline.nodes.getNodeById).to.have.been.calledOnce;
+                    expect(
+                        waterline.nodes.getNodeById.firstCall.args[0]
+                    ).to.equal(node.id);
+                    expect(ret).to.deep.equal(obm);
+                });
+        });
+
+        it('should report node not found for GET', function () {
+            waterline.nodes.getNodeById.resolves();
+
+            return expect(nodeApiService.getObmsByNodeId(node.id))
+                .to.be.rejectedWith(Errors.NotFoundError);
+        });
+
     });
 });

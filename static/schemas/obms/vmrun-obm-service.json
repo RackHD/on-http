@@ -22,7 +22,7 @@
                     "required": ["vmxpath"]
                 }
             },
-            "required": ["nodeId", "service", "config"]
+            "required": ["service", "config"]
         }
     }
 }

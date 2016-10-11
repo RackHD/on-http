@@ -1,2 +1,2 @@
 
-&copy;2015, EMC, Inc.
+&copy;2015-2016, Dell EMC, Inc.

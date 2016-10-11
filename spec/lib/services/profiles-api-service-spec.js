@@ -11,7 +11,7 @@ describe("Http.Services.Api.Profiles", function () {
     var eventsProtocol;
     var waterline;
     var lookupService;
-    
+
     before("Http.Services.Api.Profiles before", function() {
         helper.setupInjector([
             helper.di.simpleWrapper({}, 'TaskGraph.Store'),
@@ -59,23 +59,18 @@ describe("Http.Services.Api.Profiles", function () {
     });
 
     describe("setLookup", function() {
-        var node;
-        var proxy;
-        var nodeRes = {
-            id: 'id',
-            ip: 'ip',
-            mac: 'mac'
+        var proxy = '12.1.1.1';
+
+        var res = {
+            locals: {
+                ipAddress: 'ip1'
+            }
         };
-        var proxyRes = {
-            id: 'id',
-            ip: 'ip',
-            mac: 'mac',
-            proxy: 'proxy'
-        };
-        var req = {
+
+        var profileReq = {
             query: {
-                'ip':'ip',
-                'mac':'mac'
+                'ips': ['ip1', 'ip2'],
+                'macs': ['mac1', 'mac2']
             },
             get: function(header) {
                 if(header === Constants.HttpHeaders.ApiProxyIp) {
@@ -84,57 +79,53 @@ describe("Http.Services.Api.Profiles", function () {
             }
         };
 
-        it("setLookup should add IP lookup entry for new node", function() {
-            this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
-            this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress')
-                .resolves(proxyRes);
-            this.sandbox.stub(lookupService, 'setIpAddress').resolves(nodeRes);
- 
-            return profileApiService.setLookup(req)
-            .then(function(result) {
-                expect(lookupService.setIpAddress).to.be.calledOnce;
-                expect(waterline.lookups.upsertProxyToMacAddress).to.not.be.called;
-                expect(result).to.deep.equal(nodeRes);
-            });
-        });
+        var profileReq1 = {
+            query: {
+                'ips': ['', ''],
+                'macs': ['mac1', 'mac2']
+            },
+            get: function(header) {
+                if(header === Constants.HttpHeaders.ApiProxyIp) {
+                    return proxy;
+                }
+            }
+        };
 
-        it("setLookup should add IP lookup entry and proxy for new node", function() {
-            proxy = '12.1.1.1';
-            this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
-            this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress')
-                .resolves(proxyRes);
-            this.sandbox.stub(lookupService, 'setIpAddress').resolves(nodeRes);
-            return profileApiService.setLookup(req)
-            .then(function(result) {
-                expect(lookupService.setIpAddress).to.be.calledOnce;
-                expect(waterline.lookups.upsertProxyToMacAddress).to.be.calledOnce;
-                expect(result).to.deep.equal(proxyRes);
-            });
-        });
-
-        it("setLookup does not add IP lookup entry for existing node", function() {
-            node = {
-                discovered: true
-            };
-            this.sandbox.stub(waterline.nodes, 'findByIdentifier').resolves(node);
-            this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress').resolves();
+        it("setLookup should add IP lookup entry and proxy", function() {
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
-            return profileApiService.setLookup(req)
+            this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress').resolves();
+            return profileApiService.setLookup(profileReq, res)
             .then(function(result) {
-                expect(lookupService.setIpAddress).to.not.be.called;
-                expect(waterline.lookups.upsertProxyToMacAddress).to.not.be.called;
-                expect(result).to.be.undefined;
+                expect(lookupService.setIpAddress).to.be.calledWithExactly('ip1', 'mac1');
+                expect(waterline.lookups.upsertProxyToMacAddress).to.be.calledOnce;
             });
         });
 
         it("setLookup does not lookup node on missing required query string", function() {
             this.sandbox.stub(lookupService, 'setIpAddress').resolves();
             this.sandbox.stub(waterline.lookups, 'upsertProxyToMacAddress').resolves();
-            return profileApiService.setLookup({query: {macs:'macs'}})
+            return profileApiService.setLookup({query: {macs:'macs'}}, res)
             .then(function(result) {
                 expect(lookupService.setIpAddress).to.not.be.called;
                 expect(waterline.lookups.upsertProxyToMacAddress).to.not.be.called;
-                expect(result).to.be.undefined;
+            });
+        });
+
+        it("setLookup should set request IP and MAC lookup for query macs and ips", function() {
+            this.sandbox.stub(lookupService, 'setIpAddress').resolves();
+
+            return profileApiService.setLookup(profileReq, res)
+            .then(function(result) {
+                expect(lookupService.setIpAddress).to.be.calledWithExactly('ip1', 'mac1');
+            });
+        });
+
+        it("setLookup should not set lookup if IP is null in query", function() {
+            this.sandbox.stub(lookupService, 'setIpAddress').resolves();
+
+            return profileApiService.setLookup(profileReq1, res)
+            .then(function(result) {
+                expect(lookupService.setIpAddress).to.not.be.called;
             });
         });
 
@@ -232,24 +223,19 @@ describe("Http.Services.Api.Profiles", function () {
 
     describe("renderProfile", function() {
 
-        it("render profile fail when no active graph and cannot get node bootSettings", function() {
+        it("render profile fail when no active graph and invalid bootSettings", function() {
             var node = { id: 'test' , type: 'compute', bootSettings: {}};
 
-            var bootSettingsFailure = {
-                context: undefined,
-                profile: 'error.ipxe',
-                options: {
-                    error: 'Unable to retrieve node bootSettings'
-                }
-            };
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
             this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
 
-            return profileApiService.renderProfileFromTaskOrNode(node)
-            .then(function(result) {
+            var promise = profileApiService.getProfileFromTaskOrNode(node);
+
+            return expect(promise).to.be.rejectedWith('Unable to retrieve valid node bootSettings')
+            .then(function() {
                 expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
                 expect(taskProtocol.requestProperties).to.not.be.called;
-                expect(result).to.deep.equal(bootSettingsFailure);
+                expect(promise.reason().status).to.equal(500);
             });
         });
 
@@ -266,7 +252,7 @@ describe("Http.Services.Api.Profiles", function () {
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
             this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
 
-            return profileApiService.renderProfileFromTaskOrNode(node)
+            return profileApiService.getProfileFromTaskOrNode(node)
             .then(function(result) {
                 expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
                 expect(taskProtocol.requestProperties).to.not.be.called;
@@ -274,23 +260,23 @@ describe("Http.Services.Api.Profiles", function () {
             });
         });
 
-        it("render profile fail due to no active graph or there are no bootSettings", function() {
+        it("render profile pass when no active graph and bootSettings", function() {
             var node = { id: 'test', type: 'compute' };
-            var activeGraphFailure = {
-                context: undefined,
-                profile: 'error.ipxe',
-                options: {
-                    error: 'Unable to locate active workflow or there are no bootSettings'
-                }
-            };
+
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(undefined);
             this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
 
-            return profileApiService.renderProfileFromTaskOrNode(node)
+            return profileApiService.getProfileFromTaskOrNode(node)
             .then(function(result) {
                 expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
                 expect(taskProtocol.requestProperties).to.not.be.called;
-                expect(result).to.deep.equal(activeGraphFailure);
+                expect(result).to.deep.equal({
+                    context: undefined,
+                    profile: 'ipxe-info.ipxe',
+                    options: { message:
+                        'No active workflow and bootSettings, continue to boot' }
+                });
+
             });
         });
 
@@ -302,7 +288,7 @@ describe("Http.Services.Api.Profiles", function () {
             this.sandbox.stub(taskProtocol, 'requestProfile').resolves('profile');
             this.sandbox.stub(taskProtocol, 'requestProperties').resolves({});
 
-            return profileApiService.renderProfileFromTaskOrNode(node)
+            return profileApiService.getProfileFromTaskOrNode(node)
             .then(function(result) {
                 expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
                 expect(taskProtocol.requestProfile).to.have.been.calledOnce;
@@ -317,24 +303,19 @@ describe("Http.Services.Api.Profiles", function () {
 
         it("render profile fail when retrieve workflow properties fail", function() {
             var node = { id: 'test', type: 'compute' };
-            var retrieveProperitesFailure = {
-                context: undefined,
-                profile: 'error.ipxe',
-                options: {
-                    error: 'Unable to retrieve workflow properties'
-                }
-            };
 
             this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves(true);
             this.sandbox.stub(taskProtocol, 'requestProfile').resolves('profile');
             this.sandbox.stub(taskProtocol, 'requestProperties').rejects(new Error(''));
 
-            return profileApiService.renderProfileFromTaskOrNode(node)
-            .then(function(result) {
+            var promise = profileApiService.getProfileFromTaskOrNode(node);
+
+            return expect(promise).to.be.rejectedWith('Unable to retrieve workflow properties')
+            .then(function() {
                 expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
                 expect(taskProtocol.requestProfile).to.have.been.calledOnce;
                 expect(taskProtocol.requestProperties).to.have.been.calledOnce;
-                expect(result).to.deep.equal(retrieveProperitesFailure);
+                expect(promise.reason().status).to.equal(503);
             });
         });
 

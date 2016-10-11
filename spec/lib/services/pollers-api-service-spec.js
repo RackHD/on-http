@@ -34,7 +34,7 @@ describe("Http.Services.Api.Pollers", function () {
     describe("getPollers", function() {
         it("should expose the appropriate methods", function() {
             pollerService.should.have.property("getPollers")
-                .that.is.a("function").with.length(1);
+                .that.is.a("function").with.length(2);
         });
 
         it("Run getPollers", function() {
@@ -213,7 +213,7 @@ describe("Http.Services.Api.Pollers", function () {
     describe("getPollersByIdData", function() {
         it("should expose the appropriate methods", function() {
             pollerService.should.have.property("getPollersByIdData")
-            .that.is.a("function").with.length(1);
+            .that.is.a("function").with.length(2);
         });
 
         it("Run getPollersByIdData", function() {
@@ -223,31 +223,10 @@ describe("Http.Services.Api.Pollers", function () {
                 config: {}
             }];
 
-
+            waterline.workitems.needByIdentifier.resolves();
             taskProtocol.requestPollerCache.resolves(mockPoller);
 
             return pollerService.getPollersByIdData().then(function (pollers) {
-                expect(pollers).to.deep.equal(mockPoller);
-            });
-        });
-    });
-
-
-    describe("getPollersByIdDataCurrent", function() {
-        it("should expose the appropriate methods", function() {
-            pollerService.should.have.property("getPollersByIdDataCurrent")
-            .that.is.a("function").with.length(1);
-        });
-
-        it("Run getPollersByIdDataCurrent", function() {
-            var mockPoller = [{
-                id: "1234",
-                name: "Pollers.IPMI",
-                config: {}
-            }];
-
-            taskProtocol.requestPollerCache.resolves(mockPoller);
-            return pollerService.getPollersByIdDataCurrent().then(function (pollers) {
                 expect(pollers).to.deep.equal(mockPoller);
             });
         });

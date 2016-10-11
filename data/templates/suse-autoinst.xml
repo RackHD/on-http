@@ -161,7 +161,7 @@
         <!-- scripts for workflow completion -->
         <source> <![CDATA[
           #!/bin/sh
-          curl http://<%=server%>:<%=port%>/api/current/templates/<%=completionUri%>
+          curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
           ]]>
         </source>
       </script>

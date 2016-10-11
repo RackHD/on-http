@@ -5,8 +5,7 @@
 var _ = require('lodash'),  /* jshint ignore: line */
     _di = require('di'),
     onCore = require('on-core'),
-    onTasks = require('on-tasks'),
-    ws = require('ws');
+    onTasks = require('on-tasks');
 
 var self = module.exports = {
     injector: null,

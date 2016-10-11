@@ -3,8 +3,6 @@
 
 'use strict';
 
-var ws = require('ws');
-
 describe('Http.Api.Login', function () {
     var server;
     var sandbox = sinon.sandbox.create();
@@ -42,7 +40,7 @@ describe('Http.Api.Login', function () {
             }
         );
     }
-    
+
     function restoreConfig(){
         return helper.injector.get('Services.Configuration')
             .set('authPasswordHash', 'KcBN9YobNV0wdux8h0fKNqi4uoKCgGl/j8c6YGlG7iA' +
@@ -55,7 +53,6 @@ describe('Http.Api.Login', function () {
     helper.before(function () {
         return [
             dihelper.simpleWrapper(require('swagger-express-mw'), 'swagger'),
-            dihelper.simpleWrapper(ws.Server, 'WebSocketServer'),
             dihelper.simpleWrapper({}, 'TaskGraph.TaskGraph'),
             dihelper.simpleWrapper({}, 'TaskGraph.Store'),
             dihelper.simpleWrapper({}, 'Task.Services.OBM'),
@@ -79,7 +76,7 @@ describe('Http.Api.Login', function () {
     after('disallow self signed certs', function () {
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
     });
-    
+
     var waterline;
     before('setup default admin user', function() {
         waterline = helper.injector.get('Services.Waterline');
@@ -320,4 +317,3 @@ describe('Http.Api.Login', function () {
         });
     });
 });
-

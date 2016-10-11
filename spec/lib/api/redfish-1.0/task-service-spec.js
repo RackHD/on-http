@@ -10,14 +10,14 @@ describe('Redfish TaskService', function () {
     var waterline;
     var Promise;
     var Constants;
-    var template;
+    var view;
     var fs;
     var graph;
     var Errors;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
-        return fs.readFileAsync(__dirname + '/../../../../data/templates/' + entry, 'utf-8')
+        return fs.readFileAsync(__dirname + '/../../../../data/views/redfish-1.0/' + entry, 'utf-8')
             .then(function(contents) {
                 return { contents: contents };
             });
@@ -28,8 +28,8 @@ describe('Redfish TaskService', function () {
         return helper.startServer([]).then(function () {
             Constants = helper.injector.get('Constants');
 
-            template = helper.injector.get('Templates');
-            sinon.stub(template, "get", redirectGet);
+            view = helper.injector.get('Views');
+            sinon.stub(view, "get", redirectGet);
 
             validator = helper.injector.get('Http.Api.Services.Schema');
             sinon.spy(validator, 'validate');
@@ -85,7 +85,7 @@ describe('Redfish TaskService', function () {
     after('stop HTTP server', function () {
         validator.validate.restore();
         redfish.render.restore();
-        template.get.restore();
+        view.get.restore();
 
         function restoreStubs(obj) {
             _(obj).methods().forEach(function (method) {
@@ -102,6 +102,8 @@ describe('Redfish TaskService', function () {
 
     it('should return a valid task service root', function () {
         waterline.graphobjects.find.resolves([graph]);
+        waterline.nodes.findByIdentifier.resolves({ id: 'abcdefg'});
+
         return helper.request().get('/redfish/v1/TaskService')
             .expect('Content-Type', /^application\/json/)
             .expect(200)

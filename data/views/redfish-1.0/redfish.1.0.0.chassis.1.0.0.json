@@ -45,5 +45,21 @@
                 <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
             <% }); %>
         ]
+        <% if( typeof contains !== 'undefined' ) { %>
+        ,"Contains@odata.count": <%= contains.length %>,
+        "Contains": [
+            <% contains.forEach(function(encloses, i, arr) { %>
+                {
+                    "@odata.id": "<%= basepath %>/Chassis/<%= encloses %>"
+                }
+                <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+            <% }); %>
+        ]
+        <% } %>
+        <% if( typeof containedBy !== 'undefined' ) { %>
+        , "ContainedBy": {
+            "@odata.id": "<%= basepath %>/Chassis/<%= containedBy %>"
+        }
+        <% } %>
     }
 }

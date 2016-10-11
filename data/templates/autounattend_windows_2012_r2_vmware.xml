@@ -110,7 +110,7 @@
             </AutoLogon>
             <FirstLogonCommands>
            <SynchronousCommand wcm:action="add">
-                    <CommandLine>powershell -Command "Invoke-WebRequest -uri http://<%=server%>:<%=port%>/api/current/templates/renasar-ansible.pub"</CommandLine>
+                    <CommandLine>powershell -Command "curl -Method POST -ContentType 'application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%> -Outfile windows-install.log"</CommandLine>
                     <Description>flag the end of the setup</Description>
                     <Order>1</Order>
                     <RequiresUserInput>true</RequiresUserInput>

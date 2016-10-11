@@ -6,7 +6,7 @@
 describe('Http.Api.Pollers', function () {
     var taskProtocol;
     before('start HTTP server', function () {
-        this.timeout(5000);
+        this.timeout(10000);
         taskProtocol = {
             requestPollerCache: sinon.stub()
         };
@@ -257,9 +257,8 @@ describe('Http.Api.Pollers', function () {
         });
 
         it('should update with PATCH /pollers', function () {
-            poller.pollInterval = 20000;
             return helper.request().patch('/api/2.0/pollers/' + poller.id)
-            .send(poller)
+            .send( { pollInterval: 20000} )
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function (res) {

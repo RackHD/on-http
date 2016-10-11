@@ -108,12 +108,13 @@ describe('Http.Api.Lookup 2.0', function () {
 
         describe('POST', function () {
             it('should call waterline.lookups.create', function() {
+                var postData = _.omit(data[0], [ 'id', 'createdAt', 'updatedAt' ]);
                 return helper.request().post('/api/2.0/lookups')
-                    .send(data[0])
+                    .send(postData)
                     .expect('Content-Type', /^application\/json/)
                     .expect(201)
                     .expect(function () {
-                        expect(create).to.have.been.calledWith(sinon.match(data[0]));
+                        expect(create).to.have.been.calledWith(sinon.match(postData));
                     });
             });
             it('should reject invalid input', function() {
@@ -121,7 +122,6 @@ describe('Http.Api.Lookup 2.0', function () {
                     return helper.request().post('/api/2.0/lookups')
                         .send(data)
                         .expect(400)
-                        .expect(/ValidationError: /);
                 });
             });
         });
@@ -141,12 +141,13 @@ describe('Http.Api.Lookup 2.0', function () {
 
         describe('PATCH', function () {
             it('should call waterline.lookups.updateOneById with 123', function() {
+                var patchData = _.omit(data[0], [ 'id', 'createdAt', 'updatedAt' ]);
                 return helper.request().patch('/api/2.0/lookups/123')
-                    .send(data[0])
+                    .send(patchData)
                     .expect('Content-Type', /^application\/json/)
                     .expect(200)
                     .expect(function () {
-                        expect(updateOneById).to.have.been.calledWith('123', sinon.match(data[0]));
+                        expect(updateOneById).to.have.been.calledWith('123', patchData);
                     });
             });
 
@@ -155,7 +156,6 @@ describe('Http.Api.Lookup 2.0', function () {
                     return helper.request().post('/api/2.0/lookups')
                         .send(data)
                         .expect(400)
-                        .expect(/ValidationError: /);
                 });
             });
         });

@@ -1,0 +1,4 @@
+kernel <%=kernelUri%>
+initrd <%=initrdUri%>
+imgargs <%=kernelFile%> initrd=<%=initrdFile%> console=tty0 rancher.password=root rancher.cloud_init.datasources=['url:http://<%=server%>:<%=port%>/api/common/templates/cloud-config.yaml']
+boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell

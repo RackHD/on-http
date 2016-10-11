@@ -51,7 +51,7 @@
                     "required": ["host", "community", "cyclePassword", "pduOutlets"]
                 }
             },
-            "required": ["nodeId", "service", "config"]
+            "required": ["service", "config"]
         }
     }
 }

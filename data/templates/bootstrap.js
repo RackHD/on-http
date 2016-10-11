@@ -10,9 +10,10 @@ var http = require('http'),
     server = '<%=server%>',
     port = '<%=port%>',
     tasksPath = '/api/current/tasks/<%=identifier%>',
-    MAX_BUFFER = 1000 * 1024,
-    RETRIES = 5;
-
+    // Set the buffer size to ~5MB to accept all output in flashing bios
+    // Otherwise the process will be killed if exceeds the buffer size
+    MAX_BUFFER = 5000 * 1024,
+    MAX_RETRY_TIMEOUT = 60 * 1000;
 /**
  * Synchronous each loop from caolan/async.
  * @private
@@ -54,9 +55,9 @@ function eachSeries(arr, iterator, callback) {
  * @private
  * @param data
  * @param timeout
- * @param retries
  */
-function updateTasks(data, timeout, retries) {
+function updateTasks(data, timeout, retry, retries) {
+
     var request = http.request({
         hostname: server,
         port: port,
@@ -79,39 +80,31 @@ function updateTasks(data, timeout, retries) {
                 }, timeout);
             } else {
                 console.log("Task Execution Complete");
-
                 process.exit(data.exit.code || 0);
             }
         });
     }).on('error', function (err) {
-        console.log("Update Tasks Error: " + err);
-
-        if (retries === undefined) {
-            retries = 1;
-        } else {
-            retries = retries + 1;
-        }
-
-        if (retries < RETRIES) {
+            console.log("Update Tasks Error: " + err);
+            if (retries === undefined){
+                retries = 1;
+            }else {
+                retries = retries + 1;
+            }
             console.log("Retrying Update Tasks Attempt #" + retries);
 
             setTimeout(function () {
-                updateTasks(data, timeout, retries);
-            }, timeout * retries);
-        } else {
-            console.log("Update Tasks retries completed, getting new tasks.");
-
-            setTimeout(function () {
-                getTasks(timeout);
-            }, timeout);
-        }
-    });
+                updateTasks(data, timeout, retry, retries);
+            }, Math.min(timeout * retries, MAX_RETRY_TIMEOUT));
+        });
 
     // Call error.toString() on certain errors so when it is JSON.stringified
     // it doesn't end up as '{}' before we send it back to the server.
-    if (data.error && !data.error.code) {
-        data.error = data.error.toString();
-    }
+    data.tasks.forEach(function(task) {
+        if (task.error && !task.error.code) {
+            task.error = task.error.toString();
+        }
+    });
+
     request.write(JSON.stringify(data));
     request.write("\n");
     request.end();

@@ -14,7 +14,7 @@ describe('2.0 Http.Api.Nodes', function () {
     var nodesApi;
 
     before('start HTTP server', function () {
-        this.timeout(5000);
+        this.timeout(10000);
         return helper.startServer([
         ]).then(function () {
             configuration = helper.injector.get('Services.Configuration');
@@ -106,6 +106,12 @@ describe('2.0 Http.Api.Nodes', function () {
         type: 'compute',
         workflows: '/api/2.0/nodes/1234abcd1234abcd1234abcd/workflows'
     };
+
+    var postNode = {
+        name: 'name',
+        type: 'compute'
+    };
+
     var rawNode = {
         autoDiscover: "false",
         id: '1234abcd1234abcd1234abcd',
@@ -119,6 +125,7 @@ describe('2.0 Http.Api.Nodes', function () {
     describe('2.0 GET /nodes', function () {
         it('should return a list of nodes', function () {
             waterline.nodes.find.resolves([rawNode]);
+            waterline.nodes.count.resolves(1);
             nodeApiService.getAllNodes.resolves(rawNode);
 
             return helper.request().get('/api/2.0/nodes')
@@ -140,13 +147,13 @@ describe('2.0 Http.Api.Nodes', function () {
             nodeApiService.postNode.resolves(node);
 
             return helper.request().post('/api/2.0/nodes')
-                .send(node)
+                .send(postNode)
                 .expect('Content-Type', /^application\/json/)
                 .expect(201, node)
                 .expect(function () {
                     expect(nodeApiService.postNode).to.have.been.calledOnce;
                     expect(nodeApiService.postNode.firstCall.args[0])
-                        .to.have.property('id').that.equals(node.id);
+                        .to.have.property('name').that.equals(node.name);
                 });
         });
     });
@@ -181,7 +188,7 @@ describe('2.0 Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves(node);
             waterline.nodes.updateByIdentifier.resolves(node);
             return helper.request().patch('/api/2.0/nodes/1234')
-                .send(node)
+                .send(rawNode)
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, node)
                 .expect(function () {
@@ -197,7 +204,7 @@ describe('2.0 Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
             return helper.request().patch('/api/2.0/nodes/1234')
-                .send(node)
+                .send(rawNode)
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -230,6 +237,114 @@ describe('2.0 Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
 
             return helper.request().delete('/api/2.0/nodes/1234')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+    });
+
+    describe('GET /nodes/:identifier/relations', function() {
+
+        it('should return a list of the node\'s relations', function() {
+            waterline.nodes.needByIdentifier.resolves(node);
+            return helper.request().get('/api/2.0/nodes/1234/relations')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200, node.relations);
+        });
+
+        it('should return a 404 if the node was not found', function() {
+            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+
+            return helper.request().get('/api/2.0/nodes/1234/relations')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+    });
+
+    describe('PUT /nodes/:identifier/relations', function() {
+        var relationUpdate;
+        beforeEach(function() {
+            sinon.stub(nodeApiService, 'editNodeRelations');
+            relationUpdate = {
+                containedBy: ['rackNodeId']
+            };
+        });
+
+        afterEach(function() {
+            nodeApiService.editNodeRelations.restore();
+        });
+
+        it('should add to and update a node\'s relations', function() {
+            var updatedRackNode = _.cloneDeep(rawNode);
+            updatedRackNode.type = 'rack';
+            updatedRackNode.id = 'rackNodeId';
+            updatedRackNode.relations = [{relationType: 'contains', targets: rawNode.id}];
+
+            var updatedComputeNode = _.cloneDeep(rawNode);
+            updatedComputeNode.relations = relations.concat({
+                relationType: 'containedBy', targets: ['rackNodeId']
+            });
+
+            nodeApiService.editNodeRelations.resolves([
+                updatedComputeNode, updatedRackNode
+            ]);
+            return helper.request().put('/api/2.0/nodes/1234/relations')
+                .send(relationUpdate)
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function(data) {
+                    expect(data.body[0].relations).to.deep.equal(updatedComputeNode.relations);
+                    expect(data.body[1].relations).to.deep.equal(updatedRackNode.relations);
+                    expect(nodeApiService.editNodeRelations).to.be.calledWithExactly(
+                        '1234',relationUpdate, nodeApiService._addRelation
+                    );
+                });
+
+        });
+
+        it('should return a 404 if the node is not found', function() {
+            nodeApiService.editNodeRelations.rejects(new Errors.NotFoundError("Not Found"));
+            return helper.request().put('/api/2.0/nodes/1234/relations')
+                .send(relationUpdate)
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+    });
+
+    describe('DELETE /nodes/:identifier/relations', function() {
+        var relationDeletion;
+        beforeEach(function() {
+            sinon.stub(nodeApiService, 'editNodeRelations');
+            relationDeletion = {
+                containedBy: ['rackNodeId']
+            };
+        });
+
+        afterEach(function() {
+            nodeApiService.editNodeRelations.restore();
+        });
+
+        it('should delete the given relations from a node', function() {
+            var updatedRackNode = _.cloneDeep(rawNode);
+
+            var updatedComputeNode = _.cloneDeep(rawNode);
+            nodeApiService.editNodeRelations.resolves([updatedComputeNode, updatedRackNode]);
+            return helper.request().delete('/api/2.0/nodes/1234/relations')
+                .send(relationDeletion)
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function(data) {
+                    expect(data.body[0].relations).to.deep.equal(updatedComputeNode.relations);
+                    expect(data.body[1].relations).to.deep.equal(updatedRackNode.relations);
+                    expect(nodeApiService.editNodeRelations).to.be.calledWithExactly(
+                        '1234', relationDeletion, nodeApiService._removeRelation
+                    );
+                });
+        });
+
+        it('should return a 404 if the node is not found', function() {
+            nodeApiService.editNodeRelations.rejects(new Errors.NotFoundError("Not Found"));
+            return helper.request().delete('/api/2.0/nodes/1234/relations')
+                .send(relationDeletion)
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -352,10 +467,11 @@ describe('2.0 Http.Api.Nodes', function () {
     describe('GET /nodes/:identifier/catalogs', function() {
         it('should get a list of catalogs', function () {
             var node = {
-                id: '123',
+
+                id: '1234',
                 catalogs: [
-                    {
-                        node: '123',
+                    {   id: '123',
+                        node: '1234',
                         source: 'dummysource',
                         data: {
                             foo: 'bar'
@@ -367,9 +483,19 @@ describe('2.0 Http.Api.Nodes', function () {
             waterline.nodes.needByIdentifier.resolves(node);
             waterline.catalogs.find.resolves(node.catalogs);
 
-            return helper.request().get('/api/2.0/nodes/123/catalogs')
+            return helper.request().get('/api/2.0/nodes/1234/catalogs')
                 .expect('Content-Type', /^application\/json/)
-                .expect(200, node.catalogs);
+                .expect(200)
+                .expect(function(res){
+                    expect(res.body[0])
+                        .to.have.property('node').that.equals('/api/2.0/nodes/1234');
+                    expect(res.body[0])
+                        .to.have.property('id').that.equals('123');
+                    expect(res.body[0])
+                        .to.have.property('source').that.equals('dummysource');
+                    expect(res.body[0].data)
+                        .to.deep.equal( {foo:'bar'} );
+                });
         });
 
         it('should return a 404 if the node was not found', function () {
@@ -529,8 +655,9 @@ describe('2.0 Http.Api.Nodes', function () {
         it('should create a workflow via the querystring', function () {
             nodeApiService.setNodeWorkflow.resolves(graph);
 
-            return helper.request().post('/api/2.0/nodes/123/workflows')
-                .send({ name: 'TestGraph.Dummy', domain: 'test' })
+            return helper.request()
+                .post('/api/2.0/nodes/123/workflows?name=TestGraph.Dummy')
+                .send({ domain: 'test' })
                 .expect('Content-Type', /^application\/json/)
                 .expect(201)
                 .expect(function () {
@@ -545,11 +672,31 @@ describe('2.0 Http.Api.Nodes', function () {
                 });
         });
 
+        it('should let the graph name in querystring take precedance over body', function () {
+            nodeApiService.setNodeWorkflow.resolves(graph);
+
+            return helper.request().post('/api/2.0/nodes/123/workflows?name=Graph.foo')
+                .send({ name: 'Graph.bar', options: { test: 'foo' }, domain: 'test' })
+                .expect('Content-Type', /^application\/json/)
+                .expect(201)
+                .expect(function () {
+                    expect(nodeApiService.setNodeWorkflow).to.have.been.calledOnce;
+                    expect(nodeApiService.setNodeWorkflow).to.have.been.calledWith(
+                        {
+                            name: 'Graph.foo',
+                            domain: 'test',
+                            options: { test: 'foo' }
+                        },
+                        '123'
+                    );
+                });
+        });
+
         it('should create a workflow with options via the querystring', function () {
             nodeApiService.setNodeWorkflow.resolves(graph);
 
-            return helper.request().post('/api/2.0/nodes/123/workflows')
-                .send({ name: 'TestGraph.Dummy', options: { test: 'foo' }, domain: 'test' })
+            return helper.request().post('/api/2.0/nodes/123/workflows?name=TestGraph.Dummy')
+                .send({ options: { test: 'foo' }, domain: 'test' })
                 .expect('Content-Type', /^application\/json/)
                 .expect(201)
                 .expect(function () {
@@ -704,10 +851,60 @@ describe('2.0 Http.Api.Nodes', function () {
         it('should call masterDelTagById', function() {
             return helper.request().delete('/api/2.0/nodes/tags/name')
                 .expect(204)
-                .expect(function(res) {
+                .expect(function() {
                     expect(nodesApi.masterDelTagById).to.have.been.calledWith('name');
                 });
         });
     });
-    
+
+    describe('OBM support', function() {
+
+        var obm = {
+            service: 'noop-obm-service',
+            config: {
+                host: '1.2.3.4',
+                user: 'myuser',
+                password: 'mypass'
+            }
+        };
+
+        var obmRes = {
+            id: "57c5e319c466ff9435d27fb3",
+            node: "",
+            service: "noop-obm-service",
+            config: {
+                host: "1.2.3.4",
+                user: "myuser"
+            }
+        };
+
+        after(function() {
+            nodesApi.getObmsByNodeId.restore();
+            nodesApi.putObmsByNodeId.restore();
+        });
+
+        it('should call getObmsByNodeId', function() {
+            sinon.stub(nodesApi, 'getObmsByNodeId').resolves([obmRes]);
+
+            return helper.request().get('/api/2.0/nodes/123/obm')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function(res) {
+                    expect(nodesApi.getObmsByNodeId).to.have.been.calledWith('123');
+                    expect(res.body[0].id).to.equal(obmRes.id);
+                });
+        });
+
+        it('should call putObmsByNodeId', function() {
+            sinon.stub(nodesApi, 'putObmsByNodeId').resolves([]);
+
+            return helper.request().put('/api/2.0/nodes/123/obm')
+                .send(obm)
+                .expect('Content-Type', /^application\/json/)
+                .expect(201)
+                .expect(function() {
+                    expect(nodesApi.putObmsByNodeId).to.have.been.calledWith('123',obm);
+                });
+        });
+    });
 });

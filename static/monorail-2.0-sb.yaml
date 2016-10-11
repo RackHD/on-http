@@ -118,8 +118,44 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-
-
+  /notification:
+    x-swagger-router-controller: notification
+    post:
+      operationId: notificationPost
+      summary: |
+        post a notification
+      description: |
+        post a notification
+      parameters:
+        - name: nodeId
+          in: query
+          description: |
+            Node instance identifier
+          required: false
+          type: string
+        - name: data
+          in: body
+          description: |
+            notification data
+          required: false
+          schema:
+            $ref: '#/definitions/notification_obj'
+      tags: [ "/api/2.0" ]
+      responses:
+        201:
+          description: |
+            Specifics of the notification
+          schema:
+            type: object
+        400:
+          description: |
+            bad request parameter passed or no active task or taskgraph.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /swagger:
     x-swagger-pipe: swagger_raw
 
@@ -146,6 +182,11 @@ definitions:
       message:
         type: string
       fields:
+        type: string
+
+  notification_obj:
+    properties:
+      nodeId:
         type: string
 
   generic_obj:

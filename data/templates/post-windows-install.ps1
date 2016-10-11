@@ -26,5 +26,5 @@
 <% } %>
 
 
-#curl the renasar-ansible.pub to indicate that windows install workflow has completed
-curl http://<%=server%>:<%=port%>/api/2.0/templates/renasar-ansible.pub -Outfile renasar-ansible.pub
+#signify ORA the installation completed
+curl -Method POST -ContentType 'application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%> -Outfile post-windows-install.log

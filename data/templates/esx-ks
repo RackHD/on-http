@@ -75,6 +75,10 @@ postLookup () {
   python /vmfs/volumes/datastore1/postLookup.py $mac $2
 }
 
+postLookup
+
+EOF
+
 for nic in $(localcli network nic list | grep vmnic | awk '{print $1}'); do
   localcli network vswitch standard add -v vSwitch${nic#vmnic*}
   localcli network vswitch standard uplink add -v vSwitch${nic#vmnic*} -u ${nic}
@@ -121,7 +125,7 @@ esxcli system settings advanced set -o /UserVars/ESXiShellInteractiveTimeout -i 
 esxcli network firewall set --default-action false --enabled no
 
 # set hostname and domain
-<% hostnameCmdStr = '' %>
+<% var hostnameCmdStr=''; %>
 <% if (typeof domain === 'string') hostnameCmdStr += (' --domain ' + domain) %>
 <% if (typeof hostname === 'string') hostnameCmdStr += (' --host ' + hostname) %>
 <% if (typeof fqdn === 'string') hostnameCmdStr += (' --fqdn ' + fqdn) %>
@@ -178,6 +182,7 @@ postLookup () {
   python /vmfs/volumes/datastore1/postLookup.py $mac $2
 }
 
+#setup DNS
 <% if( typeof dnsServers !== 'undefined' ) { %>
   <% if ( typeof domain !== 'undefined' ) { %>
   esxcli network ip dns search add --domain=<%=domain%>
@@ -187,16 +192,22 @@ postLookup () {
   <% }); %>
 <% } %>
 
+#create vSwitches with uplinks. An uplink can be specifed with its MAC
+#address or device name
 <% if ( typeof switchDevices !== 'undefined' ) { %>
   <% switchDevices.forEach(function(n) { %>
     localcli network vswitch standard add -v "<%=n.switchName%>"
     <% if( typeof n.uplinks !== 'undefined' ) { %>
       <% n.uplinks.forEach(function(s) { %>
-        currsw=`localcli --debug --formatter=csv network vswitch standard list | grep <%=s%> | awk -F, '{print $9}'`
+        currdev = <%=s%>
+        <% if (s.substring(0,5) !== 'vmnic') { %>
+          currdev=`localcli network nic list | grep <%=s%> | cut -d ' ' -f 1`
+        <% } %>
+        currsw=`localcli --debug --formatter=csv network vswitch standard list | grep $currsw | awk -F, '{print $9}'`
         if [ "$currsw" != "" ]; then
-          localcli network vswitch standard uplink remove -v $currsw -u <%=s%>
+          localcli network vswitch standard uplink remove -v $currsw -u $currdev
         fi
-        localcli network vswitch standard uplink add -v <%=n.switchName%> -u <%=s%>
+        localcli network vswitch standard uplink add -v <%=n.switchName%> -u $currdev
       <% }); %>
     <% } %>
   <% }); %>
@@ -206,55 +217,59 @@ postLookup () {
 <% if( typeof networkDevices !== 'undefined' ) { %>
   <% if( networkDevices.length > 0 ) { %>
 
-    <% networkDevices.forEach(function(n) { %>
-      <% if( typeof n.ipv4 !== 'undefined' ) { %>
-        <% if( typeof n.ipv4.vlanIds !== 'undefined' ) { %>
-          <% n.ipv4.vlanIds.forEach(function(vid) { %>
-            <% vmkname = 'vmk' + vmkid++ %>
-            localcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v "<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>"
-            localcli network ip interface remove -i <%=vmkname%>
-            localcli network ip interface add -i <%=vmkname%> -p <%=n.device%>.<%=vid%>
-            localcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
-            localcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
-            localcli network vswitch standard portgroup set -p <%=n.device%>.<%=vid%> -v <%=vid %>
-            postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
-          <% }); %>
-        <% } else { %>
+  <% networkDevices.forEach(function(n) { %>
+    currdev = <%=n.device%>
+    <% if (n.device.substring(0,5) != 'vmnic') { %>
+       currdev=`localcli network nic list | grep <%=n.device%> | cut -d ' ' -f 1`
+    <% } %>
+    <% if( undefined !== n.ipv4 ) { %>
+      <% if( undefined !== n.ipv4.vlanIds ) { %>
+        <% n.ipv4.vlanIds.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
-          localcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+          localcli network vswitch standard portgroup add -p $currdev.<%=vid%> -v "<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>"
           localcli network ip interface remove -i <%=vmkname%>
-          localcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
+          localcli network ip interface add -i <%=vmkname%> -p $currdev.<%=vid%>
           localcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
           localcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
+          localcli network vswitch standard portgroup set -p $currdev.<%=vid%> -v <%=vid %>
           postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
-        <% } %>
-      <% } %>
-      <% if( typeof n.ipv6 !== 'undefined' ) { %>
-        <% if( typeof n.ipv6.vlanIds !== 'undefined' ) { %>
-          <% n.ipv6.vlanIds.forEach(function(vid) { %>
-            <% vmkname = 'vmk' + vmkid++ %>
-            localcli network vswitch standard portgroup add -p <%=n.device%>.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-            localcli network ip interface remove -i <%=vmkname%>
-            localcli network ip interface add -i <%=vmkname%> -p <%=n.device%>.<%=vid%>
-            localcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
-            localcli network vswitch standard portgroup set -p <%=n.device%>.<%=vid%> -v <%=vid %>
-          <% }); %>
-        <% } else { %>
-          <% vmkname = 'vmk' + vmkid++ %>
-          localcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-          localcli network ip interface remove -i <%=vmkname%>
-          localcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
-          localcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
-        <% } %>
-      <% } %>
-      <% if( (typeof n.ipv6 === 'undefined') && (typeof n.ipv4 === 'undefined') ) { %>
+        <% }); %>
+      <% } else { %>
         <% vmkname = 'vmk' + vmkid++ %>
-        localcli network vswitch standard portgroup add -p <%=n.device%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+        localcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
         localcli network ip interface remove -i <%=vmkname%>
-        localcli network ip interface add -i <%=vmkname%> -p <%=n.device%>
-        localcli network ip interface ipv4 set -i <%=vmkname%> -t dhcp
+        localcli network ip interface add -i <%=vmkname%> -p $currdev
+        localcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
+        localcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
+        postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
       <% } %>
-    <% }); %>
+    <% } %>
+    <% if( undefined !== n.ipv6 ) { %>
+      <% if( undefined !== n.ipv6.vlanIds ) { %>
+        <% n.ipv6.vlanIds.forEach(function(vid) { %>
+          <% vmkname = 'vmk' + vmkid++ %>
+          localcli network vswitch standard portgroup add -p $currdev.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+          localcli network ip interface remove -i <%=vmkname%>
+          localcli network ip interface add -i <%=vmkname%> -p $currdev.<%=vid%>
+          localcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
+          localcli network vswitch standard portgroup set -p $currdev.<%=vid%> -v <%=vid %>
+        <% }); %>
+      <% } else { %>
+        <% vmkname = 'vmk' + vmkid++ %>
+        localcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+        localcli network ip interface remove -i <%=vmkname%>
+        localcli network ip interface add -i <%=vmkname%> -p $currdev
+        localcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
+      <% } %>
+    <% } %>
+    <% if( (undefined === n.ipv6) && (undefined === n.ipv4) ) { %>
+      <% vmkname = 'vmk' + vmkid++ %>
+      localcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+      localcli network ip interface remove -i <%=vmkname%>
+      localcli network ip interface add -i <%=vmkname%> -p $currdev
+      localcli network ip interface ipv4 set -i <%=vmkname%> -t dhcp
+    <% } %>
+  <% }); %>
 <% } %>
 <% } else { %>
     for nic in $(localcli network nic list | grep vmnic | awk '{print $1}'); do

@@ -328,14 +328,17 @@ describe("SKU Pack Service", function() {
     describe('should delete sku by ID', function(){
         before(function(){
             sinon.stub(skuService, 'regenerateSkus');
+            sinon.stub(skuService, 'deletePack');
         });
         after(function(){
             skuService.regenerateSkus.restore();
+            skuService.deletePack.restore();
         });
         it('should delete sku by ID', function(){
             var emptySku = [];
             waterline.skus.destroyByIdentifier.resolves(emptySku);
             skuService.regenerateSkus.resolves();
+            skuService.deletePack.resolves();
             return skuService.deleteSkuById().then(function(sku){
                 expect(sku).to.deep.equal(emptySku);
                 expect(waterline.skus.destroyByIdentifier).to.have.been.called;
@@ -465,7 +468,8 @@ describe("SKU Pack Service", function() {
                 workflowApiService.defineTaskGraph.should.have.been.calledWith({
                     injectableName: 'Graph.ABC::a'
                 });
-                Env.set.should.have.been.calledWith('config', _.merge({}, skuAData.skuConfig, { Graph: { ABC : 'Graph.ABC::a'}}), 'a');
+                Env.set.should.have.been.calledWith('config', _.merge({}, skuAData.skuConfig,
+                                                   {Graph: { ABC : 'Graph.ABC::a'}}), 'a');
             });
         });
 
@@ -535,7 +539,8 @@ describe("SKU Pack Service", function() {
             httpTemplateRoot: 'templates',
         };
         fs.readdirAsync.withArgs('./valid').resolves(['static']);
-        return skuService.validatePack(JSON.stringify(data), './valid').should.be.rejectedWith(Errors.BadRequestError);
+        return skuService.validatePack(JSON.stringify(data), './valid')
+            .should.be.rejectedWith(Errors.BadRequestError);
     });
 
     it('should install a pack', function() {
@@ -572,10 +577,6 @@ describe("SKU Pack Service", function() {
     });
 
     it('should delete a pack', function() {
-        var data = {
-            httpStaticRoot: 'static',
-            httpTemplateRoot: 'templates'
-        };
         fs.readdirAsync.withArgs('./root/skuid/templates').resolves([]);
         return skuService.start('./root').then(function() {
             skuService.skuHandlers.skuid = {};

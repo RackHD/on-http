@@ -9,13 +9,13 @@ describe('Redfish Account Service', function () {
     var redfish;
     var waterline;
     var Promise;
-    var template;
+    var view;
     var fs;
     var accountService;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
-        return fs.readFileAsync(__dirname + '/../../../../data/templates/' + entry, 'utf-8')
+        return fs.readFileAsync(__dirname + '/../../../../data/views/redfish-1.0/' + entry, 'utf-8')
             .then(function(contents) {
                 return { contents: contents };
             });
@@ -40,7 +40,7 @@ describe('Redfish Account Service', function () {
 
         return helper.startServer([], { authEnabled: true })
         .then(function() {
-            template = helper.injector.get('Templates');
+            view = helper.injector.get('Views');
             redfish = helper.injector.get('Http.Api.Services.Redfish');
             validator = helper.injector.get('Http.Api.Services.Schema');
             waterline = helper.injector.get('Services.Waterline');
@@ -49,7 +49,7 @@ describe('Redfish Account Service', function () {
             tv4 = require('tv4');
             accountService = helper.injector.get('Http.Services.Api.Account');
 
-            self.sandbox.stub(template, "get", redirectGet);
+            self.sandbox.stub(view, "get", redirectGet);
             self.sandbox.spy(redfish, 'render');
             self.sandbox.spy(validator, 'validate');
             self.sandbox.stub(waterline.localusers, 'findOne');
@@ -185,11 +185,40 @@ describe('Redfish Account Service', function () {
         accountService.modifyUserByName.resolves(userObj);
         return helper.request().patch('/redfish/v1/AccountService/Accounts/admin')
             .auth('admin', 'admin123')
-            .send({UserName: 'admin2', Password: 'admin123', RoleId: 'Administrator'})
+            .send({Password: 'admin456', RoleId: 'Administrator'})
             .expect('Content-Type', /^application\/json/)
             .expect(202)
             .then(function() {
-                expect(accountService.modifyUserByName).to.have.been.called;
+                expect(accountService.modifyUserByName)
+                    .to.have.been.calledWith('admin', {password:'admin456', role: 'Administrator'});
+            });
+    });
+
+    it('should 202 a user patch attempt with auth', function() {
+        accountService.getUserByName.resolves(readOnlyObj);
+        accountService.modifyUserByName.resolves(readOnlyObj);
+        return helper.request().patch('/redfish/v1/AccountService/Accounts/readonly')
+            .auth('readonly', 'read123')
+            .send({Password: 'read456'})
+            .expect('Content-Type', /^application\/json/)
+            .expect(202)
+            .then(function() {
+                expect(accountService.modifyUserByName)
+                    .to.have.been.calledWith('readonly', {password:'read456'});
+            });
+    });
+
+    it('should 400 a user patch attempt with auth', function() {
+        accountService.getUserByName.resolves(readOnlyObj);
+        accountService.modifyUserByName.resolves(readOnlyObj);
+        return helper.request().patch('/redfish/v1/AccountService/Accounts/readonly')
+            .auth('readonly', 'read123')
+            .send({UserName: 'readonly', Password: 'read456', RoleId: 'Administrator'})
+            .expect('Content-Type', /^application\/json/)
+            .expect(400)
+            .then(function() {
+                expect(accountService.modifyUserByName)
+                    .to.not.have.been.called;
             });
     });
 

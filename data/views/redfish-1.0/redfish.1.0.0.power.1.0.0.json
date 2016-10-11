@@ -1,0 +1,40 @@
+{
+	"@odata.context" : "<%= basepath %>/$metadata#Chassis/Links/Members/<%= identifier %>/Power/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Power.1.0.0.Power",
+    "Oem": {},
+    "Id": "<%= identifier %>",
+    "Description": "",
+	"Name": "Power",
+	"PowerControl": [],
+	"Voltages@odata.count": <%= voltageList.length %>,
+	"Voltages": [
+		<% voltageList.forEach(function(sdr, i, arr) { %>
+			{
+				"Oem": {},
+				"Name": "<%= sdr['sensorId'] %>",
+				"ReadingVolts": <%= _.isNaN(parseFloat(sdr['sensorReading'])) ? 'null' : parseFloat(sdr['sensorReading']) %>,
+				"UpperThresholdNonCritical": <%= _.isNaN(parseFloat(sdr['upperNonCritical'])) ? 'null' : parseFloat(sdr['upperNonCritical'])%>,
+				"UpperThresholdCritical": <%= _.isNaN(parseFloat(sdr['upperCritical'])) ? 'null' : parseFloat(sdr['upperCritical']) %>,
+				"UpperThresholdFatal": null,
+				"LowerThresholdNonCritical": <%= _.isNaN(parseFloat(sdr['lowerNonCritical'])) ? 'null' : parseFloat(sdr['lowerNonCritical']) %>,
+				"LowerThresholdCritical": <%= _.isNaN(parseFloat(sdr['lowerCritical'])) ? 'null' : parseFloat(sdr['lowerCritical']) %>,
+				"LowerThresholdFatal": null,
+				"MinReadingRange": <%= _.isNaN(parseFloat(sdr['normalMinimum'])) ? 'null' : parseFloat(sdr['normalMinimum']) %>,
+				"MaxReadingRange": <%= _.isNaN(parseFloat(sdr['normalMaximum'])) ? 'null' : parseFloat(sdr['normalMaximum']) %>
+			}
+			<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+		<% }); %>
+	],
+	"PowerSupplies@odata.count": <%= wattsList.length %>,
+	"PowerSupplies": [
+		<% wattsList.forEach(function(sdr, i, arr) { %>
+			{
+				"Oem": {},
+				"Name": "<%= sdr['sensorId'] %>",
+				"LastPowerOutputWatts": <%= _.isNaN(parseFloat(sdr['sensorReading'])) ? 'null' : parseFloat(sdr['sensorReading']) %>
+			}
+			<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+		<% }); %>
+	]
+}
