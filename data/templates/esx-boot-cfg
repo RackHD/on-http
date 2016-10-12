@@ -2,6 +2,6 @@ bootstate=0
 title=Loading ESXi installer
 kernel=<%=tbootFile%>
 kernelopt=runweasel formatwithmbr com1_baud=115200 com1_Port=<%=comportaddress%> tty2Port=<%=comport%> debugLogToSerial=1 logPort=<%=comport%> ks=<%=installScriptUri%>
-modules=<%=moduleFiles%>
+modules=<%=moduleFiles%> <%=kargs%>
 build=
 updated=0
