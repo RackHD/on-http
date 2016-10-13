@@ -10,6 +10,7 @@ describe('Http.Api.Notification', function () {
     var needByIdentifier;
     var postNodeNotification;
     var postBroadcastNotification;
+    var TaskGraph;
 
     var nodeNotificationMessage = {
         nodeId: "57a86b5c36ec578876878294",
@@ -20,16 +21,26 @@ describe('Http.Api.Notification', function () {
         data: 'dummy data'
     };
 
-    var node = {_id: nodeNotificationMessage.nodeId}
+    var progressNotificationMessage = {
+        taskId: "57a86b5c36ec578876878294",
+        progress: {
+            description: "test",
+            percentage: "10%"
+        }
+    };
+
+    var node = {_id: nodeNotificationMessage.nodeId};
 
     before('Setup mocks', function () {
         helper.setupInjector([
-            helper.require("/lib/services/notification-api-service.js")
+            onHttpContext.prerequisiteInjectables,
+            helper.require("/lib/services/notification-api-service.js"),
         ]);
         notificationApiService = helper.injector.get('Http.Services.Api.Notification');
         _ = helper.injector.get('_');
         eventProtocol = helper.injector.get('Protocol.Events');
         waterline = helper.injector.get('Services.Waterline');
+        TaskGraph = helper.injector.get('TaskGraph.TaskGraph');
         waterline.nodes = {
             needByIdentifier: function() {}
         };
@@ -112,5 +123,55 @@ describe('Http.Api.Notification', function () {
                 expect(resp).to.deep.equal(broadcastNotificationMessage);
             });
         });
+
+        it('should update graph progress', function () {
+            var tasks = [{graphId: "graphId"}],
+                graphs = [{
+                    instanceId: "graphId",
+                    definition: {friendlyName: "Test Graph"},
+                    tasks: {"57a86b5c36ec578876878294": {friendlyName: "Test Task"}}
+                }],
+                progressData = {
+                    graphId: graphs[0].instanceId,
+                    graphName: graphs[0].definition.friendlyName,
+                    progress: {
+                        percentage: "na",
+                        description: progressNotificationMessage.progress.description
+                    },
+                    taskProgress: {
+                        graphId: graphs[0].instanceId,
+                        taskId: progressNotificationMessage.taskId,
+                        taskName: graphs[0].tasks[progressNotificationMessage.taskId].friendlyName,
+                        progress: progressNotificationMessage.progress
+                    }
+                };
+            waterline.taskdependencies = {find: function() {}};
+            waterline.graphobjects = {find: function() {}};
+            sinon.stub(waterline.taskdependencies, 'find').resolves(tasks);
+            sinon.stub(waterline.graphobjects, 'find').resolves(graphs);
+            sinon.stub(TaskGraph.prototype, 'updateGraphProgress').resolves();
+            return notificationApiService.postProgressEvent(progressNotificationMessage)
+            .then(function () {
+                expect(waterline.taskdependencies.find).to.be.calledOnce;
+                expect(waterline.taskdependencies.find).to.be.calledWith({
+                    taskId: progressNotificationMessage.taskId});
+                expect(waterline.graphobjects.find).to.be.calledOnce;
+                expect(waterline.graphobjects.find).to.be.calledOnce.calledWith({
+                    instanceId: tasks[0].graphId});
+                expect(TaskGraph.prototype.updateGraphProgress).to.be.calledOnce;
+                expect(TaskGraph.prototype.updateGraphProgress).to.be.calledWith(progressData);
+            });
+        });
+
+        it('should call postProgressEvent', function () {
+            sinon.stub(notificationApiService, 'postProgressEvent').resolves();
+            return notificationApiService.postNotification(progressNotificationMessage)
+            .then(function () {
+                expect(notificationApiService.postProgressEvent).to.be.calledOnce;
+                expect(notificationApiService.postProgressEvent).to.be
+                    .calledWith(progressNotificationMessage);
+            });
+        });
+
     });
 });
