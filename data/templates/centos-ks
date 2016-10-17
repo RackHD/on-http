@@ -154,7 +154,6 @@ export PATH
         sed -i '/^BOOTPROTO=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         sed -i '/^ONBOOT=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "DEVICE=<%=n.device%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
-        echo "HWADDR=<%=n.hwaddr%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "BOOTPROTO=none" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         echo "IPADDR=<%=n.ipv4.ipAddr%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
@@ -189,13 +188,6 @@ export PATH
         echo "IPV6_DEFAULTGW=<%=n.ipv6.gateway%>" >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
         <% ipv6 = 1 %>
       <% } %>
-    <% } %>
-    <% if( (undefined === n.ipv6) && (undefined === n.ipv4) ) { %>
-       sed -i '/^BOOTPROTO=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
-       sed -i '/^ONBOOT=/d' /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
-
-       echo 'BOOTPROTO=dhcp' >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
-       echo 'ONBOOT=yes' >> /etc/sysconfig/network-scripts/ifcfg-<%=n.device%>
     <% } %>
   <% }); %>
   <% if( ipv6 ) { %>
