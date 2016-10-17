@@ -7,113 +7,43 @@ accepteula
   install --disk=<%=installDisk%> --overwritevmfs
 <% } %>
 rootpw <%=rootPlainPassword%>
+reboot
 
-# Search the networkDevices and set the first device (if defined) up.
-# If no device is specified in the networkDevices, then we fallback
-# to setting 'vmnic0' up as DHCP. The device can be specified with a
-# MAC address or device name ('vmnic0' for example)
-<% if( typeof networkDevices !== 'undefined' ) { %>
-  <% need_default = networkDevices.every(function(n) { %>
-    <% if(typeof n.ipv4 !== 'undefined') { %>
-      <% ipopts = '--ip=' + n.ipv4.ipAddr + ' --gateway=' + n.ipv4.gateway + ' --netmask=' + n.ipv4.netmask %>
-      <% if (typeof n.ipv4.vlanIds !== 'undefined' ) { %>
-        <% ipopts += ' --vlandid=' + n.ipv4.vlanIds[0] %>
-      <% } %>
-      network --bootproto=static --device=<%=n.device%> <%=ipopts%>
-    <% } else { %>
-      network --bootproto=dhcp --device=<%=n.device%>
-    <% } %>
-    <% return false; %>
-  <% }); %>
-  <% if (need_default) { %>
-    network --bootproto=dhcp --device=vmnic0
-  <% } %>
-<% } %>
-#reboot
-
-%post --interpreter=busybox
-#create python script to add/update vmk mac
-
-cat > /vmfs/volumes/datastore1/postLookup.py <<EOF
-import urllib, urllib2, json, sys, time
-
-args = sys.argv
-query_args = { 'q': args[1] }
-encoded_args = urllib.urlencode(query_args)
-
-url = "http://<%=server%>:<%=port%>/api/1.1/lookups"
-
-time.sleep(5)
-response = urllib2.urlopen(url + "?" + encoded_args)
-data = json.loads(response.read())
-print data
-
-request = urllib2.Request(url)
-body = {'node': '<%=task.nodeId%>', 'macAddress'  : args[1]}
-
-if len(data) > 0:
-  request = urllib2.Request(url + "/" + data[0]["id"])
-  request.get_method = lambda: 'PATCH'
-if len(args) > 2:
-  body.update({'ipAddress': args[2]})
-
-request.add_header('Content-Type', 'application/json')
-
-response = urllib2.urlopen(request, json.dumps(body))
-data = json.loads(response.read())
-print data
-
-EOF
+%firstboot --interpreter=busybox
 
 postLookup () {
   echo "Attempting postLookup operation on $1" >> /vmfs/volumes/datastore1/firstboot.log
-  mac=`localcli --formatter=table network ip interface list | grep $1 | awk '{print $3}'`
+  mac=`esxcli --debug --formatter=csv network ip interface list | grep $1 | awk -F, '{print $3}'`
   if [ "<%=version%>" == "5.5" ]; then
-    mac=`localcli --formatter=table network ip interface list | grep $1 | awk '{print $2}'`
+    mac=`esxcli --debug --formatter=csv network ip interface list | grep $1 | awk -F, '{print $2}'`
   fi
-
-  python /vmfs/volumes/datastore1/postLookup.py $mac $2
+  BODY="{"
+  BODY=$BODY"\"macAddress\": \"$mac\","
+  BODY=$BODY"\"node\": \"<%=nodeId%>\""
+  BODY=$BODY"}"
+  BODYLEN=$(echo -n ${BODY} | wc -c )
+  echo ${BODY} >> /vmfs/volumes/datastore1/firstboot.log
+  result=`echo -ne "POST /api/current/lookups HTTP/1.0\r\nHost: $2\r\nContent-Type: application/json\r\nContent-Length: ${BODYLEN}\r\n\r\n${BODY}" | nc -i 3  <%=server%> <%=port%> | grep -oE 'HTTP/1.1 [0-9]{3}' | awk '{print $2}'`
+  if [ "$result" -ge "400" ]; then
+    # Make an attempt to PATCH if we can find the node id.  This is to handle the case where the
+    # ARP poller added the lookup entry when we tried to POST above causing a collision.
+    id=`wget http://<%=server%>:<%=port%>/api/current/lookups?q=$mac -qO - | grep -oE '\"id\":\"(.)*\"'`
+    if [ "$?" -eq "0" ]; then
+      id=`echo $id | awk -F: '{gsub(/"/,"",$2); print $2}'`
+      result=`echo -ne "PATCH /api/current/lookups/$id HTTP/1.0\r\nHost: $2\r\nContent-Type: application/json\r\nContent-Length: ${BODYLEN}\r\n\r\n${BODY}" | nc -i 3 <%=server%> <%=port%> | grep -oE 'HTTP/1.1 [0-9]{3}' | awk '{print $2}'`
+      echo "Patch result: $result to id: $id" >> /vmfs/volumes/datastore1/firstboot.log
+    fi
+  fi
+  wget http://<%=server%>:<%=port%>/api/current/lookups?q=$mac -qO - >> /vmfs/volumes/datastore1/firstboot.log
 }
 
-postLookup
-
-EOF
-
-for nic in $(localcli network nic list | grep vmnic | awk '{print $1}'); do
-  localcli network vswitch standard add -v vSwitch${nic#vmnic*}
-  localcli network vswitch standard uplink add -v vSwitch${nic#vmnic*} -u ${nic}
-  localcli network vswitch standard portgroup add -p ${nic} -v vSwitch${nic#vmnic*}
-  localcli network ip interface remove -i vmk${nic#vmnic*}
-  localcli network ip interface add -i vmk${nic#vmnic*} -p ${nic}
-  localcli network ip interface ipv4 set -i vmk${nic#vmnic*} -t dhcp
-  postLookup vmk${nic#vmnic*}
-
-done
-
-
-<% if( typeof postInstallCommands !== 'undefined' ) { %>
-  <% postInstallCommands.forEach(function(n) { %>
-    <%=n%>
-  <% }); %>
-<% } %>
-
-#signify ORA the installation completed
-/bin/sleep 30
-/usr/bin/wget -s http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>
-
-#reboot the system after host configuration
-/bin/reboot
-
-
-%firstboot --interpreter=busybox
+# enable VHV (Virtual Hardware Virtualization to run nested 64bit Guests + Hyper-V VM)
+grep -i "vhv.enable" /etc/vmware/config || echo "vhv.enable = \"TRUE\"" >> /etc/vmware/config
 
 vim-cmd hostsvc/enable_ssh
 vim-cmd hostsvc/start_ssh
 vim-cmd hostsvc/enable_esx_shell
 vim-cmd hostsvc/start_esx_shell
-
-# enable VHV (Virtual Hardware Virtualization to run nested 64bit Guests + Hyper-V VM)
-grep -i "vhv.enable" /etc/vmware/config || echo "vhv.enable = \"TRUE\"" >> /etc/vmware/config
 
 #suppress shell warnings
 esxcli system settings advanced set -o /UserVars/SuppressShellWarning -i 1
@@ -162,9 +92,6 @@ restrict 127.0.0.1 kkl,lkl
 __NTP_CONFIG__
 /sbin/chkconfig ntpd on
 
-#backup ESXi configuration to persist it
-/sbin/auto-backup.sh
-
 #enter maintenance mode
 esxcli system maintenanceMode set -e true
 
@@ -172,23 +99,13 @@ esxcli system maintenanceMode set -e true
 cp /var/log/hostd.log "/vmfs/volumes/datastore1/firstboot-hostd.log"
 cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.log"
 
-postLookup () {
-  echo "Attempting postLookup operation on $1" >> /vmfs/volumes/datastore1/firstboot.log
-  mac=`localcli --formatter=table network ip interface list | grep $1 | awk '{print $3}'`
-  if [ "<%=version%>" == "5.5" ]; then
-    mac=`localcli --formatter=table network ip interface list | grep $1 | awk '{print $2}'`
-  fi
-
-  python /vmfs/volumes/datastore1/postLookup.py $mac $2
-}
-
 #setup DNS
 <% if( typeof dnsServers !== 'undefined' ) { %>
   <% if ( typeof domain !== 'undefined' ) { %>
   esxcli network ip dns search add --domain=<%=domain%>
   <% } %>
   <% dnsServers.forEach(function(dns) { %>
-    localcli network ip dns server add --server=<%= dns %>
+    esxcli network ip dns server add --server=<%= dns %>
   <% }); %>
 <% } %>
 
@@ -196,18 +113,18 @@ postLookup () {
 #address or device name
 <% if ( typeof switchDevices !== 'undefined' ) { %>
   <% switchDevices.forEach(function(n) { %>
-    localcli network vswitch standard add -v "<%=n.switchName%>"
-    <% if( typeof n.uplinks !== 'undefined' ) { %>
+    esxcli network vswitch standard add -v "<%=n.switchName%>"
+    <% if( undefined !== n.uplinks ) { %>
       <% n.uplinks.forEach(function(s) { %>
-        currdev = <%=s%>
+        currdev=<%=s%>
         <% if (s.substring(0,5) !== 'vmnic') { %>
-          currdev=`localcli network nic list | grep <%=s%> | cut -d ' ' -f 1`
+          currdev=`esxcli network nic list | grep -i <%=s%> | cut -d ' ' -f 1`
         <% } %>
-        currsw=`localcli --debug --formatter=csv network vswitch standard list | grep $currsw | awk -F, '{print $9}'`
+        currsw=`esxcli --debug --formatter=csv network vswitch standard list | grep $currdev | awk -F, '{print $9}'`
         if [ "$currsw" != "" ]; then
-          localcli network vswitch standard uplink remove -v $currsw -u $currdev
+          esxcli network vswitch standard uplink remove -v $currsw -u $currdev
         fi
-        localcli network vswitch standard uplink add -v <%=n.switchName%> -u $currdev
+        esxcli network vswitch standard uplink add -v <%=n.switchName%> -u $currdev
       <% }); %>
     <% } %>
   <% }); %>
@@ -215,32 +132,30 @@ postLookup () {
 
 <% vmkid = 0 %>
 <% if( typeof networkDevices !== 'undefined' ) { %>
-  <% if( networkDevices.length > 0 ) { %>
-
   <% networkDevices.forEach(function(n) { %>
-    currdev = <%=n.device%>
+    currdev=<%=n.device%>
     <% if (n.device.substring(0,5) != 'vmnic') { %>
-       currdev=`localcli network nic list | grep <%=n.device%> | cut -d ' ' -f 1`
+       currdev=`esxcli network nic list | grep -i <%=n.device%> | cut -d ' ' -f 1`
     <% } %>
     <% if( undefined !== n.ipv4 ) { %>
       <% if( undefined !== n.ipv4.vlanIds ) { %>
         <% n.ipv4.vlanIds.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
-          localcli network vswitch standard portgroup add -p $currdev.<%=vid%> -v "<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>"
-          localcli network ip interface remove -i <%=vmkname%>
-          localcli network ip interface add -i <%=vmkname%> -p $currdev.<%=vid%>
-          localcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
-          localcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
-          localcli network vswitch standard portgroup set -p $currdev.<%=vid%> -v <%=vid %>
+          esxcli network vswitch standard portgroup add -p $currdev.<%=vid%> -v "<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>"
+          esxcli network ip interface remove -i <%=vmkname%>
+          esxcli network ip interface add -i <%=vmkname%> -p $currdev.<%=vid%>
+          esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
+          esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
+          esxcli network vswitch standard portgroup set -p $currdev.<%=vid%> -v <%=vid %>
           postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
         <% }); %>
       <% } else { %>
         <% vmkname = 'vmk' + vmkid++ %>
-        localcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-        localcli network ip interface remove -i <%=vmkname%>
-        localcli network ip interface add -i <%=vmkname%> -p $currdev
-        localcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
-        localcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
+        esxcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+        esxcli network ip interface remove -i <%=vmkname%>
+        esxcli network ip interface add -i <%=vmkname%> -p $currdev
+        esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
+        esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
         postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
       <% } %>
     <% } %>
@@ -248,42 +163,72 @@ postLookup () {
       <% if( undefined !== n.ipv6.vlanIds ) { %>
         <% n.ipv6.vlanIds.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
-          localcli network vswitch standard portgroup add -p $currdev.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-          localcli network ip interface remove -i <%=vmkname%>
-          localcli network ip interface add -i <%=vmkname%> -p $currdev.<%=vid%>
-          localcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
-          localcli network vswitch standard portgroup set -p $currdev.<%=vid%> -v <%=vid %>
+          esxcli network vswitch standard portgroup add -p $currdev.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+          esxcli network ip interface remove -i <%=vmkname%>
+          esxcli network ip interface add -i <%=vmkname%> -p $currdev.<%=vid%>
+          esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
+          esxcli network vswitch standard portgroup set -p $currdev.<%=vid%> -v <%=vid %>
         <% }); %>
       <% } else { %>
         <% vmkname = 'vmk' + vmkid++ %>
-        localcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-        localcli network ip interface remove -i <%=vmkname%>
-        localcli network ip interface add -i <%=vmkname%> -p $currdev
-        localcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
+        esxcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+        esxcli network ip interface remove -i <%=vmkname%>
+        esxcli network ip interface add -i <%=vmkname%> -p $currdev
+        esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
       <% } %>
     <% } %>
     <% if( (undefined === n.ipv6) && (undefined === n.ipv4) ) { %>
       <% vmkname = 'vmk' + vmkid++ %>
-      localcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-      localcli network ip interface remove -i <%=vmkname%>
-      localcli network ip interface add -i <%=vmkname%> -p $currdev
-      localcli network ip interface ipv4 set -i <%=vmkname%> -t dhcp
+      esxcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
+      esxcli network ip interface remove -i <%=vmkname%>
+      esxcli network ip interface add -i <%=vmkname%> -p $currdev
+      esxcli network ip interface ipv4 set -i <%=vmkname%> -t dhcp
+      postLookup <%=vmkname%>
     <% } %>
   <% }); %>
 <% } %>
-<% } else { %>
-    for nic in $(localcli network nic list | grep vmnic | awk '{print $1}'); do
-      localcli network vswitch standard add -v vSwitch${nic#vmnic*}
-      localcli network vswitch standard uplink add -v vSwitch${nic#vmnic*} -u ${nic}
-      localcli network vswitch standard portgroup add -p ${nic} -v vSwitch${nic#vmnic*}
-      localcli network ip interface remove -i vmk${nic#vmnic*}
-      localcli network ip interface add -i vmk${nic#vmnic*} -p ${nic}
-      localcli network ip interface ipv4 set -i vmk${nic#vmnic*} -t dhcp
-      postLookup vmk${nic#vmnic*}
 
-    done
+<% if( typeof postInstallCommands !== 'undefined' ) { %>
+  <% postInstallCommands.forEach(function(n) { %>
+    <%-n%>
+  <% }); %>
 <% } %>
 
+# Download the service to callback to RackHD after OS installation/reboot completion
+# %firstboot ends with a reboot, this script will run afterwards to signify completion
+# of the installer and all reboot steps.
+#
+# The approved method for adding startup commands is to write to /etc/rc.local.d/local.sh,
+# which is a pre-existing file with a sticky bit set by VisorFS. You can't just create new
+# files and expect them to stick around, even if you set a sticky bit yourself.
+# The /sbin/auto-backup.sh script will ensure the changes are persisted across reboots and
+# MUST be executed after making any changes.
+#
+# See these links for more information:
+# http://www.virtuallyghetto.com/2011/08/how-to-persist-configuration-changes-in.html
+# http://blogs.vmware.com/vsphere/2011/09/how-often-does-esxi-write-to-the-boot-disk.html
+# https://communities.vmware.com/message/1273849#1273849
+#
+# NOTE: this method only works for ESXi 5.1 or greater. For older versions, the changes
+# must be written to /etc/rc.local instead.
+#
+# NOTE: this script will execute right away as a result of writing it to local.sh
+# along with executing on every subsequent boot
+# rackhdCallbackScript is no longer in context once "Task.Os.Install.ESXi" is marked as completed
+
+mv /vmfs/volumes/datastore1/<%=rackhdCallbackScript%> /etc/rc.local.d/local.sh
+
+#backup ESXi configuration to persist it
+/sbin/auto-backup.sh
+
+#reboot the system after host configuration
+esxcli system shutdown reboot -d 10 -r "Rebooting after first boot host configuration"
+
+%post --interpreter=busybox
+#disable firewall
+localcli network firewall set --enabled no
 #signify ORA the installation completed
-/usr/bin/wget -s http://<%=server%>:<%=port%>/api/common/templates/<%=completionUri%>
-EOF
+wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%> -O /vmfs/volumes/datastore1/<%=rackhdCallbackScript%>
+chmod +x /vmfs/volumes/datastore1/<%=rackhdCallbackScript%>
+/vmfs/volumes/datastore1/<%=rackhdCallbackScript%>
+
