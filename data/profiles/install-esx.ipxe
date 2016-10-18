@@ -1,7 +1,7 @@
 iseq ${platform} efi && goto is_efi || goto not_efi
 
 :not_efi
-kernel <%=mbootFile%> -c <%=esxBootConfigTemplateUri%> BOOTIF=01-${netX/mac}
+kernel <%=repo%>/<%=mbootFile%> -c <%=esxBootConfigTemplateUri%> BOOTIF=01-${netX/mac}
 boot
 
 :is_efi
