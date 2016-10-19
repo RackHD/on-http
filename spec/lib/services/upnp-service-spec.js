@@ -45,7 +45,8 @@ describe("UPnP Service", function() {
         helper.setupInjector([
             helper.require("/lib/services/upnp-service"),
             helper.di.simpleWrapper(messenger, 'Services.Messenger'),
-            helper.di.simpleWrapper(rx,'Rx')
+            helper.di.simpleWrapper(rx,'Rx'),
+            helper.di.requireWrapper('node-cache', 'node-cache')
         ]);
         helper.injector.get('Services.Configuration')
         .set('httpEndpoints', [{
@@ -84,6 +85,9 @@ describe("UPnP Service", function() {
         emitter.removeAllListeners('advertise-bye');
         emitter.removeAllListeners('advertise-alive');
         emitter.removeAllListeners('response');
+        uPnPService.cache.removeAllListeners('set');
+        uPnPService.cache.removeAllListeners('del');
+        uPnPService.cache.removeAllListeners('expired');
     });
 
     helper.after(function () {
@@ -163,7 +167,13 @@ describe("UPnP Service", function() {
             };
             return uPnPService.start()
             .then(function() {
-                emitter.emit('response', {header:'header'},{code:'200'},{info:'info'});
+                emitter.emit('response',
+                             {
+                                USN: 'usn-1234',
+                                'CACHE-CONTROL':'max-age=1800'
+                             },
+                             {code:'200'},
+                             {info:'info'});
                 setImmediate(function() {
                     try {
                         expect(messenger.publish).to.have.been.calledOnce;
