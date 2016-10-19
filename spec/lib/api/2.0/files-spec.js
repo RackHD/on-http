@@ -95,7 +95,10 @@ describe('Http.Api.Internal.Files', function () {
         it('should get file by filename', function () {
             return helper.request().get('/api/2.0/files/mockfile/md5')
                 .expect(200)
-                .expect('Content-Type', /^text\/plain/);
+                .expect('Content-Type', /^application\/json/)
+                .expect(function(res) {
+                    expect(res.body).to.be.a('string');
+                });
         });
 
         it('should return 404 if no file found', function () {
