@@ -578,6 +578,7 @@ paths:
       x-privileges:
       - Read
       - filesRead
+      x-view: files.md5.2.0.json
     x-swagger-router-controller: files
   /files/{filename}/metadata:
     get:
