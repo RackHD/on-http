@@ -83,10 +83,14 @@ describe('2.0 Http.Api.Nodes', function () {
     }];
 
     var ibm =[{
-        config: {},
+        config: {
+            host: '1234',
+            user: 'fake-password',
+            password: 'fake-password'
+        },
         id: "11111111111111111111111111",
         node: "12341234abcd123412341234",
-        service: "ssh"
+        service: "ssh-ibm-service"
     }];
 
     var relations =[{
@@ -112,7 +116,7 @@ describe('2.0 Http.Api.Nodes', function () {
             ref: '/api/2.0/obms/574dcd5794ab6e2506fd107a'
         }],
         ibms: [{
-            service: 'ssh',
+            service: 'ssh-ibm-service',
             ref: '/api/2.0/ibms/11111111111111111111111111'
         }],
         type: 'compute',
@@ -134,7 +138,7 @@ describe('2.0 Http.Api.Nodes', function () {
         ibms: ibm,
         type: 'compute'
     };
-    
+
     describe('2.0 GET /nodes', function () {
         it('should return a list of nodes', function () {
             waterline.nodes.find.resolves([rawNode]);
@@ -365,10 +369,13 @@ describe('2.0 Http.Api.Nodes', function () {
 
     describe('GET /nodes/:identifier/ssh', function () {
         var sshNode = _.cloneDeep(node);
-        sshNode.sshSettings = {
+        sshNode.ibms = {
+            service: "ssh-ibm-service",
+            config:{
             host: '1.2.3.4',
             user: 'myuser',
             password: 'mypass'
+            }
         };
 
         it('should return a list of the node\'s ssh settings', function () {
@@ -379,7 +386,7 @@ describe('2.0 Http.Api.Nodes', function () {
                 .expect('Content-Type', /^application\/json/)
                 .expect(200, ibm);
         });
-
+        
         it('should return a 404 if the node was not found', function () {
             waterline.nodes.getNodeById.rejects(new Errors.NotFoundError('Not Found'));
 
@@ -398,19 +405,17 @@ describe('2.0 Http.Api.Nodes', function () {
         });
 
     });
-     
+
     describe('POST /nodes/:identifier/ssh', function () {
         var sshNode = _.cloneDeep(node);
-        sshNode.ibms = 
-            [{ 
-                service: 'ssh',
-                ref: '/api/2.0/ibms/1234' 
-             }];
+        sshNode.ibms = [{
+            service: "ssh-ibm-service",
+            ref: '/api/2.0/ibms/1234'
+        }];
 
         var sendSsh = {
-            id: "1234",
-            service: "test",
-            config: {
+            service: "ssh-ibm-service",
+            config:{
                 host: "5.5.5.5",
                 user: "myuser2",
                 password: 'mypass'
@@ -419,8 +424,8 @@ describe('2.0 Http.Api.Nodes', function () {
         
         var outputIbm = 
             {
-                service: 'test',
-                ref: '/api/2.0/ibms/1234'
+                service: "ssh-ibm-service",
+                ref: "/api/2.0/ibms/1234"
             };
         var tempNode = 
         {
@@ -429,7 +434,7 @@ describe('2.0 Http.Api.Nodes', function () {
             id: '1234foo',
             name: 'name',
             identifiers: []
-        }
+        };
         
         it('should replace existing settings with a new set of ssh settings', function () {
             waterline.nodes.getNodeById.resolves(node);
@@ -480,7 +485,7 @@ describe('2.0 Http.Api.Nodes', function () {
                 .expect(404);
         });
     });
-    
+
     describe('GET /nodes/:identifier/catalogs', function() {
         it('should get a list of catalogs', function () {
             var node = {
@@ -924,5 +929,5 @@ describe('2.0 Http.Api.Nodes', function () {
                 });
         });
     });
-  
+
 });
