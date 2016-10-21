@@ -84,7 +84,7 @@ class Progress:
             "option": parameters["option"]      # erase command arguments options
         }
         self.disk_list = disks  # disks to be erased
-        self.interval = 10      # erase progress polling interval
+        self.interval = 600      # erase progress polling interval in seconds
         self.percent = 0.0      # last progress percent buffer
         self.duration = {}      # erase duration for each disks
         self.path = path        # log file path
