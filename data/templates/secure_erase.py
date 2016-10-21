@@ -26,6 +26,9 @@ ARG_PARSER = argparse.ArgumentParser(description='RackHD secure-erase argument')
 ARG_PARSER.add_argument("-i", action="store", default='undefined', type=str,
                         help="Secure erase taskId")
 
+ARG_PARSER.add_argument("-s", action="store", default='', type=str,
+                        help="RackHD host server address")
+
 ARG_PARSER.add_argument("-d", action="append", default=[], type=str,
                         help="Disks to be erased with arguments")
 
@@ -48,7 +51,8 @@ ARG_PARSER.add_argument("-o", action="store", type=str,
                              'For sg_sanitize SE options, "block", "crypto", "fail" are supported. '
                              'Overwrite option is not supported at current stage. '
                              'Please read tool man page for more details \n'
-                             'For hdparm, "secure-erase" and "secure-erase-enhanced" are supported')
+                             'For hdparm, "security-erase" and "security-erase-enhanced" \n'
+                             'are supported')
 
 ARG_LIST = ARG_PARSER.parse_args()
 
@@ -61,6 +65,10 @@ FRONT_SKIP = "4096"
 HDPARM_RETRY_EXITCODES = [5]
 COMMAND_LOG_MARKER = "\n==========================" \
                      "==========================\n"
+if os.getcwd()[-1] != '/':
+    PATH = os.getcwd() + "/"
+else:
+    PATH = os.getcwd()
 
 
 class Progress:
@@ -68,14 +76,18 @@ class Progress:
     Secure erase job progress class.
     """
 
-    def __init__(self, task_id, disks, se_param, se_tool):
-        self.task_id = task_id  # task id for notification
+    def __init__(self, disks, path, parameters):
+        self.parameters = {                     # parameters parsed from command
+            "taskId": parameters["taskId"],     # task id for notification
+            "address": parameters["address"],   # rackhd server address
+            "tool": parameters["tool"],         # erase tool to be used
+            "option": parameters["option"]      # erase command arguments options
+        }
         self.disk_list = disks  # disks to be erased
         self.interval = 10      # erase progress polling interval
-        self.param = se_param   # erase command arguments
-        self.tool = se_tool     # erase tool to be used
-        self.percent = 0.0      # last progress percent, as a buffer
+        self.percent = 0.0      # last progress percent buffer
         self.duration = {}      # erase duration for each disks
+        self.path = path        # log file path
 
     def scrub_parser(self, drive):
         """
@@ -94,32 +106,24 @@ class Progress:
         # scrub: verify  |................................................|
 
         # Maximum dot count for each pass
-        log = open('/home/monorail/' + drive + '.log', 'r')
-        MAX_DOT_COUNT = 48
+        log = open(self.path + drive + '.log', 'r')
+        MAX_DOT_COUNT = 50
         # Scrub pass counts for different scrub methods, default pass count is 1
         pass_counts = {"nnsa": 4, "dod": 4, "gutmann": 35, "schneier":7, "pfitzner7":7,
                        "pfitzner33": 33, "usarmy": 3, "random2": 2, "old": 6, "fastold": 5}
-        pass_count = pass_counts[self.param]
-        count = 0
-        patterna = re.compile("^scrub: \w{4,6}\s*\|\.{" + str(MAX_DOT_COUNT) + "}\|")
-        patternb = re.compile("^scrub: \w{4,6}\s*\|\.*")
-        last_line = ''
+        pass_count = pass_counts[self.parameters["option"]]
+        line_count = 0
+        dot_count = 0
+        patterna = re.compile("^scrub: \w{4,6}\s*\|\.+\|$")
+        patternb = re.compile("^scrub: \w{4,6}\s*\|\.*$")
         for line in log.readlines():
             line = line.strip()
             if patterna.match(line):
-                count += 1
+                line_count += 1
             elif patternb.match(line):
-                last_line = line
-        if last_line:
-            print last_line
-            dot_count = len(last_line.split("|")[1])
-            # "|" is also counted as a dot for percentage calculation
-            percent = (100.00/pass_count)*(count + (dot_count+1.0)/(MAX_DOT_COUNT+2.0))
-        elif count != 0:
-            percent = (100.00/pass_count)*count
-        else:
-            percent = 0.00
-
+                dot_count = len(line.split("|")[1])
+        percent = 100.00*(line_count*MAX_DOT_COUNT + dot_count)/(pass_count*MAX_DOT_COUNT)
+        log.close()
         return percent
 
     def __get_hdparm_duration(self, log):
@@ -128,14 +132,14 @@ class Progress:
         :param log: a file object of secure erase log
         :return: required secure erase time indicated by hdparm tool
         """
-        pattern = re.compile("(\d{1,4})\s*min for SECURE ERASE UNIT." +
-                             "\s*(\d{1,4})\s*min for ENHANCED SECURE ERASE UNIT.")
+        pattern = re.compile("(\d{1,4})\s*min for SECURITY ERASE UNIT." +
+                             "\s*(\d{1,4})\s*min for ENHANCED SECURITY ERASE UNIT.", re.I)
         estimated_time = 0
         for line in log.readlines():
             line = line.strip()
             match = pattern.match(line)
             if match:
-                if self.param == "secure-erase":
+                if self.parameters["option"] == "security-erase":
                     estimated_time = match.group(1)
                 else:
                     estimated_time = match.group(2)
@@ -147,7 +151,7 @@ class Progress:
         :param drive: drive name
         :return: a float digital of percentage
         """
-        log = open('/home/monorail/' + drive + '.log', 'r')
+        log = open(self.path + drive + '.log', 'r')
         percent = 0.0
         if not self.duration.has_key(drive) or self.duration[drive] == 0:
             self.duration[drive] = self.__get_hdparm_duration(log)
@@ -157,6 +161,7 @@ class Progress:
             # Let maximum precent to be 99.00 instead
             if percent > 100.00:
                 percent = 99.00
+        log.close()
         return percent
 
     def __sg_requests_parser(self, drive):
@@ -177,6 +182,8 @@ class Progress:
             match = patterna.match(progress_output)
             if match:
                 return float(match.group(1))
+        elif self.percent > 0:
+            return self.percent
         return 0.00
 
     def sg_format_parser(self, drive):
@@ -196,7 +203,7 @@ class Progress:
         #return float('+inf')
         return self.__sg_requests_parser(drive)
 
-    def run(self):
+    def __run(self):
         """
         Get secure erase progress for secure erase task.
         """
@@ -210,27 +217,29 @@ class Progress:
         percentage_list = [0.0]*disk_count
         erase_start_flags = [False]*disk_count
         payload = {
-            "taskId": self.task_id,
+            "taskId": self.parameters["taskId"],
             "progress": {}
         }
         counter = 0
         total_percent = 0.00
+        if not self.parameters["address"]:
+            self.parameters["address"] = "http://172.31.128.1:9080"
         while True:
             for (index, value) in enumerate(self.disk_list):
+                value = value.split("/")[-1]
                 if erase_start_flags[index]:
-                    # Check secure erase sub-progress is alive
+                    # Check if secure erase sub-progress is alive
                     command = 'ps aux | grep {} | grep {} | sed "/grep/d" | sed "/python/d"' \
-                        .format(self.tool, value)
+                        .format(self.parameters["tool"], value)
                     erase_alive = subprocess.check_output(command, shell=True)
                     if not erase_alive:
                         percentage_list[index] = 100
                     else:
                         self.percent = percentage_list[index]
-                        percentage_list[index] = parser_mapper[self.tool](value)
+                        percentage_list[index] = parser_mapper[self.parameters["tool"]](value)
                 else:
-                    erase_start_flags[index] = os.path.exists('/home/monorail/' + value + '.log')
+                    erase_start_flags[index] = os.path.exists(self.path + value + '.log')
             total_percent = sum(percentage_list)/disk_count
-            print percentage_list
             if total_percent == float('+inf'):
                 payload["progress"]["percentage"] = "Not Available"
             else:
@@ -239,16 +248,27 @@ class Progress:
             payload["progress"]["description"] = "This is the {}th polling with {}s interval" \
                 .format(str(counter), str(self.interval))
             cmd = 'curl -X POST -H "Content-Type:application/json" ' \
-                  '-d \'{}\' http://172.31.128.1:8080/api/1.1/notification' \
-                .format(json.dumps(payload))
-            print cmd + "\n"
-            if total_percent == 100:
-                break
+                '-d \'{}\' {}/api/1.1/notification' \
+                .format(json.dumps(payload), self.parameters["address"])
             try:
                 subprocess.call(cmd, shell=True)
             except subprocess.CalledProcessError as err:
                 print err.output
+            if total_percent == 100:
+                break
             time.sleep(self.interval)
+
+    def run(self):
+        """
+        Get secure erase progress for secure erase task with try except to catch errors
+        """
+        try:
+            self.__run()
+        except Exception as err:
+            return {"exit_code": -1, "message":  err}
+        else:
+            return {"exit_code": 0, "message": "Progress succeeded"}
+
 
 def create_jbod(disk_arg, raid_tool):
     """
@@ -489,7 +509,7 @@ def secure_erase_base(disk_name, cmd):
     """
     name = disk_name.split("/")[-1]
     log_file = name + ".log"  # log file for sdx will be sdx.log
-    log = open(log_file, "a")
+    log = open(log_file, "a+")
 
     record_timestamp(log=log, action="start")
 
@@ -544,7 +564,7 @@ def hdparm_secure_erase(disk_name, se_option):
     """
     # enhance_se = ARG_LIST.e
     log_file = disk_name.split("/")[-1] + ".log"  # log file for sdx will be sdx.log
-    log = open(log_file, "a")
+    log = open(log_file, "a+")
     if se_option:
         hdparm_option = "--" + se_option
     else:
@@ -646,7 +666,8 @@ def delete_logs(disks):
     :return:
     """
     for value in disks:
-        log_file = value + ".log"
+        value = value.split("/")[-1]
+        log_file = PATH + value + ".log"
         if os.path.exists(log_file):
             os.remove(log_file)
 
@@ -663,7 +684,7 @@ def get_process_exit_status(async_result):
         process_result = {"exitcode": -1, "message": err}
     else:
         process_result["exitcode"] = process_exit_result["exit_code"]
-        if process_result["exit_code"] == 0:
+        if process_result["exitcode"] == 0:
             process_result["message"] = "Secure erase completed successfully"
         else:
             process_result["message"] = process_exit_result["message"]
@@ -675,7 +696,7 @@ def progress_wrapper(obj):
     :param obj: an object of Progress
     :return:
     """
-    obj.run()
+    return obj.run()
 
 if __name__ == '__main__':
     TOOL_MAPPER = {
@@ -687,6 +708,7 @@ if __name__ == '__main__':
     tool = ARG_LIST.t
     option = ARG_LIST.o
     task_id = ARG_LIST.i
+    server = ARG_LIST.s
     assert tool in ["scrub", "hdparm", "sg_format", "sg_sanitize"], \
         "Secure erase tool is not supported"
 
@@ -704,7 +726,9 @@ if __name__ == '__main__':
     pool = Pool(process_count)
 
     #Get secure erase progress and send notification
-    progress_parser = Progress(task_id, disk_list, option, tool)
+    progress_parser = Progress(disk_list, PATH,
+                               {"taskId": task_id, "option": option,
+                                "tool": tool, "address": server})
     progress_status = pool.apply_async(progress_wrapper, (progress_parser, ))
     # Run multiple processes for SE
     erase_output_list = []
@@ -727,7 +751,7 @@ if __name__ == '__main__':
     pool.close()
     pool.join()
 
-    if progress_result("exitcode"):
+    if progress_result["exitcode"]:
         print progress_result["Message"]
 
     print erase_result_list
