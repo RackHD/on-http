@@ -18,6 +18,14 @@ do
         echo "Failed to connect to RackHD API callback, retrying"
         sleep 1
     else
+        if [ -e /vmfs/volumes/datastore1/rackhd_callback ]
+        then
+            echo "Remove RackHD callback script"
+            rm /vmfs/volumes/datastore1/rackhd_callback
+            rm /etc/rc.local.d/local.sh
+        else
+            touch /vmfs/volumes/datastore1/rackhd_callback
+        fi
         exit 0
     fi
 done;
