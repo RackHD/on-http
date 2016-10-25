@@ -1,6 +1,6 @@
 echo Starting SUSE <%=version%> installer >
 set base-url <%=repo%>
-set params linux install=${base-url} autoyast=<%=installScriptUri%>
+set params linux install=${base-url} autoyast=<%=installScriptUri%> <%=kargs%>
 kernel ${base-url}/boot/x86_64/loader/linux
 initrd ${base-url}/boot/x86_64/loader/initrd
 imgargs linux ${params}
