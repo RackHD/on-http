@@ -18,7 +18,7 @@
                 "role": {
                     "description": "The role of the user",
                     "type": "string",
-                    "enum": ["Administrator", "ReadOnly"]
+                    "enum": ["Administrator", "ReadOnly", "Operator"]
                 }
             },
             "additionalProperties": false
@@ -26,7 +26,7 @@
         "User": {
             "allOf": [
                 { "$ref": "#/definitions/PartialUser" },
-                { "required": [ "username", "password" ] }
+                { "required": [ "username", "password", "role" ] }
             ]
         }
     }
