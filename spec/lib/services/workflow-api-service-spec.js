@@ -76,7 +76,7 @@ describe('Http.Services.Api.Workflows', function () {
         this.sandbox.stub(workflowApiService, 'createActiveGraph');
         this.sandbox.stub(workflowApiService, 'runTaskGraph');
         this.sandbox.stub(env, 'get');
-        this.sandbox.stub(TaskGraph.prototype, 'updateGraphProgress').resolves();
+        this.sandbox.stub(TaskGraph, 'updateGraphProgress').resolves();
     });
 
     afterEach('Http.Services.Api.Profiles afterEach', function() {
@@ -114,8 +114,8 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
                 graphDefinition, { test: 1 }, { test: 2 }, 'test'
             );
-            expect(TaskGraph.prototype.updateGraphProgress).to.have.been.calledOnce;
-            expect(TaskGraph.prototype.updateGraphProgress).to.have.been.calledWith(data);
+            expect(TaskGraph.updateGraphProgress).to.have.been.calledOnce;
+            expect(TaskGraph.updateGraphProgress).to.have.been.calledWith(data);
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
                 .to.have.been.calledWith(graph.instanceId, 'test');

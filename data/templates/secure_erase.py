@@ -84,7 +84,7 @@ class Progress:
             "option": parameters["option"]      # erase command arguments options
         }
         self.disk_list = disks  # disks to be erased
-        self.interval = 600      # erase progress polling interval in seconds
+        self.interval = 60      # erase progress polling interval in seconds
         self.percent = 0.0      # last progress percent buffer
         self.duration = {}      # erase duration for each disks
         self.path = path        # log file path
@@ -159,7 +159,7 @@ class Progress:
             percent = self.percent + 100.0*self.interval/(self.duration[drive]*60.00)
             # As hdparm SE duration is estimated, there might be percent larger than 100
             # Let maximum precent to be 99.00 instead
-            if percent > 100.00:
+            if percent > 99.00:
                 percent = 99.00
         log.close()
         return percent
@@ -223,7 +223,7 @@ class Progress:
         counter = 0
         total_percent = 0.00
         if not self.parameters["address"]:
-            self.parameters["address"] = "http://172.31.128.1:9080"
+            self.parameters["address"] = "http://172.31.128.1:9080/api/current/notification"
         while True:
             for (index, value) in enumerate(self.disk_list):
                 value = value.split("/")[-1]
@@ -248,8 +248,7 @@ class Progress:
             payload["progress"]["description"] = "This is the {}th polling with {}s interval" \
                 .format(str(counter), str(self.interval))
             cmd = 'curl -X POST -H "Content-Type:application/json" ' \
-                '-d \'{}\' {}/api/1.1/notification' \
-                .format(json.dumps(payload), self.parameters["address"])
+                '-d \'{}\' {}'.format(json.dumps(payload), self.parameters["address"])
             try:
                 subprocess.call(cmd, shell=True)
             except subprocess.CalledProcessError as err:

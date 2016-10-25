@@ -149,7 +149,7 @@ describe('Http.Api.Notification', function () {
             waterline.graphobjects = {findOne: function() {}};
             this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves(tasks);
             this.sandbox.stub(waterline.graphobjects, 'findOne').resolves(graphs);
-            this.sandbox.stub(TaskGraph.prototype, 'updateGraphProgress').resolves();
+            this.sandbox.stub(TaskGraph, 'updateGraphProgress').resolves();
             return notificationApiService.postProgressNotification(progressNotificationMessage)
             .then(function () {
                 expect(waterline.taskdependencies.findOne).to.be.calledOnce;
@@ -158,8 +158,8 @@ describe('Http.Api.Notification', function () {
                 expect(waterline.graphobjects.findOne).to.be.calledOnce;
                 expect(waterline.graphobjects.findOne).to.be.calledWith({
                     instanceId: tasks.graphId});
-                expect(TaskGraph.prototype.updateGraphProgress).to.be.calledOnce;
-                expect(TaskGraph.prototype.updateGraphProgress).to.be.calledWith(progressData);
+                expect(TaskGraph.updateGraphProgress).to.be.calledOnce;
+                expect(TaskGraph.updateGraphProgress).to.be.calledWith(progressData);
             });
         });
 
@@ -169,12 +169,12 @@ describe('Http.Api.Notification', function () {
             waterline.graphobjects = {findOne: function() {}};
             this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves([]);
             this.sandbox.spy(waterline.graphobjects, 'findOne');
-            this.sandbox.spy(TaskGraph.prototype, 'updateGraphProgress');
+            this.sandbox.spy(TaskGraph, 'updateGraphProgress');
             return notificationApiService.postProgressNotification({taskId: 'aTask'})
             .then(function () {
                 expect(waterline.taskdependencies.findOne).to.be.calledOnce;
                 expect(waterline.graphobjects.findOne).to.have.not.been.called;
-                expect(TaskGraph.prototype.updateGraphProgress).to.have.not.been.called;
+                expect(TaskGraph.updateGraphProgress).to.have.not.been.called;
             });
         });
 
