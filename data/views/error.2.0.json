@@ -2,6 +2,14 @@
     "message": "<%=message%>",
     "status": "<%=status%>",
     "UUID": "<%=uuid%>"
+    <% if (hasOwnProperty("errors")) { %>
+    ,"errors": [
+    <% errors.forEach(function ( item, i, arr){ %>
+    "<%=item %>"
+    <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+    <% }); %>
+    ]
+    <% } %>
     <% if (hasOwnProperty("stack")) { %>
     ,"stack": [
     <% stack.forEach(function ( item, i, arr){ %>
