@@ -221,7 +221,7 @@ chmod +x /etc/rc.d/init.d/<%=rackhdCallbackScript%>
 chkconfig <%=rackhdCallbackScript%> on
 
 #signify ORA the installation completed
-/usr/bin/wget --spider http://<%=server%>:<%=port%>/api/current/templates/renasar-ansible.pub
+/usr/bin/curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
 
 ) 2>&1 >>/root/install-post-sh.log
 EOF
