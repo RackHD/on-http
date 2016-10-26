@@ -620,6 +620,13 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should 404 a reset type list on an invalid node', function() {
+        nodeApi.getNodeById.resolves();
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    'invalid/Actions/ComputerSystem.Reset')
+            .expect(404);
+    });
+
     it('should perform the specified valid reset', function() {
         return helper.request().post('/redfish/v1/Systems/' + node.id +
                                     '/Actions/ComputerSystem.Reset')
@@ -631,6 +638,14 @@ describe('Redfish Systems Root', function () {
                 expect(validator.validate.called).to.be.true;
                 expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
             });
+    });
+
+    it('should 404 a reset on an invalid node', function() {
+        nodeApi.getNodeById.resolves();
+        return helper.request().post('/redfish/v1/Systems/' + node.id +
+                                    'invalid/Actions/ComputerSystem.Reset')
+            .send({ reset_type: "ForceRestart"})
+            .expect(404);
     });
 
     it('should 400 an invalid reset type', function() {
