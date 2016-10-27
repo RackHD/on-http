@@ -555,7 +555,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved the md5sum of a specific file
+          description: Successfully retrieved the md5sum of the specified file
           schema:
             type: object
         404:
@@ -592,7 +592,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved metadata of a specific file
+          description: Successfully retrieved metadata of the specified file
           schema:
             type: object
         404:
@@ -678,7 +678,7 @@ paths:
     x-swagger-router-controller: lookups
   /lookups/{id}:
     delete:
-      description: Delete a specific lookup.
+      description: Delete the specified lookup.
       operationId: lookupsDelById
       parameters:
       - description: The identifier of the lookup to delete
@@ -872,7 +872,7 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}:
     delete:
-      description: Delete a specific node.
+      description: Delete the specified node.
       operationId: nodesDelById
       parameters:
       - description: The node identifier
@@ -900,7 +900,7 @@ paths:
       - Write
       - nodesRemove
     get:
-      description: Get all information on a specific node.
+      description: Get all information on the specified node.
       operationId: nodesGetById
       parameters:
       - description: The node identifier
@@ -933,7 +933,7 @@ paths:
       - nodesRead
       x-view: node.2.0.json
     patch:
-      description: Modify the properties of a specific node.
+      description: Modify the properties of the specified node.
       operationId: nodesPatchById
       parameters:
       - description: The node identifier
@@ -949,7 +949,7 @@ paths:
           $ref: '#/definitions/node.2.0_PartialNode'
       responses:
         200:
-          description: Successfully modified a specific node
+          description: Successfully modified the specified node
           schema:
             type: object
         404:
@@ -972,7 +972,7 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/catalogs:
     get:
-      description: Get a list of all of the catalogs for a specific node.
+      description: Get a list of all of the catalogs for the specified node.
       operationId: nodesGetCatalogById
       parameters:
       - description: The node identifier
@@ -1006,7 +1006,7 @@ paths:
   /nodes/{identifier}/catalogs/{source}:
     get:
       description:
-        Get a list of all of the catalogs for a specific node, containing a specific value of the source catalog property.
+        Get a list of all of the catalogs for the specified node, containing the specified value of the source catalog property.
       operationId: nodesGetCatalogSourceById
       parameters:
       - description: The node identifier
@@ -1043,7 +1043,7 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/obm:
     get:
-      description: Get all the OBM settings for a specific node.
+      description: Get all the OBM settings for the specified node.
       operationId: nodesGetObmsByNodeId
       parameters:
       - description: The Node identifier
@@ -1053,7 +1053,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved a specific OBM service
+          description: Successfully retrieved the specified OBM service
           schema:
             type: object
         default:
@@ -1070,7 +1070,7 @@ paths:
       - obmsRead
       x-view: obm.2.0.json
     put:
-      description: Create or update a specific OBM service with the associated Node ID
+      description: Create or update the specified OBM service with the associated Node ID
       operationId: nodesPutObmsByNodeId
       parameters:
       - description: The Node identifier
@@ -1110,7 +1110,7 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/pollers:
     get:
-      description: Get a list of all of the pollers for a specific node.
+      description: Get a list of all of the pollers for the specified node.
       operationId: nodesGetPollersById
       parameters:
       - description: The node identifier
@@ -1179,7 +1179,7 @@ paths:
       - nodesRemove
       x-swagger-schema: relations.2.0.json#/definitions/Relation
     get:
-      description: Get the relations field of a specific node
+      description: Get the relations field of the specified node
       operationId: nodesGetRelations
       parameters:
       - description: The node identifier
@@ -1254,7 +1254,7 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/ssh:
     get:
-      description: Get all of the ssh settings associated with a specific node.
+      description: Get all of the ssh settings associated with the specified node.
       operationId: nodesGetSshById
       parameters:
       - description: The node identifier
@@ -1285,7 +1285,7 @@ paths:
       - nodesRead
       x-swagger-serializer: nodes
     post:
-      description: Create the ssh settings associated with a specific node.
+      description: Create the ssh settings associated with the specified node.
       operationId: nodesPostSshById
       parameters:
       - description: The node identifier
@@ -1322,7 +1322,7 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/tags:
     get:
-      description: Get a list of all tags associated with a specific node.
+      description: Get a list of all tags associated with the specified node.
       operationId: nodesGetTagsById
       parameters:
       - description: The node identifier
@@ -1338,7 +1338,7 @@ paths:
               type: object
             type: array
         404:
-          description: The specified node was not.
+          description: The specified node was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1354,7 +1354,7 @@ paths:
       - Read
       - nodesRead
     patch:
-      description: Modify the tag(s) associated with a specific node.
+      description: Modify the tag(s) associated with the specified node.
       operationId: nodesPatchTagById
       parameters:
       - description: The node identifier
@@ -1393,7 +1393,7 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/tags/{tagName}:
     delete:
-      description: Delete a specific tag from a specific node.
+      description: Delete the specified tag from the specified node.
       operationId: nodesDelTagById
       parameters:
       - description: The node identifier
@@ -1429,7 +1429,7 @@ paths:
   /nodes/{identifier}/workflows:
     get:
       description: >
-        Get a list of all workflows that have run against a specific node, or
+        Get a list of all workflows that have run against the specified node, or
         are currently running against the node.
       operationId: nodesGetWorkflowById
       parameters:
@@ -1465,7 +1465,7 @@ paths:
       - Read
       - workflowsRead
     post:
-      description: Run a workflow against for a specific node.
+      description: Run a workflow against for the specified node.
       operationId: nodesPostWorkflowById
       parameters:
       - description: The node identifier
@@ -1487,7 +1487,7 @@ paths:
         type: string
       responses:
         201:
-          description: Successfully started a specific workflow.
+          description: Successfully started the specified workflow.
           schema:
             type: object
         404:
@@ -1527,11 +1527,11 @@ paths:
           $ref: '#/definitions/action'
       responses:
         202:
-          description: Successfully performed the action on a specific workflow
+          description: Successfully performed the action on the specified workflow
           schema:
             type: object
         404:
-          description: The specific node was not found.
+          description: The specified node was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1574,7 +1574,7 @@ paths:
       x-view: obm.2.0.json
     put:
       description:
-        Create or update a specific OBM service, and associate it with a node.
+        Create or update the specified OBM service, and associate it with a node.
       operationId: obmsPut
       parameters:
       - description: The OBM settings information to create
@@ -1632,7 +1632,7 @@ paths:
     x-swagger-router-controller: obms
   /obms/definitions/{name}:
     get:
-      description: Get the contents of a specific OBM service schema.
+      description: Get the contents of the specified OBM service schema.
       operationId: obmsDefinitionsGetByName
       parameters:
       - description: The OBM service name
@@ -1642,7 +1642,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved a specific OBM schema
+          description: Successfully retrieved the specified OBM schema
           schema:
             type: object
         default:
@@ -1695,7 +1695,7 @@ paths:
     x-swagger-router-controller: obms
   /obms/{identifier}:
     delete:
-      description: Delete the OBM settings with a specific identifier.
+      description: Delete the OBM settings with the specified identifier.
       operationId: obmsDeleteById
       parameters:
       - description: The OBM service identifier
@@ -1705,11 +1705,11 @@ paths:
         type: string
       responses:
         204:
-          description: Successfully deleted a specific OBM settings
+          description: Successfully deleted the specified OBM settings
           schema:
             type: object
         404:
-          description: The OBM service with a specific identifier was not found
+          description: The OBM service with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -1725,7 +1725,7 @@ paths:
       - Write
       - obmsRemove
     get:
-      description: Get the OBM settings associated with a specific identifier
+      description: Get the OBM settings associated with the specified identifier
       operationId: obmsGetById
       parameters:
       - description: The OBM service identifier
@@ -1735,7 +1735,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved a specific OBM service
+          description: Successfully retrieved the specified OBM service
           schema:
             type: object
         default:
@@ -1752,7 +1752,7 @@ paths:
       - obmsRead
       x-view: obm.2.0.json
     patch:
-      description: Update the properties of the OBM settings with a specific identifier.
+      description: Update the properties of the OBM settings with the specified identifier.
       operationId: obmsPatchById
       parameters:
       - description: The OBM service identifier
@@ -1768,7 +1768,7 @@ paths:
           $ref: '#/definitions/ipmi-obm-service_Obm'
       responses:
         200:
-          description: Successfully patched a specific OBM settings
+          description: Successfully patched the specified OBM settings
           schema:
             type: object
         500:
@@ -1829,7 +1829,7 @@ paths:
       - pollersRead
       x-view: poller.2.0.json
     post:
-      description: Create and start a new poller, which will run at a specific time interval.
+      description: Create and start a new poller, which will run at the specified time interval.
       operationId: pollersPost
       parameters:
       - description: >
@@ -1887,7 +1887,7 @@ paths:
   /pollers/library/{identifier}:
     get:
       description: >
-        Get the poller definition with a specific identifier from the
+        Get the poller definition with the specified identifier from the
         poller library
       operationId: pollersLibByIdGet
       parameters:
@@ -1898,7 +1898,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successful retrieval of a specific poller
+          description: Successful retrieval of the specified poller
           schema:
             type: object
         404:
@@ -1909,7 +1909,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get a specific poller
+      summary: Get the specified poller
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1920,7 +1920,7 @@ paths:
     x-swagger-router-controller: pollers
   /pollers/{identifier}:
     delete:
-      description: Delete the poller with a specific identifier.
+      description: Delete the poller with the specified identifier.
       operationId: pollersDelete
       parameters:
       - description: The poller identifier
@@ -1939,7 +1939,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Delete a specific poller
+      summary: Delete the specified poller
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1949,7 +1949,7 @@ paths:
       - pollersRemove
     get:
       description: >
-        Get information associated with a specific poller, including
+        Get information associated with the specified poller, including
         type, run interval, command, and whether the poller is paused.
       operationId: pollersIdGet
       parameters:
@@ -1971,7 +1971,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get a specific poller
+      summary: Get the specified poller
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1981,7 +1981,7 @@ paths:
       - pollersRead
       x-view: poller.2.0.json
     patch:
-      description: Modify one or more properties of the poller with a specific identifier.
+      description: Modify one or more properties of the poller with the specified identifier.
       operationId: pollersPatch
       parameters:
       - description: The poller identifier
@@ -2001,7 +2001,7 @@ paths:
           schema:
             type: object
         404:
-          description: Poller with a specific identifier was not found
+          description: Poller with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2023,7 +2023,7 @@ paths:
     get:
       description: >
         Get the complete history of output data generated by the poller
-        with a specific identifier.
+        with the specified identifier.
       operationId: pollersDataGet
       parameters:
       - description: The identifier of the poller
@@ -2060,7 +2060,7 @@ paths:
   /pollers/{identifier}/data/current:
     get:
       description:
-        Get latest output data generated by the poller poller with a specific identifier.
+        Get latest output data generated by the poller poller with the specified identifier.
       operationId: pollersCurrentDataGet
       parameters:
       - description: The identifier of the poller
@@ -2168,7 +2168,7 @@ paths:
           schema:
             type: object
         404:
-          description: The profile with a specific name was not found
+          description: The profile with the specified name was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2187,7 +2187,7 @@ paths:
       consumes:
       - application/octet-stream
       - application/x-www-form-urlencoded
-      description: Create or modify a specific profile metadata and contents.
+      description: Create or modify the specified profile metadata and contents.
       operationId: profilesPutLibByName
       parameters:
       - description: The profile name
@@ -2202,7 +2202,7 @@ paths:
         type: string
       responses:
         201:
-          description: Successfully created or modified a specific profile
+          description: Successfully created or modified the specified profile
           schema:
             type: object
         500:
@@ -2247,7 +2247,7 @@ paths:
     x-swagger-router-controller: profiles
   /profiles/metadata/{name}:
     get:
-      description: Get the metadata associated with a specific profile.
+      description: Get the metadata associated with the specified profile.
       operationId: profilesGetMetadataByName
       parameters:
       - description: The profile name
@@ -2266,14 +2266,14 @@ paths:
           schema:
             type: object
         404:
-          description: The profile with a specific identifier was not found
+          description: The profile with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get a specific profiles metadata from database
+      summary: Get the specified profiles metadata from database
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2414,7 +2414,7 @@ paths:
     x-swagger-router-controller: roles2.0
   /roles/{name}:
     delete:
-      description: Delete a specific Role.
+      description: Delete the specified Role.
       operationId: removeRole
       parameters:
       - description: role name
@@ -2424,7 +2424,7 @@ paths:
         type: string
       responses:
         204:
-          description: Successfully deleted a specific role
+          description: Successfully deleted the specified role
         401:
           description: Unauthorized
           schema:
@@ -2446,7 +2446,7 @@ paths:
       - Write
       - rolesRemove
     get:
-      description: Get information about a specific role.
+      description: Get information about the specified role.
       operationId: getRole
       parameters:
       - description: The role name
@@ -2456,7 +2456,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved a specific role
+          description: Successfully retrieved the specified role
         401:
           description: Unauthorized
           schema:
@@ -2564,7 +2564,7 @@ paths:
     x-swagger-router-controller: schemas2
   /schemas/tasks/{identifier}:
     get:
-      description: Get a specific task schema.
+      description: Get the specified task schema.
       operationId: taskSchemasIdGet
       parameters:
       - description: The filename of the task schema
@@ -2601,7 +2601,7 @@ paths:
     x-swagger-router-controller: schemas2
   /schemas/{identifier}:
     get:
-      description: Get a specific schema.
+      description: Get the specified schema.
       operationId: schemasIdGet
       parameters:
       - description: The identifier of the schema
@@ -2729,7 +2729,7 @@ paths:
       - multipart/form-data
       - application/x-www-form-urlencoded
       description: >
-        Create a new SKU Pack, which is used to serve a specific
+        Create a new SKU Pack, which is used to serve the specified
         set of files to a node during provisioning.
       operationId: skuPackPost
       responses:
@@ -2752,7 +2752,7 @@ paths:
     x-swagger-router-controller: skus
   /skus/{identifier}:
     delete:
-      description: Delete the SKU with a specific identifier.
+      description: Delete the SKU with the specified identifier.
       operationId: skusIdDelete
       parameters:
       - description: The SKU identifier
@@ -2766,7 +2766,7 @@ paths:
           schema:
             type: object
         404:
-          description: The SKU with a specific identifier was not found
+          description: The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2782,7 +2782,7 @@ paths:
       - Write
       - skusRemove
     get:
-      description: Get the SKU with a specific identifier.
+      description: Get the SKU with the specified identifier.
       operationId: skusIdGet
       parameters:
       - description: The SKU identifier
@@ -2796,14 +2796,14 @@ paths:
           schema:
             type: object
         404:
-          description: The SKU with a specific identifier was not found
+          description: The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get a specific SKU
+      summary: Get the specified SKU
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2813,7 +2813,7 @@ paths:
       - skusRead
       x-view: sku-2.0.json
     patch:
-      description: Modify the SKU with a specific identifier.
+      description: Modify the SKU with the specified identifier.
       operationId: skusPatch
       parameters:
       - description: The sku identifier
@@ -2829,11 +2829,11 @@ paths:
           $ref: '#/definitions/skus.2.0_SkusUpsert'
       responses:
         200:
-          description: Successfully modified a specific SKU
+          description: Successfully modified the specified SKU
           schema:
             type: object
         404:
-          description: The SKU with a specific identifier was not found
+          description: The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         500:
@@ -2855,7 +2855,7 @@ paths:
     x-swagger-router-controller: skus
   /skus/{identifier}/nodes:
     get:
-      description: Get the nodes associated with a specific SKU definition.
+      description: Get the nodes associated with the specified SKU definition.
       operationId: skusIdGetNodes
       parameters:
       - description: The SKU identifier
@@ -2865,11 +2865,11 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved the nodes associated with a specific SKU
+          description: Successfully retrieved the nodes associated with the specified SKU
           schema:
             type: object
         404:
-          description: The SKU with a specific identifier was not found
+          description: The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2889,7 +2889,7 @@ paths:
     delete:
       consumes:
       - application/x-www-form-urlencoded
-      description: Delete a SKU Pack associated with a specific SKU.
+      description: Delete a SKU Pack associated with the specified SKU.
       operationId: skusIdDeletePack
       parameters:
       - description: The SKU identifier
@@ -2899,11 +2899,11 @@ paths:
         type: string
       responses:
         204:
-          description: Successfully deleted a specific SKU Pack
+          description: Successfully deleted the specified SKU Pack
           schema:
             type: object
         404:
-          description: The SKU Pack with a specific identifier was not found
+          description: The SKU Pack with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -2921,7 +2921,7 @@ paths:
     put:
       consumes:
       - application/x-www-form-urlencoded
-      description: Create or modify a SKU Pack, and associate the SKU Pack with a specific SKU.
+      description: Create or modify a SKU Pack, and associate the SKU Pack with the specified SKU.
       operationId: skusIdPutPack
       parameters:
       - description: The identifier of the SKU Pack
@@ -2935,14 +2935,14 @@ paths:
           schema:
             type: object
         404:
-          description: The SKU with a specific identifier was not found
+          description: The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Put a SKU Pack to a specific SKU
+      summary: Put a SKU Pack to the specified SKU
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3023,7 +3023,7 @@ paths:
     x-swagger-router-controller: tags
   /tags/{tagName}:
     delete:
-      description: Delete a specific tag.
+      description: Delete the specified tag.
       operationId: deleteTag
       parameters:
       - description: The tag identifier
@@ -3044,7 +3044,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Delete a specific tag
+      summary: Delete the specified tag
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3053,7 +3053,7 @@ paths:
       - Write
       - tagsRemove
     get:
-      description: Get the data associated with a specific tag.
+      description: Get the data associated with the specified tag.
       operationId: getTag
       parameters:
       - description: The tag identifier
@@ -3063,7 +3063,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved information about a specific tag
+          description: Successfully retrieved information about the specified tag
           schema:
             type: object
         404:
@@ -3086,7 +3086,7 @@ paths:
     x-swagger-router-controller: tags
   /tags/{tagName}/nodes:
     get:
-      description: Get a list of nodes with a specific tag.
+      description: Get a list of nodes with the specified tag.
       operationId: getNodesByTag
       parameters:
       - description: The tag identifier
@@ -3096,7 +3096,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved the list of nodes with a specific tag
+          description: Successfully retrieved the list of nodes with the specified tag
           schema:
             items:
               type: object
@@ -3109,7 +3109,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get nodes with a specific tag
+      summary: Get nodes with the specified tag
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3120,7 +3120,7 @@ paths:
     x-swagger-router-controller: tags
   /tags/{tagName}/nodes/workflows:
     post:
-      description: Start a workflow against all nodes with a specific tag.
+      description: Start a workflow against all nodes with the specified tag.
       operationId: postWorkflowById
       parameters:
       - description: The tag identifier
@@ -3186,7 +3186,7 @@ paths:
     x-swagger-router-controller: tasks
   /tasks/{identifier}:
     get:
-      description: Get a specific task.
+      description: Get the specified task.
       operationId: getTasksById
       parameters:
       - description: The task identifier
@@ -3196,7 +3196,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved a specific task
+          description: Successfully retrieved the specified task
           schema:
             type: object
         404:
@@ -3207,7 +3207,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get a specific task
+      summary: Get the specified task
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3216,7 +3216,7 @@ paths:
       - Read
       x-view: tasks.2.0.json
     post:
-      description: Start a specific task
+      description: Start the specified task
       operationId: postTaskById
       parameters:
       - description: The task identifier
@@ -3232,7 +3232,7 @@ paths:
           $ref: '#/definitions/post_tasks'
       responses:
         201:
-          description: Successfully started a specific task
+          description: Successfully posted the specified task
           schema:
             type: object
         404:
@@ -3254,7 +3254,7 @@ paths:
     x-swagger-router-controller: tasks
   /templates/library/{name}:
     delete:
-      description: Delete the template with a specific name.
+      description: Delete the template with the specified name.
       operationId: templatesLibDelete
       parameters:
       - description: The name of the template
@@ -3270,7 +3270,7 @@ paths:
         type: string
       responses:
         204:
-          description: Successfully deleted a specific template
+          description: Successfully deleted the specified template
         404:
           description: The template with specified identifier was not found
           schema:
@@ -3279,7 +3279,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Delete a specific template
+      summary: Delete the specified template
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3288,7 +3288,7 @@ paths:
       - Write
       - templatesRemove
     get:
-      description: Get the contents of a specific template file.
+      description: Get the contents of the specified template file.
       operationId: templatesLibGet
       parameters:
       - description: The file name of the template
@@ -3304,7 +3304,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved the contents of a specific template
+          description: Successfully retrieved the contents of the specified template
           schema:
             type: object
         404:
@@ -3315,7 +3315,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get a specific template
+      summary: Get the specified template
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3327,7 +3327,7 @@ paths:
       consumes:
       - text/plain
       - application/x-www-form-urlencoded
-      description: Create or update the metadata and the content of a specific template.
+      description: Create or update the metadata and the content of the specified template.
       operationId: templatesLibPut
       parameters:
       - description: The name of the template
@@ -3343,7 +3343,7 @@ paths:
         type: string
       responses:
         201:
-          description: Successfully created or updated a specific template.
+          description: Successfully created or updated the specified template.
           schema:
             type: object
         404:
@@ -3354,7 +3354,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Put a specific template
+      summary: Create or update the specified template
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3398,7 +3398,7 @@ paths:
     x-swagger-router-controller: templates
   /templates/metadata/{name}:
     get:
-      description: Get metadata for the template with a specific name.
+      description: Get metadata for the template with the specified name.
       operationId: templatesMetaGetByName
       parameters:
       - description: The file name of the template
@@ -3414,7 +3414,7 @@ paths:
       responses:
         200:
           description:
-            Successfully retrieved the metadata of a specific template.
+            Successfully retrieved the metadata of the specified template.
           schema:
             type: object
         404:
@@ -3425,7 +3425,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get the metadata for a specific template
+      summary: Get the metadata for the specified template
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3437,7 +3437,7 @@ paths:
     x-swagger-router-controller: templates
   /templates/{name}:
     get:
-      description: Get the template with a specific name.
+      description: Get the template with the specified name.
       operationId: templatesGetByName
       parameters:
       - description: The name of the template
@@ -3447,7 +3447,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfuly retrieved a specific template
+          description: Successfuly retrieved the specified template
           schema:
             type: object
         404:
@@ -3458,7 +3458,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get a specific template
+      summary: Get the specified template
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3467,7 +3467,7 @@ paths:
       - Read
       - templatesRead
     head:
-      description: Get the template headers with a specific name. Only gets headers
+      description: Get the template headers with the specified name. Only gets headers
         and returns no body.
       operationId: templatesHeadByName
       parameters:
@@ -3478,7 +3478,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfuly retrieved a specific template headers
+          description: Successfuly retrieved the specified template headers
           schema:
             type: object
         404:
@@ -3489,7 +3489,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get headers of a specific template
+      summary: Get headers of the specified template
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3577,7 +3577,7 @@ paths:
     x-swagger-router-controller: users
   /users/{name}:
     delete:
-      description: Delete a specific user.
+      description: Delete the specified user.
       operationId: removeUser
       parameters:
       - description: The username
@@ -3587,7 +3587,7 @@ paths:
         type: string
       responses:
         204:
-          description: Successfully deleted a specific user
+          description: Successfully deleted the specified user
         401:
           description: Unauthorized
           schema:
@@ -3600,7 +3600,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Delete a specific user
+      summary: Delete the specified user
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3609,7 +3609,7 @@ paths:
       - Write
       - usersRemove
     get:
-      description: Get information about a specific user.
+      description: Get information about the specified user.
       operationId: getUser
       parameters:
       - description: The username
@@ -3619,7 +3619,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved a specific user
+          description: Successfully retrieved the specified user
           schema:
             $ref: '#/definitions/user_obj'
         401:
@@ -3634,7 +3634,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get a specific user
+      summary: Get the specified user
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3675,7 +3675,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Patch a specific user
+      summary: Patch the specified user
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3715,7 +3715,7 @@ paths:
     x-swagger-router-controller: views
   /views/{identifier}:
     delete:
-      description: Delete a view with a specific name.
+      description: Delete a view with the specified name.
       operationId: viewsDelete
       parameters:
       - description: The name of view to delete
@@ -3736,7 +3736,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Delete a specific view
+      summary: Delete the specified view
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3745,7 +3745,7 @@ paths:
       - Write
       - viewsRemove
     get:
-      description: Get the view with a specific file name.
+      description: Get the view with the specified file name.
       operationId: viewsGetById
       parameters:
       - description: The view name
@@ -3755,7 +3755,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved a specific view
+          description: Successfully retrieved the specified view
           schema:
             type: object
         404:
@@ -3766,7 +3766,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get a specific view
+      summary: Get the specified view
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3779,7 +3779,7 @@ paths:
       consumes:
       - text/plain
       - application/octet-stream
-      description: Create or update a view with a specific name.
+      description: Create or update a view with the specified name.
       operationId: viewsPut
       parameters:
       - description: The name of view to create or update
@@ -3789,10 +3789,10 @@ paths:
         type: string
       responses:
         201:
-          description: Successfully created or modified a specific view.
+          description: Successfully created or modified the specified view.
           schema:
             type: object
-      summary: Put a specific view
+      summary: Put the specified view
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3946,7 +3946,7 @@ paths:
   /workflows/graphs/{injectableName}:
     delete:
       description:
-        Delete the workflow graph with a specific value of the injectableName property.
+        Delete the workflow graph with the specified value of the injectableName property.
       operationId: workflowsDeleteGraphsByName
       parameters:
       - description: The workflow graph injectable name
@@ -3956,18 +3956,18 @@ paths:
         type: string
       responses:
         204:
-          description: Successfully deleted a specific workflow graph
+          description: Successfully deleted the specified workflow graph
           schema:
             type: object
         404:
-          description: The graph with a specific injectable name was not found
+          description: The graph with the specified injectable name was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Delete a specific workflow graph
+      summary: Delete the specified workflow graph
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3977,7 +3977,7 @@ paths:
       - workflowsRemove
     get:
       description:
-        Get the workflow graph with a specific value of the injectableName property.
+        Get the workflow graph with the specified value of the injectableName property.
       operationId: workflowsGetGraphsByName
       parameters:
       - description: The workflow graph injectable name
@@ -3988,14 +3988,14 @@ paths:
       responses:
         200:
           description:
-            Successfully retrieved the workflow graph with a specific injectable name
+            Successfully retrieved the workflow graph with the specified injectable name
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get a specific workflow graph
+      summary: Get the specified workflow graph
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4062,7 +4062,7 @@ paths:
   /workflows/tasks/{injectableName}:
     delete:
       description:
-        Delete the workflow task with a specific value of the injectableName property.
+        Delete the workflow task with the specified value of the injectableName property.
       operationId: workflowsDeleteTasksByName
       parameters:
       - description: The task injectable name
@@ -4072,18 +4072,18 @@ paths:
         type: string
       responses:
         204:
-          description: Successfully deleted a specific workflow task
+          description: Successfully deleted the specified workflow task
           schema:
             type: object
         404:
-          description: The workflow task with a specific injectable name was not found
+          description: The workflow task with the specified injectable name was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Delete a specific workflow task
+      summary: Delete the specified workflow task
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4092,7 +4092,7 @@ paths:
       - Write
       - workflowsRemove
     get:
-      description: Get the task with a specific value of the injectableName property.
+      description: Get the task with the specified value of the injectableName property.
       operationId: workflowsGetTasksByName
       parameters:
       - description: The task injectable name
@@ -4110,7 +4110,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get a specific workflow task
+      summary: Get the specified workflow task
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4122,7 +4122,7 @@ paths:
     x-swagger-router-controller: workflowTasks
   /workflows/{identifier}:
     delete:
-      description: Delete the workflow with a specific instance identifier.
+      description: Delete the workflow with the specified instance identifier.
       operationId: workflowsDeleteByInstanceId
       parameters:
       - description: The workflow instance identifier
@@ -4132,7 +4132,7 @@ paths:
         type: string
       responses:
         204:
-          description: Successfully deleted a specific workflow
+          description: Successfully deleted the specified workflow
           schema:
             type: object
         404:
@@ -4143,7 +4143,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Delete a specific workflow
+      summary: Delete the specified workflow
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4152,7 +4152,7 @@ paths:
       - Write
       - workflowsRemove
     get:
-      description: Get the workflow with a specific instance identifier.
+      description: Get the workflow with the specified instance identifier.
       operationId: workflowsGetByInstanceId
       parameters:
       - description: The workflow instance identifier
@@ -4162,14 +4162,14 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved a specific workflow
+          description: Successfully retrieved the specified workflow
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Get a specific workflow
+      summary: Get the specified workflow
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4182,7 +4182,7 @@ paths:
   /workflows/{identifier}/action:
     put:
       description: >
-        Perform a specific action on the workflow with a specific
+        Perform the specified action on the workflow with the specified
         instance identifier. Currently, the cancel action is supported.
       operationId: workflowsAction
       parameters:
@@ -4199,7 +4199,7 @@ paths:
           $ref: '#/definitions/action'
       responses:
         202:
-          description: Successfully performed the action on a specific workflow
+          description: Successfully performed the action on the specified workflow
           schema:
             type: object
         404:
@@ -4210,7 +4210,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Perform an action on a specific workflow
+      summary: Perform an action on the specified workflow
       tags:
       - /api/2.0
       x-authentication-type:
