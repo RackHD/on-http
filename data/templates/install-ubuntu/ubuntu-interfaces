@@ -10,7 +10,7 @@ iface <%=n.device%>.<%=vid%> inet static
 address <%=ip.ipAddr%>
 netmask <%=ip.netmask%>
 gateway <%=ip.gateway%>
-
+vlan-raw-device <%=n.device%>
             <%_ }); _%>
         <%_ } else { _%>
 auto <%=n.device%>
