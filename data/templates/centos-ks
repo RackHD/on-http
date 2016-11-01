@@ -45,14 +45,14 @@ clearpart --all --drives=<%=installDisk%>
         <% if(partition.mountPoint !== undefined && partition.size !== undefined) { %>
             <% if(partition.fsType !== undefined) { %>
                 <% if(partition.size === 'auto') { %>
-                    partition <%=partition.mountPoint%> --grow --fstype=<%=partition.fsType%>
+                    partition <%=partition.mountPoint%> --size=250 --grow --fstype=<%=partition.fsType%>
                 <% } else { %>
                     partition <%=partition.mountPoint%> --size=<%=partition.size%> --fstype=<%=partition.fsType%>
                 <% } %>
             <% } else { %>
                 # fsType is optional
                 <% if(partition.size === 'auto') { %>
-                    partition <%=partition.mountPoint%> --grow
+                    partition <%=partition.mountPoint%> --size=250 --grow
                 <% } else { %>
                     partition <%=partition.mountPoint%> --size=<%=partition.size%>
                 <% } %>
