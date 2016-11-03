@@ -6,7 +6,7 @@ interfaces=[]
 for dirname, dirnames, filenames in os.walk('/sys/class/net/'):
     for subdirname in dirnames:
         if subdirname != "lo":
-            //Here we are assigning an arbitrary IP which could be a different one. This is just to get the interface up
+            #Here we are assigning an arbitrary IP which could be a different one. This is just to get the interface up
             interfaces.append(subdirname)
             ip= 100+count
             string += "auto " + subdirname
