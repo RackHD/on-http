@@ -125,7 +125,7 @@
                     "description": "This property shall specify a valid odata or Redfish property."
                 }
             },
-            "additionalProperties": false,
+            "additionalProperties": true,
             "properties": {
                 "device": {
                     "type": "string"
@@ -155,7 +155,7 @@
                     "description": "This property shall specify a valid odata or Redfish property."
                 }
             },
-            "additionalProperties": false,
+            "additionalProperties": true,
             "properties": {
                 "netmask": {
                     "type": "string"
