@@ -32,13 +32,23 @@ describe('Ssh Serializable V1', function () {
             ).should.eventually.have.property('password').that.equals('REDACTED');
         });
 
+        it('should redact encrypted publicKey fields', function() {
+            return this.subject.serialize(
+                {
+                    host: 'fake-host',
+                    user: 'fake-user',
+                    publicKey: encryption.encrypt('fake-public-key')
+                }
+            ).should.eventually.have.property('publicKey').that.equals('REDACTED');
+        });
+
         it('should redact encrypted privateKey fields', function() {
             return this.subject.serialize(
                 {
                     host: 'fake-host',
                     user: 'fake-user',
                     publicKey: 'fake-public-key',
-                    privateKey: encryption.encrypt('fake-private-key'),
+                    privateKey: encryption.encrypt('fake-private-key')
                 }
             ).should.eventually.have.property('privateKey').that.equals('REDACTED');
         });
@@ -87,7 +97,7 @@ describe('Ssh Serializable V1', function () {
                 {
                     host: 'fake-host',
                     user: 'fake-user',
-                    publicKey: 'fake-public-key'
+                    privateKey: 'fake-private-key'
                 }
             ).should.be.rejectedWith(/SchemaError/);
         });
@@ -97,7 +107,7 @@ describe('Ssh Serializable V1', function () {
                 {
                     host: 'fake-host',
                     user: 'fake-user',
-                    publicKey: 'fake-public-key'
+                    privateKey: 'fake-private-key'
                 }
             ).should.be.rejectedWith(/SchemaError/);
         });
@@ -112,6 +122,19 @@ describe('Ssh Serializable V1', function () {
             ).should.eventually.have.property(
                 'password'
             ).and.not.equal('fake-password');
+        });
+
+        it('should encrypt publicKey fields', function() {
+            return this.subject.deserialize(
+                {
+                    host: 'fake-host',
+                    user: 'fake-user',
+                    publicKey: 'fake-public-key',
+                    privateKey: 'fake-private-key'
+                }
+            ).should.eventually.have.property(
+                'publicKey'
+            ).and.not.equal('fake-public-key');
         });
 
         it('should encrypt privateKey fields', function() {
