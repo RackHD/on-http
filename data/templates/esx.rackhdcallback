@@ -22,7 +22,9 @@ do
         then
             echo "Remove RackHD callback script"
             rm /vmfs/volumes/datastore1/rackhd_callback
-            rm /etc/rc.local.d/local.sh
+            /vmfs/volumes/datastore1/rackhd_create_sshkeys
+            echo $'#!/bin/sh\n/vmfs/volumes/datastore1/rackhd_create_sshkeys\nexit 0' > /etc/rc.local.d/local.sh
+            /sbin/auto-backup.sh
         else
             touch /vmfs/volumes/datastore1/rackhd_callback
         fi
