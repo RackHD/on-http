@@ -49,7 +49,10 @@ describe('Http.Services.Api.Workflows', function () {
         waterline.taskdefinitions = {
             destroy: sinon.stub().resolves({ injectableName: 'test' })
         };
-        graph = { instanceId: 'testgraphid' };
+        graph = {
+            instanceId: 'testgraphid',
+            definition: {friendlyName: 'testGraph'}
+        };
         task = { instanceId: 'testtaskid' };
         workflow = { id: 'testid', _status: 'cancelled' };
         graphDefinition = { injectableName: 'Graph.Test' };
@@ -73,6 +76,7 @@ describe('Http.Services.Api.Workflows', function () {
         this.sandbox.stub(workflowApiService, 'createActiveGraph');
         this.sandbox.stub(workflowApiService, 'runTaskGraph');
         this.sandbox.stub(env, 'get');
+        this.sandbox.stub(TaskGraph, 'updateGraphProgress').resolves();
     });
 
     afterEach('Http.Services.Api.Profiles afterEach', function() {
@@ -87,7 +91,14 @@ describe('Http.Services.Api.Workflows', function () {
         workflowApiService.findGraphDefinitionByName.resolves(graphDefinition);
         workflowApiService.createActiveGraph.resolves(graph);
         workflowApiService.runTaskGraph.resolves();
-
+        var data = {
+            graphId: graph.instanceId,
+            progress: {
+                percentage: "0%",
+                description: 'Graph "' + graph.definition.friendlyName + '" started'
+            },
+            taskProgress: {}
+        };
         return workflowApiService.createAndRunGraph({
             name: 'Graph.Test',
             options: { test: 1 },
@@ -103,6 +114,8 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
                 graphDefinition, { test: 1 }, { test: 2 }, 'test'
             );
+            expect(TaskGraph.updateGraphProgress).to.have.been.calledOnce;
+            expect(TaskGraph.updateGraphProgress).to.have.been.calledWith(data);
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
                 .to.have.been.calledWith(graph.instanceId, 'test');
