@@ -15,6 +15,10 @@ definitions:
     properties:
       message:
         type: string
+      errors:
+        items:
+          type: string
+        type: array
     required:
     - message
   Lookups.2.0_LookupBase:
