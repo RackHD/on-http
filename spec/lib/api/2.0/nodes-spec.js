@@ -421,12 +421,7 @@ describe('2.0 Http.Api.Nodes', function () {
                 password: 'mypass'
             }
         };
-        
-        var outputIbm = 
-            {
-                service: "ssh-ibm-service",
-                ref: "/api/2.0/ibms/1234"
-            };
+
         var tempNode = 
         {
             autoDiscover: "false",

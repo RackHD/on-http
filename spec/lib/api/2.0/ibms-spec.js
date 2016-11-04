@@ -181,7 +181,7 @@ describe('Http.Api.Ibms', function () {
         });
 
         it('should 404 if IBM instance is not found', function () {
-            waterline.ibms.needByIdentifier.rejects( new Errors.NotFoundError('not found'));;
+            waterline.ibms.needByIdentifier.rejects( new Errors.NotFoundError('not found'));
 
             return helper.request().get('/api/2.0/ibms/123')
                 .expect(404);

@@ -31,7 +31,9 @@ describe('Ssh Serializable V1', function () {
                         password: encryption.encrypt('fake-password')
                     }
                 }
-            ).should.eventually.have.property('config').that.is.an('object').and.to.have.property('password').and.not.equals('fake-password');
+            ).should.eventually.have.property('config')
+             .that.is.an('object').and.to.have.property('password')
+             .and.not.equals('fake-password');
         });
 
         it('should redact encrypted privateKey fields', function() {
@@ -44,7 +46,9 @@ describe('Ssh Serializable V1', function () {
                         privateKey: encryption.encrypt('fake-private-key')
                     }
                 }
-            ).should.eventually.have.property('config').that.is.an('object').and.to.have.property('privateKey').and.not.equals('fake-private-key');
+            ).should.eventually.have.property('config')
+             .that.is.an('object').and.to.have.property('privateKey')
+             .and.not.equals('fake-private-key');
         });
     });
 
@@ -131,7 +135,9 @@ describe('Ssh Serializable V1', function () {
                         password: 'fake-password'
                     }
                 }
-            ).should.eventually.have.property('config').that.is.an('object').and.to.have.property('password').and.not.equals('fake-password');
+            ).should.eventually.have.property('config')
+             .that.is.an('object').and.to.have.property('password')
+             .and.not.equals('fake-password');
         });
 
         it('should encrypt privateKey fields', function() {
@@ -145,7 +151,9 @@ describe('Ssh Serializable V1', function () {
                         privateKey: 'fake-private-key'
                     }
                 }
-            ).should.eventually.have.property('config').that.is.an('object').and.to.have.property('privateKey').and.not.equals('fake-private-key');
+            ).should.eventually.have.property('config')
+             .that.is.an('object').and.to.have.property('privateKey')
+             .and.not.equals('fake-private-key');
         });
     });
 });
