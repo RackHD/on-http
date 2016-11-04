@@ -99,6 +99,7 @@ net-tools
 %end
 
 %pre
+/usr/bin/curl -X POST -H 'Content-Type:application/json' -d "{\"taskId\": \"<%=taskId%>\", \"progress\": { \"description\": \"Installer started, starting OS installtion\", \"totalSteps\": \"<%=steps%>\", \"currentStep\": 3}}" http://<%=server%>:<%=port%>/api/current/notification;
 %end
 
 %post --log=/root/install-post.log
@@ -221,6 +222,7 @@ chmod +x /etc/rc.d/init.d/<%=rackhdCallbackScript%>
 chkconfig <%=rackhdCallbackScript%> on
 
 #signify ORA the installation completed
+/usr/bin/curl -X POST -H 'Content-Type:application/json' -d "{\"taskId\": \"<%=taskId%>\", \"progress\": { \"description\": \"Installation completed, starting first boot\", \"totalSteps\": \"<%=steps%>\", \"currentStep\": 4}}" http://<%=server%>:<%=port%>/api/current/notification;
 /usr/bin/curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
 
 ) 2>&1 >>/root/install-post-sh.log

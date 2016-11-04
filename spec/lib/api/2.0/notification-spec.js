@@ -42,10 +42,10 @@ describe('Http.Api.Notification', function () {
     describe('POST /notification', function () {
         it('should return node notification detail', function () {
             return helper.request()
-            .post('/api/2.0/notification?nodeId='
-                + nodeNotificationMessage.nodeId
-                + '&randomData='
-                + nodeNotificationMessage.randomData)
+            .post('/api/2.0/notification?nodeId=' +
+                  nodeNotificationMessage.nodeId +
+                  '&randomData=' +
+                  nodeNotificationMessage.randomData)
             .set('Content-Type', 'application/json')
             .expect('Content-Type', /^application\/json/)
             .expect(201, nodeNotificationMessage)
@@ -71,7 +71,7 @@ describe('Http.Api.Notification', function () {
             .post('/api/2.0/notification')
             .send({ nodeId: nodeNotificationMessage.nodeId })
             .expect('Content-Type', /^application\/json/)
-            .expect(201, nodeNotificationMessage)
+            .expect(201, nodeNotificationMessage);
         });
 
         it('should pass with nodeId in query body', function () {
@@ -79,7 +79,45 @@ describe('Http.Api.Notification', function () {
             .post('/api/2.0/notification')
             .send(nodeNotificationMessage)
             .expect('Content-Type', /^application\/json/)
-            .expect(201, nodeNotificationMessage)
+            .expect(201, nodeNotificationMessage);
+        });
+    });
+
+    describe('GET /notification/:taskId/:steps', function () {
+        
+        var descript = "iPXE initrd download done, starting initiating installer";
+        var progress = {
+            taskId: 'taskid',
+            progress:
+                {totalSteps: 5, currentStep: 2, description: descript}
+        };
+        before(function(){
+            sinon.stub(notificationApiService, 'postNotification').resolves();
+        });
+
+        it('should post progress notification', function () {
+            return helper.request()
+            .get('/api/2.0/notification/taskid/5')
+            .expect(200)
+            .expect(function(res){
+                expect(res.text).to.equal('Notification response, no file will be sent');
+            })
+            .then(function() {
+                expect(notificationApiService.postNotification).to.be.calledWith(progress);
+            });
+        });
+        
+        it('should post progress notification', function () {
+            progress.progress.totalSteps = 2;
+            return helper.request()
+            .get('/api/2.0/notification/taskid/0')
+            .expect(200)
+            .expect(function(res){
+                expect(res.text).to.equal('Notification response, no file will be sent');
+            })
+            .then(function() {
+                expect(notificationApiService.postNotification).to.be.calledWith(progress);
+            });
         });
     });
 });

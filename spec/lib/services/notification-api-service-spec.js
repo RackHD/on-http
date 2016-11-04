@@ -124,7 +124,7 @@ describe('Http.Api.Notification', function () {
             });
         });
 
-        it('should update graph progress', function () {
+        it('should update graph progress percentage', function () {
             var tasks = {graphId: "graphId"},
                 graphs = {
                     instanceId: "graphId",
@@ -135,11 +135,11 @@ describe('Http.Api.Notification', function () {
                     graphId: graphs.instanceId,
                     graphName: graphs.definition.friendlyName,
                     progress: {
-                        percentage: "na",
+                        percentage: null,
                         description: progressNotificationMessage.progress.description
                     },
                     taskProgress: {
-                        graphId: graphs.instanceId,
+                        //graphId: graphs.instanceId,
                         taskId: progressNotificationMessage.taskId,
                         taskName: graphs.tasks[progressNotificationMessage.taskId].friendlyName,
                         progress: progressNotificationMessage.progress
@@ -158,6 +158,44 @@ describe('Http.Api.Notification', function () {
                 expect(waterline.graphobjects.findOne).to.be.calledOnce;
                 expect(waterline.graphobjects.findOne).to.be.calledWith({
                     instanceId: tasks.graphId});
+                expect(TaskGraph.updateGraphProgress).to.be.calledOnce;
+                expect(TaskGraph.updateGraphProgress).to.be.calledWith(progressData);
+            });
+        });
+
+        it('should update graph progress with steps', function () {
+            var tasks = {graphId: "graphId"},
+                progressMessage = { 
+                    taskId: "57a86b5c36ec578876878294",
+                    progress: {description: "test", totalSteps: 5, currentStep: '2'}
+                },
+                graphs = {
+                    instanceId: "graphId",
+                    definition: {friendlyName: "Test Graph"},
+                    tasks: {"57a86b5c36ec578876878294": {friendlyName: "Test Task"}}
+                },
+                progressData = {
+                    graphId: graphs.instanceId,
+                    graphName: graphs.definition.friendlyName,
+                    progress: {
+                        percentage: null,
+                        description: progressMessage.progress.description
+                    },
+                    taskProgress: {
+                        //graphId: graphs.instanceId,
+                        taskId: progressMessage.taskId,
+                        taskName: graphs.tasks[progressMessage.taskId].friendlyName,
+                        progress: {description: "test", progressRate: "2/5"}
+                    }
+                };
+            this.sandbox.restore();
+            waterline.taskdependencies = {findOne: function() {}};
+            waterline.graphobjects = {findOne: function() {}};
+            this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves(tasks);
+            this.sandbox.stub(waterline.graphobjects, 'findOne').resolves(graphs);
+            this.sandbox.stub(TaskGraph, 'updateGraphProgress').resolves();
+            return notificationApiService.postProgressNotification(progressMessage)
+            .then(function () {
                 expect(TaskGraph.updateGraphProgress).to.be.calledOnce;
                 expect(TaskGraph.updateGraphProgress).to.be.calledWith(progressData);
             });
