@@ -37,6 +37,12 @@ describe('Http.Api.Nodes v1.1', function () {
                 upsertByNode: sinon.stub(),
                 findByNode: sinon.stub()
             };
+            sinon.stub(waterline.ibms);
+            waterline.ibms = {
+                find: sinon.stub(),
+                upsertByNode: sinon.stub(),
+                findByNode: sinon.stub()
+            };
             sinon.stub(waterline.catalogs);
             sinon.stub(waterline.workitems);
             sinon.stub(waterline.graphobjects);
@@ -78,6 +84,7 @@ describe('Http.Api.Nodes v1.1', function () {
         resetStubs(waterline.workitems);
         resetStubs(waterline.graphobjects);
         resetStubs(workflowApiService);
+        resetStubs(waterline.ibms);
 
         ObmService.prototype.identifyOn.reset();
         ObmService.prototype.identifyOff.reset();
@@ -428,9 +435,12 @@ describe('Http.Api.Nodes v1.1', function () {
     describe('GET /nodes/:identifier/ssh', function () {
         var sshNode = _.cloneDeep(node);
         sshNode.sshSettings = {
-            host: '1.2.3.4',
-            user: 'myuser',
-            password: 'mypass'
+            service: 'ssh-ibm-service',
+            config: {
+                host: '1.2.3.4',
+                user: 'myuser',
+                password: 'mypass'
+            }
         };
         var serializedSshSettings = {
             host: '1.2.3.4',
@@ -439,7 +449,8 @@ describe('Http.Api.Nodes v1.1', function () {
         };
 
         it('should return a list of the node\'s ssh settings', function () {
-            waterline.nodes.needByIdentifier.resolves(sshNode);
+            nodesApiService.getNodeById.resolves(sshNode);
+            waterline.ibms.findByNode.resolves(sshNode.sshSettings);
 
             return helper.request().get('/api/1.1/nodes/1234/ssh')
                 .expect('Content-Type', /^application\/json/)
@@ -447,7 +458,7 @@ describe('Http.Api.Nodes v1.1', function () {
         });
 
         it('should return a 404 if the node was not found', function () {
-            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+            nodesApiService.getNodeById.rejects(new Errors.NotFoundError('Not Found'));
 
             return helper.request().get('/api/1.1/nodes/1234/ssh')
                 .expect('Content-Type', /^application\/json/)
@@ -455,7 +466,8 @@ describe('Http.Api.Nodes v1.1', function () {
         });
 
         it('should return a 404 if the node has no ssh settings', function () {
-            waterline.nodes.needByIdentifier.resolves({ id: node.id });
+            nodesApiService.getNodeById.resolves({ id: node.id, toJSON: function () { return; }});
+            waterline.ibms.findByNode.rejects(new Errors.NotFoundError('Not Found'));
 
             return helper.request().get('/api/1.1/nodes/1234/ssh')
                 .expect('Content-Type', /^application\/json/)
@@ -480,21 +492,54 @@ describe('Http.Api.Nodes v1.1', function () {
             'user': 'myuser2',
             'password': 'REDACTED'
         };
+        var modelSshSettings = {
+            service: 'ssh-ibm-service',
+            config: {
+                host: '5.5.5.5',
+                user: 'myuser2',
+                password: 'mypassword2'
+            }
+        };
+        var nodeWithIbm = {
+            autoDiscover: 'false',
+            id: '1234abcd1234abcd1234abcd',
+            name: 'name',
+            identifiers: [],
+            tags: [],
+            type: 'compute',
+            sshSettings: {
+                service: 'ssh-ibm-service',
+                config: {
+                    host: '5.5.5.5',
+                    user: 'myuser2',
+                    password: 'mypassword2'
+                }
+            },
+            toJSON: function () { return nodeWithIbm; }
+        };
+        var existingNode = {
+            autoDiscover: 'false',
+            id: '1234abcd1234abcd1234abcd',
+            name: 'name',
+            identifiers: [],
+            tags: [],
+            type: 'compute',
+            toJSON: function () { return this; }
+        };
 
         it('should replace existing settings with a new set of ssh settings', function () {
-            var updated = _.cloneDeep(nodeModelData);
-            updated.sshSettings = updatedSshSettings;
-            waterline.nodes.needByIdentifier.resolves(nodeModelData);
-            waterline.nodes.updateByIdentifier.resolves(updated);
-            return helper.request().post('/api/1.1/nodes/1234/ssh')
+            waterline.nodes.needByIdentifier.resolves(existingNode);
+            waterline.ibms.upsertByNode.resolves(nodeWithIbm);
+            waterline.ibms.findByNode.resolves(modelSshSettings);
+            return helper.request().post('/api/1.1/nodes/1234abcd1234abcd1234abcd/ssh')
                 .send(updatedSshSettings)
                 .expect('Content-Type', /^application\/json/)
                 .expect(201)
                 .expect(function (data) {
                     expect(data.body.sshSettings).to.deep.equal(serializedUpdatedSshSettings);
-                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledOnce;
-                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledWith(node.id);
-                    expect(waterline.nodes.updateByIdentifier.firstCall.args[1].sshSettings.host)
+                    expect(waterline.ibms.upsertByNode).to.have.been.calledOnce;
+                    expect(waterline.ibms.upsertByNode).to.have.been.calledWith(node.id);
+                    expect(waterline.ibms.upsertByNode.firstCall.args[1].config.host)
                         .to.equal(updatedSshSettings.host);
                 });
         });
@@ -503,35 +548,35 @@ describe('Http.Api.Nodes v1.1', function () {
             waterline.nodes.needByIdentifier.resolves({ id: nodeModelData.id });
             var updated = _.cloneDeep(nodeModelData);
             updated.sshSettings = updatedSshSettings;
-            waterline.nodes.updateByIdentifier.resolves(updated);
-            return helper.request().post('/api/1.1/nodes/1234/ssh')
+            waterline.nodes.needByIdentifier.resolves(existingNode);
+            waterline.ibms.upsertByNode.resolves(nodeWithIbm);
+            waterline.ibms.findByNode.resolves(modelSshSettings);
+            return helper.request().post('/api/1.1/nodes/1234abcd1234abcd1234abcd/ssh')
                 .send(updatedSshSettings)
                 .expect('Content-Type', /^application\/json/)
                 .expect(201)
                 .expect(function (data) {
                     expect(data.body.sshSettings).to.deep.equal(serializedUpdatedSshSettings);
-                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledOnce;
-                    expect(waterline.nodes.updateByIdentifier)
+                    expect(waterline.ibms.upsertByNode).to.have.been.calledOnce;
+                    expect(waterline.ibms.upsertByNode)
                                           .to.have.been.calledWith(nodeModelData.id);
-                    expect(waterline.nodes.updateByIdentifier.firstCall.args[1].sshSettings.host)
+                    expect(waterline.ibms.upsertByNode.firstCall.args[1].config.host)
                         .to.equal(updatedSshSettings.host);
                 });
         });
 
         it('should not add a new unsupported ssh settings', function () {
-            waterline.nodes.needByIdentifier.resolves(nodeModelData);
+            waterline.nodes.needByIdentifier.resolves(existingNode);
             var invalidSetting = {
                 'host': '5.5.5.5'
             };
-
-            waterline.nodes.needByIdentifier.resolves(nodeModelData);
 
             return helper.request().post('/api/1.1/nodes/1234/ssh')
                 .send(invalidSetting)
                 .expect('Content-Type', /^application\/json/)
                 .expect(400)
                 .expect(function () {
-                    expect(waterline.nodes.updateByIdentifier).to.not.have.been.called;
+                    expect(waterline.ibms.upsertByNode).to.not.have.been.called;
                 });
         });
 

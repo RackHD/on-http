@@ -1,0 +1,46 @@
+{
+    "title": "ssh-ibm-service",
+    "definitions": {
+        "Ibm": {
+            "description": "IBM settings",
+            "type": "object",
+            "properties": {
+                "nodeId": {
+                    "type": "string"
+                },
+                "service": {
+                    "type": "string"
+                },
+                "config": {
+                    "type": "object",
+                    "properties": {
+                        "host": {
+                            "description": "The IP address to SSH into",
+                            "type": "string"
+                        },
+                        "user": {
+                            "description": "username",
+                            "type": "string"
+                        },
+                        "password": {
+                            "description": "password",
+                            "type": "string"
+                        },
+                        "publicKey": {
+                            "description": "publicKey",
+                            "type": "string"
+                        },
+                        "privateKey": {
+                            "description": "privateKey",
+                            "type": "string"
+                        }
+                    },
+                    "anyOf": [
+                        { "required": ["host", "user", "password"] },
+                        { "required": [ "host", "user", "privateKey" ] }
+                }
+            },
+            "required": ["service", "config"]
+        }
+    }
+}
