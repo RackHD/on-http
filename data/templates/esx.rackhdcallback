@@ -3,7 +3,7 @@
 # description: calls back to rackhd post installation API hook
 
 echo "Attempting to call back to RackHD ESX installer"
-
+LOCALSH=/etc/rc.local.d/local.sh
 # *sigh*, busybox shell does not support {1..30}. Retry 30 times with 1 second
 # sleep in between.
 for retry in $(awk 'BEGIN { for ( i=0; i<30; i++ ) { print i; } }');
@@ -22,8 +22,11 @@ do
         then
             echo "Remove RackHD callback script"
             rm /vmfs/volumes/datastore1/rackhd_callback
+            echo "Create RackHD SSH keys for non-root users after second reboot and on startup"
             /vmfs/volumes/datastore1/rackhd_create_sshkeys
-            echo $'#!/bin/sh\n/vmfs/volumes/datastore1/rackhd_create_sshkeys\nexit 0' > /etc/rc.local.d/local.sh
+            echo '#!/bin/sh' > $LOCALSH
+            cat /vmfs/volumes/datastore1/rackhd_create_sshkeys >> $LOCALSH
+            echo 'exit 0' >> $LOCALSH
             /sbin/auto-backup.sh
         else
             touch /vmfs/volumes/datastore1/rackhd_callback
