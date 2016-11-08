@@ -32,14 +32,14 @@ describe('Ssh Serializable V1', function () {
             ).should.eventually.have.property('password').that.equals('REDACTED');
         });
 
-        it('should redact encrypted publicKey fields', function() {
+        it('should not redact publicKey fields', function() {
             return this.subject.serialize(
                 {
                     host: 'fake-host',
                     user: 'fake-user',
-                    publicKey: encryption.encrypt('fake-public-key')
+                    publicKey: 'fake-public-key'
                 }
-            ).should.eventually.have.property('publicKey').that.equals('REDACTED');
+            ).should.eventually.have.property('publicKey').that.not.equals('REDACTED');
         });
 
         it('should redact encrypted privateKey fields', function() {
@@ -124,7 +124,7 @@ describe('Ssh Serializable V1', function () {
             ).and.not.equal('fake-password');
         });
 
-        it('should encrypt publicKey fields', function() {
+        it('should not encrypt publicKey fields', function() {
             return this.subject.deserialize(
                 {
                     host: 'fake-host',
@@ -134,7 +134,7 @@ describe('Ssh Serializable V1', function () {
                 }
             ).should.eventually.have.property(
                 'publicKey'
-            ).and.not.equal('fake-public-key');
+            ).and.equal('fake-public-key');
         });
 
         it('should encrypt privateKey fields', function() {
