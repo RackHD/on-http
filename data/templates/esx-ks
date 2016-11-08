@@ -92,16 +92,18 @@ esxcli network firewall set --default-action false --enabled no
 <%} %>
 
 #create users
+rm /vmfs/volumes/datastore1/rackhd_create_sshkeys
 <% if( typeof users !== 'undefined' ) { %>
 <% users.forEach(function(user) { %>
     /usr/lib/vmware/auth/bin/adduser -s /bin/sh -G root -h / -D <%=user.name%>
     echo <%=user.plainPassword%> | passwd <%=user.name%> --stdin
     <% if (typeof user.sshKey !== 'undefined') { %>
-        mkdir /etc/ssh/keys-<%=user.name%>
-        echo <%=user.sshKey%> > /etc/ssh/keys-<%=user.name%>/authorized_keys
+        echo "mkdir /etc/ssh/keys-<%=user.name%>" >> /vmfs/volumes/datastore1/rackhd_create_sshkeys
+        echo "echo <%=user.sshKey%> > /etc/ssh/keys-<%=user.name%>/authorized_keys" >> /vmfs/volumes/datastore1/rackhd_create_sshkeys
     <%} %>
 <%}) %>
 <%} %>
+chmod +x /vmfs/volumes/datastore1/rackhd_create_sshkeys
 
 #setup ntp
 cat > /etc/ntp.conf << __NTP_CONFIG__
