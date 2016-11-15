@@ -117,7 +117,7 @@
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <Order>3</Order>
-                    <CommandLine>powershell -Command "curl http://<%=server%>:<%=port%>/api/1.1/templates/post-windows-install.ps1" -Outfile post-windows-install.ps1 </CommandLine>
+                    <CommandLine>powershell -Command "curl http://<%=server%>:<%=port%>/api/current/templates/post-windows-install.ps1?nodeId=<%=nodeId%>" -Outfile post-windows-install.ps1 </CommandLine>
                     <Description>setup any the VLAN IDs and trigger the end of the install workflow</Description>
                     <RequiresUserInput>false</RequiresUserInput>
                 </SynchronousCommand>
