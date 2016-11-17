@@ -109,8 +109,10 @@
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <Order>2</Order>
+                    <% if( firewallDisable ) { %>
                     <CommandLine>powershell -Command "Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False" </CommandLine>
                     <Description>disable firewall on node to be able to ping the new IP when max payload is used</Description>
+                    <% } %>
                     <RequiresUserInput>false</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
