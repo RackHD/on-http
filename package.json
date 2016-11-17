@@ -41,7 +41,7 @@
     "node-ssdp": "~2.7.0",
     "on-core": "git+https://github.com/RackHD/on-core.git",
     "on-finished": "^2.2.0",
-    "on-tasks": "git+https://github.com/RackHD/on-tasks.git",
+    "on-tasks": "git+https://github.com/uppalk1/on-tasks.git",
     "os-tmpdir": "~1.0.1",
     "passport": "^0.3.2",
     "passport-anonymous": "~1.0.1",
