@@ -80,7 +80,7 @@ function updateTasks(data, timeout, retry, retries) {
                 }, timeout);
             } else {
                 console.log("Task Execution Complete");
-                process.exit(data.exit.code || 0);
+                process.exit(data.exit.code || data.exit || 0);
             }
         });
     }).on('error', function (err) {
