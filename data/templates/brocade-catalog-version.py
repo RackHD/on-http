@@ -7,8 +7,8 @@ def main():
     data = {}
 
     try:
-        output = CLI('show version', do_print=False).get_output()
-        data = output[2]
+        output = CLI('show system', do_print=False).get_output()
+        data = output[5]
     except:
         pass
 

@@ -139,7 +139,7 @@ tasksel tasksel/first multiselect ubuntu-server
 # Individual additional packages to install
 <% var pkgs = ((typeof kvm === 'undefined' || !kvm) ? '' : 'qemu-kvm virt-manager libvirt0 python-libvirt bridge-utils') -%>
 # Minimum packages (see postinstall.sh)
-d-i pkgsel/include string openssh-server wget curl ssl-cert
+d-i pkgsel/include string openssh-server wget curl ssl-cert vlan
 d-i pkgsel/upgrade select safe-upgrade
 d-i pkgsel/update-policy select none
 d-i pkgsel/language-packs multiselect en
@@ -188,11 +188,33 @@ xserver-xorg xserver-xorg/autodetect_monitor boolean true
 #d-i pretemplate/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 
 d-i preseed/late_command string \
+#enable root ssh
+in-target sed -i 's/PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config; \
+
+#Enable Network standards that supports VLANs
+#Load the 8021q module into the kernel
+in-target modprobe 8021q; \
+in-target su -c 'echo "8021q" >> /etc/modules'; \
+
+#config vlan
 <%_ if (typeof networkDevices !== 'undefined' && networkDevices.length > 0) { _%>
+<%_ networkDevices.forEach(function(n) { _%>
+    <%_ for (p in n) { _%>
+        <%_ ip = n[p]; _%>
+        <%_ if (['ipv4','ipv6'].indexOf(p) === -1 || undefined == ip) continue; _%>
+        <%_ if (undefined !== ip.vlanIds) { _%>
+            <%_ ip.vlanIds.forEach(function(vid) { _%>
+in-target vconfig add ip.device <%=vid%>; \
+            <%_ }); _%>
+        <%_ } _%>
+    <%_ } _%>
+<%_ }); _%>
 wget http://<%=server%>:<%=port%>/api/current/templates/ubuntu-interfaces -O /etc/network/interfaces; \
 <%_ } _%>
 in-target wget http://<%=server%>:<%=port%>/api/current/templates/post-install-ubuntu.sh -O ./post-install.sh; \
 in-target chmod +x ./post-install.sh; \
 in-target ./post-install.sh; \
 in-target wget http://<%=server%>:<%=port%>/api/current/templates/ubuntu-sources -O /etc/apt/sources.list; \
+in-target wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%> -O /etc/rc2.d/S99callback; \
+in-target chmod +x /etc/rc2.d/S99callback; \
 in-target curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>

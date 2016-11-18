@@ -169,7 +169,7 @@
 
             <% if( undefined != n.ipv6 ) { %>
             <% if( undefined != n.ipv6.netmask ) { %>
-            <% n.ipv4.netmask.split('.').forEach(function(octet) {%>
+            <% n.ipv6.netmask.split('.').forEach(function(octet) {%>
             <%cidr_bits+=((octet >>> 0).toString(2).match(/1/g)||[]).length;%>
             <%});%>
             <% } %>
