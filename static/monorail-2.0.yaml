@@ -81,17 +81,23 @@ definitions:
     - config
     type: object
   node.2.0_PartialNode:
-    description: Post a node in RackHD
+    description: Post a node into RackHD
     properties:
       autoDiscover:
         type: string
       name:
         description: Name of the node
         type: string
+      obms:
+        description: The list of obm settings
+        type: array
+        items:
+            $ref: "#/definitions/nodes_post_obm_by_id"
       type:
         description: Type of node
         enum:
         - compute
+        - compute-container
         - switch
         - dae
         - pdu
@@ -101,7 +107,7 @@ definitions:
         type: string
     type: object
   nodes_post_obm_by_id:
-    description: IPMI OBM settings
+    description: OBM settings
     properties:
       config:
         type: object
