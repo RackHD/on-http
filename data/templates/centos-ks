@@ -18,7 +18,7 @@ services --enabled=NetworkManager,sshd
 network --device=<%=macaddress%> --noipv6 --activate
 
 # enable syslog
-<% if (logRequired) { %>
+<% if (remoteLogging) { %>
   logging --host=<%=server%> --level=info
 <% } %>
 

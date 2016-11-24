@@ -21,7 +21,7 @@ describe('Http.Api.Notification', function () {
         data: 'dummy data'
     };
 
-    var progressNotificationMessage = {
+    var progressData = {
         taskId: "57a86b5c36ec578876878294",
         progress: {
             description: "test",
@@ -87,22 +87,26 @@ describe('Http.Api.Notification', function () {
         });
 
         it('should fail with no nodeId', function () {
-            return notificationApiService.postNodeNotification(_.omit(nodeNotificationMessage, 'nodeId'))
+            return notificationApiService.postNodeNotification(_.omit(nodeNotificationMessage,
+                                                                      'nodeId'))
             .then(function (done) {
                 done(new Error("Expected service to fail"));
             })
             .catch(function (e) {
-                expect(e).to.have.property('message').that.equals('Invalid node ID in query or body');
+                expect(e).to.have.property('message').that.equals(
+                    'Invalid node ID in query or body');
             });
         });
 
         it('should fail with nodeId that is not a string', function () {
-            return notificationApiService.postNodeNotification(_.assign({}, nodeNotificationMessage, {nodeId: {data: "I am an object"}}))
+            return notificationApiService.postNodeNotification(
+                _.assign({}, nodeNotificationMessage, {nodeId: {data: "I am an object"}}))
             .then(function (done) {
                 done(new Error("Expected service to fail"));
             })
             .catch(function (e) {
-                expect(e).to.have.property('message').that.equals('Invalid node ID in query or body');
+                expect(e).to.have.property('message').that.equals(
+                    'Invalid node ID in query or body');
             });
         });
 
@@ -131,18 +135,18 @@ describe('Http.Api.Notification', function () {
                     definition: {friendlyName: "Test Graph"},
                     tasks: {"57a86b5c36ec578876878294": {friendlyName: "Test Task"}}
                 },
-                progressData = {
+                data = {
                     graphId: graphs.instanceId,
                     graphName: graphs.definition.friendlyName,
                     progress: {
                         percentage: null,
-                        description: progressNotificationMessage.progress.description
+                        description: progressData.progress.description
                     },
                     taskProgress: {
                         //graphId: graphs.instanceId,
-                        taskId: progressNotificationMessage.taskId,
-                        taskName: graphs.tasks[progressNotificationMessage.taskId].friendlyName,
-                        progress: progressNotificationMessage.progress
+                        taskId: progressData.taskId,
+                        taskName: graphs.tasks[progressData.taskId].friendlyName,
+                        progress: progressData.progress
                     }
                 };
             waterline.taskdependencies = {findOne: function() {}};
@@ -150,24 +154,25 @@ describe('Http.Api.Notification', function () {
             this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves(tasks);
             this.sandbox.stub(waterline.graphobjects, 'findOne').resolves(graphs);
             this.sandbox.stub(TaskGraph, 'updateGraphProgress').resolves();
-            return notificationApiService.postProgressNotification(progressNotificationMessage)
+            return notificationApiService.postProgressNotification(progressData.taskId,
+                                                                   progressData.progress)
             .then(function () {
                 expect(waterline.taskdependencies.findOne).to.be.calledOnce;
                 expect(waterline.taskdependencies.findOne).to.be.calledWith({
-                    taskId: progressNotificationMessage.taskId});
+                    taskId: progressData.taskId});
                 expect(waterline.graphobjects.findOne).to.be.calledOnce;
                 expect(waterline.graphobjects.findOne).to.be.calledWith({
                     instanceId: tasks.graphId});
                 expect(TaskGraph.updateGraphProgress).to.be.calledOnce;
-                expect(TaskGraph.updateGraphProgress).to.be.calledWith(progressData);
+                expect(TaskGraph.updateGraphProgress).to.be.calledWith(data);
             });
         });
 
         it('should update graph progress with steps', function () {
             var tasks = {graphId: "graphId"},
-                progressMessage = { 
+                progressMessage = {
                     taskId: "57a86b5c36ec578876878294",
-                    progress: {description: "test", totalSteps: 5, currentStep: '2'}
+                    progress: {totalSteps: 5, currentStep: '2'}
                 },
                 graphs = {
                     instanceId: "graphId",
@@ -179,13 +184,13 @@ describe('Http.Api.Notification', function () {
                     graphName: graphs.definition.friendlyName,
                     progress: {
                         percentage: null,
-                        description: progressMessage.progress.description
+                        description: ""
                     },
                     taskProgress: {
                         //graphId: graphs.instanceId,
                         taskId: progressMessage.taskId,
                         taskName: graphs.tasks[progressMessage.taskId].friendlyName,
-                        progress: {description: "test", progressRate: "2/5"}
+                        progress: {progressRate: "2/5"}
                     }
                 };
             this.sandbox.restore();
@@ -194,21 +199,23 @@ describe('Http.Api.Notification', function () {
             this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves(tasks);
             this.sandbox.stub(waterline.graphobjects, 'findOne').resolves(graphs);
             this.sandbox.stub(TaskGraph, 'updateGraphProgress').resolves();
-            return notificationApiService.postProgressNotification(progressMessage)
+            return notificationApiService.postProgressNotification(progressMessage.taskId,
+                                                                   progressMessage.progress)
             .then(function () {
                 expect(TaskGraph.updateGraphProgress).to.be.calledOnce;
                 expect(TaskGraph.updateGraphProgress).to.be.calledWith(progressData);
             });
         });
 
-        it('should not update graph progress', function () {
+        it('should not update graph progress if no active task found', function () {
             this.sandbox.restore();
             waterline.taskdependencies = {findOne: function() {}};
             waterline.graphobjects = {findOne: function() {}};
             this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves([]);
             this.sandbox.spy(waterline.graphobjects, 'findOne');
             this.sandbox.spy(TaskGraph, 'updateGraphProgress');
-            return notificationApiService.postProgressNotification({taskId: 'aTask'})
+            return notificationApiService.postProgressNotification(progressData.taskId,
+                                                                   progressData.progress)
             .then(function () {
                 expect(waterline.taskdependencies.findOne).to.be.calledOnce;
                 expect(waterline.graphobjects.findOne).to.have.not.been.called;
@@ -216,13 +223,29 @@ describe('Http.Api.Notification', function () {
             });
         });
 
+        it('should not update graph progress if not enough  info in progress data', function () {
+            var tasks = {graphId: "graphId"};
+            this.sandbox.restore();
+            waterline.taskdependencies = {findOne: function() {}};
+            waterline.graphobjects = {findOne: function() {}};
+            this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves(tasks);
+            this.sandbox.stub(waterline.graphobjects, 'findOne').resolves();
+            this.sandbox.spy(TaskGraph, 'updateGraphProgress');
+            return notificationApiService.postProgressNotification(progressData.taskId, {})
+            .then(function () {
+                expect(waterline.taskdependencies.findOne).to.be.calledOnce;
+                expect(waterline.graphobjects.findOne).to.have.been.called;
+                expect(TaskGraph.updateGraphProgress).to.have.not.been.called;
+            });
+        });
+
         it('should call postProgressNotification', function () {
             sinon.stub(notificationApiService, 'postProgressNotification').resolves();
-            return notificationApiService.postNotification(progressNotificationMessage)
+            return notificationApiService.postNotification(progressData)
             .then(function () {
                 expect(notificationApiService.postProgressNotification).to.be.calledOnce;
                 expect(notificationApiService.postProgressNotification).to.be
-                    .calledWith(progressNotificationMessage);
+                    .calledWith(progressData.taskId, progressData.progress);
             });
         });
 
