@@ -3,5 +3,11 @@ set -e
 CLOUD_CONFIG_FILE=pxe-cloud-config.yml
 curl -o $CLOUD_CONFIG_FILE http://<%=server%>:<%=port%>/api/current/templates/$CLOUD_CONFIG_FILE?nodeId=<%=nodeId%>
 sudo coreos-install -d <%=installDisk%> -c $CLOUD_CONFIG_FILE -b <%=repo%>
+
+# Customizations for supporting CoreOS Ignition:
+mkdir /mnt/coreos
+mount <%=installDisk%>6 /mnt/coreos/
+echo "set linux_append=\"coreos.first_boot=1 coreos.config.url=<%=ignitionScriptUri%>\"" > /mnt/coreos/grub.cfg
+
 curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
 sudo reboot
