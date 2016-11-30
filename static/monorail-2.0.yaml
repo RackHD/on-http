@@ -3455,6 +3455,19 @@ paths:
         name: name
         required: true
         type: string
+      - description: The node identifier
+        in: query
+        name: nodeId
+        required: false
+        type: string
+      - collectionFormat: multi
+        description: List of valid MAC addresses to lookup
+        in: query
+        items:
+          type: string
+        name: macs
+        required: false
+        type: array
       responses:
         200:
           description: Successfuly retrieved the specified template
@@ -3486,6 +3499,19 @@ paths:
         name: name
         required: true
         type: string
+      - description: The node identifier
+        in: query
+        name: nodeId
+        required: false
+        type: string
+      - collectionFormat: multi
+        description: List of valid MAC addresses to lookup
+        in: query
+        items:
+          type: string
+        name: macs
+        required: false
+        type: array
       responses:
         200:
           description: Successfuly retrieved the specified template headers

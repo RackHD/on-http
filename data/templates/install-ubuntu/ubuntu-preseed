@@ -209,12 +209,12 @@ in-target vconfig add ip.device <%=vid%>; \
         <%_ } _%>
     <%_ } _%>
 <%_ }); _%>
-wget http://<%=server%>:<%=port%>/api/current/templates/ubuntu-interfaces -O /etc/network/interfaces; \
+wget http://<%=server%>:<%=port%>/api/current/templates/ubuntu-interfaces?nodeId=<%=nodeId%> -O /etc/network/interfaces; \
 <%_ } _%>
-in-target wget http://<%=server%>:<%=port%>/api/current/templates/post-install-ubuntu.sh -O ./post-install.sh; \
+in-target wget http://<%=server%>:<%=port%>/api/current/templates/post-install-ubuntu.sh?nodeId=<%=nodeId%> -O ./post-install.sh; \
 in-target chmod +x ./post-install.sh; \
 in-target ./post-install.sh; \
-in-target wget http://<%=server%>:<%=port%>/api/current/templates/ubuntu-sources -O /etc/apt/sources.list; \
-in-target wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%> -O /etc/rc2.d/S99callback; \
+in-target wget http://<%=server%>:<%=port%>/api/current/templates/ubuntu-sources?nodeId=<%=nodeId%> -O /etc/apt/sources.list; \
+in-target wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%>?nodeId=<%=nodeId%> -O /etc/rc2.d/S99callback; \
 in-target chmod +x /etc/rc2.d/S99callback; \
 in-target curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>

@@ -3,6 +3,7 @@
 "use strict";
 
 var http = require('http'),
+    url = require('url'),
     fs = require('fs'),
     path = require('path'),
     childProcess = require('child_process'),
@@ -232,13 +233,9 @@ function getTasks(timeout) {
  * @param cb
  */
 function getFile(downloadUrl, cb) {
-    http.request({
-        hostname: server,
-        port: port,
-        path: downloadUrl,
-        method: 'GET'
-    }, function (res) {
-        var filename = path.basename(downloadUrl);
+    var urlObj = url.parse(downloadUrl);
+    http.request(urlObj, function (res) {
+        var filename = path.basename(urlObj.pathname);
         var stream = fs.createWriteStream(filename);
 
         res.on('end', function () {

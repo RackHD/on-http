@@ -215,7 +215,7 @@ export PATH
 <% } %>
 
 # Download the service to callback to RackHD after OS installation/reboot completion
-/usr/bin/wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%> -O /etc/rc.d/init.d/<%=rackhdCallbackScript%>
+/usr/bin/wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%>?nodeId=<%=nodeId%> -O /etc/rc.d/init.d/<%=rackhdCallbackScript%>
 chmod +x /etc/rc.d/init.d/<%=rackhdCallbackScript%>
 # Enable the above service, it should auto-disable after running once
 chkconfig <%=rackhdCallbackScript%> on
