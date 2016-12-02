@@ -627,6 +627,29 @@ paths:
       - filesRead
       x-view: file.2.0.json
     x-swagger-router-controller: files
+  /files/static/list:
+    x-swagger-router-controller: files
+    get:
+      operationId: filesGetAllStatic
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        List all static files
+      description: |
+        List all static files
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: array of all
+          schema:
+            type: array
+            items:
+              type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /lookups:
     get:
       description:
