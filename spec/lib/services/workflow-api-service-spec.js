@@ -94,7 +94,7 @@ describe('Http.Services.Api.Workflows', function () {
         var data = {
             graphId: graph.instanceId,
             progress: {
-                percentage: "0%",
+                percentage: null,
                 description: 'Graph "' + graph.definition.friendlyName + '" started'
             },
             taskProgress: {}

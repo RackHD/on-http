@@ -83,9 +83,9 @@ describe('Http.Api.Notification', function () {
         });
     });
 
-    describe('GET /notification/:taskId/:steps', function () {
+    describe('GET /notification/:taskId/:totalSteps', function () {
         
-        var descript = "iPXE initrd download done, starting initiating installer";
+        var descript = "kernel download done, starting initiating installer";
         var progress = {
             taskId: 'taskid',
             progress:

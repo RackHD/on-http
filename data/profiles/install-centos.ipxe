@@ -5,8 +5,8 @@ kernel ${base-url}/vmlinuz repo=<%=repo%> ${params}
 initrd ${base-url}/initrd.img
 
 # Below two lines are designed for progress info, downloading action itself is meaningless.
-initrd http://<%=server%>:<%=port%>/api/current/notification/<%=taskId%>/<%=steps%>
-imgfree <%=steps%>
+imgfetch --name fakedimage http://<%=server%>:<%=port%>/api/current/notification/<%=taskId%>/<%=totalSteps%>
+imgfree fakedimage
 
 boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell
 
