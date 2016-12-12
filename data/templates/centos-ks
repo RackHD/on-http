@@ -101,7 +101,7 @@ net-tools
 %end
 
 %pre
-/usr/bin/curl -X POST -H 'Content-Type:application/json' -d "{\"taskId\": \"<%=taskId%>\", \"progress\": { \"description\": \"Installer started, starting OS installtion\", \"totalSteps\": \"<%=steps%>\", \"currentStep\": 3}}" http://<%=server%>:<%=port%>/api/current/notification;
+/usr/bin/curl -X POST -H 'Content-Type:application/json' -d "{\"taskId\": \"<%=taskId%>\", \"progress\": { \"description\": \"Installer started, starting OS installtion\", \"maximum\": \"<%=totalSteps%>\", \"value\": 3}}" http://<%=server%>:<%=port%>/api/current/notification;
 %end
 
 %post --log=/root/install-post.log

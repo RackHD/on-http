@@ -156,14 +156,14 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /notification/{taskId}/{totalSteps}:
+  /notification/{taskId}/{totalSteps}/{currentStep}:
     x-swagger-router-controller: notification
     get:
-      operationId: notificationIpxeGet
+      operationId: notificationTaskProgressGet
       summary: |
-        get notification from ipxe
+        notification for task to get progress info
       description: |
-        send taskid and step sequence to rackhd via notification get function
+        send taskid, total setps and current step sequence to rackhd via notification get function
       parameters:
         - name: taskId
           in: path
@@ -174,7 +174,13 @@ paths:
         - name: totalSteps
           in: path
           description: |
-            OS installation task total steps
+            Total steps planed for the task
+          required: true
+          type: string
+        - name: currentStep
+          in: path
+          description: |
+            Step sequence the API stands
           required: true
           type: string
       tags: [ "/api/2.0" ]

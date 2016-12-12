@@ -22,8 +22,10 @@ describe('Http.Api.Notification', function () {
         this.timeout(5000);
         return helper.startServer([]).then(function () {
             notificationApiService = helper.injector.get('Http.Services.Api.Notification');
-            sinon.stub(notificationApiService, 'postNodeNotification').resolves(nodeNotificationMessage);
-            sinon.stub(notificationApiService, 'postBroadcastNotification').resolves(broadcastNotificationMessage);
+            sinon.stub(notificationApiService, 'postNodeNotification')
+                .resolves(nodeNotificationMessage);
+            sinon.stub(notificationApiService, 'postBroadcastNotification')
+                .resolves(broadcastNotificationMessage);
         });
 
     });
@@ -51,7 +53,8 @@ describe('Http.Api.Notification', function () {
             .expect(201, nodeNotificationMessage)
             .then(function () {
                 expect(notificationApiService.postNodeNotification).to.have.been.calledOnce;
-                expect(notificationApiService.postNodeNotification).to.have.been.calledWith(nodeNotificationMessage);
+                expect(notificationApiService.postNodeNotification)
+                    .to.have.been.calledWith(nodeNotificationMessage);
             });
         });
         it('should return broadcast notification detail', function () {
@@ -63,7 +66,8 @@ describe('Http.Api.Notification', function () {
             .expect(201, broadcastNotificationMessage)
             .then(function () {
                 expect(notificationApiService.postBroadcastNotification).to.have.been.calledOnce;
-                expect(notificationApiService.postBroadcastNotification).to.have.been.calledWith(broadcastNotificationMessage);
+                expect(notificationApiService.postBroadcastNotification)
+                    .to.have.been.calledWith(broadcastNotificationMessage);
             });
         });
         it('should pass with nodeId in query body', function () {
@@ -83,13 +87,13 @@ describe('Http.Api.Notification', function () {
         });
     });
 
-    describe('GET /notification/:taskId/:totalSteps', function () {
+    describe('GET /notification/:taskId/:totalSteps/currentStep', function () {
         
         var descript = "kernel download done, starting initiating installer";
         var progress = {
             taskId: 'taskid',
             progress:
-                {totalSteps: 5, currentStep: 2, description: descript}
+                {maximum: "5", value: "2", description: descript}
         };
         before(function(){
             sinon.stub(notificationApiService, 'postNotification').resolves();
@@ -97,7 +101,7 @@ describe('Http.Api.Notification', function () {
 
         it('should post progress notification', function () {
             return helper.request()
-            .get('/api/2.0/notification/taskid/5')
+            .get('/api/2.0/notification/taskid/5/2')
             .expect(200)
             .expect(function(res){
                 expect(res.text).to.equal('Notification response, no file will be sent');
@@ -107,17 +111,5 @@ describe('Http.Api.Notification', function () {
             });
         });
         
-        it('should post progress notification', function () {
-            progress.progress.totalSteps = 2;
-            return helper.request()
-            .get('/api/2.0/notification/taskid/0')
-            .expect(200)
-            .expect(function(res){
-                expect(res.text).to.equal('Notification response, no file will be sent');
-            })
-            .then(function() {
-                expect(notificationApiService.postNotification).to.be.calledWith(progress);
-            });
-        });
     });
 });

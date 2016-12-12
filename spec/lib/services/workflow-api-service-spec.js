@@ -92,12 +92,11 @@ describe('Http.Services.Api.Workflows', function () {
         workflowApiService.createActiveGraph.resolves(graph);
         workflowApiService.runTaskGraph.resolves();
         var data = {
-            graphId: graph.instanceId,
             progress: {
-                percentage: null,
+                maximum: null,
+                value: 0,
                 description: 'Graph "' + graph.definition.friendlyName + '" started'
-            },
-            taskProgress: {}
+            }
         };
         return workflowApiService.createAndRunGraph({
             name: 'Graph.Test',
@@ -115,7 +114,8 @@ describe('Http.Services.Api.Workflows', function () {
                 graphDefinition, { test: 1 }, { test: 2 }, 'test'
             );
             expect(TaskGraph.updateGraphProgress).to.have.been.calledOnce;
-            expect(TaskGraph.updateGraphProgress).to.have.been.calledWith(data);
+            expect(TaskGraph.updateGraphProgress)
+                .to.have.been.calledWith(graph.instanceId, data);
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
                 .to.have.been.calledWith(graph.instanceId, 'test');

@@ -218,7 +218,10 @@ class Progress:
         erase_start_flags = [False]*disk_count
         payload = {
             "taskId": self.parameters["taskId"],
-            "progress": {}
+            "progress": {
+                "value": "0",
+                "maximum": "100"
+            }
         }
         counter = 0
         total_percent = 0.00
@@ -244,6 +247,7 @@ class Progress:
                 payload["progress"]["percentage"] = "Not Available"
             else:
                 payload["progress"]["percentage"] = str("%.2f" % total_percent) + "%"
+                payload["progress"]["value"] = int(total_percent)
             counter += 1
             payload["progress"]["description"] = "This is the {}th polling with {}s interval" \
                 .format(str(counter), str(self.interval))
