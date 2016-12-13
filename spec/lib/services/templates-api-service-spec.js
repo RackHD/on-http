@@ -37,7 +37,6 @@ describe('Http.Api.Templates', function () {
     });
 
     beforeEach('before each', function () {
-        this.sandbox.stub(taskProtocol, 'activeTaskExists').resolves({});
         this.sandbox.stub(taskProtocol, 'requestProperties').resolves({});
         getNodeByIdentifierStub = this.sandbox.stub(nodeApiService, 'getNodeByIdentifier');
         this.sandbox.stub(swagger, 'makeRenderableOptions').resolves({});
@@ -78,8 +77,6 @@ describe('Http.Api.Templates', function () {
                     expect(swagger.makeRenderableOptions).to.be.calledWith(req, res, {});
                     expect(taskProtocol.requestProperties).to.be.calledOnce;
                     expect(taskProtocol.requestProperties).to.be.calledWith(nodeId);
-                    expect(taskProtocol.activeTaskExists).to.be.calledOnce;
-                    expect(taskProtocol.activeTaskExists).to.be.calledWith(nodeId);
                     expect(templates.render).to.have.been.calledOnce;
                     expect(templates.render).to.have.been.calledWith(
                         'any',
@@ -107,7 +104,6 @@ describe('Http.Api.Templates', function () {
                     expect(workflowApiService.findActiveGraphForTarget).to.have.not.been.called;
                     expect(swagger.makeRenderableOptions).to.have.not.been.called;
                     expect(taskProtocol.requestProperties).to.have.not.been.called;
-                    expect(taskProtocol.activeTaskExists).to.have.not.been.called;
                     expect(templates.render).to.have.not.been.called;
                     expect(err).to.deep.equal(
                         new Errors.BadRequestError('Neither query nodeId nor macs is provided.')

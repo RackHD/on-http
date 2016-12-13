@@ -16,6 +16,7 @@ describe('Http.Services.Api.Workflows', function () {
     var workflow;
     var Promise;
     var TaskGraph;
+    var taskMessenger;
 
     before('Http.Services.Api.Workflows before', function() {
         helper.setupInjector([
@@ -29,6 +30,7 @@ describe('Http.Services.Api.Workflows', function () {
         env = helper.injector.get('Services.Environment');
         Promise = helper.injector.get('Promise');
         TaskGraph = helper.injector.get('TaskGraph.TaskGraph');
+        taskMessenger = helper.injector.get('Task.Messenger');
     });
 
     beforeEach(function() {
@@ -76,7 +78,7 @@ describe('Http.Services.Api.Workflows', function () {
         this.sandbox.stub(workflowApiService, 'createActiveGraph');
         this.sandbox.stub(workflowApiService, 'runTaskGraph');
         this.sandbox.stub(env, 'get');
-        this.sandbox.stub(TaskGraph, 'updateGraphProgress').resolves();
+        this.sandbox.stub(taskMessenger, 'publishProgressEvent').resolves();
     });
 
     afterEach('Http.Services.Api.Profiles afterEach', function() {
@@ -113,8 +115,8 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
                 graphDefinition, { test: 1 }, { test: 2 }, 'test'
             );
-            expect(TaskGraph.updateGraphProgress).to.have.been.calledOnce;
-            expect(TaskGraph.updateGraphProgress)
+            expect(taskMessenger.publishProgressEvent).to.have.been.calledOnce;
+            expect(taskMessenger.publishProgressEvent)
                 .to.have.been.calledWith(graph.instanceId, data);
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
