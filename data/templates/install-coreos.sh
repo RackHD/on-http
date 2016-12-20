@@ -6,7 +6,8 @@ sudo coreos-install -d <%=installDisk%> -c $CLOUD_CONFIG_FILE -b <%=repo%>
 
 # Customizations for supporting CoreOS Ignition:
 mkdir /mnt/coreos
-mount <%=installDisk%>6 /mnt/coreos/
+OEM_PARTITION_NUM=6 # https://coreos.com/os/docs/latest/sdk-disk-partitions.html
+mount <%=installDisk%>${OEM_PARTITION_NUM} /mnt/coreos/
 echo "set linux_append=\"coreos.first_boot=1 coreos.config.url=<%=ignitionScriptUri%>\"" > /mnt/coreos/grub.cfg
 
 curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
