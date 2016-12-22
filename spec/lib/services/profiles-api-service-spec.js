@@ -211,7 +211,7 @@ describe("Http.Services.Api.Profiles", function () {
                     defaults: {
                         graphOptions: {
                             target: node.id,
-                            'obm-option': { obmOption: "false" }
+                            'obm-option': { autoCreateObm: "false" }
                         },
                         nodeId: node.id
                     }
