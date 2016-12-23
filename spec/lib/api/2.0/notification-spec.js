@@ -87,8 +87,7 @@ describe('Http.Api.Notification', function () {
         });
     });
 
-    describe('GET /notification/:taskId/:totalSteps/currentStep', function () {
-        
+    describe('GET /notification/progress', function () {
         var descript = "kernel download done, starting initiating installer";
         var progress = {
             taskId: 'taskid',
@@ -101,7 +100,7 @@ describe('Http.Api.Notification', function () {
 
         it('should post progress notification', function () {
             return helper.request()
-            .get('/api/2.0/notification/taskid/5/2')
+            .get('/api/2.0/notification/progress?taskId=taskid&totalSteps=5&currentStep=2')
             .expect(200)
             .expect(function(res){
                 expect(res.text).to.equal('Notification response, no file will be sent');
@@ -110,6 +109,6 @@ describe('Http.Api.Notification', function () {
                 expect(notificationApiService.postNotification).to.be.calledWith(progress);
             });
         });
-        
+
     });
 });
