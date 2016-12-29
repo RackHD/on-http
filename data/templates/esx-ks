@@ -209,7 +209,20 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
 #
 # NOTE: this script will execute right away as a result of writing it to local.sh
 # along with executing on every subsequent boot
-wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%>?nodeId=<%=nodeId%> -O /etc/rc.local.d/local.sh
+#
+# Try to download call back script 60 times 1 second
+# sleep in between to allow link to be up after DHCP
+for retry in $(awk 'BEGIN { for ( i=0; i<60; i++ ) { print i; } }');
+do
+    wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%>?nodeId=<%=nodeId%> -O /etc/rc.local.d/local.sh
+    if [ $? -eq 0 ]; then
+        echo "The call back script was downloaded successfully."
+        break
+    else
+        echo "Failed to download call back script, retrying..."
+        sleep 1
+    fi
+done;
 
 #backup ESXi configuration to persist it
 /sbin/auto-backup.sh
