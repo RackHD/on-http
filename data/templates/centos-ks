@@ -17,8 +17,10 @@ selinux --permissive
 services --enabled=NetworkManager,sshd
 network --device=<%=macaddress%> --noipv6 --activate
 
-#enable syslog
-logging --host=<%=server%> --level=info
+# enable syslog
+<% if (typeof remoteLogging !== 'undefined' && remoteLogging) { %>
+  logging --host=<%=server%> --level=info
+<% } %>
 
 authconfig --enableshadow --passalgo=sha512 --enablefingerprint
 
@@ -99,6 +101,7 @@ net-tools
 %end
 
 %pre
+/usr/bin/curl -X POST -H 'Content-Type:application/json' -d "{\"taskId\": \"<%=taskId%>\", \"progress\": { \"description\": \"Installer started, starting OS installtion\", \"maximum\": \"<%=totalSteps%>\", \"value\": 3}}" http://<%=server%>:<%=port%>/api/current/notification;
 %end
 
 %post --log=/root/install-post.log

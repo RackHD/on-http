@@ -12,6 +12,7 @@ describe('Services.Http.Swagger', function() {
     var mockWaterlineService = {
         test: {}
     };
+    var taskProtocol = {activeTaskExists: sinon.stub().resolves({taskId: 'taskid'})}; 
 
     before('inject swagger service', function() {
         helper.setupInjector(_.flattenDeep([
@@ -19,7 +20,8 @@ describe('Services.Http.Swagger', function() {
                 onHttpContext.injectables,
                 dihelper.simpleWrapper(MockSerializable, 'Mock.Serializable'),
                 dihelper.simpleWrapper(new MockSchemaService(), 'Http.Api.Services.Schema'),
-                dihelper.simpleWrapper(mockWaterlineService, 'Services.Waterline')
+                dihelper.simpleWrapper(mockWaterlineService, 'Services.Waterline'),
+                dihelper.simpleWrapper(taskProtocol, 'Protocol.Task')
             ])
         );
 
@@ -665,6 +667,7 @@ describe('Services.Http.Swagger', function() {
 
         afterEach(function() {
             configGetStub.restore();
+            taskProtocol.activeTaskExists.reset();
         });
 
         it('should return file.server when configuring fileServerAddress', function() {
@@ -682,9 +685,12 @@ describe('Services.Http.Swagger', function() {
                     return defaults;
                 }
             });
-            return makeRenderableOptions(req, res, {}, true)
+            return makeRenderableOptions(req, res, {target: 'nodeId'}, true)
             .then(function(options) {
-               expect(options.file.server).to.equal('http://10.1.1.2:8080/static');
+                expect(options.file.server).to.equal('http://10.1.1.2:8080/static');
+                expect(options.taskId).to.equal('taskid');
+                expect(taskProtocol.activeTaskExists).to.be.calledOnce;
+                expect(taskProtocol.activeTaskExists).to.be.calledWith('nodeId');
             });
         });
 
