@@ -72,13 +72,13 @@ describe('Http.Api.Tasks', function () {
             });
         });
 
-        it("should return 204 if no active task exists", function() {
+        it("should return 404 if no active task exists", function() {
             var tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
             taskProtocol.activeTaskExists.rejects(new tasksApiService.NoActiveTaskError());
             return helper.request().get('/api/2.0/tasks/testnodeid')
-            .expect(204)
+            .expect(404)
             .expect(function (res) {
-                expect(res.body).to.be.empty;
+                expect(res.body.message).to.deep.equal('Not Found');
             });
         });
 
