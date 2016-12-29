@@ -212,7 +212,7 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
 #
 # Try to download call back script 60 times 1 second
 # sleep in between to allow link to be up after DHCP
-for retry in $(awk 'BEGIN { for ( i=0; i<60; i++ ) { print i; } }');
+for retry in $(seq 1 60);
 do
     wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%>?nodeId=<%=nodeId%> -O /etc/rc.local.d/local.sh
     if [ $? -eq 0 ]; then
