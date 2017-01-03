@@ -1,0 +1,11 @@
+{
+  "ignition": { "version": "2.0.0" },
+  "storage": {
+    "files": [{
+      "filesystem": "root",
+      "path": "/root/ignition-RackHD.txt",
+      "mode":400,
+      "contents": { "source": "data:text/plain;charset=utf-8;base64,WW91IG1heSBjdXN0b21pemUgeW91ciBDb3JlT1MgaW5zdGFsbGF0aW9uIHVzaW5nIElnbml0aW9uIGJ5IGNvbmZpZ3VyaW5nIHRoZSBpZ25pdGlvblNjcmlwdFVyaSB2YXJpYWJsZSB0byBwb2ludCB0byBhIGN1c3RvbSBJZ25pdGlvbiBmaWxlIHByaW9yIHRvIGV4ZWN1dGluZyB0aGUgUmFja0hEIFRhc2suT3MuSW5zdGFsbC5Db3JlT1MgdGFzay4=" }
+    }]
+  }
+}
