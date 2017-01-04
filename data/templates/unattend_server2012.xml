@@ -109,12 +109,20 @@
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <Order>2</Order>
-                    <CommandLine>powershell -Command "curl http://<%=server%>:<%=port%>/api/1.1/templates/post-windows-install.ps1" -Outfile post-windows-install.ps1 </CommandLine>
-                    <Description>setup any the VLAN IDs and trigger the end of the install workflow</Description>
+                    <% if( firewallDisable ) { %>
+                    <CommandLine>powershell -Command "Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False" </CommandLine>
+                    <Description>disable firewall on node to be able to ping the new IP when max payload is used</Description>
+                    <% } %>
                     <RequiresUserInput>false</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <Order>3</Order>
+                    <CommandLine>powershell -Command "curl http://<%=server%>:<%=port%>/api/current/templates/post-windows-install.ps1?nodeId=<%=nodeId%>" -Outfile post-windows-install.ps1 </CommandLine>
+                    <Description>setup any the VLAN IDs and trigger the end of the install workflow</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <Order>4</Order>
                     <CommandLine>powershell -ExecutionPolicy ByPass -File post-windows-install.ps1</CommandLine>
                     <Description>run the script</Description>
                     <RequiresUserInput>false</RequiresUserInput>

@@ -9,6 +9,7 @@ module.exports = Runner;
 
 di.annotate(Runner, new di.Provide('app'));
 di.annotate(Runner, new di.Inject(
+        'Constants',
         'Http.Server',
         'Services.Core',
         'Services.Configuration',
@@ -23,6 +24,7 @@ di.annotate(Runner, new di.Inject(
     )
 );
 function Runner(
+    constants,
     HttpService,
     core,
     configuration,
@@ -51,7 +53,8 @@ function Runner(
                 });
             })
             .then(function() {
-                return skuPack.start(configuration.get('skuPackRoot', './skupack.d'));
+                return skuPack.start(configuration.get('skuPackRoot', 
+                           constants.HttpStaticDir.skupack));
             })
             .then(function() {
                 return accountService.start();

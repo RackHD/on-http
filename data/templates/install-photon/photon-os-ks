@@ -50,12 +50,12 @@
                     "#!/bin/sh",
 
                     "# Set the configuration",
-                    "/bin/curl http://<%=server%>:<%=port%>/api/current/templates/post-install-photon.sh > /tmp/post-install-photon.sh",
+                    "/bin/curl http://<%=server%>:<%=port%>/api/current/templates/post-install-photon.sh?nodeId=<%=nodeId%> > /tmp/post-install-photon.sh",
                     "chmod +x /tmp/post-install-photon.sh",
                     "./tmp/post-install-photon.sh 2>&1 > /root/post-install-photon.log",
 
                     "# Download the service to callback to RackHD after OS installation/reboot completion",
-                    "/bin/curl http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%> > /etc/<%=rackhdCallbackScript%>",
+                    "/bin/curl http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%>?nodeId=<%=nodeId%> > /etc/<%=rackhdCallbackScript%>",
                     "chmod +x /etc/<%=rackhdCallbackScript%>",
 
                     "# Generate the service file",

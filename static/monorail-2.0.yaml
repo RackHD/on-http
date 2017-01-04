@@ -85,17 +85,23 @@ definitions:
     - config
     type: object
   node.2.0_PartialNode:
-    description: Post a node in RackHD
+    description: Post a node into RackHD
     properties:
       autoDiscover:
         type: string
       name:
         description: Name of the node
         type: string
+      obms:
+        description: The list of obm settings
+        type: array
+        items:
+            $ref: "#/definitions/nodes_post_obm_by_id"
       type:
         description: Type of node
         enum:
         - compute
+        - compute-container
         - switch
         - dae
         - pdu
@@ -105,7 +111,7 @@ definitions:
         type: string
     type: object
   nodes_post_obm_by_id:
-    description: IPMI OBM settings
+    description: OBM settings
     properties:
       config:
         type: object
@@ -621,6 +627,29 @@ paths:
       - filesRead
       x-view: file.2.0.json
     x-swagger-router-controller: files
+  /files/static/list:
+    x-swagger-router-controller: files
+    get:
+      operationId: filesGetAllStatic
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        List all static files
+      description: |
+        List all static files
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: array of all
+          schema:
+            type: array
+            items:
+              type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /lookups:
     get:
       description:
@@ -3449,6 +3478,19 @@ paths:
         name: name
         required: true
         type: string
+      - description: The node identifier
+        in: query
+        name: nodeId
+        required: false
+        type: string
+      - collectionFormat: multi
+        description: List of valid MAC addresses to lookup
+        in: query
+        items:
+          type: string
+        name: macs
+        required: false
+        type: array
       responses:
         200:
           description: Successfuly retrieved the specified template
@@ -3480,6 +3522,19 @@ paths:
         name: name
         required: true
         type: string
+      - description: The node identifier
+        in: query
+        name: nodeId
+        required: false
+        type: string
+      - collectionFormat: multi
+        description: List of valid MAC addresses to lookup
+        in: query
+        items:
+          type: string
+        name: macs
+        required: false
+        type: array
       responses:
         200:
           description: Successfuly retrieved the specified template headers
