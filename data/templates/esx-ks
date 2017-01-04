@@ -216,10 +216,10 @@ for retry in $(seq 1 60);
 do
     wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%>?nodeId=<%=nodeId%> -O /etc/rc.local.d/local.sh
     if [ $? -eq 0 ]; then
-        echo "The call back script was downloaded successfully."
+        logger "The call back script was downloaded successfully after $retry attempt(s)."
         break
     else
-        echo "Failed to download call back script, retrying..."
+        logger "Failed to download call back script after $retry attempt(s)."
         sleep 1
     fi
 done;
