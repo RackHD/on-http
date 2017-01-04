@@ -30,9 +30,8 @@ class _Urllib2(object):
         """
         Download a python script from downloadUrl
         """
-        url = urllib2.urlparse.urljoin('http://<%=server%>:<%=port%>', _downloadUrl)
-        poc_log("Downloading script at {}".format(url))
-        script = urllib2.urlopen(url).read()
+        poc_log("Downloading script at {}".format(_downloadUrl))
+        script = urllib2.urlopen(_downloadUrl).read()
         poc_log("{0}".format(script))
         with open('script.py', 'w') as rackhd_script:
             rackhd_script.write(script)
@@ -74,9 +73,8 @@ class _Requests(object):
         Download a python script from downloadUrl
         """
         session = requests.Session()
-        url = 'http://<%=server%>:<%=port%>' + _downloadUrl
-        poc_log("Downloading script at {}".format(url))
-        script = session.get(url, auth=("", ""))
+        poc_log("Downloading script at {}".format(_downloadUrl))
+        script = session.get(_downloadUrl, auth=("", ""))
         session.close()
         poc_log("{0}".format(script))
         with open('script.py', 'w') as rackhd_script:

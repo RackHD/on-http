@@ -12,9 +12,11 @@ describe(require('path').basename(__filename), function () {
         var presenter;
         var req;
         var res;
+        var taskProtocol = {activeTaskExists: function(){}};
         before(function() {
             helper.setupInjector([
-                helper.require("/lib/services/common-api-presenter.js")
+                helper.require("/lib/services/common-api-presenter.js"),
+                helper.di.simpleWrapper(taskProtocol, 'Protocol.Task')
             ]);
             config = helper.injector.get('Services.Configuration');
             env = helper.injector.get('Services.Environment');
@@ -50,7 +52,10 @@ describe(require('path').basename(__filename), function () {
                     expect(options.file.server).to.equal('http://10.1.1.2:8080/static');
                 });
         });
+        
         it('should return file.server when not configuring fileServerAddress', function() {
+            var taskExistStub = sinon.stub(taskProtocol, 'activeTaskExists');
+            taskExistStub.resolves({taskId: 'taskId'});
             configGetAllStub = sinon.stub(config, 'getAll', function() {
                 return {
                     apiServerAddress: '10.1.1.1',
@@ -58,9 +63,12 @@ describe(require('path').basename(__filename), function () {
                 };
             });
             return presenter(req, res)
-                ._buildContext({}, true)
+                ._buildContext({target: 'nodeId'}, true)
                 .then(function(options) {
                     expect(options.file.server).to.equal('http://10.1.1.1:80');
+                    expect(taskProtocol.activeTaskExists).to.be.calledOnce;
+                    expect(taskProtocol.activeTaskExists).to.be.calledWith('nodeId');
+                    expect(options.taskId).to.equal('taskId');
                 });
         });
     });
