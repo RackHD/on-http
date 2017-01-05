@@ -605,6 +605,7 @@ describe('2.0 Http.Api.Nodes', function () {
                     }]
             };
 
+            waterline.nodes.needByIdentifier.resolves(node);
             waterline.graphobjects.find.resolves(node.workflows);
 
             return helper.request().get('/api/2.0/nodes/123/workflows')
