@@ -1,0 +1,10 @@
+{
+    "url": "<%=url%>", 
+    "id": "<%=id%>",
+    <% if (typeof name !== "undefined") {%>
+    "name": "<%=name%>",
+    <% } %>
+    "filters": <%- JSON.stringify(filters)%>
+}
+
+    
