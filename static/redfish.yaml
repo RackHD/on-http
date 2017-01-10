@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "0.0.1"
+  version: "1.0.6"
   title: Redfish v1.0.0
 # during dev, should point to your local machine
 #host: localhost:8080
