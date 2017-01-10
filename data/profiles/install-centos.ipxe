@@ -4,7 +4,7 @@ set params initrd=initrd.img ks=<%=installScriptUri%> hostname=<%=hostname%> ksd
 kernel ${base-url}/vmlinuz repo=<%=repo%> ${params}
 initrd ${base-url}/initrd.img
 
-imgfetch --name fakedimage http://<%=server%>:<%=port%>/api/current/notification/progress?taskId=<%=taskId%>&totalSteps=<%=totalSteps%>&currentStep=2
+imgfetch --name fakedimage http://<%=server%>:<%=port%>/api/current/notification/progress?taskId=<%=taskId%>&totalSteps=<%=totalSteps%>&currentStep=2&description=kernel+download+done%2C+starting+initiating+installer
 imgfree fakedimage
 
 boot || prompt --key 0x197e --timeout 2000 Press F12 to investigate || exit shell
