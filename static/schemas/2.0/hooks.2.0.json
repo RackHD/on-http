@@ -19,22 +19,11 @@
                     }
                 }
             },
-            "required": [ "url" ],
             "additionalProperties": false
         },
-        "HookArray": {
-            "description": "A hook list",
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/HookBase"
-            },
-            "uniqueItems": true
-        },
-        "Hooks": {
-            "anyOf": [
-                { "$ref": "#/definitions/HookBase" },
-                { "$ref": "#/definitions/HookArray" }
-            ]
+        "HookPost": {
+            "$ref": "#/definitions/HookBase",
+            "required": [ "url" ]
         }
     }
 }

@@ -1,13 +1,14 @@
-// Copyright 2015, EMC, Inc.
+// Copyright 2017, Dell EMC, Inc.
 /* jshint node:true */
 
 'use strict';
 
 describe('Http.Api.Hooks v2.0', function () {
-    var hookService, Errors;
+    var hookService, Errors, _, hookPayload;
     var hookSample = [{
         url: "http://x.x.x.x",
         name: "test",
+        id: "testid",
         filters: []
     }];
     var sandbox = sinon.sandbox.create();
@@ -17,6 +18,8 @@ describe('Http.Api.Hooks v2.0', function () {
         .then(function() {
             hookService = helper.injector.get('Http.Services.Api.Hooks');
             Errors = helper.injector.get('Errors');
+            _ = helper.injector.get('_');
+            hookPayload = _.omit(hookSample[0], 'id');
         });
     });
 
@@ -29,29 +32,57 @@ describe('Http.Api.Hooks v2.0', function () {
     });
 
     it('should return hooks', function () {
-        sandbox.stub(hookService, 'getHooks').resolves(hookSample);
+        var hookList = _.cloneDeep(hookSample);
+        sandbox.stub(hookService, 'getHooks').resolves(hookList);
         return helper.request()
             .get('/api/2.0/hooks')
             .expect('Content-Type', /^application\/json/)
             .expect(200, hookSample)
-            .expect(function (res) {
+            .expect(function () {
                 expect(hookService.getHooks).to.have.been.calledOnce;
                 expect(hookService.getHooks).to.have.been.calledWith({});
             });
     });
 
+    it('should return hook by id', function () {
+        var hook = _.cloneDeep(hookSample[0]);
+        sandbox.stub(hookService, 'getHookById').resolves(hook);
+        return helper.request()
+            .get('/api/2.0/hooks/test')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200, hookSample[0])
+            .expect(function () {
+                expect(hookService.getHookById).to.have.been.calledOnce;
+                expect(hookService.getHookById).to.have.been.calledWith('test');
+            });
+    });
+
     it('should post new hooks', function () {
-        sandbox.stub(hookService, 'createHook').resolves(hookSample[0]);
+        var hookList = _.cloneDeep(hookSample[0]);
+        sandbox.stub(hookService, 'createHook').resolves(hookList);
         return helper.request()
             .post('/api/2.0/hooks')
-            .send(hookSample[0])
+            .send(hookPayload)
             .set('Content-Type', 'application/json')
             .expect('Content-Type', /^application\/json/)
-            .expect(201, hookSample[0])
-            .expect(function () {
+            .expect(201)
+            .expect(function (res) {
+                expect(res.body).to.deep.equal(hookSample[0]);
                 expect(hookService.createHook).to.have.been.calledOnce;
-                expect(hookService.createHook).to.have.been.calledWith(hookSample[0]);
+                expect(hookService.createHook).to.have.been.calledWith(hookPayload);
             });
+    });
+
+    it('should return 400 post new hooks without url', function () {
+        var hookList = _.cloneDeep(hookSample[0]);
+        var hookWithNoUrl = _.cloneDeep(hookList);
+        delete hookWithNoUrl.url;
+        sandbox.stub(hookService, 'createHook').resolves(hookList);
+        return helper.request()
+            .post('/api/2.0/hooks')
+            .send(hookWithNoUrl)
+            .set('Content-Type', 'application/json')
+            .expect(400);
     });
 
     it('should throw 400 with bad request error', function () {
@@ -66,16 +97,17 @@ describe('Http.Api.Hooks v2.0', function () {
     });
 
     it('should patch hook', function () {
-        sandbox.stub(hookService, 'updateHookById').resolves(hookSample[0]);
+        var hookList = _.cloneDeep(hookSample[0]);
+        sandbox.stub(hookService, 'updateHookById').resolves(hookList);
         return helper.request()
             .patch('/api/2.0/hooks/test')
-            .send(hookSample[0])
+            .send(hookPayload)
             .set('Content-Type', 'application/json')
             .expect('Content-Type', /^application\/json/)
             .expect(200, hookSample[0])
             .expect(function () {
                 expect(hookService.updateHookById).to.have.been.calledOnce;
-                expect(hookService.updateHookById).to.have.been.calledWith('test', hookSample[0]);
+                expect(hookService.updateHookById).to.have.been.calledWith('test', hookPayload);
             });
     });
 

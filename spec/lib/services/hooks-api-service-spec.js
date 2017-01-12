@@ -1,4 +1,4 @@
-// Copyright 2016, EMC, Inc.
+// Copyright 2017, Dell EMC, Inc.
 
 'use strict';
 
@@ -44,6 +44,16 @@ describe('Http.Services.Api.Hooks', function () {
         });
     });
 
+    it('should find hook by id', function () {
+        var query = {id: 'id'};
+        this.sandbox.stub(waterline.hooks, 'findOne').resolves(hook);
+        return hooksApiService.getHookById('id')
+        .then(function() {
+            expect(waterline.hooks.findOne).to.be.calledOnce;
+            expect(waterline.hooks.findOne).to.be.calledWith(query);
+        });
+    });
+
     it('should create hooks if hook url does not exist', function () {
         this.sandbox.stub(waterline.hooks, 'findOne').resolves({});
         this.sandbox.stub(waterline.hooks, 'create').resolves(hook);
@@ -57,28 +67,12 @@ describe('Http.Services.Api.Hooks', function () {
         });
     });
 
-    it('should update hooks filters if hook url exist', function () {
-        var existingHook = _.defaults(hook, {filters: [{graphId: 'graphId'}]});
-        var newHook = _.cloneDeep(existingHook);
-        newHook.filters[1] = body.filters[0];
-        this.sandbox.stub(waterline.hooks, 'findOne').resolves(existingHook);
-        this.sandbox.stub(waterline.hooks, 'update').resolves(newHook);
-        return hooksApiService.createHook(body)
-        .then(function(result) {
-            expect(waterline.hooks.findOne).to.be.calledOnce;
-            expect(waterline.hooks.findOne).to.be.calledWith({url: body.url});
-            expect(waterline.hooks.update).to.have.been.calledOnce;
-            expect(waterline.hooks.update).to.be.calledWith(newHook);
-            expect(result).to.be.deep.equal(newHook);
-        });
-    });
-
-    it('should throw errors if new hook is identical with existing one', function (done) {
+    it('should throw errors if hook exists', function (done) {
         var existingHook = _.defaults(body, {id: 'test'});
         this.sandbox.stub(waterline.hooks, 'findOne').resolves(existingHook);
         return hooksApiService.createHook(body)
         .then(function(){
-            throw new Error("test should fail");
+            done(new Error("test should fail"));
         })
         .catch(function(err){
             expect(waterline.hooks.findOne).to.be.calledOnce;
