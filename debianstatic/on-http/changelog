@@ -1,5 +1,5 @@
-on-http (1.1-1) unstable; urgency=low
+on-http (0.9.0) UNRELEASED; urgency=low
 
   * Initial release
 
- -- Joe Heck <joseph.heck@emc.com>  Fri, 31 Oct 2014 00:17:50 +0000
+ -- rackhd <rackhd@emc.com>  Fri, 31 Oct 2014 00:17:50 +0000
