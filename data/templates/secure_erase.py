@@ -219,8 +219,8 @@ class Progress:
         payload = {
             "taskId": self.parameters["taskId"],
             "progress": {
-                "value": "0",
-                "maximum": "100"
+                "value": 0,
+                "maximum": 100
             }
         }
         counter = 0

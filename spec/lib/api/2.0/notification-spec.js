@@ -100,7 +100,8 @@ describe('Http.Api.Notification', function () {
 
         it('should post progress notification', function () {
             return helper.request()
-            .get('/api/2.0/notification/progress?taskId=taskid&totalSteps=5&currentStep=2')
+            .get('/api/2.0/notification/progress?taskId=taskid&totalSteps=5&currentStep=2' +
+                 '&description=kernel+download+done%2C+starting+initiating+installer')
             .expect(200)
             .expect(function(res){
                 expect(res.text).to.equal('Notification response, no file will be sent');
