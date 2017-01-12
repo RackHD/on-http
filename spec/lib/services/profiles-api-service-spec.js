@@ -213,10 +213,11 @@ describe("Http.Services.Api.Profiles", function () {
                     defaults: {
                         graphOptions: {
                             target: node.id,
-                            'obm-option': { autoCreateObm: "false" }
+                            'obm-option': { autoCreateObm: 'false' }
                         },
                         nodeId: node.id
-                    }
+                    },
+                    'skip-pollers': { skipPollersCreation: 'false' }
                 }
             });
             expect(profileApiService.waitForDiscoveryStart).to.have.been.calledOnce;
@@ -232,6 +233,7 @@ describe("Http.Services.Api.Profiles", function () {
         this.sandbox.stub(configuration, 'get').withArgs('discoveryGraph')
             .returns('from.config.graph');
         configuration.get.withArgs('autoCreateObm').returns('false');
+        configuration.get.withArgs('skipPollersCreation').returns('false');
         return profileApiService.runDiscovery(node)
         .then(function(_node) {
             expect(_node).to.equal(node);
@@ -245,7 +247,8 @@ describe("Http.Services.Api.Profiles", function () {
                             'obm-option': { autoCreateObm: "false" }
                         },
                         nodeId: node.id
-                    }
+                    },
+                    'skip-pollers': { skipPollersCreation: 'false' }
                 }
             });
             expect(profileApiService.waitForDiscoveryStart).to.have.been.calledOnce;
