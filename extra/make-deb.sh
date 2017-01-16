@@ -36,6 +36,10 @@ java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-c
 ./build-package.bash python-client "${BRANCH}" "on-http-api1.1"
 ./build-package.bash python-client "${BRANCH}" "on-http-api2.0"
 ./build-package.bash python-client "${BRANCH}" "on-http-redfish-1.0"
-./build-package.bash on-http "${BRANCH}"
+
+##### Peter remove on-http.deb building & upload to bintray ,since Jenkins takes over this work
+#./build-package.bash on-http "${BRANCH}"
+#
+
 if [ -d deb ]; then rm -rf deb/; fi
 mkdir deb && cp -a *.deb deb/
