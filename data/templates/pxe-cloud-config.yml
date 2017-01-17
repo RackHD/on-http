@@ -9,6 +9,65 @@ coreos:
       command: start
     - name: fleet.service
       command: start
+<% if (typeof networkDevices !== 'undefined' ) { %>
+  <% networkDevices.forEach(function(networkDevice) { %>
+    - name: systemd-networkd.service
+      command: stop
+    - name: 00-<%=networkDevice.device%>.network
+      runtime: true
+      content: |
+        [Match]
+        Name=<%=networkDevice.device%>
+
+        [Network]
+<% if (typeof dnsServers !== 'undefined') { %>
+  <% dnsServers.forEach(function(dnsServer) { %>
+        DNS=<%=dnsServer%>
+  <% }) %>
+<% } %>
+
+<% cidr_bits = 0 %>
+<% if( undefined !== networkDevice.ipv4.netmask ) { %>
+    <% networkDevice.ipv4.netmask.split('.').forEach(function(octet) {%>
+    <%cidr_bits+=((octet >>> 0).toString(2).match(/1/g)||[]).length;%>
+  <% }) %>
+<% } %>
+        Address=<%=networkDevice.ipv4.ipAddr%>/<%=cidr_bits%>
+        Gateway=<%=networkDevice.ipv4.gateway%>
+    - name: down-interfaces.service
+      command: start
+      content: |
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/ip link set <%=networkDevice.device%> down
+        ExecStart=/usr/bin/ip addr flush dev <%=networkDevice.device%>
+    - name: systemd-networkd.service
+      command: restart
+  <% }) %>
+<% } %>
 hostname: <%=hostname%>
+<% if( typeof users !== 'undefined' ) { %>
+  <% users.forEach(function(user) { %>
+users:
+  - name: "<%=user.name%>"
+    passwd: "<%=user.encryptedPassword%>"
+<% if ( user.sshKey) { %>
+    ssh-authorized-keys:
+      - "<%=user.sshKey%>"
+<% } %>
+    <% if (typeof user.groups !== 'undefined') { %>
+    groups:
+      <% user.groups.forEach(function(group) { %>
+      - "<%=group%>"
+      <% }) %>
+    <% } %>
+  <% }) %>
+<% } %>
+<% if (typeof coreSshKeys !== 'undefined') { %>
 ssh_authorized_keys:
-  - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDEh48tb2BGtLILBhs9TygDqzLrGTZjnWn4ag336p5InXVOa4kIoifwh+jplXrqdoyFkMtWg6hYhh52cdyIkoNtbLcTitQe7LMPT2OQ19bSWjM5PEJj8yT9IspFyVVqbFfS4PC2lj10a7ZF8zPsk2SIkqrCWUP87gEf8nDQbaMuYryzGqiVHMpCmFIn2CzijzLIOOJ8jusfmIM0oB+sE5piPtKCBLUWlTE2CGR1auaOACt0Z9o6u22N4KHEFPRCp0CkP4VX7LJ41X0zlyLnk8PZSDh8y2Kp7KKHYxzCJ1qKSQv9jK3DUbubm8jptM30QM8ehhFTZq40FEBKXVqe5eDq90ib0NKPcUn/IZWU/a4/Cg+aq4z1lyUHBC05tbIQOiG/szl5xrA8PcGP80cfvHpv4Zig7OE5XYW143LiVSHSS3SwLkSwKLpZLnwoHvX2keYKC32cpCWDNgeiFpbh9iws6vxBnBX9uJwaxzP3eXQX1b3sE8wggj9DxvimWMds8G2B3OZFg680Y987wfa/z0LSTSxF2q1kSLA7yELN1HGl7Ij6t12kkzJtqycLe8DKAmnO7D9Rbhm3+D+rKNNX/v6OjtDeXn0RwYLgkyyKRrf0KC5xL1pt7/ietMAnUXwjpuk5pw/XvK8vu3mIugAfKHlRvTDdZqIoYb7z7c2KAoyZZw== example RackHD"
+  <% coreSshKeys.forEach(function(coreSshKey) { %>
+  - "<%=coreSshKey%>"
+  <% }) %>
+<% } %>
+
+

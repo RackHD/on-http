@@ -37,7 +37,7 @@ function generatePdf(swaggerFile) {
                     format: 'Letter'
                 };
                 var pdfFile = docDir +
-                    '/rackhd-api-' +
+                    '/' +
                     swaggerTitle +
                     '-' +
                     swaggerDef.info.version +

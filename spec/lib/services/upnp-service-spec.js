@@ -40,13 +40,13 @@ describe("UPnP Service", function() {
             Promise.resolve()
         )
     };
-    
+
     before(function() {
         helper.setupInjector([
             helper.require("/lib/services/upnp-service"),
             helper.di.simpleWrapper(messenger, 'Services.Messenger'),
             helper.di.simpleWrapper(rx,'Rx'),
-            helper.di.requireWrapper('node-cache', 'node-cache')
+            helper.di.requireWrapper('node-cache', 'node-cache', undefined, __dirname)
         ]);
         helper.injector.get('Services.Configuration')
         .set('httpEndpoints', [{
@@ -56,11 +56,11 @@ describe("UPnP Service", function() {
             'routers': 'northbound-api-router'
             }]
         );
-        
+
         uPnPService = helper.injector.get('Http.Services.uPnP');
         systemUuid = helper.injector.get('SystemUuid');
         fs = helper.injector.get('fs');
-        
+
         sandbox.stub(fs, 'writeFileAsync');
         sandbox.stub(fs, 'readFileAsync');
         sandbox.stub(ejs, 'render');
@@ -68,10 +68,10 @@ describe("UPnP Service", function() {
         sandbox.stub(SSDP.prototype, 'start').resolves();
         sandbox.stub(SSDP.prototype, 'stop').resolves();
         sandbox.stub(SSDP.prototype, 'addUSN').resolves();
-        
+
         sandbox.stub(SSDPClient.prototype, 'start').resolves();
         sandbox.stub(SSDPClient.prototype, 'search').resolves();
-        
+
         systemUuid.getUuid.resolves(uuid);
         fs.readFileAsync.resolves(udn);
         fs.writeFileAsync.resolves();
@@ -95,35 +95,35 @@ describe("UPnP Service", function() {
     });
 
     describe('service control', function() {
-        
+
         it('should start service', function() {
             return uPnPService.start()
             .then(function() {
                 expect(uPnPService.ssdpList.length).to.equal(uPnPService.registry.length);
             });
         });
-        
+
         it('should stop service', function() {
             return expect(uPnPService.stop()).to.be.ok;
         });
-        
+
         it('should find valid NT entry', function() {
             var nt = uPnPService.registry[0].urn;
             var urn = { nt: uPnPService.registry[0], index: 0 };
             return expect(uPnPService.findNTRegistry(nt)).to.deep.equal(urn);
         });
-        
+
         it('should find no NT entries', function() {
             return expect(uPnPService.findNTRegistry('xyz')).to.deep.equal({});
         });
-        
+
         it('should run advertise-alive event', function(done) {
             SSDP.prototype.on = function(event, callback) {
                 emitter.on(event, function(header) {
                     callback.call(uPnPService, header);
                 });
             };
-            return uPnPService.start()
+            uPnPService.start()
             .then(function() {
                 expect(uPnPService.registry[0].alive).to.equal(false);
                 emitter.emit('advertise-alive', {NT: uPnPService.registry[0].urn});
@@ -137,14 +137,14 @@ describe("UPnP Service", function() {
                 });
             });
         });
-        
+
         it('should run advertise-bye event', function(done) {
             SSDP.prototype.on = function(event, callback) {
                 emitter.on(event, function(header) {
                     callback.call(uPnPService, header);
                 });
             };
-            return uPnPService.start()
+            uPnPService.start()
             .then(function() {
                 uPnPService.registry[0].alive = true;
                 emitter.emit('advertise-bye', {NT: uPnPService.registry[0].urn});
@@ -165,7 +165,7 @@ describe("UPnP Service", function() {
                     callback.call(uPnPService, headers, code, info);
                 });
             };
-            return uPnPService.start()
+            uPnPService.start()
             .then(function() {
                 emitter.emit('response',
                              {

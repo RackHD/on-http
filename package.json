@@ -1,6 +1,6 @@
 {
   "name": "on-http",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "OnRack Http Server",
   "main": "index.js",
   "scripts": {
@@ -56,7 +56,8 @@
     "tar": "~2.2.1",
     "tv4": "~1.2.7",
     "url-parse": "~1.1.1",
-    "validator": "^5.2.0"
+    "validator": "^5.2.0",
+    "walk": "~2.3.9"
   },
   "devDependencies": {
     "apidoc": "^0.12.1",
@@ -84,7 +85,7 @@
     "supertest": "^1.2.0",
     "xunit-file": "0.0.6",
     "bootprint-swagger": "~0.13.1",
-    "bootprint": "~0.8.5",
+    "bootprint": "^1.0.0",
     "html-pdf": "~2.1.0"
   },
   "apidoc": {

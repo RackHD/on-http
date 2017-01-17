@@ -30,19 +30,11 @@ before_deploy:
    if ! [ "$BEFORE_DEPLOY_RUN" ]; then
      export BEFORE_DEPLOY_RUN=1;
      ./extra/make-docs.sh;
-     ./extra/make-deb.sh;
    fi
 
 deploy:
   - provider: bintray
     file: .bintray-doc.json
-    user: $BINTRAY_USER
-    key: $BINTRAY_KEY
-    on:
-      branch: master
-      node: "4"
-  - provider: bintray
-    file: .bintray-deb.json
     user: $BINTRAY_USER
     key: $BINTRAY_KEY
     on:

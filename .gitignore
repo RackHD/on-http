@@ -39,6 +39,7 @@ node_modules
 
 # IDE
 .idea
+.vscode/
 
 # static images
 static/ansible/
