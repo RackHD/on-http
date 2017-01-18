@@ -1,0 +1,32 @@
+{
+    "title": "smnp-ibm-service",
+    "definitions": {
+        "Ibm": {
+            "description": "IBM settings",
+            "type": "object",
+            "properties": {
+                "required": [ "service", "config" ],
+                "nodeId": {
+                    "type": "string"
+                },
+                "service": {
+                    "type": "string"
+                },
+                "config": {
+                    "type": "object",
+                    "properties": {
+                        "required": ["host", "community" ],
+                        "host": {
+                            "description": "The IP address",
+                            "type": "string"
+                        },
+                        "community": {
+                            "description": "community",
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
