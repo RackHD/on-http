@@ -41,13 +41,6 @@ deploy:
     on:
       branch: master
       node: "4"
-  - provider: bintray
-    file: .bintray-deb.json
-    user: $BINTRAY_USER
-    key: $BINTRAY_KEY
-    on:
-      branch: master
-      node: "4"
 
 notifications:
   slack:
