@@ -108,11 +108,10 @@ describe("Http.Services.Api.Nodes", function () {
     });
 
     describe("postNode", function() {
-        var node = {
-            id: '1234abcd1234abcd1234abcd',
+        var postBody = {
             name: 'name',
             type: 'compute',
-            obmSettings: [
+            obms: [
                 {
                     service: 'ipmi-obm-service',
                     config: {
@@ -120,18 +119,37 @@ describe("Http.Services.Api.Nodes", function () {
                         user: 'myuser',
                         password: 'mypass'
                     }
+                },
+                {
+                    service: 'snmp-obm-service',
+                    config: {
+                        host: '1.2.3.4',
+                        community: 'abcdef'
+                    }
                 }
             ]
         };
 
-        it('should create a node', function () {
+        var node = {
+            id: '1234abcd1234abcd1234abcd',
+            name: 'name',
+            type: 'compute',
+            obms: []
+        };
+
+        it('should create a node & obms', function () {
             waterline.nodes.create.resolves(node);
-            return nodeApiService.postNode(node)
+            return nodeApiService.postNode(postBody)
             .then(function() {
                 expect(waterline.nodes.create).to.have.been.calledOnce;
                 expect(
                     waterline.nodes.create.firstCall.args[0]
-                ).to.have.property('id').and.equal(node.id);
+                ).to.deep.equal({ name: 'name', type: 'compute' });
+                expect(waterline.obms.upsertByNode).to.have.been.calledTwice;
+                expect(waterline.obms.upsertByNode)
+                    .to.be.calledWith(node.id, postBody.obms[0]);
+                expect(waterline.obms.upsertByNode)
+                    .to.be.calledWith(node.id, postBody.obms[1]);
             });
         });
 
@@ -150,8 +168,9 @@ describe("Http.Services.Api.Nodes", function () {
             waterline.nodes.create.resolves(switchNode);
             this.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves({});
 
-            return nodeApiService.postNode({})
+            return nodeApiService.postNode(switchNode)
             .then(function() {
+                expect(waterline.obms.upsertByNode).to.not.be.called;
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledOnce;
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledWith(
                     {
@@ -168,7 +187,7 @@ describe("Http.Services.Api.Nodes", function () {
             var mgmtNode = {
                 id: '1234abcd1234abcd1234abce',
                 name: 'mgmt server',
-                obmSettings: [
+                obms: [
                     {
                         config: {
                             host: '1.2.3.4',
@@ -193,8 +212,11 @@ describe("Http.Services.Api.Nodes", function () {
             waterline.nodes.create.resolves(mgmtNode);
             this.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves({});
 
-            return nodeApiService.postNode({})
+            return nodeApiService.postNode(mgmtNode)
             .then(function() {
+                expect(waterline.obms.upsertByNode).to.be.calledOne;
+                expect(waterline.obms.upsertByNode)
+                    .to.be.calledWith(mgmtNode.id, mgmtNode.obms[0]);
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledOnce;
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledWith(
                     {
@@ -220,8 +242,9 @@ describe("Http.Services.Api.Nodes", function () {
             waterline.nodes.create.resolves(pduNode);
             this.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves({});
 
-            return nodeApiService.postNode({})
+            return nodeApiService.postNode(pduNode)
             .then(function() {
+                expect(waterline.obms.upsertByNode).to.not.be.called;
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledOnce;
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledWith(
                     {
@@ -240,7 +263,7 @@ describe("Http.Services.Api.Nodes", function () {
                 name: 'rackNode'
             };
             waterline.nodes.create.resolves(rackNode);
-            return nodeApiService.postNode({})
+            return nodeApiService.postNode(rackNode)
             .then(function() {
                 expect(eventsProtocol.publishNodeEvent).to.be.calledWithExactly(
                     rackNode, 'added'
@@ -1027,7 +1050,7 @@ describe("Http.Services.Api.Nodes", function () {
             id: '1234abcd1234abcd1234abcd',
             name: 'name',
             type: 'compute',
-            obmSettings: [
+            obms: [
                 {
                     service: 'ipmi-obm-service',
                     config: {

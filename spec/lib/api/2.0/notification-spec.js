@@ -22,8 +22,10 @@ describe('Http.Api.Notification', function () {
         this.timeout(5000);
         return helper.startServer([]).then(function () {
             notificationApiService = helper.injector.get('Http.Services.Api.Notification');
-            sinon.stub(notificationApiService, 'postNodeNotification').resolves(nodeNotificationMessage);
-            sinon.stub(notificationApiService, 'postBroadcastNotification').resolves(broadcastNotificationMessage);
+            sinon.stub(notificationApiService, 'postNodeNotification')
+                .resolves(nodeNotificationMessage);
+            sinon.stub(notificationApiService, 'postBroadcastNotification')
+                .resolves(broadcastNotificationMessage);
         });
 
     });
@@ -42,16 +44,17 @@ describe('Http.Api.Notification', function () {
     describe('POST /notification', function () {
         it('should return node notification detail', function () {
             return helper.request()
-            .post('/api/2.0/notification?nodeId='
-                + nodeNotificationMessage.nodeId
-                + '&randomData='
-                + nodeNotificationMessage.randomData)
+            .post('/api/2.0/notification?nodeId=' +
+                  nodeNotificationMessage.nodeId +
+                  '&randomData=' +
+                  nodeNotificationMessage.randomData)
             .set('Content-Type', 'application/json')
             .expect('Content-Type', /^application\/json/)
             .expect(201, nodeNotificationMessage)
             .then(function () {
                 expect(notificationApiService.postNodeNotification).to.have.been.calledOnce;
-                expect(notificationApiService.postNodeNotification).to.have.been.calledWith(nodeNotificationMessage);
+                expect(notificationApiService.postNodeNotification)
+                    .to.have.been.calledWith(nodeNotificationMessage);
             });
         });
         it('should return broadcast notification detail', function () {
@@ -63,7 +66,8 @@ describe('Http.Api.Notification', function () {
             .expect(201, broadcastNotificationMessage)
             .then(function () {
                 expect(notificationApiService.postBroadcastNotification).to.have.been.calledOnce;
-                expect(notificationApiService.postBroadcastNotification).to.have.been.calledWith(broadcastNotificationMessage);
+                expect(notificationApiService.postBroadcastNotification)
+                    .to.have.been.calledWith(broadcastNotificationMessage);
             });
         });
         it('should pass with nodeId in query body', function () {
@@ -71,7 +75,7 @@ describe('Http.Api.Notification', function () {
             .post('/api/2.0/notification')
             .send({ nodeId: nodeNotificationMessage.nodeId })
             .expect('Content-Type', /^application\/json/)
-            .expect(201, nodeNotificationMessage)
+            .expect(201, nodeNotificationMessage);
         });
 
         it('should pass with nodeId in query body', function () {
@@ -79,7 +83,33 @@ describe('Http.Api.Notification', function () {
             .post('/api/2.0/notification')
             .send(nodeNotificationMessage)
             .expect('Content-Type', /^application\/json/)
-            .expect(201, nodeNotificationMessage)
+            .expect(201, nodeNotificationMessage);
         });
+    });
+
+    describe('GET /notification/progress', function () {
+        var descript = "kernel download done, starting initiating installer";
+        var progress = {
+            taskId: 'taskid',
+            progress:
+                {maximum: "5", value: "2", description: descript}
+        };
+        before(function(){
+            sinon.stub(notificationApiService, 'postNotification').resolves();
+        });
+
+        it('should post progress notification', function () {
+            return helper.request()
+            .get('/api/2.0/notification/progress?taskId=taskid&totalSteps=5&currentStep=2' +
+                 '&description=kernel+download+done%2C+starting+initiating+installer')
+            .expect(200)
+            .expect(function(res){
+                expect(res.text).to.equal('Notification response, no file will be sent');
+            })
+            .then(function() {
+                expect(notificationApiService.postNotification).to.be.calledWith(progress);
+            });
+        });
+
     });
 });

@@ -26,14 +26,20 @@ npm prune --production
 if [ -d swagger-codegen ]; then rm -rf swagger-codegen/; fi
 git clone --branch v2.1.5 https://github.com/swagger-api/swagger-codegen.git
 pushd ./swagger-codegen && mvn package && popd
-java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar generate -i static/monorail.yml -o on-http-api1.1 -l python --additional-properties packageName=on_http_api1_1
-java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar generate -i static/monorail-2.0.yaml -o on-http-api2.0 -l python --additional-properties packageName=on_http_api2_0
-java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar generate -i static/redfish.yaml -o on-http-redfish-1.0 -l python --additional-properties packageName=on_http_redfish_1_0
-
+VERSION=$(awk -F \" '/version: +"[0-9]+.[0-9]+.[0-9]+"/{print $2;exit}' static/monorail.yml)
+java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar generate -i static/monorail.yml -o on-http-api1.1 -l python --additional-properties packageName=on_http_api1_1,packageVersion=${VERSION}
+VERSION=$(awk -F \" '/version: +"[0-9]+.[0-9]+.[0-9]+"/{print $2;exit}' static/monorail-2.0.yaml)
+java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar generate -i static/monorail-2.0.yaml -o on-http-api2.0 -l python --additional-properties packageName=on_http_api2_0,packageVersion=${VERSION}
+VERSION=$(awk -F \" '/version: +"[0-9]+.[0-9]+.[0-9]+"/{print $2;exit}' static/redfish.yaml)
+java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar generate -i static/redfish.yaml -o on-http-redfish-1.0 -l python --additional-properties packageName=on_http_redfish_1_0,packageVersion=${VERSION}
 
 ./build-package.bash python-client "${BRANCH}" "on-http-api1.1"
 ./build-package.bash python-client "${BRANCH}" "on-http-api2.0"
 ./build-package.bash python-client "${BRANCH}" "on-http-redfish-1.0"
-./build-package.bash on-http "${BRANCH}"
+
+##### Peter remove on-http.deb building & upload to bintray ,since Jenkins takes over this work
+#./build-package.bash on-http "${BRANCH}"
+#
+
 if [ -d deb ]; then rm -rf deb/; fi
 mkdir deb && cp -a *.deb deb/

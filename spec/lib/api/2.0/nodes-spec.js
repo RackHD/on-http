@@ -877,7 +877,7 @@ describe('2.0 Http.Api.Nodes', function () {
     describe('OBM support', function() {
 
         var obm = {
-            service: 'noop-obm-service',
+            service: 'ipmi-obm-service',
             config: {
                 host: '1.2.3.4',
                 user: 'myuser',
@@ -889,10 +889,7 @@ describe('2.0 Http.Api.Nodes', function () {
             id: "57c5e319c466ff9435d27fb3",
             node: "",
             service: "noop-obm-service",
-            config: {
-                host: "1.2.3.4",
-                user: "myuser"
-            }
+            config: {}
         };
 
         after(function() {

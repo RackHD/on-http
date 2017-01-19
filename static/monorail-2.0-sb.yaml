@@ -156,6 +156,49 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /notification/progress:
+    x-swagger-router-controller: notification
+    get:
+      operationId: notificationProgressGet
+      summary: |
+        notification for task to get progress info
+      description: |
+        send taskid, total setps and current step sequence to rackhd via notification get function
+      parameters:
+        - name: taskId
+          in: query
+          description: |
+            Task instance identifier
+          required: true 
+          type: string
+        - name: totalSteps
+          in: query
+          description: |
+            Task instance identifier
+          required: false
+          type: string
+        - name: currentStep
+          in: query
+          description: |
+            Task instance identifier
+          required: false
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        201:
+          description: |
+            Specifics of the notification
+          schema:
+            type: object
+        400:
+          description: |
+            bad request parameter passed or no active task or taskgraph.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /swagger:
     x-swagger-pipe: swagger_raw
 
