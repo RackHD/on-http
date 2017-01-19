@@ -1,5 +1,5 @@
 {
-    "title": "smnp-ibm-service",
+    "title": "snmp-ibm-service",
     "definitions": {
         "Ibm": {
             "description": "IBM settings",
