@@ -2,7 +2,7 @@ define({
   "description": "RackHD Task Annotation",
   "footer": {
     "title": "Other Information",
-    "content": "<p>&copy;2016, EMC, Inc.</p>\n"
+    "content": "<p>&copy;2016, Dell EMC, Inc.</p>\n"
   },
   "header": {
     "title": "About",
