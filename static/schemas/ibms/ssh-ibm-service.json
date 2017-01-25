@@ -38,7 +38,8 @@
                     "anyOf": [
                         { "required": ["host", "user", "password"] },
                         { "required": [ "host", "user", "privateKey" ] }
-                }
+                    ]
+		 }
             },
             "required": ["service", "config"]
         }
