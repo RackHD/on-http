@@ -2,7 +2,7 @@
 
 'use strict';
 
-describe('Ssh Serializable V1', function () {
+describe('Snmp Serializable V1', function () {
     var encryption;
     var Serializable;
 
