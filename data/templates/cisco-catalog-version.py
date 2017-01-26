@@ -8,7 +8,10 @@ def main():
     data = {}
 
     try:
-        data = json.loads(clid('show version'))
+        # The "as is" will cause dumps from taskrunner.py to produce an invalid jason string
+        dataString = clid('show version')
+        dataString = dataString.replace("\\\"as is,\\\"", "as is")
+        data = json.loads(dataString)
     except:
         pass
 
