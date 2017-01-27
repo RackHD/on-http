@@ -153,14 +153,17 @@ describe('Ssh Serializable V1', function () {
         it('should not encrypt publicKey fields', function() {
             return this.subject.deserialize(
                 {
-                    host: 'fake-host',
-                    user: 'fake-user',
-                    publicKey: 'fake-public-key',
-                    privateKey: 'fake-private-key'
+                    service: "test",
+                    config: {
+                        host: 'fake-host',
+                        user: 'fake-user',
+                        publicKey: 'fake-public-key',
+                        privateKey: 'fake-private-key'
+                    }
                 }
-            ).should.eventually.have.property(
-                'publicKey'
-            ).and.equal('fake-public-key');
+            ).should.eventually.have.property('config')
+                .that.is.an('object').and.to.have.property('publicKey')
+                .and.equal('fake-public-key');
         });
 
         it('should encrypt privateKey fields', function() {
