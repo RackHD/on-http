@@ -3,6 +3,7 @@
 "use strict";
 
 var http = require('http'),
+    url = require('url'),
     fs = require('fs'),
     path = require('path'),
     childProcess = require('child_process'),
@@ -80,7 +81,7 @@ function updateTasks(data, timeout, retry, retries) {
                 }, timeout);
             } else {
                 console.log("Task Execution Complete");
-                process.exit(data.exit.code || 0);
+                process.exit(data.exit.code || data.exit || 0);
             }
         });
     }).on('error', function (err) {
@@ -232,13 +233,9 @@ function getTasks(timeout) {
  * @param cb
  */
 function getFile(downloadUrl, cb) {
-    http.request({
-        hostname: server,
-        port: port,
-        path: downloadUrl,
-        method: 'GET'
-    }, function (res) {
-        var filename = path.basename(downloadUrl);
+    var urlObj = url.parse(downloadUrl);
+    http.request(urlObj, function (res) {
+        var filename = path.basename(urlObj.pathname);
         var stream = fs.createWriteStream(filename);
 
         res.on('end', function () {

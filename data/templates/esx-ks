@@ -69,16 +69,18 @@ esxcli network firewall set --default-action false --enabled no
 <%} %>
 
 #create users
+rm /vmfs/volumes/datastore1/rackhd_create_sshkeys
 <% if( typeof users !== 'undefined' ) { %>
 <% users.forEach(function(user) { %>
     /usr/lib/vmware/auth/bin/adduser -s /bin/sh -G root -h / -D <%=user.name%>
     echo <%=user.plainPassword%> | passwd <%=user.name%> --stdin
     <% if (typeof user.sshKey !== 'undefined') { %>
-        mkdir /etc/ssh/keys-<%=user.name%>
-        echo <%=user.sshKey%> > /etc/ssh/keys-<%=user.name%>/authorized_keys
+        echo "mkdir /etc/ssh/keys-<%=user.name%>" >> /vmfs/volumes/datastore1/rackhd_create_sshkeys
+        echo "echo <%=user.sshKey%> > /etc/ssh/keys-<%=user.name%>/authorized_keys" >> /vmfs/volumes/datastore1/rackhd_create_sshkeys
     <%} %>
 <%}) %>
 <%} %>
+chmod +x /vmfs/volumes/datastore1/rackhd_create_sshkeys
 
 #setup ntp
 cat > /etc/ntp.conf << __NTP_CONFIG__
@@ -147,7 +149,6 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
           esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
           esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
           esxcli network vswitch standard portgroup set -p $currdev.<%=vid%> -v <%=vid %>
-          postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
         <% }); %>
       <% } else { %>
         <% vmkname = 'vmk' + vmkid++ %>
@@ -156,7 +157,6 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
         esxcli network ip interface add -i <%=vmkname%> -p $currdev
         esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
         esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
-        postLookup <%=vmkname%> <%=n.ipv4.ipAddr%>
       <% } %>
     <% } %>
     <% if( undefined !== n.ipv6 ) { %>
@@ -228,7 +228,23 @@ esxcli system shutdown reboot -d 10 -r "Rebooting after first boot host configur
 #disable firewall
 localcli network firewall set --enabled no
 #signify ORA the installation completed
-wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%> -O /vmfs/volumes/datastore1/<%=rackhdCallbackScript%>
+#
+# Try to download call back script 60 times 1 second
+# sleep in between to allow link to be up after DHCP
+for retry in $(seq 1 60);
+do
+    wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%>?nodeId=<%=nodeId%> -O /vmfs/volumes/datastore1/<%=rackhdCallbackScript%>
+    if [ $? -eq 0 ]; then
+        logger -p user.info "RackHD's call back script was downloaded successfully after $retry attempt(s)."
+        break
+    else
+        logger -p user.info "Failed to download RackHD's call back script after $retry attempt(s)."
+        sleep 1
+    fi
+done;
+
+if [ $retry -eq 60 ]; then
+   logger -p user.err "RackHD's call back script was not downloaded successfully."
+fi
 chmod +x /vmfs/volumes/datastore1/<%=rackhdCallbackScript%>
 /vmfs/volumes/datastore1/<%=rackhdCallbackScript%>
-

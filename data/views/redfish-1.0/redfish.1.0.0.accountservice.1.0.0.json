@@ -8,8 +8,8 @@
     "Name": "Account Service",
     "Status": {},
     "ServiceEnabled": true,
-    "MinPasswordLength": 8,
-    "MaxPasswordLength": 32,
+    "MinPasswordLength": 6,
+    "MaxPasswordLength": 50,
     "AccountLockoutThreshold": 0,
     "Accounts" : {
         "@odata.id": "<%= basepath %>/AccountService/Accounts"

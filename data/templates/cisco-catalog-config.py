@@ -8,8 +8,8 @@ def main():
     data = {}
 
     try:
-        data['startup-config'] = cli('show startup-config')[0]
-        data['running-config'] = cli('show running-config')[0]
+        data['startup-config'] = cli('show startup-config')
+        data['running-config'] = cli('show running-config')
     except:
         pass
 

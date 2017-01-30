@@ -21,9 +21,10 @@ Note: requires MongoDB and RabbitMQ to be running to start correctly.
  * http://127.0.0.1/docs -- RackHD Docs
  * http://127.0.0.1/taskdoc -- RackHD Task Annotation
 
-## API Reference
+## API References
 
- *http://rackhd.readthedocs.io/en/latest/rackhd/index.html
+ * http://rackhd.readthedocs.io/en/latest/rackhd/index.html
+ * https://bintray.com/rackhd/docs/apidoc#files
 
 The readthedocs shows API usage for 1.1 by default. Unless otherwise specified
 you can use `/api/2.0/` in place of `/api/1.1/` to leverage the 2.0 API. Any functional

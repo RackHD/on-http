@@ -16,6 +16,7 @@
     </mode>
   </general>
 
+
   <!-- users settings -->
   <users config:type="list">
     <user>
@@ -71,7 +72,6 @@
       <% if( undefined != n.ipv4.vlanIds ) { %>
         <% n.ipv4.vlanIds.forEach(function(vid) { %>
         <interface>
-          <bootproto>none</bootproto>
           <startmode>auto</startmode>
           <device><%=n.device%>.<%=vid%></device>
           <ipaddr><%=n.ipv4.ipAddr%></ipaddr>
@@ -82,7 +82,6 @@
         <% }); %>
       <% } else { %>
         <interface>
-          <bootproto>none</bootproto>
           <startmode>auto</startmode>
           <device><%=n.device%></device>
           <ipaddr><%=n.ipv4.ipAddr%></ipaddr>
@@ -95,7 +94,6 @@
       <% if( undefined != n.ipv6.vlanIds ) { %>
         <% n.ipv6.vlanIds.forEach(function(vid) { %>
         <interface>
-          <bootproto>none</bootproto>
           <startmode>auto</startmode>
           <device><%=n.device%>.<%=vid%></device>
           <ipaddr><%=n.ipv6.ipAddr%></ipaddr>
@@ -107,7 +105,6 @@
         <% }); %>
       <% } else { %>
         <interface>
-          <bootproto>none</bootproto>
           <startmode>auto</startmode>
           <device><%=n.device%></device>
           <ipaddr><%=n.ipv6.ipAddr%></ipaddr>
@@ -193,6 +190,8 @@
             <% } %>
           <% }) %>
           <% } %>
+
+          curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
           ]]>
         </source>
       </script>

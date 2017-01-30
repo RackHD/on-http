@@ -14,7 +14,7 @@ write_files:
           -e SERVER='<%= server %>' \
           -e PORT='<%= port %>' \
           -e MAC='<%= macaddress %>' \
-          --privileged --net=host rackhd/micro
+          --privileged --net=host -v=/dev:/dev rackhd/micro
 
       mapfile -t containerlist < <(docker ps)
       container=(${containerlist[1]//$'\n'/ })

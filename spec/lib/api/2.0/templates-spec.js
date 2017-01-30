@@ -12,6 +12,7 @@ describe('Http.Api.Templates', function () {
     var swagger;
     var tasksApiService;
     var findActiveGraphForTarget;
+    var nodeApiService;
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -26,10 +27,15 @@ describe('Http.Api.Templates', function () {
         Errors = helper.injector.get('Errors');
         waterline = helper.injector.get('Services.Waterline');
         swagger = helper.injector.get('Http.Services.Swagger');
+        sinon.stub(swagger, 'makeRenderableOptions').resolves({});
         this.sandbox = sinon.sandbox.create();
 
         tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
         tasksApiService.getNode = sinon.stub().resolves({ id: '1234abcd5678effe9012dcba' });
+
+        nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
+        nodeApiService.getNodeByIdentifier = sinon.stub()
+            .resolves({ id: '1234abcd5678effe9012dcba' });
 
         lookupService.ipAddressToMacAddress = sinon.stub().resolves('00:11:22:33:44:55');
         lookupService.reqIpAddressToMacAddress = sinon.stub().resolves();
@@ -69,6 +75,7 @@ describe('Http.Api.Templates', function () {
         resetMocks(taskProtocol);
         resetMocks(workflowApiService);
         resetMocks(templates);
+        resetMocks(swagger);
     });
 
     after('stop HTTP server', function () {
@@ -173,23 +180,43 @@ describe('Http.Api.Templates', function () {
     });
 
     describe('GET SB /templates/:name', function () {
-        it('should return a template', function () {
+        it('should return a template with query nodeId', function () {
             var graph = {
                 instanceId: '0123'
             };
-            waterline.nodes = {
-                needByIdentifier: sinon.stub().resolves({
-                    id: 'node id'
-                })
-            };
             findActiveGraphForTarget.resolves(graph);
-            this.sandbox.stub(swagger, 'makeRenderableOptions').resolves({});
             taskProtocol.requestProperties.resolves({});
-            return helper.request().get('/api/2.0/templates/123')
+            return helper.request()
+                .get('/api/2.0/templates/123?nodeId=583ae29c68896e275779e2ff')
                 .expect(200)
                 .then(function () {
                     expect(templates.render).to.have.been.calledOnce;
                     expect(templates.render).to.have.been.calledWith('123');
+                });
+        });
+
+        it('should return a template with query macs', function () {
+            var graph = {
+                instanceId: '0123'
+            };
+            findActiveGraphForTarget.resolves(graph);
+            taskProtocol.requestProperties.resolves({});
+            return helper.request()
+                .get('/api/2.0/templates/123?macs=00:50:56:aa:7d:85')
+                .expect(200)
+                .then(function () {
+                    expect(templates.render).to.have.been.calledOnce;
+                    expect(templates.render).to.have.been.calledWith('123');
+                });
+        });
+
+        it('should return 400 when nodeId is not provided', function () {
+            return helper.request().get('/api/2.0/templates/123')
+                .expect('Content-Type', /^application\/json/)
+                .expect(400)
+                .expect(function (req) {
+                    expect(req.body).to.have.property('message')
+                        .to.equal('Neither query nodeId nor macs is provided.');
                 });
         });
     });

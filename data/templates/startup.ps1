@@ -54,8 +54,9 @@ if( $Response_RAW -match "LOCATION:(.*)" ) {
 
 Write-Host Using RackHD instance: $server
 
-$url1 = "${server}templates/unattend_server2012.xml"
-$url2 = "${server}templates/winpe-kickstart.ps1"
+$macAddress = Get-WmiObject -Class Win32_NetworkAdapterConfiguration -Filter "MACAddress!=null" | select -First 1 -ExpandProperty MACAddress
+$url1 = "${server}templates/unattend_server2012.xml?macs=${macAddress}"
+$url2 = "${server}templates/winpe-kickstart.ps1?macs=${macAddress}"
 curl ${url1} -Outfile unattend.xml
 Write-Host loading ${url2}
 curl ${url2} -Outfile winpe-kickstart.ps1

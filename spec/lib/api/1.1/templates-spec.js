@@ -93,6 +93,29 @@ describe('Http.Api.Templates', function () {
                 expect(templates.get).to.have.been.calledWith('123');
             });
         });
+
+        it('should return a single template with scope', function () {
+            templates.get.resolves(template);
+            return helper.request().get('/api/1.1/templates/library/123?scope=abc')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200, template)
+            .then(function () {
+                expect(templates.get).to.have.been.calledOnce;
+                expect(templates.get).to.have.been.calledWith('123','abc');
+            });
+        });
+
+        it('should not return a single template with invalid scope', function () {
+            templates.get.resolves(undefined);
+            return helper.request().get('/api/1.1/templates/library/123?scope=noop')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404)
+            .then(function () {
+                expect(templates.get).to.have.been.calledOnce;
+                expect(templates.get).to.have.been.calledWith('123', 'noop');
+            });
+        });
+
     });
 
     describe('PUT /templates/library/:id', function () {

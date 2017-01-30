@@ -39,6 +39,7 @@ node_modules
 
 # IDE
 .idea
+.vscode/
 
 # static images
 static/ansible/
@@ -49,6 +50,13 @@ static/tftp/
 static/web-ui/
 static/swagger-ui/
 static/*-patch.yaml
+static/taskdoc
+static/upnp/upnp-device-description.xml
+
+# skupack.d
+!skupack.d
+skupack.d/*
+!skupack.d/README.md
 
 build/
 

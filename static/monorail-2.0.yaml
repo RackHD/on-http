@@ -1,3 +1,6 @@
+info:
+  title: rackhd api 
+  version: "2.0.0" 
 basePath: /api/2.0
 consumes:
 - application/json
@@ -15,6 +18,10 @@ definitions:
     properties:
       message:
         type: string
+      errors:
+        items:
+          type: string
+        type: array
     required:
     - message
   Lookups.2.0_LookupBase:
@@ -81,17 +88,23 @@ definitions:
     - config
     type: object
   node.2.0_PartialNode:
-    description: Post a node in RackHD
+    description: Post a node into RackHD
     properties:
       autoDiscover:
         type: string
       name:
         description: Name of the node
         type: string
+      obms:
+        description: The list of obm settings
+        type: array
+        items:
+            $ref: "#/definitions/nodes_post_obm_by_id"
       type:
         description: Type of node
         enum:
         - compute
+        - compute-container
         - switch
         - dae
         - pdu
@@ -101,7 +114,7 @@ definitions:
         type: string
     type: object
   nodes_post_obm_by_id:
-    description: IPMI OBM settings
+    description: OBM settings
     properties:
       config:
         type: object
@@ -143,7 +156,7 @@ definitions:
         type: string
       options:
         properties:
-          default:
+          defaults:
             type: object
         type: object
     type: object
@@ -171,7 +184,7 @@ definitions:
         type: string
       options:
         properties:
-          default:
+          defaults:
             properties:
               graphOptions:
                 type: object
@@ -296,15 +309,10 @@ definitions:
       properties:
         type: object
     type: object
-info:
-  title: RackHD 2.0
-  version: 0.0.1
 paths:
   /catalogs:
     get:
-      description: 'Get an array of catalog data describing all hardware in the system.
-
-        '
+      description: Get an array of catalog data describing all hardware in the system.
       operationId: catalogsGet
       parameters:
       - description: A query string containing catalog properties to search
@@ -319,7 +327,7 @@ paths:
         type: string
         pattern: '[- +]{0,1}(name|id)'
       responses:
-        '200':
+        200:
           description: Successfully retrieved a list of catalogs
           schema:
             $ref: '#/definitions/VersionsResponse'
@@ -327,9 +335,7 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/ErrorResponse'
-      summary: 'Get all catalogs
-
-        '
+      summary: Get all catalogs
       tags:
       - /api/2.0
       x-authentication-type:
@@ -341,9 +347,7 @@ paths:
     x-swagger-router-controller: catalogs
   /catalogs/{identifier}:
     get:
-      description: 'Get a catalog based on its catalog identifier.
-
-        '
+      description: Get a catalog based on its catalog identifier.
       operationId: catalogsIdGet
       parameters:
       - description: The catalog identifier
@@ -352,7 +356,7 @@ paths:
         required: true
         type: string
       responses:
-        '200':
+        200:
           description: Successfully retrieved the catalog
           schema:
             $ref: '#/definitions/VersionsResponse'
@@ -360,9 +364,7 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/ErrorResponse'
-      summary: 'Get a catalog
-
-        '
+      summary: Get a catalog
       tags:
       - /api/2.0
       x-authentication-type:
@@ -374,9 +376,7 @@ paths:
     x-swagger-router-controller: catalogs
   /config:
     get:
-      description: 'Get the RackHD server configuration properties.
-
-        '
+      description: Get the RackHD server configuration properties.
       operationId: configGet
       responses:
         200:
@@ -387,9 +387,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get server configuration
-
-        '
+      summary: Get server configuration
       tags:
       - /api/2.0
       x-authentication-type:
@@ -400,9 +398,7 @@ paths:
     patch:
       consumes:
       - application/json
-      description: 'Modify the RackHD server configuration.
-
-        '
+      description: Modify the RackHD server configuration.
       operationId: configPatch
       parameters:
       - description: The configuration properties to be modified
@@ -420,9 +416,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Patch server configuration
-
-        '
+      summary: Patch server configuration
       tags:
       - /api/2.0
       x-authentication-type:
@@ -433,9 +427,7 @@ paths:
     x-swagger-router-controller: config
   /files:
     get:
-      description: 'Get a list of all files currently stored.
-
-        '
+      description: Get a list of all files currently stored.
       operationId: filesGetAll
       responses:
         200:
@@ -450,9 +442,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get all files
-
-        '
+      summary: Get all files
       tags:
       - /api/2.0
       x-authentication-type:
@@ -463,9 +453,7 @@ paths:
     x-swagger-router-controller: files
   /files/{fileidentifier}:
     delete:
-      description: 'Delete a file based on uuid.
-
-        '
+      description: Delete a file based on uuid.
       operationId: filesDelete
       parameters:
       - description: UUID of the file you wish to delete
@@ -488,9 +476,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a file
-
-        '
+      summary: Delete a file
       tags:
       - /api/2.0
       x-authentication-type:
@@ -499,13 +485,10 @@ paths:
       - Write
       - FilesRemove
     get:
-      description: 'Get file based on uuid or file name.
-
-        '
+      description: Get file based on uuid or file name.
       operationId: filesGet
       parameters:
-      - description: The uuid or file name of a file as provided when you originally
-          stored it
+      - description: The uuid or file name of a file as provided when you originally stored it
         in: path
         name: fileidentifier
         required: true
@@ -527,9 +510,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a file
-
-        '
+      summary: Get a file
       tags:
       - /api/2.0
       x-authentication-type:
@@ -541,10 +522,7 @@ paths:
       consumes:
       - application/octet-stream
       - application/x-www-form-urlencoded
-      description: 'Put file based on its filename. Returns the uuid of the stored
-        file.
-
-        '
+      description: Put file based on its filename. Returns the uuid of the stored file.
       operationId: filesPut
       parameters:
       - description: The filename of the file you want to store
@@ -565,9 +543,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Put a file
-
-        '
+      summary: Put a file
       tags:
       - /api/2.0
       x-authentication-type:
@@ -579,9 +555,7 @@ paths:
     x-swagger-router-controller: files
   /files/{filename}/md5:
     get:
-      description: 'Get md5sum based on file name.
-
-        '
+      description: Get md5sum based on file name.
       operationId: filesMd5Get
       parameters:
       - description: File name of a file as provided when you originally stored it
@@ -606,9 +580,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get md5sum of file
-
-        '
+      summary: Get md5sum of file
       tags:
       - /api/2.0
       x-authentication-type:
@@ -616,12 +588,11 @@ paths:
       x-privileges:
       - Read
       - filesRead
+      x-view: files.md5.2.0.json
     x-swagger-router-controller: files
   /files/{filename}/metadata:
     get:
-      description: 'Get file metadata by file name.
-
-        '
+      description: Get file metadata by file name.
       operationId: filesMetadataGet
       parameters:
       - description: The name of a file as provided when you originally stored it
@@ -631,7 +602,7 @@ paths:
         type: string
       responses:
         200:
-          description: Successfully retrieved the specified file
+          description: Successfully retrieved metadata of the specified file
           schema:
             type: object
         404:
@@ -639,16 +610,14 @@ paths:
           schema:
             $ref: '#/definitions/Error'
         500:
-          description: Failed to serve file request
+          description: Failed to serve file metadata request
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get file metadata
-
-        '
+      summary: Get file metadata
       tags:
       - /api/2.0
       x-authentication-type:
@@ -658,13 +627,33 @@ paths:
       - filesRead
       x-view: file.2.0.json
     x-swagger-router-controller: files
+  /files/static/list:
+    x-swagger-router-controller: files
+    get:
+      operationId: filesGetAllStatic
+      x-privileges: [ 'Read' ]
+      x-authentication-type: [ 'jwt' ]
+      summary: |
+        List all static files
+      description: |
+        List all static files
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: array of all
+          schema:
+            type: array
+            items:
+              type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /lookups:
     get:
-      description: 'Get a list of all lookups currently stored. Lookups
-
-        relate mac addresses to ip addresses.
-
-        '
+      description:
+        Get a list of all lookups currently stored. Lookups relate mac addresses to ip addresses.
       operationId: lookupsGet
       parameters:
       - description: Query string specifying properties to search for
@@ -683,9 +672,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a list of lookups
-
-        '
+      summary: Get a list of lookups
       tags:
       - /api/2.0
       x-authentication-type:
@@ -694,9 +681,7 @@ paths:
       - Read
       - lookupsRead
     post:
-      description: 'Create and store a new lookup.
-
-        '
+      description: Create and store a new lookup.
       operationId: lookupsPost
       parameters:
       - description: The properties of the lookup
@@ -714,9 +699,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Post a lookup
-
-        '
+      summary: Post a lookup
       tags:
       - /api/2.0
       x-authentication-type:
@@ -728,14 +711,10 @@ paths:
     x-swagger-router-controller: lookups
   /lookups/{id}:
     delete:
-      description: 'Delete the specified lookup.
-
-        '
+      description: Delete the specified lookup.
       operationId: lookupsDelById
       parameters:
-      - description: 'The identifier of the lookup to delete
-
-          '
+      - description: The identifier of the lookup to delete
         in: path
         name: id
         required: true
@@ -751,9 +730,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a lookup
-
-        '
+      summary: Delete a lookup
       tags:
       - /api/2.0
       x-authentication-type:
@@ -762,9 +739,7 @@ paths:
       - Write
       - lookupsRemove
     get:
-      description: 'Get a lookup by specifying its identifier.
-
-        '
+      description: Get a lookup by specifying its identifier.
       operationId: lookupsGetById
       parameters:
       - description: The lookup identifier
@@ -783,9 +758,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a lookup
-
-        '
+      summary: Get a lookup
       tags:
       - /api/2.0
       x-authentication-type:
@@ -794,21 +767,15 @@ paths:
       - Read
       - lookupsRead
     patch:
-      description: 'Modify the properties of a lookup.
-
-        '
+      description: Modify the properties of a lookup.
       operationId: lookupsPatchById
       parameters:
-      - description: 'The id of the lookup to patch
-
-          '
+      - description: The id of the lookup to patch
         in: path
         name: id
         required: true
         type: string
-      - description: 'The lookup properties to be modified
-
-          '
+      - description: The lookup properties to be modified
         in: body
         name: body
         required: true
@@ -827,9 +794,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Patch a lookup
-
-        '
+      summary: Patch a lookup
       tags:
       - /api/2.0
       x-authentication-type:
@@ -841,9 +806,7 @@ paths:
     x-swagger-router-controller: lookups
   /nodes:
     get:
-      description: 'Get a list of all currently stored nodes.
-
-        '
+      description: Get a list of all currently stored nodes.
       operationId: nodesGetAll
       parameters:
       - description: Query string specifying properties to search for
@@ -877,9 +840,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a list of nodes
-
-        '
+      summary: Get a list of nodes
       tags:
       - /api/2.0
       x-authentication-type:
@@ -889,14 +850,10 @@ paths:
       - nodesRead
       x-view: node.2.0.json
     post:
-      description: 'Create and store a new node manually.
-
-        '
+      description: Create and store a new node manually.
       operationId: nodesPost
       parameters:
-      - description: 'The properties of the new node
-
-          '
+      - description: The properties of the new node
         in: body
         name: identifiers
         required: true
@@ -911,9 +868,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Post a node
-
-        '
+      summary: Post a node
       tags:
       - /api/2.0
       x-authentication-type:
@@ -926,9 +881,7 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/tags/{tagName}:
     delete:
-      description: 'Delete specified tag from all nodes.
-
-        '
+      description: Delete specified tag from all nodes.
       operationId: nodesMasterDelTagById
       parameters:
       - description: The tag identifier
@@ -941,9 +894,7 @@ paths:
           description: Successfully deleted tags
         404:
           description: The tag name identifier was not found
-      summary: 'Delete tags nodes
-
-        '
+      summary: Delete nodes tag
       tags:
       - /api/2.0
       x-authentication-type:
@@ -954,14 +905,10 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}:
     delete:
-      description: 'Delete the specified node.
-
-        '
+      description: Delete the specified node.
       operationId: nodesDelById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
@@ -977,9 +924,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a node
-
-        '
+      summary: Delete a node
       tags:
       - /api/2.0
       x-authentication-type:
@@ -988,21 +933,17 @@ paths:
       - Write
       - nodesRemove
     get:
-      description: 'Get a list of all nodes currently stored.
-
-        '
+      description: Get all information on the specified node.
       operationId: nodesGetById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: Successfully retrieved the list of nodes
+          description: Successfully retrieved the specified node
           schema:
             items:
               type: object
@@ -1015,9 +956,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get nodes
-
-        '
+      summary: Get a node
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1027,21 +966,15 @@ paths:
       - nodesRead
       x-view: node.2.0.json
     patch:
-      description: 'Modify the properties of the specified node.
-
-        '
+      description: Modify the properties of the specified node.
       operationId: nodesPatchById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
         type: string
-      - description: 'The node properties to modify
-
-          '
+      - description: The node properties to modify
         in: body
         name: body
         required: true
@@ -1060,9 +993,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Patch a node
-
-        '
+      summary: Patch a node
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1074,38 +1005,28 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/catalogs:
     get:
-      description: 'Get a list of all of the catalogs for the specified node.
-
-        '
+      description: Get a list of all of the catalogs for the specified node.
       operationId: nodesGetCatalogById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved catalogs of specified node
-
-            '
+          description: Successfully retrieved catalogs of specified node
           schema:
             type: object
         404:
-          description: 'The specified node was not found
-
-            '
+          description: The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get the catalogs for a node
-
-        '
+      summary: Get the catalogs for a node
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1117,48 +1038,34 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/catalogs/{source}:
     get:
-      description: 'Get a list of all of the catalogs for the specified node,
-
-        containing the specified value of the source catalog property.
-
-        '
+      description:
+        Get a list of all of the catalogs for the specified node, containing the specified value of the source catalog property.
       operationId: nodesGetCatalogSourceById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
         type: string
-      - description: 'The source catalog name to fetch
-
-          '
+      - description: The source catalog name to fetch
         in: path
         name: source
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved specific source catalog of specified
-            node
-
-            '
+          description: Successfully retrieved specific source catalog of specified node
           schema:
             type: object
         404:
-          description: 'The specified node was not found
-
-            '
+          description: The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get the catalogs for a node
-
-        '
+      summary: Get the catalogs for a node by source
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1169,32 +1076,24 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/obm:
     get:
-      description: 'Get all the OBM settings for the specified node.
-
-        '
+      description: Get all the OBM settings for the specified node.
       operationId: nodesGetObmsByNodeId
       parameters:
-      - description: 'The Node identifier
-
-          '
+      - description: The Node identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the specified OBM service
-
-            '
+          description: Successfully retrieved the specified OBM service
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get all OBM services
-
-        '
+      summary: Get all OBM services
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1204,22 +1103,15 @@ paths:
       - obmsRead
       x-view: obm.2.0.json
     put:
-      description: 'Create or update a single OBM service with the associated Node
-        ID
-
-        '
+      description: Create or update the specified OBM service with the associated Node ID
       operationId: nodesPutObmsByNodeId
       parameters:
-      - description: 'The Node identifier
-
-          '
+      - description: The Node identifier
         in: path
         name: identifier
         required: true
         type: string
-      - description: 'The OBM settings information to create
-
-          '
+      - description: The OBM settings information to create
         in: body
         name: body
         required: true
@@ -1227,24 +1119,18 @@ paths:
           $ref: '#/definitions/nodes_post_obm_by_id'
       responses:
         201:
-          description: 'Successfully put the OBM service
-
-            '
+          description: Successfully put the OBM service
           schema:
             type: object
         500:
-          description: 'OBM service creation failed
-
-            '
+          description: OBM service creation failed
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Put an OBM service
-
-        '
+      summary: Put an OBM service
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1257,38 +1143,28 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/pollers:
     get:
-      description: 'Get a list of all of the pollers for the specified node.
-
-        '
+      description: Get a list of all of the pollers for the specified node.
       operationId: nodesGetPollersById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the pollers of specified node
-
-            '
+          description: Successfully retrieved the pollers of specified node
           schema:
             type: object
         404:
-          description: 'The specified node was not found
-
-            '
+          description: The specified node was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get the pollers for a node
-
-        '
+      summary: Get the pollers for a node
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1299,21 +1175,17 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/relations:
     delete:
-      description: 'Edit the relations fields of nodes to remove specific relationships
-
-        '
+      description: Edit the relations fields of nodes to remove specific relationships
       operationId: nodesDelRelations
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
         type: string
-      - description: "A json object with relation types as keys and arrays of node\
-          \ ids \nas values. The node's given relation types will be updated to remove\n\
-          the nodes given by id \n"
+      - description: >
+          A json object with relation types as keys and arrays of node ids as values.
+          The nodes given relation types will be updated to remove the nodes given by id
         in: body
         name: content
         required: true
@@ -1323,16 +1195,14 @@ paths:
         204:
           description: Successfully removed the relations
         404:
-          description: The node with the identifier was not found.
+          description: The specified node was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Remove relations from nodes
-
-        '
+      summary: Remove relations from a node
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1342,36 +1212,30 @@ paths:
       - nodesRemove
       x-swagger-schema: relations.2.0.json#/definitions/Relation
     get:
-      description: 'Get the relations field of a node
-
-        '
+      description: Get the relations field of the specified node
       operationId: nodesGetRelations
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: Successfully retrieved the node's relations
+          description: Successfully retrieved the nodes relations
           schema:
             items:
               type: object
             type: array
         404:
-          description: The node with the identifier was not found.
+          description: The specified node was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a node''s relations
-
-        '
+      summary: Get a nodes relations
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1380,21 +1244,19 @@ paths:
       - Read
       - nodesRead
     put:
-      description: 'Edit the relations fields of nodes to add realtionships
-
-        '
+      description: Edit the relations fields of a specifc node to add
+        one more relationships.
       operationId: nodesAddRelations
       parameters:
-      - description: 'The identifier for the node
-
-          '
+      - description: The identifier for the node
         in: path
         name: identifier
         required: true
         type: string
-      - description: "A json object with relation types as keys and arrays of node\
-          \ ids \nas values. The node's given relation types will be updated with\
-          \ the \nnodes given by id  \n"
+      - description: >
+          A json object with relation types as keys and arrays of node
+          ids as values. The nodes given relation types will be updated with
+          the nodes given by id
         in: body
         name: content
         required: true
@@ -1402,20 +1264,18 @@ paths:
           $ref: '#/definitions/generic_obj'
       responses:
         200:
-          description: update succeeded
+          description: Node relations update succeeded.
           schema:
             type: object
         404:
-          description: Not found
+          description: The specified node was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Add relationships between nodes
-
-        '
+      summary: Add relationships between nodes
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1427,14 +1287,10 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/ssh:
     get:
-      description: 'Get all of the ssh settings associated with a node.
-
-        '
+      description: Get all of the ssh settings associated with the specified node.
       operationId: nodesGetSshById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
@@ -1445,18 +1301,14 @@ paths:
           schema:
             type: object
         404:
-          description: 'The node with the identifier was not found or has no ssh settings.
-
-            '
+          description: The node with the identifier was not found or has no ssh settings.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get the ssh settings for a node
-
-        '
+      summary: Get the ssh settings for a node
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1466,21 +1318,15 @@ paths:
       - nodesRead
       x-swagger-serializer: nodes
     post:
-      description: 'Create the ssh settings associated with a node.
-
-        '
+      description: Create the ssh settings associated with the specified node.
       operationId: nodesPostSshById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
         type: string
-      - description: 'The ssh properties to create
-
-          '
+      - description: The ssh properties to create
         in: body
         name: body
         required: true
@@ -1490,18 +1336,14 @@ paths:
         201:
           description: Successfull created ssh settings
         404:
-          description: 'The specified node was not found or has no ssh settings.
-
-            '
+          description: The specified node was not found or has no ssh settings.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Post ssh settings
-
-        '
+      summary: Post ssh settings
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1513,14 +1355,10 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/tags:
     get:
-      description: 'Get a list of all tags association with the specified node.
-
-        '
+      description: Get a list of all tags associated with the specified node.
       operationId: nodesGetTagsById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
@@ -1533,16 +1371,14 @@ paths:
               type: object
             type: array
         404:
-          description: The specified node was not found
+          description: The specified node was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get node tags
-
-        '
+      summary: Get node tags
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1551,21 +1387,15 @@ paths:
       - Read
       - nodesRead
     patch:
-      description: 'Modify the tags associated with a node.
-
-        '
+      description: Modify the tag(s) associated with the specified node.
       operationId: nodesPatchTagById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
         type: string
-      - description: 'The tag properties to patch
-
-          '
+      - description: The tag properties to patch
         in: body
         name: body
         required: true
@@ -1573,20 +1403,18 @@ paths:
           $ref: '#/definitions/post_tags'
       responses:
         200:
-          description: Successfully modified tags
+          description: Successfully modified node tag(s).
           schema:
             type: object
         404:
-          description: The specified node was not found
+          description: The specified node was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Patch node tags
-
-        '
+      summary: Patch node tags
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1598,14 +1426,10 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/tags/{tagName}:
     delete:
-      description: 'Delete a tag from the specified node.
-
-        '
+      description: Delete the specified tag from the specified node.
       operationId: nodesDelTagById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
@@ -1617,18 +1441,16 @@ paths:
         type: string
       responses:
         204:
-          description: Successfully deleted tag
+          description: Successfully deleted a specified tag from a node.
         404:
-          description: The specified node was not found
+          description: The specified node was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a tag from node
-
-        '
+      summary: Delete a tag from a node
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1639,48 +1461,35 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/workflows:
     get:
-      description: 'Get a list of all workflows that have run against the specified
-        node, or
-
+      description: >
+        Get a list of all workflows that have run against the specified node, or
         are currently running against the node.
-
-        '
       operationId: nodesGetWorkflowById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
         type: string
-      - description: 'A query string to specify workflow properties to search for
-
-          '
+      - description: A query string to specify workflow properties to search for
         in: query
         name: active
         required: false
         type: boolean
       responses:
         200:
-          description: 'Successfully retrieved the workflows for specified node
-
-            '
+          description: Successfully retrieved the workflows for specified node
           schema:
             type: object
         404:
-          description: 'The specified node was not found
-
-            '
+          description: The specified node was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get all workflows for a node
-
-        '
+      summary: Get all workflows for a node
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1689,20 +1498,16 @@ paths:
       - Read
       - workflowsRead
     post:
-      description: 'Run a workflow against for the specified node.
-
-        '
+      description: Run a workflow against for the specified node.
       operationId: nodesPostWorkflowById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
         type: string
-      - description: The name property set to the injectableName property of the workflow
-          graph
+      - description: 
+          The name property set to the injectableName property of the workflow graph
         in: body
         name: body
         required: false
@@ -1715,24 +1520,18 @@ paths:
         type: string
       responses:
         201:
-          description: 'Successfully started the specified workflow
-
-            '
+          description: Successfully started the specified workflow.
           schema:
             type: object
         404:
-          description: 'The specified node was not found
-
-            '
+          description: The specified node was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Post workflow for the node
-
-        '
+      summary: Post workflow for the node
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1743,16 +1542,12 @@ paths:
     x-swagger-router-controller: nodes
   /nodes/{identifier}/workflows/action:
     put:
-      description: 'Perform an action on a workflow associated with a node. Currently,
-
+      description: >
+        Perform an action on a workflow associated with a node. Currently,
         the cancel action is supported.
-
-        '
       operationId: nodesWorkflowActionById
       parameters:
-      - description: 'The node identifier
-
-          '
+      - description: The node identifier
         in: path
         name: identifier
         required: true
@@ -1765,24 +1560,18 @@ paths:
           $ref: '#/definitions/action'
       responses:
         202:
-          description: 'Successfully performed the action on the specified workflow
-
-            '
+          description: Successfully performed the action on the specified workflow
           schema:
             type: object
         404:
-          description: 'The node with the identifier was not found
-
-            '
+          description: The specified node was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Perform an action on a workflow
-
-        '
+      summary: Perform an action on a workflow
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1793,28 +1582,21 @@ paths:
     x-swagger-router-controller: nodes
   /obms:
     get:
-      description: 'Get a list of all OBM settings that have been associated
-
+      description: >
+        Get a list of all OBM settings that have been associated
         with nodes. OBM settings allow RackHD to communicate with
-
         the BMC of a node.
-
-        '
       operationId: obmsGet
       responses:
         200:
-          description: 'Successfully retrieved the list of OBM service instances
-
-            '
+          description: Successfully retrieved the list of OBM service instances
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get list of all OBM service instances
-
-        '
+      summary: Get list of all OBM service instances
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1824,16 +1606,11 @@ paths:
       - obmsRead
       x-view: obm.2.0.json
     put:
-      description: 'Create or update a single OBM service, and
-
-        associate it with a node.
-
-        '
+      description:
+        Create or update the specified OBM service, and associate it with a node.
       operationId: obmsPut
       parameters:
-      - description: 'The OBM settings information to create
-
-          '
+      - description: The OBM settings information to create
         in: body
         name: body
         required: true
@@ -1841,24 +1618,18 @@ paths:
           $ref: '#/definitions/ipmi-obm-service_Obm'
       responses:
         201:
-          description: 'Successfully put the OBM service
-
-            '
+          description: Successfully put the OBM service
           schema:
             type: object
         500:
-          description: 'OBM service creation failed
-
-            '
+          description: OBM service creation failed
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Put an OBM service
-
-        '
+      summary: Put an OBM service
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1871,26 +1642,19 @@ paths:
     x-swagger-router-controller: obms
   /obms/definitions:
     get:
-      description: 'Get a list of OBM schemas, which define the properties
-
-        required to create OBM settings.
-
-        '
+      description:
+        Get a list of OBM schemas, which define the properties required to create OBM settings.
       operationId: obmsDefinitionsGetAll
       responses:
         200:
-          description: 'Successfully retrieved a list of OBM schemas
-
-            '
+          description: Successfully retrieved a list of OBM schemas
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get list of OBM services
-
-        '
+      summary: Get list of OBM services
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1901,32 +1665,24 @@ paths:
     x-swagger-router-controller: obms
   /obms/definitions/{name}:
     get:
-      description: 'Get the contents of the specified OBM service schema.
-
-        '
+      description: Get the contents of the specified OBM service schema.
       operationId: obmsDefinitionsGetByName
       parameters:
-      - description: 'The OBM service name
-
-          '
+      - description: The OBM service name
         in: path
         name: name
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the specified OBM shcema
-
-            '
+          description: Successfully retrieved the specified OBM schema
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get an OBM service definition
-
-        '
+      summary: Get an OBM service definition
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1937,21 +1693,14 @@ paths:
     x-swagger-router-controller: obms
   /obms/led:
     post:
-      description: 'Enable or disable identify LED on node through OBM, if supported.
-
-        '
+      description: Enable or disable identify LED on node through OBM, if supported.
       operationId: obmsPostLed
       parameters:
-      - description: 'If the body contains the property value: true, the LED will
-          be lit.
-
+      - description: >
+          If the body contains the property value: true, the LED will be lit.
           If the value property does not exist, the LED will be turned off.
-
           The body must contain the property nodeId set to the correct node
-
           identifier.
-
-          '
         in: body
         name: body
         required: true
@@ -1961,18 +1710,14 @@ paths:
         201:
           description: OBM settings accepted
         404:
-          description: 'The node with the identifier was not found or has no obm settings
-
-            '
+          description: The node with the identifier was not found or has no obm settings
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Set identify light status
-
-        '
+      summary: Set identify light status
       tags:
       - /api/2.0
       x-authentication-type:
@@ -1983,38 +1728,28 @@ paths:
     x-swagger-router-controller: obms
   /obms/{identifier}:
     delete:
-      description: 'Delete the OBM settings with the specified identifier.
-
-        '
+      description: Delete the OBM settings with the specified identifier.
       operationId: obmsDeleteById
       parameters:
-      - description: 'The OBM service identifier
-
-          '
+      - description: The OBM service identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         204:
-          description: 'Successfully deleted the specified OBM settings
-
-            '
+          description: Successfully deleted the specified OBM settings
           schema:
             type: object
         404:
-          description: 'The OBM service with the specified identifier was not found
-
-            '
+          description: The OBM service with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete OBM settings
-
-        '
+      summary: Delete OBM settings
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2023,32 +1758,24 @@ paths:
       - Write
       - obmsRemove
     get:
-      description: 'Get the OBM settings associated with the specified identifier
-
-        '
+      description: Get the OBM settings associated with the specified identifier
       operationId: obmsGetById
       parameters:
-      - description: 'The OBM service identifier
-
-          '
+      - description: The OBM service identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the specified OBM service
-
-            '
+          description: Successfully retrieved the specified OBM service
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get an OBM service
-
-        '
+      summary: Get an OBM service
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2058,14 +1785,10 @@ paths:
       - obmsRead
       x-view: obm.2.0.json
     patch:
-      description: 'Update the properties of the OBM settings with the specified identifier.
-
-        '
+      description: Update the properties of the OBM settings with the specified identifier.
       operationId: obmsPatchById
       parameters:
-      - description: 'The OBM service identifier
-
-          '
+      - description: The OBM service identifier
         in: path
         name: identifier
         required: true
@@ -2078,24 +1801,18 @@ paths:
           $ref: '#/definitions/ipmi-obm-service_Obm'
       responses:
         200:
-          description: 'Successfully patched the specified OBM settings
-
-            '
+          description: Successfully patched the specified OBM settings
           schema:
             type: object
         500:
-          description: 'OBM patch failed
-
-            '
+          description: OBM patch failed
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Patch OBM settings
-
-        '
+      summary: Patch OBM settings
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2107,9 +1824,7 @@ paths:
     x-swagger-router-controller: obms
   /pollers:
     get:
-      description: 'Get list of all pollers that are currently running.
-
-        '
+      description: Get list of all pollers that are currently running.
       operationId: pollersGet
       parameters:
       - description: Query string specifying properties to search for
@@ -2130,18 +1845,14 @@ paths:
         pattern: '[- +]{0,1}(id)'
       responses:
         200:
-          description: 'Successful retrieval of the list of pollers
-
-            '
+          description: Successful retrieval of the list of pollers
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a list of all active pollers
-
-        '
+      summary: Get a list of all active pollers
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2151,22 +1862,14 @@ paths:
       - pollersRead
       x-view: poller.2.0.json
     post:
-      description: 'Create and start a new poller, which will run
-
-        at the specified time interval.
-
-        '
+      description: Create and start a new poller, which will run at the specified time interval.
       operationId: pollersPost
       parameters:
-      - description: 'The request body must contain the necessary information
-
+      - description: >
+          The request body must contain the necessary information
           to create the poller, including type, pollInterval, and command. The
-
           node identifier must also be included if the poller is to be associated
-
           with a node.
-
-          '
         in: body
         name: content
         required: true
@@ -2174,18 +1877,14 @@ paths:
           $ref: '#/definitions/poller.2.0_PartialPoller'
       responses:
         201:
-          description: 'Poller created successfully
-
-            '
+          description: Poller created successfully
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Post a poller
-
-        '
+      summary: Post a poller
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2198,24 +1897,18 @@ paths:
     x-swagger-router-controller: pollers
   /pollers/library:
     get:
-      description: 'Get a list of all available poller definitions in the poller library.
-
-        '
+      description: Get a list of all available poller definitions in the poller library.
       operationId: pollersLibGet
       responses:
         200:
-          description: 'Successful retrieval of the list of all pollers in the library
-
-            '
+          description: Successful retrieval of the list of all pollers in the library
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a list of possible pollers
-
-        '
+      summary: Get a list of possible pollers
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2226,39 +1919,30 @@ paths:
     x-swagger-router-controller: pollers
   /pollers/library/{identifier}:
     get:
-      description: 'Get the poller definition with the specified identifier from the
+      description: >
+        Get the poller definition with the specified identifier from the
         poller library
-
-        '
       operationId: pollersLibByIdGet
       parameters:
-      - description: 'The poller identifier
-
-          '
+      - description: The poller identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Successful retrieval of the specified poller
-
-            '
+          description: Successful retrieval of the specified poller
           schema:
             type: object
         404:
-          description: 'The poller with specified identifier not found
-
-            '
+          description: The poller with specified identifier not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get the specified poller
-
-        '
+      summary: Get the specified poller
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2269,36 +1953,26 @@ paths:
     x-swagger-router-controller: pollers
   /pollers/{identifier}:
     delete:
-      description: 'Delete the poller with the specified identifier.
-
-        '
+      description: Delete the poller with the specified identifier.
       operationId: pollersDelete
       parameters:
-      - description: 'The poller identifier
-
-          '
+      - description: The poller identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         204:
-          description: 'Poller was deleted successfully
-
-            '
+          description: Poller was deleted successfully
         404:
-          description: 'Poller with specified identifier was not found
-
-            '
+          description: Poller with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete the specified poller
-
-        '
+      summary: Delete the specified poller
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2307,40 +1981,30 @@ paths:
       - Write
       - pollersRemove
     get:
-      description: 'Get information associated with the specified poller, including
-
+      description: >
+        Get information associated with the specified poller, including
         type, run interval, command, and whether the poller is paused.
-
-        '
       operationId: pollersIdGet
       parameters:
-      - description: 'The poller identifier
-
-          '
+      - description: The poller identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Poller information retrieved successfully
-
-            '
+          description: Poller information retrieved successfully
           schema:
             type: object
         404:
-          description: 'Poller with specified identifier was not found
-
-            '
+          description: Poller with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a specific poller
-
-        '
+      summary: Get the specified poller
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2350,25 +2014,15 @@ paths:
       - pollersRead
       x-view: poller.2.0.json
     patch:
-      description: 'Modify one or more properties of the poller with the
-
-        specified identifier.
-
-        '
+      description: Modify one or more properties of the poller with the specified identifier.
       operationId: pollersPatch
       parameters:
-      - description: 'The poller identifier
-
-          '
+      - description: The poller identifier
         in: path
         name: identifier
         required: true
         type: string
-      - description: 'The body must contain the specific properties of the
-
-          poller that will be modified.
-
-          '
+      - description: The body must contain the specific properties of the poller that will be modified.
         in: body
         name: content
         required: true
@@ -2376,24 +2030,18 @@ paths:
           $ref: '#/definitions/poller.2.0_PartialPoller'
       responses:
         200:
-          description: 'Poller was successfully modified
-
-            '
+          description: Poller was successfully modified
           schema:
             type: object
         404:
-          description: 'Poller with the specified identifier was not found
-
-            '
+          description: Poller with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Patch a poller
-
-        '
+      summary: Patch a poller
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2406,47 +2054,34 @@ paths:
     x-swagger-router-controller: pollers
   /pollers/{identifier}/data:
     get:
-      description: 'Get the complete history of output data generated by the poller
-
+      description: >
+        Get the complete history of output data generated by the poller
         with the specified identifier.
-
-        '
       operationId: pollersDataGet
       parameters:
-      - description: 'The identifier of the poller
-
-          '
+      - description: The identifier of the poller
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved poller data
-
-            '
+          description: Successfully retrieved poller data
           schema:
             type: object
         204:
-          description: 'Successfully processed the request and did not return any
-            data
-
-            '
+          description: Successfully processed the request and did not return any data
           schema:
             type: object
         404:
-          description: 'Poller with specified identifier was not found
-
-            '
+          description: Poller with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get output data for a poller
-
-        '
+      summary: Get output data for a poller
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2457,47 +2092,33 @@ paths:
     x-swagger-router-controller: pollers
   /pollers/{identifier}/data/current:
     get:
-      description: 'Get latest output data generated by the poller
-
-        poller with the specified identifier.
-
-        '
+      description:
+        Get latest output data generated by the poller poller with the specified identifier.
       operationId: pollersCurrentDataGet
       parameters:
-      - description: 'The identifier of the poller
-
-          '
+      - description: The identifier of the poller
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved poller data
-
-            '
+          description: Successfully retrieved the latest poller data
           schema:
             type: object
         204:
-          description: 'Successfully processed the request and did not return any
-            data
-
-            '
+          description: Successfully processed the request and did not return any data
           schema:
             type: object
         404:
-          description: 'Poller with specified identifier was not found
-
-            '
+          description: Poller with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get latest data for a poller
-
-        '
+      summary: Get latest data for a poller
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2508,17 +2129,13 @@ paths:
     x-swagger-router-controller: pollers
   /profiles:
     get:
-      description: 'Get the list of currently defined profiles. Profiles are scripts
-
+      description: >
+        Get the list of currently defined profiles. Profiles are scripts
         used by RackHD to control how a node PXE boots.
-
-        '
       operationId: profilesGet
       parameters:
       - collectionFormat: multi
-        description: 'List of valid MAC addresses to lookup
-
-          '
+        description: List of valid MAC addresses to lookup
         in: query
         items:
           type: string
@@ -2526,46 +2143,35 @@ paths:
         required: false
         type: array
       - collectionFormat: multi
-        description: 'List of IP addresses to lookup
-
-          '
+        description: List of IP addresses to lookup
         in: query
         items:
           type: string
         name: ips
         required: false
         type: array
-      - description: 'When macs parameter is not passed, passed with IP adds MAC address
-          to lookup
-
-          '
+      - description:
+          When macs parameter is not passed, passed with IP adds MAC address to lookup
         in: query
         name: mac
         required: false
         type: string
-      - description: 'When macs parameters is not passed, passed with MAC adds IP
-          address to lookup
-
-          '
+      - description: 
+          When macs parameters is not passed, passed with MAC adds IP address to lookup
         in: query
         name: ip
         required: false
         type: string
       responses:
         200:
-          description: 'Successfully retrieved a list of profiles for specified mac
-            / ip
-
-            '
+          description: Successfully retrieved a list of profiles for specified mac / ip
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get list of profiles
-
-        '
+      summary: Get list of profiles
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2576,14 +2182,10 @@ paths:
     x-swagger-router-controller: profiles
   /profiles/library/{name}:
     get:
-      description: 'Get the contents of a profile specified by its name.
-
-        '
+      description: Get the contents of a profile specified by its name.
       operationId: profilesGetLibByName
       parameters:
-      - description: 'The profile name
-
-          '
+      - description: The profile name
         in: path
         name: name
         required: true
@@ -2595,24 +2197,18 @@ paths:
         type: string
       responses:
         200:
-          description: 'Successfully returned profile
-
-            '
+          description: Successfully returned profile
           schema:
             type: object
         404:
-          description: 'The profile with the specified name was not found
-
-            '
+          description: The profile with the specified name was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get contents of a profile
-
-        '
+      summary: Get contents of a profile
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2624,14 +2220,10 @@ paths:
       consumes:
       - application/octet-stream
       - application/x-www-form-urlencoded
-      description: 'Create or modify the specified profile metadata and contents.
-
-        '
+      description: Create or modify the specified profile metadata and contents.
       operationId: profilesPutLibByName
       parameters:
-      - description: 'The profile name
-
-          '
+      - description: The profile name
         in: path
         name: name
         required: true
@@ -2643,24 +2235,18 @@ paths:
         type: string
       responses:
         201:
-          description: 'Successfully put the specified profile
-
-            '
+          description: Successfully created or modified the specified profile
           schema:
             type: object
         500:
-          description: 'Profile creation failed
-
-            '
+          description: Profile creation failed
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Put a profile
-
-        '
+      summary: Put a profile
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2671,26 +2257,18 @@ paths:
     x-swagger-router-controller: profiles
   /profiles/metadata:
     get:
-      description: 'Get the list of metadata associated with all known
-
-        profiles.
-
-        '
+      description: Get the list of metadata associated with all known profiles.
       operationId: profilesGetMetadata
       responses:
         200:
-          description: 'Successfully retrieved the list of profile metadata
-
-            '
+          description: Successfully retrieved the list of profile metadata
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get list of profile metadata
-
-        '
+      summary: Get list of profile metadata
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2702,14 +2280,10 @@ paths:
     x-swagger-router-controller: profiles
   /profiles/metadata/{name}:
     get:
-      description: 'Get the metadata associated with the specified profile.
-
-        '
+      description: Get the metadata associated with the specified profile.
       operationId: profilesGetMetadataByName
       parameters:
-      - description: 'The profile name
-
-          '
+      - description: The profile name
         in: path
         name: name
         required: true
@@ -2721,24 +2295,18 @@ paths:
         type: string
       responses:
         200:
-          description: 'Successfully returned the profile
-
-            '
+          description: Successfully returned the profile
           schema:
             type: object
         404:
-          description: 'The profile with the specified identifier was not found
-
-            '
+          description: The profile with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a single profile''s metadata from database
-
-        '
+      summary: Get the specified profiles metadata from database
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2750,16 +2318,11 @@ paths:
     x-swagger-router-controller: profiles
   /profiles/switch/error:
     post:
-      description: 'Manually send a switch error to the log, since most switches
-
-        don''t generate errors.
-
-        '
+      description:
+        Manually send a switch error to the log, since most switches do not generate errors.
       operationId: profilesPostSwitchError
       parameters:
-      - description: 'The switch error to send
-
-          '
+      - description: The switch error to send
         in: body
         name: body
         required: true
@@ -2767,24 +2330,18 @@ paths:
           $ref: '#/definitions/generic_obj'
       responses:
         201:
-          description: 'Successfully posted the switch error
-
-            '
+          description: Successfully posted the switch error
           schema:
             type: object
         500:
-          description: 'Upload failed
-
-            '
+          description: Upload failed
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Post a switch error
-
-        '
+      summary: Post a switch error
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2795,38 +2352,28 @@ paths:
     x-swagger-router-controller: profiles
   /profiles/switch/{vendor}:
     get:
-      description: 'Get a profile rendered with the switch vendor name.
-
-        '
+      description: Get a profile rendered with the switch vendor name.
       operationId: profilesGetSwitchVendor
       parameters:
-      - description: 'The switch vendor name
-
-          '
+      - description: The switch vendor name
         in: path
         name: vendor
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully returned the profile
-
-            '
+          description: Successfully returned the profile with switch vendor name.
           schema:
             type: object
         404:
-          description: 'Profile not found
-
-            '
+          description: Profile not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a profile
-
-        '
+      summary: Get a profile
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2837,15 +2384,11 @@ paths:
     x-swagger-router-controller: profiles
   /roles:
     get:
-      description: 'Get the list of roles currently stored in the system.
-
-        '
+      description: Get the list of roles currently stored in the system.
       operationId: listRoles
       responses:
         200:
-          description: 'Successfully retrieved the list of roles
-
-            '
+          description: Successfully retrieved the list of roles
         401:
           description: Unauthorized
           schema:
@@ -2858,9 +2401,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get the list of roles
-
-        '
+      summary: Get the list of roles
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2869,9 +2410,7 @@ paths:
       - Write
       - rolesRead
     post:
-      description: 'Create a new role and store it.
-
-        '
+      description: Create a new role and store it.
       operationId: addRole
       parameters:
       - description: The role information
@@ -2882,9 +2421,7 @@ paths:
           $ref: '#/definitions/role_obj'
       responses:
         201:
-          description: 'Successfully created a new role
-
-            '
+          description: Successfully created a new role
           schema:
             type: object
         401:
@@ -2899,9 +2436,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Post a new role
-
-        '
+      summary: Post a new role
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2912,9 +2447,7 @@ paths:
     x-swagger-router-controller: roles2.0
   /roles/{name}:
     delete:
-      description: 'Delete the specified Role.
-
-        '
+      description: Delete the specified Role.
       operationId: removeRole
       parameters:
       - description: role name
@@ -2924,9 +2457,7 @@ paths:
         type: string
       responses:
         204:
-          description: 'Successfully deleted the specified role
-
-            '
+          description: Successfully deleted the specified role
         401:
           description: Unauthorized
           schema:
@@ -2939,9 +2470,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a role
-
-        '
+      summary: Delete a role
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2950,9 +2479,7 @@ paths:
       - Write
       - rolesRemove
     get:
-      description: 'Get information about the specified role.
-
-        '
+      description: Get information about the specified role.
       operationId: getRole
       parameters:
       - description: The role name
@@ -2962,9 +2489,7 @@ paths:
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the specified role
-
-            '
+          description: Successfully retrieved the specified role
         401:
           description: Unauthorized
           schema:
@@ -2977,9 +2502,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a role
-
-        '
+      summary: Get a role
       tags:
       - /api/2.0
       x-authentication-type:
@@ -2988,9 +2511,7 @@ paths:
       - Write
       - rolesRead
     patch:
-      description: 'Modify the properties of a role.
-
-        '
+      description: Modify the properties of a role.
       operationId: modifyRole
       parameters:
       - description: The role name
@@ -3006,9 +2527,7 @@ paths:
           $ref: '#/definitions/role_obj'
       responses:
         200:
-          description: 'Successfully modified the role
-
-            '
+          description: Successfully modified the role
           schema:
             type: object
         401:
@@ -3023,9 +2542,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Patch a role
-
-        '
+      summary: Patch a role
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3036,12 +2553,10 @@ paths:
     x-swagger-router-controller: roles2.0
   /schemas:
     get:
-      description: 'Get a list of all schemas currently stored in the system.
-
-        '
+      description: Get a list of all schemas currently stored in the system.
       operationId: schemasGet
       responses:
-        '200':
+        200:
           description: Successfully retrieved the list of schemas
           schema:
             type: object
@@ -3049,9 +2564,7 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/ErrorResponse'
-      summary: 'Get all schemas
-
-        '
+      summary: Get all schemas
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3062,12 +2575,10 @@ paths:
     x-swagger-router-controller: schemas2
   /schemas/tasks:
     get:
-      description: 'Get a list of all task schema names currently stored in the system.
-
-        '
+      description: Get a list of all task schema names currently stored in the system.
       operationId: taskSchemasGet
       responses:
-        '200':
+        200:
           description: Successfully retrieved the list of task schema names
           schema:
             type: object
@@ -3075,9 +2586,7 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/ErrorResponse'
-      summary: 'Get all task schemas names
-
-        '
+      summary: Get all task schemas names
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3088,9 +2597,7 @@ paths:
     x-swagger-router-controller: schemas2
   /schemas/tasks/{identifier}:
     get:
-      description: 'Get the specified task schema.
-
-        '
+      description: Get the specified task schema.
       operationId: taskSchemasIdGet
       parameters:
       - description: The filename of the task schema
@@ -3098,20 +2605,17 @@ paths:
         name: identifier
         required: true
         type: string
-      - description: 'The reference resolve flag.
-
+      - description: >
+          The reference resolve flag.
           false - a simple schema with any internal reference only in the response.
-
           true - all the internal references will be resolved and fully defined in
           the response.
-
-          '
         in: query
         name: resolveRef
         required: false
         type: boolean
       responses:
-        '200':
+        200:
           description: Successfully retrieved the task schema
           schema:
             type: object
@@ -3119,9 +2623,7 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/ErrorResponse'
-      summary: 'Get a task schema
-
-        '
+      summary: Get a task schema
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3132,9 +2634,7 @@ paths:
     x-swagger-router-controller: schemas2
   /schemas/{identifier}:
     get:
-      description: 'Get the specified schema.
-
-        '
+      description: Get the specified schema.
       operationId: schemasIdGet
       parameters:
       - description: The identifier of the schema
@@ -3143,7 +2643,7 @@ paths:
         required: true
         type: string
       responses:
-        '200':
+        200:
           description: Successfully retrieved the schema
           schema:
             type: object
@@ -3151,9 +2651,7 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/ErrorResponse'
-      summary: 'Get a schema
-
-        '
+      summary: Get a schema
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3164,13 +2662,10 @@ paths:
     x-swagger-router-controller: schemas2
   /skus:
     get:
-      description: 'Get list of currently defined SKUs, which are used to
-
+      description: >
+        Get list of currently defined SKUs, which are used to
         group nodes based on matching a set of rules with information
-
-        present in a node''s catalog.
-
-        '
+        present in a nodes catalog.
       operationId: skusGet
       parameters:
       - description: SKU properties to search
@@ -3180,18 +2675,14 @@ paths:
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the list of SKUs
-
-            '
+          description: Successfully retrieved the list of SKUs
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get list of SKUs
-
-        '
+      summary: Get list of SKUs
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3201,14 +2692,10 @@ paths:
       - skusRead
       x-view: sku-2.0.json
     post:
-      description: 'Create a new SKU.
-
-        '
+      description: Create a new SKU.
       operationId: skusPost
       parameters:
-      - description: 'The properties used to define the new SKU
-
-          '
+      - description: The properties used to define the new SKU
         in: body
         name: body
         required: true
@@ -3216,24 +2703,18 @@ paths:
           $ref: '#/definitions/skus.2.0_SkusUpsert'
       responses:
         201:
-          description: 'Successfully created the SKU
-
-            '
+          description: Successfully created the SKU
           schema:
             type: object
         500:
-          description: 'Upload failed.
-
-            '
+          description: Upload failed.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Post a SKU
-
-        '
+      summary: Post a SKU
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3243,14 +2724,10 @@ paths:
       - skusWrite
       x-swagger-schema: skus.2.0.json#/definitions/SkusUpsert
     put:
-      description: 'Create or modify a SKU.
-
-        '
+      description: Create or modify a SKU.
       operationId: skusPut
       parameters:
-      - description: 'The properties used to define the SKU
-
-          '
+      - description: The properties used to define the SKU
         in: body
         name: body
         required: true
@@ -3258,24 +2735,18 @@ paths:
           $ref: '#/definitions/skus.2.0_SkusUpsert'
       responses:
         201:
-          description: 'Successfully created or updated SKU definition
-
-            '
+          description: Successfully created or updated SKU definition
           schema:
             type: object
         500:
-          description: 'Update failed
-
-            '
+          description: Update failed
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Put a SKU
-
-        '
+      summary: Put a SKU
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3290,26 +2761,20 @@ paths:
       consumes:
       - multipart/form-data
       - application/x-www-form-urlencoded
-      description: 'Create a new SKU Pack, which is used to serve a specific
-
+      description: >
+        Create a new SKU Pack, which is used to serve the specified
         set of files to a node during provisioning.
-
-        '
       operationId: skuPackPost
       responses:
         201:
-          description: 'Successfully created the SKU Pack
-
-            '
+          description: Successfully created the SKU Pack
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Post a SKU Pack
-
-        '
+      summary: Post a SKU Pack
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3320,38 +2785,28 @@ paths:
     x-swagger-router-controller: skus
   /skus/{identifier}:
     delete:
-      description: 'Delete the SKU with the specified identifier.
-
-        '
+      description: Delete the SKU with the specified identifier.
       operationId: skusIdDelete
       parameters:
-      - description: 'The SKU identifier
-
-          '
+      - description: The SKU identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         204:
-          description: 'Successfully deleted the SKU
-
-            '
+          description: Successfully deleted the specified SKU
           schema:
             type: object
         404:
-          description: 'The SKU with the specified identifier was not found
-
-            '
+          description: The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a SKU
-
-        '
+      summary: Delete a SKU
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3360,38 +2815,28 @@ paths:
       - Write
       - skusRemove
     get:
-      description: 'Get the SKU with the specified identifier.
-
-        '
+      description: Get the SKU with the specified identifier.
       operationId: skusIdGet
       parameters:
-      - description: 'The SKU identifier
-
-          '
+      - description: The SKU identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Successfull retrieved the SKU
-
-            '
+          description: Successfull retrieved the specified SKU
           schema:
             type: object
         404:
-          description: 'The SKU with the specified identifier was not found
-
-            '
+          description: The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a single SKU
-
-        '
+      summary: Get the specified SKU
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3401,14 +2846,10 @@ paths:
       - skusRead
       x-view: sku-2.0.json
     patch:
-      description: 'Modify the SKU with the specified identifier.
-
-        '
+      description: Modify the SKU with the specified identifier.
       operationId: skusPatch
       parameters:
-      - description: 'The sku identifier
-
-          '
+      - description: The sku identifier
         in: path
         name: identifier
         required: true
@@ -3421,30 +2862,22 @@ paths:
           $ref: '#/definitions/skus.2.0_SkusUpsert'
       responses:
         200:
-          description: 'Successfully modified the specified SKU
-
-            '
+          description: Successfully modified the specified SKU
           schema:
             type: object
         404:
-          description: 'The SKU with the specified identifier was not found
-
-            '
+          description: The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         500:
-          description: 'SKU patch failed
-
-            '
+          description: SKU patch failed
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Patch a SKU
-
-        '
+      summary: Patch a SKU
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3455,39 +2888,28 @@ paths:
     x-swagger-router-controller: skus
   /skus/{identifier}/nodes:
     get:
-      description: 'Get the nodes associated with the specified SKU definition.
-
-        '
+      description: Get the nodes associated with the specified SKU definition.
       operationId: skusIdGetNodes
       parameters:
-      - description: 'The SKU identifier
-
-          '
+      - description: The SKU identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the nodes associated with the specified
-            SKU
-
-            '
+          description: Successfully retrieved the nodes associated with the specified SKU
           schema:
             type: object
         404:
-          description: 'The SKU with the specified identifier was not found
-
-            '
+          description: The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get nodes for specific SKU
-
-        '
+      summary: Get nodes for specific SKU
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3500,38 +2922,28 @@ paths:
     delete:
       consumes:
       - application/x-www-form-urlencoded
-      description: 'Delete a SKU Pack associated with the specified SKU.
-
-        '
+      description: Delete a SKU Pack associated with the specified SKU.
       operationId: skusIdDeletePack
       parameters:
-      - description: 'The SKU identifier
-
-          '
+      - description: The SKU identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         204:
-          description: 'Successfully deleted the specified SKU Pack
-
-            '
+          description: Successfully deleted the specified SKU Pack
           schema:
             type: object
         404:
-          description: 'The SKU Pack with the specified identifier was not found
-
-            '
+          description: The SKU Pack with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a SKU Pack
-
-        '
+      summary: Delete a SKU Pack
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3542,40 +2954,28 @@ paths:
     put:
       consumes:
       - application/x-www-form-urlencoded
-      description: 'Create or modify a SKU Pack, and associate the
-
-        SKU Pack with the specified SKU.
-
-        '
+      description: Create or modify a SKU Pack, and associate the SKU Pack with the specified SKU.
       operationId: skusIdPutPack
       parameters:
-      - description: 'The identifier of the SKU Pack
-
-          '
+      - description: The identifier of the SKU Pack
         in: path
         name: identifier
         required: true
         type: string
       responses:
         201:
-          description: 'Successfully created the SKU Pack
-
-            '
+          description: Successfully created the SKU Pack
           schema:
             type: object
         404:
-          description: 'The SKU with the specified identifier was not found
-
-            '
+          description: The SKU with the specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Put a SKU Pack to a specific SKU
-
-        '
+      summary: Put a SKU Pack to the specified SKU
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3588,9 +2988,7 @@ paths:
     x-swagger-pipe: swagger_raw
   /tags:
     get:
-      description: 'Get a list of all tags currently stored.
-
-        '
+      description: Get a list of all tags currently stored.
       operationId: getAllTags
       parameters:
       - name: sort
@@ -3601,17 +2999,13 @@ paths:
         pattern: '[- +]{0,1}(name|id)'
       responses:
         200:
-          description: 'Successfully retrieved all tags
-
-            '
+          description: Successfully retrieved all tags.
           schema:
             items:
               type: object
             type: array
         404:
-          description: 'Not found
-
-            '
+          description: No tags found.
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -3628,9 +3022,7 @@ paths:
       - tagsRead
       x-view: tags.2.0.json
     post:
-      description: 'Create a new tag.
-
-        '
+      description: Create a new tag.
       operationId: createTag
       parameters:
       - description: The tag properties
@@ -3641,15 +3033,11 @@ paths:
           $ref: '#/definitions/post_tags'
       responses:
         201:
-          description: 'Successfully created the tag
-
-            '
+          description: Successfully created the tag
           schema:
             type: object
         500:
-          description: 'The tag could not be created
-
-            '
+          description: The tag could not be created
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -3668,9 +3056,7 @@ paths:
     x-swagger-router-controller: tags
   /tags/{tagName}:
     delete:
-      description: 'Delete the specified tag.
-
-        '
+      description: Delete the specified tag.
       operationId: deleteTag
       parameters:
       - description: The tag identifier
@@ -3680,22 +3066,18 @@ paths:
         type: string
       responses:
         204:
-          description: 'Successfully deleted the tag
-
-            '
+          description: Successfully deleted the specified tag.
           schema:
             type: object
         404:
-          description: 'The tag name identifier was not found
-
-            '
+          description: The tag with the specified name was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: Delete a tag
+      summary: Delete the specified tag
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3704,9 +3086,7 @@ paths:
       - Write
       - tagsRemove
     get:
-      description: 'Get the data associated with the specified tag.
-
-        '
+      description: Get the data associated with the specified tag.
       operationId: getTag
       parameters:
       - description: The tag identifier
@@ -3716,15 +3096,11 @@ paths:
         type: string
       responses:
         200:
-          description: 'Successfully retrieved information about the specified tag
-
-            '
+          description: Successfully retrieved information about the specified tag
           schema:
             type: object
         404:
-          description: 'The tag name identifier was not found
-
-            '
+          description: The tag name identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -3743,9 +3119,7 @@ paths:
     x-swagger-router-controller: tags
   /tags/{tagName}/nodes:
     get:
-      description: 'Get a list of nodes with the specified tag.
-
-        '
+      description: Get a list of nodes with the specified tag.
       operationId: getNodesByTag
       parameters:
       - description: The tag identifier
@@ -3755,18 +3129,13 @@ paths:
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the list of nodes with the specified
-            tag
-
-            '
+          description: Successfully retrieved the list of nodes with the specified tag
           schema:
             items:
               type: object
             type: array
         404:
-          description: 'The specified node was not found
-
-            '
+          description: The specified tag was not found
           schema:
             $ref: '#/definitions/Error'
         default:
@@ -3784,9 +3153,7 @@ paths:
     x-swagger-router-controller: tags
   /tags/{tagName}/nodes/workflows:
     post:
-      description: 'Start a workflow against all nodes with the specified tag.
-
-        '
+      description: Start a workflow against all nodes with the specified tag.
       operationId: postWorkflowById
       parameters:
       - description: The tag identifier
@@ -3807,24 +3174,18 @@ paths:
         type: string
       responses:
         202:
-          description: 'Successfully posted workflows
-
-            '
+          description: Successfully posted workflow to all nodes with specified tag
           schema:
             type: object
         404:
-          description: 'The specified tag was not found
-
-            '
+          description: The specified tag was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Post workflow to node by tag
-
-        '
+      summary: Post workflow to node by tag
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3835,9 +3196,7 @@ paths:
     x-swagger-router-controller: tags
   /tasks/bootstrap.js:
     get:
-      description: 'Used internally by the system - get tasks bootstrap.js
-
-        '
+      description: Used internally by the system - get tasks bootstrap.js
       operationId: getBootstrap
       parameters:
       - description: Query string containing the mac address
@@ -3846,7 +3205,7 @@ paths:
         required: false
         type: string
       responses:
-        '200':
+        200:
           description: Successfully retrieved bootstrap.js
           schema:
             $ref: '#/definitions/VersionsResponse'
@@ -3854,46 +3213,34 @@ paths:
           description: Error
           schema:
             $ref: '#/definitions/ErrorResponse'
-      summary: 'Get tasks bootstrap.js
-
-        '
+      summary: Get tasks bootstrap.js
       tags:
       - /api/2.0
     x-swagger-router-controller: tasks
   /tasks/{identifier}:
     get:
-      description: 'Get the specified task.
-
-        '
+      description: Get the specified task.
       operationId: getTasksById
       parameters:
-      - description: 'The task identifier
-
-          '
+      - description: The task identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved a single task
-
-            '
+          description: Successfully retrieved the specified task
           schema:
             type: object
         404:
-          description: 'There specified task was not found
-
-            '
+          description: The specified task was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a task
-
-        '
+      summary: Get the specified task
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3902,21 +3249,15 @@ paths:
       - Read
       x-view: tasks.2.0.json
     post:
-      description: 'Start the specified task
-
-        '
+      description: Start the specified task
       operationId: postTaskById
       parameters:
-      - description: 'The task identifier
-
-          '
+      - description: The task identifier
         in: path
         name: identifier
         required: true
         type: string
-      - description: 'The obm settings to apply
-
-          '
+      - description: The obm settings to apply
         in: body
         name: body
         required: true
@@ -3924,24 +3265,18 @@ paths:
           $ref: '#/definitions/post_tasks'
       responses:
         201:
-          description: 'Successfully posted the specified task
-
-            '
+          description: Successfully posted the specified task
           schema:
             type: object
         404:
-          description: 'The specified task was not found
-
-            '
+          description: The specified task was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Post a task
-
-        '
+      summary: Post a task
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3952,44 +3287,32 @@ paths:
     x-swagger-router-controller: tasks
   /templates/library/{name}:
     delete:
-      description: 'Delete the template with the specified name.
-
-        '
+      description: Delete the template with the specified name.
       operationId: templatesLibDelete
       parameters:
-      - description: 'The name of the template
-
-          '
+      - description: The name of the template
         in: path
         name: name
         required: true
         type: string
       - default: global
-        description: 'The template scope
-
-          '
+        description: The template scope
         in: query
         name: scope
         required: false
         type: string
       responses:
         204:
-          description: 'Successfully deleted the specified template
-
-            '
+          description: Successfully deleted the specified template
         404:
-          description: 'The template with specified identifier was not found
-
-            '
+          description: The template with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a single template
-
-        '
+      summary: Delete the specified template
       tags:
       - /api/2.0
       x-authentication-type:
@@ -3998,46 +3321,34 @@ paths:
       - Write
       - templatesRemove
     get:
-      description: 'Get the contents of a single template file.
-
-        '
+      description: Get the contents of the specified template file.
       operationId: templatesLibGet
       parameters:
-      - description: 'The file name of the template
-
-          '
+      - description: The file name of the template
         in: path
         name: name
         required: true
         type: string
       - default: global
-        description: 'The template scope
-
-          '
+        description: The template scope
         in: query
         name: scope
         required: false
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the contents of a single template
-
-            '
+          description: Successfully retrieved the contents of the specified template
           schema:
             type: object
         404:
-          description: 'The template with specified identifier was not found
-
-            '
+          description: The template with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a single template
-
-        '
+      summary: Get the specified template
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4049,46 +3360,34 @@ paths:
       consumes:
       - text/plain
       - application/x-www-form-urlencoded
-      description: 'Create or update the metadata and the content of a single template.
-
-        '
+      description: Create or update the metadata and the content of the specified template.
       operationId: templatesLibPut
       parameters:
-      - description: 'The name of the template
-
-          '
+      - description: The name of the template
         in: path
         name: name
         required: true
         type: string
       - default: global
-        description: 'The template scope
-
-          '
+        description: The template scope
         in: query
         name: scope
         required: false
         type: string
       responses:
         201:
-          description: 'Successfully created the template
-
-            '
+          description: Successfully created or updated the specified template.
           schema:
             type: object
         404:
-          description: 'The template with specified identifier was not found
-
-            '
+          description: The specified template was not found.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Put a single template
-
-        '
+      summary: Create or update the specified template
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4099,13 +3398,10 @@ paths:
     x-swagger-router-controller: templates
   /templates/metadata:
     get:
-      description: 'Retrieves metadata for each defined template. The metadata
-
+      description: >
+        Retrieves metadata for each defined template. The metadata
         includes the template name, and scope, not the actual
-
         contents of the template.
-
-        '
       operationId: templatesMetaGet
       parameters:
       - name: sort
@@ -4116,18 +3412,14 @@ paths:
         pattern: '[- +]{0,1}(name|id)'
       responses:
         200:
-          description: 'Successfully retrieved all template metadata
-
-            '
+          description: Successfully retrieved all template metadata
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a list of metadata for all templates
-
-        '
+      summary: Get a list of metadata for all templates
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4139,47 +3431,34 @@ paths:
     x-swagger-router-controller: templates
   /templates/metadata/{name}:
     get:
-      description: 'Get metadata for the template with the specified name.
-
-        '
+      description: Get metadata for the template with the specified name.
       operationId: templatesMetaGetByName
       parameters:
-      - description: 'The file name of the template
-
-          '
+      - description: The file name of the template
         in: path
         name: name
         required: true
         type: string
-      - description: 'The template scope
-
-          '
+      - description: The template scope
         in: query
         name: scope
         required: false
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the metadata of the template
-
-            with the specified name
-
-            '
+          description:
+            Successfully retrieved the metadata of the specified template.
           schema:
             type: object
         404:
-          description: 'Template with specified identifier was not found
-
-            '
+          description: Template with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get the metadata for a specific template
-
-        '
+      summary: Get the metadata for the specified template
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4191,38 +3470,41 @@ paths:
     x-swagger-router-controller: templates
   /templates/{name}:
     get:
-      description: 'Get the template with the specified name.
-
-        '
+      description: Get the template with the specified name.
       operationId: templatesGetByName
       parameters:
-      - description: 'The name of the template
-
-          '
+      - description: The name of the template
         in: path
         name: name
         required: true
         type: string
+      - description: The node identifier
+        in: query
+        name: nodeId
+        required: false
+        type: string
+      - collectionFormat: multi
+        description: List of valid MAC addresses to lookup
+        in: query
+        items:
+          type: string
+        name: macs
+        required: false
+        type: array
       responses:
         200:
-          description: 'Successfuly retrieved the specified template
-
-            '
+          description: Successfuly retrieved the specified template
           schema:
             type: object
         404:
-          description: 'The template with specified identifier was not found
-
-            '
+          description: The template with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a single template
-
-        '
+      summary: Get the specified template
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4231,38 +3513,42 @@ paths:
       - Read
       - templatesRead
     head:
-      description: 'Get the template with the specified name.
-
-        '
+      description: Get the template headers with the specified name. Only gets headers
+        and returns no body.
       operationId: templatesHeadByName
       parameters:
-      - description: 'The name of the template
-
-          '
+      - description: The name of the template
         in: path
         name: name
         required: true
         type: string
+      - description: The node identifier
+        in: query
+        name: nodeId
+        required: false
+        type: string
+      - collectionFormat: multi
+        description: List of valid MAC addresses to lookup
+        in: query
+        items:
+          type: string
+        name: macs
+        required: false
+        type: array
       responses:
         200:
-          description: 'Successfuly retrieved the specified template
-
-            '
+          description: Successfuly retrieved the specified template headers
           schema:
             type: object
         404:
-          description: 'The template with specified identifier was not found
-
-            '
+          description: The template with specified identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a single template
-
-        '
+      summary: Get headers of the specified template
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4272,9 +3558,7 @@ paths:
     x-swagger-router-controller: templates
   /users:
     get:
-      description: 'Get the list of users currently stored in the system.
-
-        '
+      description: Get the list of users currently stored in the system.
       operationId: listUsers
       parameters:
       - name: sort
@@ -4285,9 +3569,7 @@ paths:
         pattern: '[- +]{0,1}(name|id)'
       responses:
         200:
-          description: 'Successfully retrieved the list of users
-
-            '
+          description: Successfully retrieved the list of users
           schema:
             items:
               $ref: '#/definitions/get_user_obj'
@@ -4304,9 +3586,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get the list of users
-
-        '
+      summary: Get the list of users
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4316,9 +3596,7 @@ paths:
       - usersRead
       x-view: users.2.0.json
     post:
-      description: 'Create a new user and store it.
-
-        '
+      description: Create a new user and store it.
       operationId: addUser
       parameters:
       - description: The user information
@@ -4329,9 +3607,7 @@ paths:
           $ref: '#/definitions/user_obj'
       responses:
         201:
-          description: 'Successfully created the user
-
-            '
+          description: Successfully created the user
           schema:
             type: object
         401:
@@ -4346,9 +3622,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Post a new user
-
-        '
+      summary: Post a new user
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4362,9 +3636,7 @@ paths:
     x-swagger-router-controller: users
   /users/{name}:
     delete:
-      description: 'Delete the specified user.
-
-        '
+      description: Delete the specified user.
       operationId: removeUser
       parameters:
       - description: The username
@@ -4374,9 +3646,7 @@ paths:
         type: string
       responses:
         204:
-          description: 'Successfully deleted the specified user
-
-            '
+          description: Successfully deleted the specified user
         401:
           description: Unauthorized
           schema:
@@ -4389,9 +3659,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a user
-
-        '
+      summary: Delete the specified user
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4400,9 +3668,7 @@ paths:
       - Write
       - usersRemove
     get:
-      description: 'Get information about the specified user.
-
-        '
+      description: Get information about the specified user.
       operationId: getUser
       parameters:
       - description: The username
@@ -4412,9 +3678,7 @@ paths:
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the specified user
-
-            '
+          description: Successfully retrieved the specified user
           schema:
             $ref: '#/definitions/user_obj'
         401:
@@ -4429,9 +3693,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a user
-
-        '
+      summary: Get the specified user
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4441,9 +3703,7 @@ paths:
       - usersRead
       x-view: users.2.0.json
     patch:
-      description: 'Modify the properties of a user.
-
-        '
+      description: Modify the properties of a user.
       operationId: modifyUser
       parameters:
       - description: The username
@@ -4459,9 +3719,7 @@ paths:
           $ref: '#/definitions/get_user_obj'
       responses:
         200:
-          description: 'Successfully modified the user
-
-            '
+          description: Successfully modified the specified user.
           schema:
             type: object
         401:
@@ -4476,9 +3734,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Patch a user
-
-        '
+      summary: Patch the specified user
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4492,28 +3748,21 @@ paths:
     x-swagger-router-controller: users
   /views:
     get:
-      description: 'Retrieve a list of all views. Views are used to render
-
+      description: >
+        Retrieve a list of all views. Views are used to render
         the output of various system resources, such as nodes,
-
         pollers, and OBM settings.
-
-        '
       operationId: viewsGet
       responses:
         200:
-          description: 'Successfully retrieved views
-
-            '
+          description: Successfully retrieved views
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get all views
-
-        '
+      summary: Get all views
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4525,38 +3774,28 @@ paths:
     x-swagger-router-controller: views
   /views/{identifier}:
     delete:
-      description: 'Delete the view with the specified name.
-
-        '
+      description: Delete a view with the specified name.
       operationId: viewsDelete
       parameters:
-      - description: 'The name of view to delete
-
-          '
+      - description: The name of view to delete
         in: path
         name: identifier
         required: true
         type: string
       responses:
         204:
-          description: 'Successfully retrieved the specified template
-
-            '
+          description: Successfully deleted the specified view
           schema:
             type: object
         404:
-          description: 'The view with specified name was not found
-
-            '
+          description: The view with specified name was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a specific view
-
-        '
+      summary: Delete the specified view
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4565,38 +3804,28 @@ paths:
       - Write
       - viewsRemove
     get:
-      description: 'Get the view with the specified file name.
-
-        '
+      description: Get the view with the specified file name.
       operationId: viewsGetById
       parameters:
-      - description: 'The view name
-
-          '
+      - description: The view name
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the specified view
-
-            '
+          description: Successfully retrieved the specified view
           schema:
             type: object
         404:
-          description: 'The view with specified name was not found
-
-            '
+          description: The view with specified name was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a specific view
-
-        '
+      summary: Get the specified view
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4609,28 +3838,20 @@ paths:
       consumes:
       - text/plain
       - application/octet-stream
-      description: 'Create or update a view with the specified name.
-
-        '
+      description: Create or update a view with the specified name.
       operationId: viewsPut
       parameters:
-      - description: 'The name of view to create or update
-
-          '
+      - description: The name of view to create or update
         in: path
         name: identifier
         required: true
         type: string
       responses:
         201:
-          description: 'Successfully created the specified template
-
-            '
+          description: Successfully created or modified the specified view.
           schema:
             type: object
-      summary: 'Put a specific view
-
-        '
+      summary: Put the specified view
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4641,14 +3862,10 @@ paths:
     x-swagger-router-controller: views
   /workflows:
     get:
-      description: 'Get list workflow that have been run, or are currently running.
-
-        '
+      description: Get list workflow that have been run or are currently running.
       operationId: workflowsGet
       parameters:
-      - description: 'Query string to search for specific workflow properties
-
-          '
+      - description: Query string to search for specific workflow properties
         in: query
         name: active
         required: false
@@ -4671,18 +3888,14 @@ paths:
         pattern: '[- +]{0,1}(name|id)'
       responses:
         200:
-          description: 'Successfull retrieved workflows
-
-            '
+          description: Successfully retrieved workflows
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a list of workflow instances
-
-        '
+      summary: Get a list of workflow instances
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4692,51 +3905,40 @@ paths:
       - workflowsRead
       x-view: workflows.2.0.json
     post:
-      description: 'Run a workflow by specifying a workflow graph injectable name.
-
+      description: >
+        Run a workflow by specifying a workflow graph injectable name.
         The workflow is not associated with a node.
-
-        '
       operationId: workflowsPost
       parameters:
-      - description: 'The body must contain the name property with the
-
+      - description: >
+          The body must contain the name property with the
           value set to the injectable name of the workflow
-
           graph to run
-
-          '
         in: body
         name: body
         required: false
         schema:
           $ref: '#/definitions/post_workflow'
-      - description: Optionally specify the injectable name of the workflow graph
-          to run
+      - description:
+          Optionally specify the injectable name of the workflow graph to run
         in: query
         name: name
         required: false
         type: string
       responses:
         201:
-          description: 'Successfully posted the workflow
-
-            '
+          description: Successfully started the specified workflow
           schema:
             type: object
         500:
-          description: 'Workflow was not run
-
-            '
+          description: Workflow was not run
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Upload failed
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Run a workflow
-
-        '
+      summary: Run a workflow
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4747,24 +3949,18 @@ paths:
     x-swagger-router-controller: workflows
   /workflows/graphs:
     get:
-      description: 'Get a list of all workflow graphs available to run.
-
-        '
+      description: Get a list of all workflow graphs available to run.
       operationId: workflowsGetGraphs
       responses:
         200:
-          description: 'Successfully retrieved all workflow graphs
-
-            '
+          description: Successfully retrieved all workflow graphs
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get list of workflow graphs
-
-        '
+      summary: Get list of workflow graphs
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4774,9 +3970,7 @@ paths:
       - workflowsRead
       x-view: workflowGraphs.2.0.json
     put:
-      description: 'Create or modify a workflow graph in the graph library.
-
-        '
+      description: Create or modify a workflow graph in the graph library.
       operationId: workflowsPutGraphs
       parameters:
       - description: The workflow graph properties
@@ -4787,24 +3981,18 @@ paths:
           $ref: '#/definitions/workflow_graph'
       responses:
         201:
-          description: 'Successfully updated workflow graph
-
-            '
+          description: Successfully created or modified a workflow graph.
           schema:
             type: object
         500:
-          description: 'Workflow graph was not updated
-
-            '
+          description: Workflow graph was not created or modified.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Upload failed
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Put a graph
-
-        '
+      summary: Put a graph
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4816,39 +4004,29 @@ paths:
     x-swagger-router-controller: workflowGraphs
   /workflows/graphs/{injectableName}:
     delete:
-      description: 'Delete the workflow graph with the specified value of the injectableName
-        property.
-
-        '
+      description:
+        Delete the workflow graph with the specified value of the injectableName property.
       operationId: workflowsDeleteGraphsByName
       parameters:
-      - description: 'The workflow graph injectable name
-
-          '
+      - description: The workflow graph injectable name
         in: path
         name: injectableName
         required: true
         type: string
       responses:
         204:
-          description: 'Successfully deleted the specified workflow graph
-
-            '
+          description: Successfully deleted the specified workflow graph
           schema:
             type: object
         404:
-          description: 'The graph with the specified injectable name was not found
-
-            '
+          description: The graph with the specified injectable name was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a workflow graph
-
-        '
+      summary: Delete the specified workflow graph
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4857,34 +4035,26 @@ paths:
       - Write
       - workflowsRemove
     get:
-      description: 'Get the workflow graph with the specified value of the injectableName
-        property.
-
-        '
+      description:
+        Get the workflow graph with the specified value of the injectableName property.
       operationId: workflowsGetGraphsByName
       parameters:
-      - description: 'The workflow graph injectable name
-
-          '
+      - description: The workflow graph injectable name
         in: path
         name: injectableName
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the workflow graph with the specified
-            injectable name
-
-            '
+          description:
+            Successfully retrieved the workflow graph with the specified injectable name
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a workflow graph
-
-        '
+      summary: Get the specified workflow graph
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4896,24 +4066,18 @@ paths:
     x-swagger-router-controller: workflowGraphs
   /workflows/tasks:
     get:
-      description: 'Get a list of all workflow tasks that can be added to a workflow.
-
-        '
+      description: Get a list of all workflow tasks that can be added to a workflow.
       operationId: workflowsGetAllTasks
       responses:
         200:
-          description: 'Successfully retrieved workflow tasks
-
-            '
+          description: Successfully retrieved workflow tasks
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get list of workflow tasks
-
-        '
+      summary: Get list of workflow tasks
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4923,9 +4087,7 @@ paths:
       - workflowsRead
       x-view: workflowTasks.2.0.json
     put:
-      description: 'Create or update a workflow task in the library of tasks.
-
-        '
+      description: Create or update a workflow task in the library of tasks.
       operationId: workflowsPutTask
       parameters:
       - description: The workflow task properties
@@ -4936,24 +4098,18 @@ paths:
           $ref: '#/definitions/workflow_task'
       responses:
         201:
-          description: 'Successfully updated workflow task
-
-            '
+          description: Successfully created or modified workflow task
           schema:
             type: object
         500:
-          description: 'Put workflow task failed
-
-            '
+          description: Failed to create or modify workflow task.
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Upload failed
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Put a workflow task
-
-        '
+      summary: Put a workflow task
       tags:
       - /api/2.0
       x-authentication-type:
@@ -4964,39 +4120,29 @@ paths:
     x-swagger-router-controller: workflowTasks
   /workflows/tasks/{injectableName}:
     delete:
-      description: 'Delete the workflow task with the specified value of the injectableName
-        property.
-
-        '
+      description:
+        Delete the workflow task with the specified value of the injectableName property.
       operationId: workflowsDeleteTasksByName
       parameters:
-      - description: 'The task injectable name
-
-          '
+      - description: The task injectable name
         in: path
         name: injectableName
         required: true
         type: string
       responses:
         204:
-          description: 'Successfully deleted the specified task
-
-            '
+          description: Successfully deleted the specified workflow task
           schema:
             type: object
         404:
-          description: 'The task with the specified injectable name was not found
-
-            '
+          description: The workflow task with the specified injectable name was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a workflow task
-
-        '
+      summary: Delete the specified workflow task
       tags:
       - /api/2.0
       x-authentication-type:
@@ -5005,33 +4151,25 @@ paths:
       - Write
       - workflowsRemove
     get:
-      description: 'Get the task with the specified value of the injectableName property.
-
-        '
+      description: Get the task with the specified value of the injectableName property.
       operationId: workflowsGetTasksByName
       parameters:
-      - description: 'The task injectable name
-
-          '
+      - description: The task injectable name
         in: path
         name: injectableName
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the task with the specified injectable
-            name
-
-            '
+          description:
+            Successfully retrieved the workflow task with the specified injectable name
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a workflow task
-
-        '
+      summary: Get the specified workflow task
       tags:
       - /api/2.0
       x-authentication-type:
@@ -5043,38 +4181,28 @@ paths:
     x-swagger-router-controller: workflowTasks
   /workflows/{identifier}:
     delete:
-      description: 'Delete the workflow with the specified instance identifier.
-
-        '
+      description: Delete the workflow with the specified instance identifier.
       operationId: workflowsDeleteByInstanceId
       parameters:
-      - description: 'The workflow instance identifier
-
-          '
+      - description: The workflow instance identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         204:
-          description: 'Successfully deleted the specified workflow
-
-            '
+          description: Successfully deleted the specified workflow
           schema:
             type: object
         404:
-          description: 'The specified workflow was not found
-
-            '
+          description: The specified workflow was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Delete a workflow
-
-        '
+      summary: Delete the specified workflow
       tags:
       - /api/2.0
       x-authentication-type:
@@ -5083,32 +4211,24 @@ paths:
       - Write
       - workflowsRemove
     get:
-      description: 'Get the workflow with the specified instance identifier.
-
-        '
+      description: Get the workflow with the specified instance identifier.
       operationId: workflowsGetByInstanceId
       parameters:
-      - description: 'The workflow instance identifier
-
-          '
+      - description: The workflow instance identifier
         in: path
         name: identifier
         required: true
         type: string
       responses:
         200:
-          description: 'Successfully retrieved the specified workflow
-
-            '
+          description: Successfully retrieved the specified workflow
           schema:
             type: object
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Get a workflow
-
-        '
+      summary: Get the specified workflow
       tags:
       - /api/2.0
       x-authentication-type:
@@ -5120,16 +4240,12 @@ paths:
     x-swagger-router-controller: workflows
   /workflows/{identifier}/action:
     put:
-      description: 'Perform the specified action on the workflow with the specified
-
+      description: >
+        Perform the specified action on the workflow with the specified
         instance identifier. Currently, the cancel action is supported.
-
-        '
       operationId: workflowsAction
       parameters:
-      - description: 'The workflow instance identifier
-
-          '
+      - description: The workflow instance identifier
         in: path
         name: identifier
         required: true
@@ -5142,24 +4258,18 @@ paths:
           $ref: '#/definitions/action'
       responses:
         202:
-          description: 'Successfully performed the action on the specified workflow
-
-            '
+          description: Successfully performed the action on the specified workflow
           schema:
             type: object
         404:
-          description: 'The workflow with the identifier was not found
-
-            '
+          description: The workflow with the identifier was not found
           schema:
             $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-      summary: 'Perform an action on a workflow
-
-        '
+      summary: Perform an action on the specified workflow
       tags:
       - /api/2.0
       x-authentication-type:

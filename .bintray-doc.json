@@ -1,0 +1,19 @@
+{
+    "package": {
+        "name": "apidoc",
+        "repo": "docs",
+        "subject": "rackhd"
+    },
+
+    "version": {
+        "name": "master"
+    },
+
+    "files":
+    [
+        {
+            "includePattern": "build/swagger-doc/(.+\.pdf)", "uploadPattern": "$1"
+        }
+    ],
+    "publish": true
+}
