@@ -6,6 +6,7 @@
   "OemPrivileges": [],
   "@odata.id": "<%= url %>",
   "Oem": {},
+  "Id": "",
   "AssignedPrivileges": [
     <% rolePrivileges.forEach(function(rolePrivilege, i, arr) { %>
   "<%= rolePrivilege %>"
