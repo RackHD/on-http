@@ -11,6 +11,7 @@ describe("Http.Services.Api.Profiles", function () {
     var eventsProtocol;
     var waterline;
     var lookupService;
+    var configuration;
 
     before("Http.Services.Api.Profiles before", function() {
         helper.setupInjector([
@@ -33,6 +34,7 @@ describe("Http.Services.Api.Profiles", function () {
             upsertProxyToMacAddress: function() {}
         };
         taskProtocol = helper.injector.get("Protocol.Task");
+        configuration = helper.injector.get("Services.Configuration");
         workflowApiService = helper.injector.get("Http.Services.Api.Workflows");
         eventsProtocol = helper.injector.get("Protocol.Events");
         lookupService = helper.injector.get("Services.Lookup");
@@ -211,10 +213,42 @@ describe("Http.Services.Api.Profiles", function () {
                     defaults: {
                         graphOptions: {
                             target: node.id,
+                            'obm-option': { autoCreateObm: 'false' }
+                        },
+                        nodeId: node.id
+                    },
+                    'skip-pollers': { skipPollersCreation: 'false' }
+                }
+            });
+            expect(profileApiService.waitForDiscoveryStart).to.have.been.calledOnce;
+            expect(profileApiService.waitForDiscoveryStart).to.have.been.calledWith(node.id);
+        });
+    });
+
+    it('should run discovery with the configuration given graph', function() {
+        var node = { id: 'test', type: 'compute' };
+        this.sandbox.stub(lookupService, 'nodeIdToProxy').resolves();
+        this.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves();
+        this.sandbox.stub(profileApiService, 'waitForDiscoveryStart').resolves();
+        this.sandbox.stub(configuration, 'get').withArgs('discoveryGraph')
+            .returns('from.config.graph');
+        configuration.get.withArgs('autoCreateObm').returns('false');
+        configuration.get.withArgs('skipPollersCreation').returns('false');
+        return profileApiService.runDiscovery(node)
+        .then(function(_node) {
+            expect(_node).to.equal(node);
+            expect(workflowApiService.createAndRunGraph).to.have.been.calledOnce;
+            expect(workflowApiService.createAndRunGraph).to.have.been.calledWith({
+                name: 'from.config.graph',
+                options: {
+                    defaults: {
+                        graphOptions: {
+                            target: node.id,
                             'obm-option': { autoCreateObm: "false" }
                         },
                         nodeId: node.id
-                    }
+                    },
+                    'skip-pollers': { skipPollersCreation: 'false' }
                 }
             });
             expect(profileApiService.waitForDiscoveryStart).to.have.been.calledOnce;
