@@ -25,10 +25,6 @@
                         "type": "object"
                     }
                 },
-                "snmpSettings": {
-                    "description": "SNMP settings",
-                    "type": "object"
-                },
                 "bootSettings": {
                     "description": "Default ipxe profile settings",
                     "type": "object"
@@ -37,11 +33,15 @@
                         "description": "Node relations",
                         "type": "array"
                 },
-                "sshSettings": {
-                    "description": "SSH settings",
-                    "type": "object"
-                },
                 "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "uniqueItems": true
+                    }
+                },
+                "identifiers": {
+                    "description": "Node Macs",
                     "type": "array",
                     "items": {
                         "type": "string",
