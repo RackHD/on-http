@@ -80,7 +80,7 @@ function parseDriveWwid(idList) {
 	//Only IDE and SCSI disk will be retrieved
     var scsiLines = [], sataLines = [], wwnLines = [], usbLines = [], requiredStrLen = 60;
     lines.forEach(function(line){
-        if ( line && !(line.match('part')) && line.match(/sd[a-z]$|sd[a-z][a-z]$|hd[a-z][a-z]$|hd[a-z]$/i)){
+        if ( line && !(line.match('part')) && line.match(/[sh]d[a-z]?[a-z]$/i)){
             var nameIndex = line.lastIndexOf('/'), idIndex = line.lastIndexOf('->');
             if (line.indexOf('scsi') === 0) {
                 scsiLines.push([line.slice(nameIndex + 1), line.slice(0, idIndex)]);
