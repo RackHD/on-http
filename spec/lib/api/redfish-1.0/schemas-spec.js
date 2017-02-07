@@ -48,23 +48,23 @@ describe('Redfish Schemas', function () {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
-                expect(res.body['Members@odata.count']).to.equal(89);
+                expect(res.body['Members@odata.count']).to.equal(194);
                 
             });
     });
 
-    it('should return valid AccountService.1.0.0 schema information ', function () {
+    it('should return valid AccountService schema information ', function () {
 
-        return helper.request().get('/redfish/v1/Schemas/AccountService.1.0.0')
+        return helper.request().get('/redfish/v1/Schemas/AccountService.v1_1_0')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
-                expect(res.body.Id).to.equal("AccountService.1.0.0");
+                expect(res.body.Id).to.equal("AccountService.v1_1_0");
                 expect(res.body.Location[0].Uri)
-                    .to.equal("/redfish/v1/SchemaStore/en/AccountService.1.0.0" );
+                    .to.equal("/redfish/v1/SchemaStore/en/AccountService.v1_1_0" );
             });
     });
 
