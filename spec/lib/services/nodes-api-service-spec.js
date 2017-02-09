@@ -20,6 +20,8 @@ describe("Http.Services.Api.Nodes", function () {
     var _;
     var eventsProtocol;
     var Promise;
+    var findByNode;
+    var upsertByNodeIbm;
 
     before("Http.Services.Api.Nodes before", function() {
         helper.setupInjector([
@@ -54,6 +56,10 @@ describe("Http.Services.Api.Nodes", function () {
         };
         waterline.obms = {
             findAllByNode: function() {},
+            upsertByNode: function() {}
+        };
+        waterline.ibms = {
+            findByNode: function() {},
             upsertByNode: function() {}
         };
         this.sandbox = sinon.sandbox.create();
@@ -99,6 +105,8 @@ describe("Http.Services.Api.Nodes", function () {
                 workflowApiService, 'findActiveGraphForTarget');
         findAllByNode = this.sandbox.stub(waterline.obms, 'findAllByNode');
         upsertByNode = this.sandbox.stub(waterline.obms, 'upsertByNode');
+        upsertByNodeIbm = this.sandbox.stub(waterline.ibms, 'upsertByNode');
+        findByNode = this.sandbox.stub(waterline.ibms, 'findByNode');
         this.sandbox.stub(eventsProtocol, 'publishNodeEvent').resolves({});
 
     });
@@ -166,11 +174,14 @@ describe("Http.Services.Api.Nodes", function () {
             };
 
             waterline.nodes.create.resolves(switchNode);
+            waterline.ibms.upsertByNode.resolves({});
+            waterline.ibms.findByNode.resolves(switchNode.snmpSettings);
             this.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves({});
 
             return nodeApiService.postNode(switchNode)
             .then(function() {
-                expect(waterline.obms.upsertByNode).to.not.be.called;
+                expect(waterline.ibms.upsertByNode).to.have.been.calledOnce;
+                expect(waterline.ibms.findByNode).to.have.been.calledOnce;
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledOnce;
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledWith(
                     {
@@ -214,7 +225,7 @@ describe("Http.Services.Api.Nodes", function () {
 
             return nodeApiService.postNode(mgmtNode)
             .then(function() {
-                expect(waterline.obms.upsertByNode).to.be.calledOne;
+                expect(waterline.obms.upsertByNode).to.be.calledOnce;
                 expect(waterline.obms.upsertByNode)
                     .to.be.calledWith(mgmtNode.id, mgmtNode.obms[0]);
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledOnce;
@@ -240,11 +251,13 @@ describe("Http.Services.Api.Nodes", function () {
                 type: 'pdu'
             };
             waterline.nodes.create.resolves(pduNode);
+            waterline.ibms.upsertByNode.resolves({});
+            waterline.ibms.findByNode.resolves(pduNode.snmpSettings);
             this.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves({});
 
             return nodeApiService.postNode(pduNode)
             .then(function() {
-                expect(waterline.obms.upsertByNode).to.not.be.called;
+                expect(waterline.ibms.upsertByNode).to.have.been.calledOnce;
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledOnce;
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledWith(
                     {

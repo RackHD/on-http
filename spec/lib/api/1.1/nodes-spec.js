@@ -92,6 +92,8 @@ describe('Http.Api.Nodes v1.1', function () {
         lookupService = helper.injector.get('Services.Lookup');
         lookupService.ipAddressToMacAddress = sinon.stub().resolves();
         lookupService.ipAddressToNodeId = sinon.stub().resolves();
+
+        waterline.ibms.find.resolves([]);
     });
 
     after('stop HTTP server', function () {
@@ -440,6 +442,16 @@ describe('Http.Api.Nodes v1.1', function () {
                 host: '1.2.3.4',
                 user: 'myuser',
                 password: 'mypass'
+            },
+            toJSON: function () {
+                return {
+                    service: 'ssh-ibm-service',
+                    config: {
+                        host: '1.2.3.4',
+                        user: 'myuser',
+                        password: 'REDACTED'
+                    }
+                };
             }
         };
         var serializedSshSettings = {
@@ -450,7 +462,7 @@ describe('Http.Api.Nodes v1.1', function () {
 
         it('should return a list of the node\'s ssh settings', function () {
             nodesApiService.getNodeById.resolves(sshNode);
-            waterline.ibms.findByNode.resolves(sshNode.sshSettings);
+            waterline.ibms.find.resolves([sshNode.sshSettings]);
 
             return helper.request().get('/api/1.1/nodes/1234/ssh')
                 .expect('Content-Type', /^application\/json/)
@@ -467,7 +479,7 @@ describe('Http.Api.Nodes v1.1', function () {
 
         it('should return a 404 if the node has no ssh settings', function () {
             nodesApiService.getNodeById.resolves({ id: node.id, toJSON: function () { return; }});
-            waterline.ibms.findByNode.rejects(new Errors.NotFoundError('Not Found'));
+            waterline.ibms.find.rejects(new Errors.NotFoundError('Not Found'));
 
             return helper.request().get('/api/1.1/nodes/1234/ssh')
                 .expect('Content-Type', /^application\/json/)
@@ -498,6 +510,16 @@ describe('Http.Api.Nodes v1.1', function () {
                 host: '5.5.5.5',
                 user: 'myuser2',
                 password: 'mypassword2'
+            },
+            toJSON: function () {
+                return {
+                    service: 'ssh-ibm-service',
+                    config: {
+                        host: '5.5.5.5',
+                        user: 'myuser2',
+                        password: 'REDACTED'
+                    }
+                };
             }
         };
         var nodeWithIbm = {
@@ -530,7 +552,7 @@ describe('Http.Api.Nodes v1.1', function () {
         it('should replace existing settings with a new set of ssh settings', function () {
             waterline.nodes.needByIdentifier.resolves(existingNode);
             waterline.ibms.upsertByNode.resolves(nodeWithIbm);
-            waterline.ibms.findByNode.resolves(modelSshSettings);
+            waterline.ibms.find.resolves([modelSshSettings]);
             return helper.request().post('/api/1.1/nodes/1234abcd1234abcd1234abcd/ssh')
                 .send(updatedSshSettings)
                 .expect('Content-Type', /^application\/json/)
@@ -550,7 +572,7 @@ describe('Http.Api.Nodes v1.1', function () {
             updated.sshSettings = updatedSshSettings;
             waterline.nodes.needByIdentifier.resolves(existingNode);
             waterline.ibms.upsertByNode.resolves(nodeWithIbm);
-            waterline.ibms.findByNode.resolves(modelSshSettings);
+            waterline.ibms.find.resolves([modelSshSettings]);
             return helper.request().post('/api/1.1/nodes/1234abcd1234abcd1234abcd/ssh')
                 .send(updatedSshSettings)
                 .expect('Content-Type', /^application\/json/)
