@@ -1,5 +1,7 @@
 # Copyright 2016, EMC, Inc.
 
+set -e
+
 if [ ! -d './node_modules/on-tasks/' ]; then
     echo 'on-tasks folder not found, please run npm install.'
     exit 1
@@ -21,3 +23,5 @@ cp -rf ./node_modules/apidoc/template/* ./static/taskdoc/
 # Copy generated json file to ./static folder, override existing files
 mv -f ./node_modules/on-tasks/api_data.js ./static/taskdoc
 mv -f ./node_modules/on-tasks/task_doc_data.json ./static/taskdoc/api_data.json
+
+echo "Visit http://<server>:<port>/taskdoc for task documentation web page"

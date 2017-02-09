@@ -21,6 +21,9 @@ describe("Schema API Service", function() {
             }
         ]
     };
+    var testObjBad = {
+        '@odata.type': '#ComputerSystem.v1_3_0.ComputerSystem'
+    };
 
     before(function() {
         helper.setupInjector([
@@ -34,7 +37,7 @@ describe("Schema API Service", function() {
         sinon.stub(template, "get").resolves({contents: JSON.stringify(testObj)});
 
         var path = helper.injector.get('path');
-        return validator.addNamespace(path.resolve(__dirname, '../../../static/DSP8010_1.0.0/json-schema'),
+        return validator.addNamespace(path.resolve(__dirname, '../../../static/DSP8010_2016.3/json-schema'),
             'http://redfish.dmtf.org/schemas/v1/');
     });
 
@@ -58,10 +61,10 @@ describe("Schema API Service", function() {
 
     it('should fail an invalid object with a valid schema', function() {
         var obj = _.merge({}, testObj, { extraParam: 'bad' });
-        var schemaName = 'ComputerSystemCollection.json#/definitions/ComputerSystemCollection';
+        var schemaName = 'ComputerSystem.v1_3_0.json#/definitions/ComputerSystem';
         return validator.validate(obj, schemaName)
             .then(function(result) {
-                expect(result.error).have.length(2);
+                expect(result.error).have.length(1);
                 expect(result.missing).to.be.empty;
                 expect(result.valid).to.be.false;
             });
@@ -76,9 +79,9 @@ describe("Schema API Service", function() {
             });
     });
 
-    it('should fail an invalid object with a valid schema', function() {
+    it('should fail an invalid object', function() {
         var obj = _.merge({}, testObj, { extraParam: 'bad' });
-        return validator.validate(obj)
+        return validator.validate(testObjBad)
             .then(function(result) {
                 expect(result.error).to.have.length(1);
                 expect(result.missing).to.be.empty;
