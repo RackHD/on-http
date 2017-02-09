@@ -1,0 +1,31 @@
+{
+    "title": "Hooks.2.0",
+    "definitions": {
+        "HookBase": {
+            "description": "A hook template",
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "format": "uri"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "filters": {
+                    "type": "array",
+                    "items":  {
+                        "type": "object"
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "HookPost": {
+            "$ref": "#/definitions/HookBase",
+            "required": [ "url" ]
+        }
+    }
+}
+
+    
