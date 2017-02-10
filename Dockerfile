@@ -1,6 +1,6 @@
 # Copyright 2016, EMC, Inc.
 
-FROM rackhd/on-tasks
+FROM docker-registry.smi.delllabs.net/dell_smi/on-tasks
 
 COPY . /RackHD/on-http/
 WORKDIR /RackHD/on-http
