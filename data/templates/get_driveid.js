@@ -174,6 +174,12 @@ function parseDriveWwid(idList) {
  * @return {Array} include device name, virtual disk name and scsi ID for each disk
  */
 function parseVdInfo(pathList) {
+    /**
+     * ls -l /dev/disk/by-path output example:
+     * total 0
+     * lrwxrwxrwx 1 root root  9 Dec 30 11:55 pci-0000:00:10.0-scsi-0:0:0:0 -> ../../sda
+     * lrwxrwxrwx 1 root root 10 Dec 30 11:55 pci-0000:00:10.0-scsi-0:0:0:0-part1 -> ../../sda1
+     */
     var lines = pathList.split('\n').map(function(line) {
         var split = line.split(/\s+/);
         return [split[8],split[10]].join('->');
@@ -189,14 +195,12 @@ function parseVdInfo(pathList) {
     });
 
     return pciLines.map(function(line) {
-        var scsiId = line[1].slice(line[1].lastIndexOf('-') + 1), vdStr;
-        if (scsiId.split(':').length === 4){
-            var scsiIdArray = scsiId.split(':');
+        var scsiId = line[1].slice(line[1].lastIndexOf('-') + 1),
+            vdStr = '';
+        var scsiIdArray = scsiId.split(':');
+        if (scsiIdArray.length === 4){
             //Suppose controller id = 0 stands for JBOD
-            if (scsiIdArray[1] === "0") {
-                //JBOD should have no virtual disk attribute
-                vdStr = '';
-            } else {
+            if (scsiIdArray[1] !== "0") {
                 vdStr = ['/c', scsiIdArray[0], '/v', scsiIdArray[2]].join('');
             }
         }
@@ -210,6 +214,10 @@ function parseVdInfo(pathList) {
  * @return {Array} include device name and scsi info for each disk
  */
 function parseScsiInfo(lsscsiList) {
+    /**
+     * lsscsi output example:
+     * [2:0:0:0]    disk    VMware   Virtual disk     1.0   /dev/sda
+    */
     var lines = lsscsiList.split('\n');
     return lines.map(function(line) {
         if(line){
