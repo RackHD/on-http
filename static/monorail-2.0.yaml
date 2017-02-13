@@ -63,6 +63,26 @@ definitions:
         type: string
       username:
         type: string
+  hooks.2.0_HookBase:
+    description: Hook base schema
+    type: object
+    properties:
+      url:
+        type: string
+        format: uri
+      name:
+        type: string
+      filters:
+        type: array
+        items:
+          type: object
+  hooks.2.0_HookPost:
+    description: Hook post schema 
+    type: object
+    properties:
+      $ref: "#/definitions/hooks.2.0_HookBase/properties"
+    required:
+      - url
   ipmi-obm-service_Obm:
     description: OBM settings
     properties:
@@ -650,6 +670,165 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+  /hooks:
+    get:
+      description: Get all hooks
+      operationId: hooksGetAll
+      responses:
+        200:
+          description: Successfully retrieved the hook configuration
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/hooks.2.0_HookBase"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get all hooks
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Read
+      - hooksRead
+      x-view: hook.2.0.json
+    post:
+      consumes:
+      - application/json
+      description: Create a new hook.
+      operationId: hooksPost
+      parameters:
+      - description: configuration hook to be created
+        in: body
+        name: body
+        required: true
+        schema:
+            $ref: '#/definitions/hooks.2.0_HookPost'
+      responses:
+        201:
+          description: Successfully created new hook
+          schema:
+            type: object
+        409:
+          description: Duplicated hook.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Post a hook
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Write
+      - hooksWrite
+      x-swagger-schema: hooks.2.0.json#/definitions/HookPost
+      x-view: hook.2.0.json
+    x-swagger-router-controller: hooks
+  /hooks/{identifier}:
+    get:
+      description: Get hook by id
+      operationId: hooksGetById
+      parameters:
+      - description: id of the hook you wish to delete
+        in: path
+        name: identifier
+        required: true
+        type: string
+      responses:
+        200:
+          description: Successfully retrieved the specified hook
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get a hook
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Read
+      - hooksRead
+      x-view: hook.2.0.json
+    delete:
+      description: Delete a hook based on hook id.
+      operationId: hooksDelById
+      parameters:
+      - description: id of the hook you wish to delete
+        in: path
+        name: identifier
+        required: true
+        type: string
+      responses:
+        204:
+          description: Hook successfully deleted
+        404:
+          description: Hook not found.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Error deleting hook from the database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Delete a hook
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Remove
+      - hooksRemove
+    patch:
+      description: Modify the properties of a hook.
+      operationId: hooksPatchById
+      parameters:
+      - description: The id of the hook to patch
+        in: path
+        name: identifier
+        required: true
+        type: string
+      - description: The hook properties to be modified
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/hooks.2.0_HookBase'
+      responses:
+        200:
+          description: Successfully modified the hook
+          schema:
+            type: object
+        404:
+          description: The specified hook was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Patch a hook
+      tags:
+        - /api/2.0
+      x-authentication-type:
+        - jwt
+      x-privileges:
+        - Write
+        - hooksModify
+      x-swagger-schema: hooks.2.0.json#/definitions/HookBase
+      x-view: hook.2.0.json
+    x-swagger-router-controller: hooks
   /lookups:
     get:
       description:

@@ -1,0 +1,778 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redfish API Schema Readme</title>
+  </head>
+  <body>
+    <style scoped>
+  a{color:#4183c4;text-decoration:none}a:hover{text-decoration:underline}.wip{font-weight:400;margin-bottom:0;padding:.5em;position:relative;text-align:left}.logo{background:url("data:image/png;base64,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") no-repeat 100%;height:133px}.preamble{font-weight:700;text-align:right}.title{margin-top:3em}#toc-header{text-align:center}#toc{padding-left:0}#toc,#toc ul{list-style-type:none}body{border-collapse:collapse;color:#333;font-size:13px;font-family:Arial;line-height:1.4;word-wrap:break-word}h1,h2,h3,h4,h5,h6{font-weight:700;margin-bottom:16px;margin-top:1em}h1{font-size:2.25em;line-height:1.2}h1,h2{prince-bookmark-level:1}h2{font-size:1.75em;line-height:1.225}h1,h2{border-bottom:1px solid #eee;padding-bottom:.3em}h3{font-size:1.5em;prince-bookmark-level:2}h4{font-size:1.25em;prince-bookmark-level:3}h5{prince-bookmark-level:4}h5,h6{font-size:1em}h6{color:#777;prince-bookmark-level:5}table{border-collapse:collapse;border-spacing:0;word-break:normal}table thead tr:nth-child(2n+1){background-color:#f8f8f8}table tr{border-top:1px solid #ccc}table td,table th{border:1px solid #ddd;padding:6px 13px}@media screen{tr:nth-child(2n){background-color:#f8f8f8}}@media print{body{font-size:10pt}#toc-header,#toc~h2{break-before:page;page-break-before:always}#toc~h2~h2{break-before:auto;page-break-before:auto}#toc{margin-left:0;padding-left:0}#toc a{text-decoration:none}#toc a:after{content:leader('.') target-counter(attr(href),page)}#toc ul>ul>ul{display:none}h1:not(.title){break-before:page;page-break-before:always}tbody tr{background-color:inherit}a{text-decoration:underline}.title{string-set:doctitle content()}.dsp{string-set:docnumber content()}.version{string-set:docversion content()}.status{string-set:docstatus content()}.confidentiality{string-set:docconfidentiality content()}}@page{size:US-Letter;font-family:Arial;font-size:10pt;border-bottom:thin solid #444;color:#333;padding-top:.25in;padding-bottom:.25in;margin:1in;@top-left{content:string(docnumber);vertical-align:bottom}@top-right{content:string(doctitle);vertical-align:bottom}@bottom-left{content:'Version ' string(docversion);vertical-align:top}@bottom-center{content:string(docconfidentiality) string(docstatus);vertical-align:top}@bottom-right{content:counter(page);vertical-align:top}}@page :first{border-bottom:none;@top-left{content:''}@top-right{content:''}@bottom-left{content:''}@bottom-center{content:''}@bottom-right{content:''}}@page :right{@top-left{content:string(docnumber)}@top-right{content:string(doctitle)}@bottom-left{content:'Version ' string(docversion)}@bottom-right{content:counter(page)}}@page :left{@top-left{content:string(doctitle)}@top-right{content:string(docnumber)}@bottom-left{content:counter(page)}@bottom-right{content:'Version ' string(docversion)}}pre{background-color:#f7f7f7;border-radius:3px;font-size:85%;line-height:1.45;overflow:auto;padding:16px;white-space:pre-wrap}h1{border:none;margin-bottom:2em}#dmtf[data-status='Work in Progress'] .wip{border:2px ridge #eee}#dmtf[data-status=Draft] .wip,#dmtf[data-status=Published] .wip{color:#fff;cursor:default;visibility:hidden;user-select:none}#dmtf[data-status=Draft] .wip a,#dmtf[data-status=Published] .wip a{color:#fff;cursor:default}.document{font-weight:700}.copyright{border:1px solid #333;padding:.5em;page-break-before:always}.copyright p:first-child{margin-top:0}.copyright p:last-child{margin-bottom:0}
+</style>
+<div data-status="" id="dmtf">
+  <div class="preamble">
+    <div class="logo"></div>
+    <p>Document Identifier: <span class="dsp">DSP8010</span></p>
+    <p>Date: 2016-12-30</p>
+    <p>Version: <span class="version">2016.3.0</span></p>
+    
+  </div>
+  <h1 class="title">Redfish API Schema Readme</h1>
+  <div class="wip">
+      </div>
+  <div class="document">
+    
+    <p>Document Class: Normative</p>
+    <p>Document Status: <span class="status">Published</span></p>
+    <p>Document Language: en-US</p>
+    <p style="display: none">Document Confidentiality: <span class="confidentiality"></span></p>
+  </div>
+  <div class="copyright">
+    <p>Copyright Notice</p>
+    <p>Copyright &copy; 2015-2016 Distributed Management Task Force, Inc. (DMTF). All rights reserved.
+  </div>
+  <p>DMTF is a not-for-profit association of industry members dedicated to promoting enterprise and systems management and interoperability. Members and non-members may reproduce DMTF specifications and documents, provided that correct attribution is given. As DMTF specifications may be revised from time to time, the particular version and release date should always be noted.</p>
+  <p>Implementation of certain elements of this standard or proposed standard may be subject to third party patent rights, including provisional patent rights (herein "patent rights"). DMTF makes no representations to users of the standard as to the existence of such rights, and is not responsible to recognize, disclose, or identify any or all such third party patent right, owners or claimants, nor for any incomplete or inaccurate identification or disclosure of such rights, owners or claimants. DMTF shall have no liability to any party, in any manner or circumstance, under any legal theory whatsoever, for failure to recognize, disclose, or identify any such third party patent rights, or for such party’s reliance on the standard or incorporation thereof in its product, protocols or testing procedures. DMTF shall have no liability to any party implementing such standard, whether such implementation is foreseeable or not, nor to any patent owner or claimant, and shall have no liability or responsibility for costs or losses incurred if a standard is withdrawn or modified after publication, and shall be indemnified and held harmless by any party implementing the standard from any and all claims of infringement by a patent owner for such implementations.</p>
+  <p>For information about patents held by third-parties which have notified the DMTF that, in their opinion, such patent may relate to or impact implementations of DMTF standards, visit <a href="http://www.dmtf.org/about/policies/disclosures.php">http://www.dmtf.org/about/policies/disclosures.php</a>.</p>
+  <p>This document’s normative language is English. Translation into other languages is permitted.</p>
+</div>
+<!--<p id="toc-header">CONTENTS</p>-->
+<ul id="toc"></ul><style scoped="">.hljs{display:block;overflow-x:auto;padding:.5em;color:#333;background:#f8f8f8}.hljs-comment,.hljs-quote{color:#998;font-style:italic}.hljs-keyword,.hljs-selector-tag,.hljs-subst{color:#333;font-weight:700}.hljs-literal,.hljs-number,.hljs-tag .hljs-attr,.hljs-template-variable,.hljs-variable{color:teal}.hljs-doctag,.hljs-string{color:#d14}.hljs-section,.hljs-selector-id,.hljs-title{color:#900;font-weight:700}.hljs-subst{font-weight:400}.hljs-class .hljs-title,.hljs-type{color:#458;font-weight:700}.hljs-attribute,.hljs-name,.hljs-tag{color:navy;font-weight:400}.hljs-link,.hljs-regexp{color:#009926}.hljs-bullet,.hljs-symbol{color:#990073}.hljs-built_in,.hljs-builtin-name{color:#0086b3}.hljs-meta{color:#999;font-weight:700}.hljs-deletion{background:#fdd}.hljs-addition{background:#dfd}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}</style><h1 id="foreword">Foreword</h1>
+<p>The following files are part of the Redfish Scalable Platforms Management API ("Redfish") development effort:</p>
+<ul>
+<li>DSP0226 - Redfish Specification - This file is the main Redfish Scalable Platforms Management API Specification.</li>
+<li>DSP0270 - Redfish Host Interface Specification - This document specifies the "in-band" or "OS-based" Redfish Host Interface. </li>
+<li>DSP2044 - Redfish Whitepaper - This is intended to be a non-normative document helping those new to Redfish understand how to interact with the Redfish Service and understand common functions and tasks.</li>
+<li>DSP2043 - Redfish Mockup - This is a mockup that can be used as sample of output from GETs from a Redfish Service.  Informative in nature, it was used to develop the schema.  A person can set up an NGINX or similar server and configure it to output JSON format and then use this directory for demonstration purposes.</li>
+<li>DSP8010 - Redfish Schema - This contains the Redfish Schema definitions.  These files are normative in nature and are normatively referenced by the Redfish Specification.  There are two Schema formats - CSDL (OData Common Schema Definition Language format, which is in XML) and JSON Schema.  These Schema definitions should be functionally equivalent, thus specifying the schema in two different languages.</li>
+</ul>
+<h1 id="redfish-schema-change-log">Redfish Schema Change log</h1>
+<table>
+<thead>
+<tr>
+<th>Schema File</th>
+<th>Version</th>
+<th>Date</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HostInterface</td>
+<td>1.0.0</td>
+<td>2016-12-07</td>
+<td>Intial release. Contains properties for describing and configuring a Redfish Host Interface.</td>
+</tr>
+<tr>
+<td>HostInterfaceCollection</td>
+<td>1.0.0</td>
+<td>2016-12-07</td>
+<td>Initial release. Collection of Redfish Host Interfaces.</td>
+</tr>
+<tr>
+<td>NetworkAdapter</td>
+<td>1.0.0</td>
+<td>2016-12-07</td>
+<td>Intial release. Describes general-purpose network adapters.</td>
+</tr>
+<tr>
+<td>NetworkAdapterCollection</td>
+<td>1.0.0</td>
+<td>2016-12-07</td>
+<td>Intial release. Collection of Network Adapters.</td>
+</tr>
+<tr>
+<td>NetworkInterface</td>
+<td>1.0.0</td>
+<td>2016-12-07</td>
+<td>Intial release. Provides linkages between NetworkAdapter, NetworkPort, and NetworkDeviceFunction instances.</td>
+</tr>
+<tr>
+<td>NetworkInterfaceCollection</td>
+<td>1.0.0</td>
+<td>2016-12-07</td>
+<td>Intial release. Collection of Network Interfaces.</td>
+</tr>
+<tr>
+<td>NetworkDeviceFunction</td>
+<td>1.0.0</td>
+<td>2016-12-07</td>
+<td>Intial release. Describes a logical interface exposed by a Network Adapter.</td>
+</tr>
+<tr>
+<td>NetworkDeviceFunctionCollection</td>
+<td>1.0.0</td>
+<td>2016-12-07</td>
+<td>Intial release. Collection of Network Device Functions.</td>
+</tr>
+<tr>
+<td>NetworkPort</td>
+<td>1.0.0</td>
+<td>2016-12-07</td>
+<td>Intial release. Describes a discrete physical port capable of connecting to a network.</td>
+</tr>
+<tr>
+<td>NetworkPortCollection</td>
+<td>1.0.0</td>
+<td>2016-12-07</td>
+<td>Intial release. Collection of Network Ports.</td>
+</tr>
+<tr>
+<td>PrivilegeRegistry</td>
+<td>1.0.0</td>
+<td>2016-12-07</td>
+<td>Initial release. Schema for definition of HTTP Operation to Privilege mapping.</td>
+</tr>
+<tr>
+<td>AccountService</td>
+<td>1.1.0</td>
+<td>2016-12-07</td>
+<td>Added link to "PrivilegeMap".</td>
+</tr>
+<tr>
+<td>Chassis</td>
+<td>1.4.0</td>
+<td>2016-12-07</td>
+<td>Added "RackGroup" to "ChassisType" enumeration.  Added link to "NetworkAdapters" resource collection. Added "HeightMm", "WidthMm", "DepthMm", and "WeightKg" properties. Added Link to "PCIeDevices".</td>
+</tr>
+<tr>
+<td>ComputerSystem</td>
+<td>1.3.0</td>
+<td>2016-12-07</td>
+<td>Added link to "NetworkDevices" resource collection. Added "FirmwareVersion2" and "InterfaceTypeSelection" to "TrustedModules" object.</td>
+</tr>
+<tr>
+<td>EthernetInterface</td>
+<td>1.2.0</td>
+<td>2016-12-07</td>
+<td>Added link to "HostInterface" to support Redfish Host Interface specification.</td>
+</tr>
+<tr>
+<td>Manager</td>
+<td>1.3.0</td>
+<td>2016-12-07</td>
+<td>Added link to "HostInterfaces" resource collection.</td>
+</tr>
+<tr>
+<td>ManagerNetworkProtocol</td>
+<td>1.1.0</td>
+<td>2016-12-07</td>
+<td>Added "DHCP" protocol object.</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>1.1.0</td>
+<td>2016-12-07</td>
+<td>Added "Status" object.</td>
+</tr>
+<tr>
+<td>MemoryDomain</td>
+<td>1.1.0</td>
+<td>2016-12-07</td>
+<td>Added "AllowsMirroring" and "AllowsSparing" properties.</td>
+</tr>
+<tr>
+<td>Resource</td>
+<td>1.3.0</td>
+<td>2016-12-07</td>
+<td>Added "PostalAddress" and "Placement" objects to "Location", each contaning numerous properties for detailed location information.</td>
+</tr>
+<tr>
+<td>SoftwareInventory</td>
+<td>1.1.0</td>
+<td>2016-12-07</td>
+<td>Added "SoftwareId", "LowestSupportedVersion", "UefiDevicePaths" and "RelatedItem" properties.</td>
+</tr>
+<tr>
+<td>Thermal</td>
+<td>1.2.0</td>
+<td>2016-12-07</td>
+<td>Added "Manufacture", "Model", "SerialNumber", "PartNumber", "SparePartNumber" and "IndicatorLED" to "Fan" object.</td>
+</tr>
+<tr>
+<td>UpdateService</td>
+<td>1.1.0</td>
+<td>2016-12-07</td>
+<td>Added "HttpPushUri" property.</td>
+</tr>
+<tr>
+<td>(all files)</td>
+<td>various</td>
+<td>2016-12-07</td>
+<td>Errata release.  Added explicit permissions annotations to all properties to clearly show which properties are read-write vs. read-only. Corrected Permission annotation with invalid enumeration references. Removed permissions annotation from embedded objects (permissions now on every property).  Removed permission annotations from CSDL Type definitions to avoid conflicts with property definitions. Corrected all property descriptions to always end with a period.</td>
+</tr>
+<tr>
+<td>ComputerSystem</td>
+<td>1.0.4</td>
+<td>2016-12-07</td>
+<td>Errata release.  Corrected CSDL Type of "TotalSystemMemoryGiB" from 'Int64' to 'Decimal'.</td>
+</tr>
+<tr>
+<td>ComputerSystem</td>
+<td>1.1.2</td>
+<td>2016-12-07</td>
+<td>Errata release.  Corrected CSDL Type of "TotalSystemMemoryGiB" from 'Int64' to 'Decimal'.</td>
+</tr>
+<tr>
+<td>ComputerSystem</td>
+<td>1.2.1</td>
+<td>2016-12-07</td>
+<td>Errata release.  Corrected CSDL Type of "TotalSystemMemoryGiB" from 'Int64' to 'Decimal'.</td>
+</tr>
+<tr>
+<td>Port</td>
+<td>1.0.1</td>
+<td>2016-12-07</td>
+<td>Corrected CSDL Type of "CurrentSpeedGbps" and "MaxSpeedGbps" from 'Int64' to 'Decimal'.</td>
+</tr>
+<tr>
+<td>Power</td>
+<td>1.2.1</td>
+<td>2016-12-07</td>
+<td>Corrected descriptions for voltage-related properties and changed sensor descriptions to avoid use of term 'current', instead referring to 'present value'.</td>
+</tr>
+<tr>
+<td>Power</td>
+<td>1.1.1</td>
+<td>2016-12-07</td>
+<td>Corrected descriptions for voltage-related properties and changed sensor descriptions to avoid use of term 'current', instead referring to 'present value'.</td>
+</tr>
+<tr>
+<td>Power</td>
+<td>1.0.3</td>
+<td>2016-12-07</td>
+<td>Corrected descriptions for voltage-related properties and changed sensor descriptions to avoid use of term 'current', instead referring to 'present value'.</td>
+</tr>
+<tr>
+<td>ServiceRoot</td>
+<td>1.1.1</td>
+<td>2016-12-07</td>
+<td>Added missing EntityContainer for "ServiceContainer" in CSDL schema.</td>
+</tr>
+<tr>
+<td>(all files)</td>
+<td>various</td>
+<td>2016-8-12</td>
+<td>Corrected Reference URI links to OData v4 (errata 3) and added Capabilities annotations to CSDL files.</td>
+</tr>
+<tr>
+<td>ActionInfo</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  ActionInfo describes the parameters and other information necessary to perform a Redfish Action to a particular Action target.</td>
+</tr>
+<tr>
+<td>Endpoint</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  An Endpoint is an entity that sends or receives protocol defined messages over a transport.</td>
+</tr>
+<tr>
+<td>EndpointCollection</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Collection of Endpoints.</td>
+</tr>
+<tr>
+<td>Fabric</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  A Fabric consists of one or more Switches and may include  Endpoints and Zones.</td>
+</tr>
+<tr>
+<td>FabricCollection</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Collection of Fabric resources.</td>
+</tr>
+<tr>
+<td>MemoryChunks</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Describes a Memory Chunk and memory Interleve Sets.</td>
+</tr>
+<tr>
+<td>MemoryChunksCollection</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Collection of Memory Chunks.</td>
+</tr>
+<tr>
+<td>MemoryDomain</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Memory Domains are used to indicate to the client which Memory (DIMMs) can be grouped together in Memory Chunks to form interleave sets or otherwise grouped together.</td>
+</tr>
+<tr>
+<td>MemoryDomainCollection</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Collection of Memory Domains.</td>
+</tr>
+<tr>
+<td>PCIeDevice</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Describes a PCIe Device attached to a system.</td>
+</tr>
+<tr>
+<td>PCIeFunction</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Describes a PCIe Function.</td>
+</tr>
+<tr>
+<td>Port</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Describes a Port of a Switch.</td>
+</tr>
+<tr>
+<td>PortCollection</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Collection of Ports.</td>
+</tr>
+<tr>
+<td>SoftwareInventory</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Describes an inventory of software components.</td>
+</tr>
+<tr>
+<td>SoftwareInventoryCollection</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Collection of Software components.</td>
+</tr>
+<tr>
+<td>Switch</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Describes a simple fabric Switch.</td>
+</tr>
+<tr>
+<td>SwitchCollection</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Collection of Switches.</td>
+</tr>
+<tr>
+<td>UpdateService</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Describes the Redfish Update Service.</td>
+</tr>
+<tr>
+<td>VolumeCollection</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Collection of Volumes.</td>
+</tr>
+<tr>
+<td>Zone</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Describes a simple fabric Zone.</td>
+</tr>
+<tr>
+<td>ZoneCollection</td>
+<td>1.0.0</td>
+<td>2016-8-12</td>
+<td>Initial release.  Collection of Zones.</td>
+</tr>
+<tr>
+<td>Chassis</td>
+<td>1.3.0</td>
+<td>2016-8-12</td>
+<td>Added "IPBasedDrive" to "ChassisType" enumerations.</td>
+</tr>
+<tr>
+<td>ComputerSystem</td>
+<td>1.2.0</td>
+<td>2016-8-12</td>
+<td>Added "HostedServices" and "HostingRoles" properties.  Added  "MemoryDomains", "PCIeDevices", "PCIFunctions", and "Endpoints" links. Added "RemoteDrive" enumeration to "BootSourceOverrideTarget".</td>
+</tr>
+<tr>
+<td>Drive</td>
+<td>1.1.0</td>
+<td>2016-8-12</td>
+<td>Added "Operations" property and "Endpoints" link.</td>
+</tr>
+<tr>
+<td>EthernetInterface</td>
+<td>1.1.0</td>
+<td>2016-8-12</td>
+<td>Added "LinkStatus" property and "Endpoints" link.</td>
+</tr>
+<tr>
+<td>EventDestination</td>
+<td>1.1.0</td>
+<td>2016-8-12</td>
+<td>Added "OriginResources" and "MessageIds" properties.</td>
+</tr>
+<tr>
+<td>LogEntry</td>
+<td>1.1.0</td>
+<td>2016-8-12</td>
+<td>Added "EventType", "EventId", and "EventTimeStamp" properties.</td>
+</tr>
+<tr>
+<td>Manager</td>
+<td>1.2.0</td>
+<td>2016-8-12</td>
+<td>Added "PowerState" property.</td>
+</tr>
+<tr>
+<td>MemoryMetrics</td>
+<td>1.1.0</td>
+<td>2016-8-12</td>
+<td>Added "PredictedMediaLifeLeftPercent" property to the "HealthData" object.</td>
+</tr>
+<tr>
+<td>Power</td>
+<td>1.2.0</td>
+<td>2016-8-12</td>
+<td>Added "IndicatorLED" property to "PowerSupply" object.</td>
+</tr>
+<tr>
+<td>Redundancy</td>
+<td>1.1.0</td>
+<td>2016-8-12</td>
+<td>Added "RedundancyEnabled" property.</td>
+</tr>
+<tr>
+<td>Resource</td>
+<td>1.2.0</td>
+<td>2016-8-12</td>
+<td>Added "Deferring", "Quiesced", and "Updating" to "State" enumerations.</td>
+</tr>
+<tr>
+<td>ServiceRoot</td>
+<td>1.1.0</td>
+<td>2016-8-12</td>
+<td>Added links to "Fabrics", "StorageSystems", "StorageServices" and "UpdateService".</td>
+</tr>
+<tr>
+<td>SessionService</td>
+<td>1.1.0</td>
+<td>2016-8-12</td>
+<td>Added OEM Action capabilities.</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>1.1.0</td>
+<td>2016-8-12</td>
+<td>Added "Links" object and "Endpoints" link.</td>
+</tr>
+<tr>
+<td>ComputerSystem</td>
+<td>1.1.1</td>
+<td>2016-8-12</td>
+<td>Errata release.  Clarified description of ComputerSystem and the "UUID" property.</td>
+</tr>
+<tr>
+<td>ComputerSystem</td>
+<td>1.0.3</td>
+<td>2016-8-12</td>
+<td>Errata release.  Clarified description of ComputerSystem and the "UUID" property.</td>
+</tr>
+<tr>
+<td>Drive</td>
+<td>1.0.1</td>
+<td>2016-8-12</td>
+<td>Errata release.  Added "Unencrypted" enumeration to EncryptionStatus and deprecated misspelled enumeration.</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>1.1.1</td>
+<td>2016-8-12</td>
+<td>Errata release.  Deprecated "Context" property in favor of the Event-specific "Context" contained within each Event.</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>1.0.3</td>
+<td>2016-8-12</td>
+<td>Errata release.  Deprecated "Context" property in favor of the Event-specific "Context" contained within each Event.</td>
+</tr>
+<tr>
+<td>IPAddresses</td>
+<td>1.0.3</td>
+<td>2016-8-12</td>
+<td>Errata release.  Corrected validation patterns for "IPv4Address" and "SubnetMask".  Added validation pattern for "Gateway".</td>
+</tr>
+<tr>
+<td>Message</td>
+<td>1.0.3</td>
+<td>2016-8-12</td>
+<td>Errata release.  Corrected "MessageId" to mark it as a required property.</td>
+</tr>
+<tr>
+<td>Resource</td>
+<td>1.1.1</td>
+<td>2016-8-12</td>
+<td>Errata release.  Removed errant "ReferenceableMember" entity type.</td>
+</tr>
+<tr>
+<td>ServiceRoot</td>
+<td>1.0.3</td>
+<td>2016-8-12</td>
+<td>Corrected validation pattern annotation for "RedfishVersion".</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>1.0.1</td>
+<td>2016-8-12</td>
+<td>Corrected type definition of the "Volumes" link.</td>
+</tr>
+<tr>
+<td>Volume</td>
+<td>1.0.1</td>
+<td>2016-8-12</td>
+<td>Corrected description of "VolumeType".</td>
+</tr>
+<tr>
+<td>AttributeRegistry</td>
+<td>1.0.0</td>
+<td>2016-5-14</td>
+<td>Initial release.  An Attribute Registry is a set of key-value pairs that are specific to a particular implementation or product, such that creating standardized property names would be impractical.  This schema describes the structure of a Registry, and also includes mechanisms for building user interfaces (menus) allowing consistent navigation of the contents.</td>
+</tr>
+<tr>
+<td>Bios</td>
+<td>1.0.0</td>
+<td>2016-5-14</td>
+<td>Initial release.  Bios contains properties surrounding a BIOS Attribute Registry (where the system-specific BIOS attributes are described) and the Actions needed to perform changes to BIOS settings, which typically require a system reset to apply.</td>
+</tr>
+<tr>
+<td>Drive</td>
+<td>1.0.0</td>
+<td>2016-5-14</td>
+<td>Initial release.  Drive contains properties describing a single physical disk drive for any system, along with links to associated Volumes.</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>1.0.0</td>
+<td>2016-5-14</td>
+<td>Initial release.  Memory describes a memory module or similar memory device as part of a system.</td>
+</tr>
+<tr>
+<td>MemoryCollection</td>
+<td>1.0.0</td>
+<td>2016-5-14</td>
+<td>Initial release.  A Collection of Memory resource instances.</td>
+</tr>
+<tr>
+<td>MemoryMetrics</td>
+<td>1.0.0</td>
+<td>2016-5-14</td>
+<td>Initial release.  MemoryMetrics contains usage and health statistics for a single Memory module or device instance.</td>
+</tr>
+<tr>
+<td>SecureBoot</td>
+<td>1.0.0</td>
+<td>2016-5-14</td>
+<td>Initial release.  This resource contains UEFI Secure Boot information. It represents properties for managing the UEFI Secure Boot functionality of a system.</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>1.0.0</td>
+<td>2016-5-14</td>
+<td>Initial release.  Storage defines a storage subsystem and its respective properties.  A storage subsystem represents a set of storage controllers (physical or virtual) and the resources such as volumes that can be accessed from that subsystem.</td>
+</tr>
+<tr>
+<td>StorageCollection</td>
+<td>1.0.0</td>
+<td>2016-5-14</td>
+<td>Initial release.  A Collection of Storage resource instances.</td>
+</tr>
+<tr>
+<td>Volume</td>
+<td>1.0.0</td>
+<td>2016-5-14</td>
+<td>Initial release.  Volume contains properties used to describe a volume, virtual disk, LUN, or other logical storage entity for any system.</td>
+</tr>
+<tr>
+<td>(all files)</td>
+<td>1.0.2</td>
+<td>2016-3-31</td>
+<td>Errata release of all schema files to adjust file naming conventions. CSDL schema files now have the major version appended to the end of the schema name (e.g., Chassis_v1), and json-schema files include the major/minor/errata version number (matching the namespace definitions in the schema as they did previously) in the filename, but are now prefaced with a 'v' and with underscore separators (e.g., Chassis.v1_0_2.json) to match the corrected namespace naming rules.  Added LongDescriptions to 'Links' and 'Actions' objects throughout.  Added 'Unit', 'Minimum', and 'Maximum' annotations throughout.  Defined all unversioned resources in CSDL as 'abstract'.  Corrected all string properties with enumerations to allow use of null (nullable).  Marked all 'Links' and other NavigationProperties and embedded objects (ComplexTypes) as non-nullable.  Improved schema description text, updated RFC references, and whitespace consistency throughout.</td>
+</tr>
+<tr>
+<td>(all Collections)</td>
+<td>n/a</td>
+<td>2016-3-31</td>
+<td>Corrected URI of the schema locations to the /schemas/v1 repository instead of the /schema location, which contains only the latest version of each schema. Corrected missing 'anyOf' structure to allow 'idref' references to collections.</td>
+</tr>
+<tr>
+<td>(all files)</td>
+<td>(various)</td>
+<td>2016-3-31</td>
+<td>Copies of all previously-released Redfish json-schema files have been created to follow the corrected json-schema filename format (v1_n_n instead of 1.n.n).  The internal schema name references were updated to match this style, but otherwise the files are identical to their originally released content.</td>
+</tr>
+<tr>
+<td>Chassis</td>
+<td>1.2.0</td>
+<td>2016-3-31</td>
+<td>Added Links for ManagersInChassis, Drives, and Storage.</td>
+</tr>
+<tr>
+<td>Chassis</td>
+<td>1.1.2</td>
+<td>2016-3-31</td>
+<td>Errata release (see 1.0.2 errata description above).  Corrected description for ManagedBy link.  Deprecated 'Unknown' enumeration value for 'IndicatorLED'.</td>
+</tr>
+<tr>
+<td>ComputerSystem</td>
+<td>1.1.0</td>
+<td>2016-3-31</td>
+<td>Added Links for 'Bios', 'Memory', 'Storage', and 'SecureBoot'.  Added 'MemoryMirroring' to the 'MemorySummary' object.  Added 'TrustedModule' object.  Added 'BootSourceOverrideMode' to 'Boot' object.  Added 'SDCard' and 'UefiHttp' enumerations to 'BootSourceOverrideTarget' in 'Boot' object.</td>
+</tr>
+<tr>
+<td>ComputerSystem</td>
+<td>1.0.2</td>
+<td>2016-3-31</td>
+<td>Errata release (see 1.0.2 errata description above).  Deprecated 'Unknown' enumeration value for 'IndicatorLED'.</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>1.1.0</td>
+<td>2016-3-31</td>
+<td>Added 'Context' property.</td>
+</tr>
+<tr>
+<td>EventService</td>
+<td>1.0.2</td>
+<td>2016-3-31</td>
+<td>Errata release (see 1.0.2 errata description above).  Corrected Unit annotations to use UCUM unit definitions.</td>
+</tr>
+<tr>
+<td>JsonSchemaFile</td>
+<td>1.0.2</td>
+<td>2016-3-31</td>
+<td>Errata release (see 1.0.2 errata description above).  Corrected text in 'Schema' property descriptions to reference "@odata.type" instead of "Type".</td>
+</tr>
+<tr>
+<td>Manager</td>
+<td>1.1.0</td>
+<td>2016-3-31</td>
+<td>Added Link for 'ManagerInChassis'.</td>
+</tr>
+<tr>
+<td>Manager</td>
+<td>1.0.2</td>
+<td>2016-3-31</td>
+<td>Errata release (see 1.0.2 errata description above).  Corrected descriptions for 'ServiceEntryPointUUID' to correctly match the intent of the property.</td>
+</tr>
+<tr>
+<td>ManagerNetworkProtocol</td>
+<td>1.0.2</td>
+<td>2016-3-31</td>
+<td>Errata release (see 1.0.2 errata description above).  Corrected read-write permissions on all embedded objects.  Corrected Unit annotations to use UCUM unit definitions.</td>
+</tr>
+<tr>
+<td>Power</td>
+<td>1.1.0</td>
+<td>2016-3-31</td>
+<td>Added 'InputRanges' array and 'Manufacturer' to 'PowerSupplies' object.  Added enumerations to the 'LineInputVoltageType' property in 'PowerSupplies' that promote better interoperability and deprecated others whose terminology differs in meaning among vendors.</td>
+</tr>
+<tr>
+<td>Power</td>
+<td>1.0.2</td>
+<td>2016-3-31</td>
+<td>Errata release (see 1.0.2 errata description above).  Corrected read-write permissions on all embedded objects.  Corrected Unit annotations to use UCUM unit definitions.</td>
+</tr>
+<tr>
+<td>Resource</td>
+<td>1.1.0</td>
+<td>2016-3-31</td>
+<td>Added 'Identifier' object, 'Location' object and 'IndicatorLED' definitions for use throughout the Redfish data model.  Added 'UnavailableOffline' enumeration to 'State' in 'Status' object.</td>
+</tr>
+<tr>
+<td>Resource</td>
+<td>1.0.2</td>
+<td>2016-3-31</td>
+<td>Errata release (see 1.0.2 errata description above).  Corrected missing Required annotation on 'Id' property. Added 'Pattern' Redfish annotation for 'Oem' property names.</td>
+</tr>
+<tr>
+<td>SessionService</td>
+<td>1.0.2</td>
+<td>2016-3-31</td>
+<td>Errata release (see 1.0.2 errata description above).  Added Unit annotations.</td>
+</tr>
+<tr>
+<td>SimpleStorage</td>
+<td>1.1.0</td>
+<td>2016-3-31</td>
+<td>Added 'CapacityBytes' to 'Devices' object.</td>
+</tr>
+<tr>
+<td>SimpleStorage</td>
+<td>1.0.2</td>
+<td>2016-3-31</td>
+<td>Errata release (see 1.0.2 errata description above).  Corrected Unit annotations to use UCUM unit definitions.</td>
+</tr>
+<tr>
+<td>Thermal</td>
+<td>1.1.0</td>
+<td>2016-3-31</td>
+<td>Added 'Name' to 'Fan' object.  Deprecated inconsistent 'FanName' in 'Fan'.</td>
+</tr>
+<tr>
+<td>Thermal</td>
+<td>1.0.2</td>
+<td>2016-3-31</td>
+<td>Errata release (see 1.0.2 errata description above).  Corrected read-write permissions on all embedded objects.  Corrected Unit annotations to use UCUM unit definitions.</td>
+</tr>
+<tr>
+<td>Chassis</td>
+<td>1.1.0</td>
+<td>2015-11-25</td>
+<td>Added 'PhysicalSecurity' object for Intrusion Detection sensor support.</td>
+</tr>
+<tr>
+<td>Thermal</td>
+<td>1.0.1</td>
+<td>2015-9-17</td>
+<td>Errata release.  Renamed Fan 'ReadingRPM' property to 'Reading' as it was determined that the initial definition was too limiting. Added Fan property 'ReadingUnits' to allow for either RPM or percent-based fan readings.  Corrected spelling errors throughout. Any future property name changes will result in a major version change to the schema file.</td>
+</tr>
+<tr>
+<td>Chassis</td>
+<td>1.0.1</td>
+<td>2015-9-17</td>
+<td>Errata release.  Added missing 'PowerState' property intended for inclusion in v1.0.0.  Corrected longDescription text of 'CooledBy'.  Clarified longDescription of 'Reset' action.</td>
+</tr>
+<tr>
+<td>ComputerSystem</td>
+<td>1.0.1</td>
+<td>2015-9-17</td>
+<td>Errata release.  Changed enumeration values of 'PowerState' to reflect a better set of real-world use cases.  Corrected annotation name in longDescription of 'UefiTargetBootSourceOverride'.</td>
+</tr>
+<tr>
+<td>Manager</td>
+<td>1.0.1</td>
+<td>2015-9-17</td>
+<td>Errata release.  Corrected longDescription text for both 'ManagerForChassis' and 'ManagerForSystem'.</td>
+</tr>
+<tr>
+<td>Power</td>
+<td>1.0.1</td>
+<td>2015-9-17</td>
+<td>Errata release.  Corrected longDescription text for 'IntervalInMin'.</td>
+</tr>
+<tr>
+<td>VLanNetworkInterface</td>
+<td>1.0.1</td>
+<td>2015-9-17</td>
+<td>Errata release.  Corrected maximum VLAN ID value.</td>
+</tr>
+<tr>
+<td>(all files)</td>
+<td>1.0.0</td>
+<td>various</td>
+<td>Initial release.</td>
+</tr>
+</tbody>
+</table>
+
+
+  </body>
+</html>

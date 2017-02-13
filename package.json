@@ -1,6 +1,6 @@
 {
   "name": "on-http",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "OnRack Http Server",
   "main": "index.js",
   "scripts": {
