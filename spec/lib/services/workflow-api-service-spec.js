@@ -1,4 +1,4 @@
-// Copyright 2016, EMC, Inc.
+// Copyright 2016-2017, Dell EMC, Inc.
 
 'use strict';
 
@@ -16,7 +16,7 @@ describe('Http.Services.Api.Workflows', function () {
     var workflow;
     var Promise;
     var TaskGraph;
-    var taskMessenger;
+    var eventsProtocol;
 
     before('Http.Services.Api.Workflows before', function() {
         helper.setupInjector([
@@ -30,7 +30,7 @@ describe('Http.Services.Api.Workflows', function () {
         env = helper.injector.get('Services.Environment');
         Promise = helper.injector.get('Promise');
         TaskGraph = helper.injector.get('TaskGraph.TaskGraph');
-        taskMessenger = helper.injector.get('Task.Messenger');
+        eventsProtocol = helper.injector.get('Protocol.Events');
     });
 
     beforeEach(function() {
@@ -51,10 +51,7 @@ describe('Http.Services.Api.Workflows', function () {
         waterline.taskdefinitions = {
             destroy: sinon.stub().resolves({ injectableName: 'test' })
         };
-        graph = {
-            instanceId: 'testgraphid',
-            definition: {friendlyName: 'testGraph'}
-        };
+        graph = { instanceId: 'testgraphid' };
         task = { instanceId: 'testtaskid' };
         workflow = { id: 'testid', _status: 'cancelled' };
         graphDefinition = { injectableName: 'Graph.Test' };
@@ -78,7 +75,7 @@ describe('Http.Services.Api.Workflows', function () {
         this.sandbox.stub(workflowApiService, 'createActiveGraph');
         this.sandbox.stub(workflowApiService, 'runTaskGraph');
         this.sandbox.stub(env, 'get');
-        this.sandbox.stub(taskMessenger, 'publishProgressEvent').resolves();
+        this.sandbox.stub(eventsProtocol, 'publishProgressEvent').resolves();
     });
 
     afterEach('Http.Services.Api.Profiles afterEach', function() {
@@ -90,16 +87,33 @@ describe('Http.Services.Api.Workflows', function () {
     });
 
     it('should create and run a graph not against a node', function () {
+        graph = {
+            instanceId: 'testgraphid',
+            name: 'testGraph',
+            node: null,
+            tasks: {
+                task1: {
+                    state: 'pending',
+                },
+                task2: {
+                    state: 'pending',
+                }
+            }
+        };
+        var data = {
+            graphId: graph.instanceId,
+            graphName: graph.name,
+            nodeId: null,
+            progress: {
+                maximum: 2,
+                value: 0,
+                percentage: '0%',
+                description: 'Graph "' + graph.name + '" started'
+            }
+        };
         workflowApiService.findGraphDefinitionByName.resolves(graphDefinition);
         workflowApiService.createActiveGraph.resolves(graph);
         workflowApiService.runTaskGraph.resolves();
-        var data = {
-            progress: {
-                maximum: null,
-                value: 0,
-                description: 'Graph "' + graph.definition.friendlyName + '" started'
-            }
-        };
         return workflowApiService.createAndRunGraph({
             name: 'Graph.Test',
             options: { test: 1 },
@@ -115,8 +129,8 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
                 graphDefinition, { test: 1 }, { test: 2 }, 'test'
             );
-            expect(taskMessenger.publishProgressEvent).to.have.been.calledOnce;
-            expect(taskMessenger.publishProgressEvent)
+            expect(eventsProtocol.publishProgressEvent).to.have.been.calledOnce;
+            expect(eventsProtocol.publishProgressEvent)
                 .to.have.been.calledWith(graph.instanceId, data);
             expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
             expect(workflowApiService.runTaskGraph)
