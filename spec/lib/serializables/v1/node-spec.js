@@ -62,17 +62,6 @@ describe('Node Serializable V1', function () {
                 'obmSettings[0].config.community'
             ).and.equal('REDACTED');
         });
-
-        it('should redact snmpSettings community', function () {
-            return this.subject.serialize({
-                name: 'fake',
-                snmpSettings: {
-                    host: 'fake-host',
-                    community: encryption.encrypt('community')
-                }
-            }).should.eventually.have.deep.property('snmpSettings.community')
-            .and.equal('REDACTED');
-        });
     });
 
     describe('deserialize', function () {
@@ -118,17 +107,6 @@ describe('Node Serializable V1', function () {
             }).should.eventually.have.deep.property(
                 'obmSettings[0].config.community'
             ).and.not.equal('community');
-        });
-
-        it('should encrypt snmpSettings community', function () {
-            return this.subject.deserialize({
-                name: 'fake',
-                snmpSettings: {
-                    host: 'fake-host',
-                    community: 'community'
-                }
-            }).should.eventually.have.deep.property('snmpSettings.community')
-            .and.not.equal('community');
         });
     });
 });

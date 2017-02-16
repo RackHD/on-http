@@ -50,5 +50,19 @@
     <% } %>
     <% } %>
     "type": "<%=type%>",
-    "workflows": "<%=basepath %>/nodes/<%=id%>/workflows" 
+    "workflows": "<%=basepath %>/nodes/<%=id%>/workflows",
+    <% if (ibms === null) { %>
+    "ibms": null,
+    <% } else { %>
+    "ibms":[
+    <% ibms.forEach(function (value, i, arr){ %>
+    {
+        "service": "<%=value.service%>",
+        "ref":"<%=basepath %>/ibms/<%=value.id%>"
+    }
+    <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+    <% }); %>
+    ]
+    <% } %>
+
 }
