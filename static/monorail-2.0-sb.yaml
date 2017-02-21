@@ -162,7 +162,7 @@ paths:
 # to compromise to define below GET api to update progress information, but actually it does the
 # job of verb "POST"
     get:
-      operationId: notificationProgressGet
+      operationId: notificationProgressPost
       summary: |
         Send progress notification to task
       description: |

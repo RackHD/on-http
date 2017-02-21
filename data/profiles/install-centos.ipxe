@@ -3,8 +3,8 @@ echo Starting CentOS/RHEL <%=version%> installer for ${hostidentifier}
 # The progress notification is just something nice-to-have, so progress notification failure should
 # never impact the normal installation process
 <% if( typeof progressMilestones !== 'undefined' && progressMilestones.enterProfileUri ) { %>
-# since there is no curl like http client in ipxe, so use imgfetch instead
-# note: the progress milestones uri must be wrapped in unescaped format, otherwise imgfetch will fail
+    # since there is no curl like http client in ipxe, so use imgfetch instead
+    # note: the progress milestones uri must be wrapped in unescaped format, otherwise imgfetch will fail
     imgfetch --name fakedimage http://<%=server%>:<%=port%><%-progressMilestones.enterProfileUri%> ||
     imgfree fakedimage ||
 <% } %>

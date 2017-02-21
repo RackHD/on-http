@@ -104,7 +104,7 @@ net-tools
 # The progress notification is just something nice-to-have, so progress notification failure should
 # never impact the normal installation process
 <% if( typeof progressMilestones !== 'undefined' && progressMilestones.preConfigUri ) { %>
-# the url may contain query, the symbol '&' will mess the command line logic, so the whole url need be wrapped in quotation marks
+    # the url may contain query, the symbol '&' will mess the command line logic, so the whole url need be wrapped in quotation marks
     /usr/bin/curl -X POST -H 'Content-Type:application/json' "http://<%=server%>:<%=port%><%-progressMilestones.preConfigUri%>" || true
 <% } %>
 %end
@@ -113,7 +113,7 @@ net-tools
 (
 #notify the current progress
 <% if( typeof progressMilestones !== 'undefined' && progressMilestones.postConfigUri ) { %>
-# the url may contain query, the symbol '&' will mess the command line logic, so the whole url need be wrapped in quotation marks
+    # the url may contain query, the symbol '&' will mess the command line logic, so the whole url need be wrapped in quotation marks
     /usr/bin/curl -X POST -H 'Content-Type:application/json' "http://<%=server%>:<%=port%><%-progressMilestones.postConfigUri%>" || true
 <% } %>
 
