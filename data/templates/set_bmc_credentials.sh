@@ -76,7 +76,6 @@ function get_newUserNumber()
 if [ $check == 0 ]; then
  echo "Creating a new user"
  get_newUserNumber
-# userNumber=$((userNumber + 1))
  ipmitool user set name $newUserNumber <%=user%>
  ipmitool user set password $newUserNumber <%=password%>
  ipmitool channel setaccess $channel $newUserNumber callin=on ipmi=on link=on privilege=4
