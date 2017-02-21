@@ -51,26 +51,26 @@ done
 
 function get_newUserNumber()
 {
-        cmdReturn=$(sudo ipmitool user summary $channel)
-        myarray=(${cmdReturn//$'\n'/ })
-        MaxCount=${myarray[3]}
-        if [ $userNumber -lt $MaxCount ]; then
-                #try to find out the empty user id
-                maxLength=${#userlist[@]}
-                for ((i=1;i<$maxLength;i++)) do
-                        ID=`echo ${userlist[i]} | awk '{print $1}'`
-                        if [ $ID != $i ]; then
-                                newUserNumber=$i
-                                break
-                        fi
-                done
-                if [ $newUserNumber -eq 0 ]; then
-                        newUserNumber=$((userNumber + 1))
-                fi
-        else
-                ecoh 'reach max user count'
-                exit 1
-        fi
+  cmdReturn=$(sudo ipmitool user summary $channel)
+  myarray=(${cmdReturn//$'\n'/ })
+  maxCount=${myarray[3]}
+  if [ $userNumber -lt $maxCount ]; then
+    #try to find out the empty user id
+    maxLength=${#userlist[@]}
+    for ((i=1;i<$maxLength;i++)) do
+      id=`echo ${userlist[i]} | awk '{print $1}'`
+      if [ $id != $i ]; then
+        newUserNumber=$i
+        break
+      fi
+    done
+    if [ $newUserNumber -eq 0 ]; then
+      newUserNumber=$((userNumber + 1))
+    fi
+  else
+    echo 'reach max user count'
+    exit 1
+  fi
 }
 
 if [ $check == 0 ]; then
