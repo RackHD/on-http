@@ -141,6 +141,82 @@ describe('Http.Api.Notification', function () {
                 });
             });
         });
+
+        it('should return 400 if taskId is missing in query', function() {
+            return helper.request()
+            .post('/api/2.0/notification/progress?maximum=5&value=2&description=foo')
+            .set('Content-Type', 'application/json')
+            .expect(400);
+        });
+
+        it('should return 400 if maximum is missing in query', function() {
+            return helper.request()
+            .post('/api/2.0/notification/progress?taskId=testid&value=2&description=foo')
+            .set('Content-Type', 'application/json')
+            .expect(400);
+        });
+
+        it('should return 400 if value is missing in query', function() {
+            return helper.request()
+            .post('/api/2.0/notification/progress?taskId=testid&maximum=4&description=foo')
+            .set('Content-Type', 'application/json')
+            .expect(400);
+        });
+
+        it('should be success if description is missing in query', function() {
+            return helper.request()
+            .post('/api/2.0/notification/progress?taskId=testid&maximum=4&value=2')
+            .set('Content-Type', 'application/json')
+            .expect(200);
+        });
+
+        it('should return 400 if taskId is missing in body', function() {
+            return helper.request()
+            .post('/api/2.0/notification/progress')
+            .send({
+                maximum: 5,
+                value: 2,
+                description: 'foo bar'
+            })
+            .set('Content-Type', 'application/json')
+            .expect(400);
+        });
+
+        it('should return 400 if maximum is missing in body', function() {
+            return helper.request()
+            .post('/api/2.0/notification/progress')
+            .send({
+                taskId: 'test',
+                value: 2,
+                description: 'foo bar'
+            })
+            .set('Content-Type', 'application/json')
+            .expect(400);
+        });
+
+        it('should return 400 if value is missing in body', function() {
+            return helper.request()
+            .post('/api/2.0/notification/progress')
+            .send({
+                taskId: 'test',
+                maximum: 5,
+                description: 'foo bar'
+            })
+            .set('Content-Type', 'application/json')
+            .expect(400);
+        });
+
+        it('should be success if description is missing in body', function() {
+            return helper.request()
+            .post('/api/2.0/notification/progress')
+            .send({
+                taskId: 'test',
+                maximum: 5,
+                value: 2
+            })
+            .set('Content-Type', 'application/json')
+            .expect(200);
+        });
     });
 
     describe('GET /notification/progress', function () {
@@ -169,6 +245,30 @@ describe('Http.Api.Notification', function () {
                     }
                 });
             });
+        });
+
+        it('should return 400 if taskId is missing', function() {
+            return helper.request()
+            .get('/api/2.0/notification/progress?maximum=5&value=2&description=foo')
+            .expect(400);
+        });
+
+        it('should return 400 if maximum is missing', function() {
+            return helper.request()
+            .get('/api/2.0/notification/progress?taskId=testid&value=2&description=foo')
+            .expect(400);
+        });
+
+        it('should return 400 if value is missing', function() {
+            return helper.request()
+            .get('/api/2.0/notification/progress?taskId=testid&maximum=4&description=foo')
+            .expect(400);
+        });
+
+        it('should be success if description is missing', function() {
+            return helper.request()
+            .get('/api/2.0/notification/progress?taskId=testid&maximum=4&value=2')
+            .expect(200);
         });
     });
 });
