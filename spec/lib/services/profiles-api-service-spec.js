@@ -213,11 +213,12 @@ describe("Http.Services.Api.Profiles", function () {
                     defaults: {
                         graphOptions: {
                             target: node.id,
-                            'obm-option': { autoCreateObm: 'false' }
+                            'skip-reboot-post-discovery': { skipReboot: 'false' }
                         },
                         nodeId: node.id
                     },
-                    'skip-pollers': { skipPollersCreation: 'false' }
+                    'skip-pollers': { skipPollersCreation: 'false' },
+                    'obm-option': { autoCreateObm: 'false' }
                 }
             });
             expect(profileApiService.waitForDiscoveryStart).to.have.been.calledOnce;
@@ -244,11 +245,12 @@ describe("Http.Services.Api.Profiles", function () {
                     defaults: {
                         graphOptions: {
                             target: node.id,
-                            'obm-option': { autoCreateObm: "false" }
+                            'skip-reboot-post-discovery': { skipReboot: 'false' }
                         },
                         nodeId: node.id
                     },
-                    'skip-pollers': { skipPollersCreation: 'false' }
+                    'skip-pollers': { skipPollersCreation: 'false' },
+                    'obm-option': { autoCreateObm: "false" }
                 }
             });
             expect(profileApiService.waitForDiscoveryStart).to.have.been.calledOnce;
