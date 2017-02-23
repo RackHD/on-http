@@ -4,6 +4,7 @@
     "@odata.type": "#Processor.1.0.0.Processor",
     "Oem" : {},
     "Id": "<%=socketId%>",
+    "Name": "",
     "Socket": "<%= hardware.data.cpus[socketId].deviceDescription %>",
     "ProcessorType": "CPU",
     "ProcessorArchitecture": "x86",
