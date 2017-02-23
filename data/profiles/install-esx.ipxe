@@ -11,13 +11,13 @@ iseq ${platform} efi && goto is_efi || goto not_efi
 
 :not_efi
 kernel <%=repo%>/<%=mbootFile%> -c <%=esxBootConfigTemplateUri%> BOOTIF=01-${netX/mac}
-goto boot
+goto boot_img
 
 :is_efi
 kernel <%=repo%>/efi/boot/bootx64.efi -c <%=esxBootConfigTemplateUri%>
-goto boot
+goto boot_img
 
-:boot
+:boot_img
 <% if( typeof progressMilestones !== 'undefined' && progressMilestones.startInstallerUri ) { %>
     imgfetch --name fakedimage http://<%=server%>:<%=port%><%-progressMilestones.startInstallerUri%> ||
     imgfree fakedimage ||

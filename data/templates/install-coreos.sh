@@ -2,8 +2,8 @@
 set -e
 CLOUD_CONFIG_FILE=pxe-cloud-config.yml
 
-<% if( typeof progressMilestones !== 'undefined' && progressMilestones.executeInstallationUri ) { %>
-    curl -X POST -H 'Content-Type:application/json' 'http://<%=server%>:<%=port%><%-progressMilestones.executeInstallationUri%>' || true
+<% if( typeof progressMilestones !== 'undefined' && progressMilestones.installToDiskUri ) { %>
+curl -X POST -H 'Content-Type:application/json' 'http://<%=server%>:<%=port%><%-progressMilestones.installToDiskUri%>' || true
 <% } %>
 
 curl -o $CLOUD_CONFIG_FILE http://<%=server%>:<%=port%>/api/current/templates/$CLOUD_CONFIG_FILE?nodeId=<%=nodeId%>

@@ -37,9 +37,9 @@ d-i mirror/http/directory string <%=repoDirectory%>
 
 d-i preseed/early_command string \
 <%_ if( typeof progressMilestones !== 'undefined' && progressMilestones.preConfigUri ) { _%>
-    wget 'http://<%=server%>:<%=port%><%-progressMilestones.preConfigUri%>' || true; \
+wget 'http://<%=server%>:<%=port%><%-progressMilestones.preConfigUri%>' || true; \
 <%_ } _%>
-    umount /media || true;
+umount /media || true;
 
 d-i apt-setup/restricted boolean false
 d-i mirror/http/proxy string
