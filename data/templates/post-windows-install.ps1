@@ -7,7 +7,7 @@ try
 }
 catch
 {
-    echo "Error to notify the current progress: <%=progressMilestones.postConfig.description%>"
+    echo "Failed to notify the current progress: <%=progressMilestones.postConfig.description%>"
 }
 <% } %>
 

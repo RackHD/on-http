@@ -19,8 +19,8 @@ initrd ${base-url}/Boot/Fonts/wgl4_boot.ttf     wgl4_boot.ttf
 initrd ${base-url}/Boot/boot.sdi                boot.sdi
 initrd ${base-url}/${arch}/media/sources/boot.wim          boot.wim
 
-<% if( typeof progressMilestones !== 'undefined' && progressMilestones.bootWinPEUri ) { %>
-    imgfetch --name fakedimage http://<%=server%>:<%=port%><%-progressMilestones.bootWinPEUri%> ||
+<% if( typeof progressMilestones !== 'undefined' && progressMilestones.startInstallerUri ) { %>
+    imgfetch --name fakedimage http://<%=server%>:<%=port%><%-progressMilestones.startInstallerUri%> ||
     imgfree fakedimage ||
 <% } %>
 

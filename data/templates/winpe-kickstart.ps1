@@ -8,7 +8,7 @@ try
 }
 catch
 {
-    echo "Error to notify the current progress: <%=progressMilestones.startInstaller.description%>"
+    echo "Failed to notify the current progress: <%=progressMilestones.startInstaller.description%>"
 }
 <% } %>
 $repo = "<%=smbRepo%>"
