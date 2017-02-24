@@ -49,6 +49,11 @@
     "postinstall": [
                     "#!/bin/sh",
 
+                    "# notify the current progress",
+                    <%_ if( typeof progressMilestones !== 'undefined' && progressMilestones.postConfigUri ) { _%>
+                        "curl -X POST -H 'Content-Type:application/json' 'http://<%=server%>:<%=port%><%-progressMilestones.postConfigUri%>' || true",
+                    <%_ } _%>
+
                     "# Set the configuration",
                     "/bin/curl http://<%=server%>:<%=port%>/api/current/templates/post-install-photon.sh?nodeId=<%=nodeId%> > /tmp/post-install-photon.sh",
                     "chmod +x /tmp/post-install-photon.sh",

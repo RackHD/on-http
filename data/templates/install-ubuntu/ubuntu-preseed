@@ -34,7 +34,13 @@ d-i mirror/http/hostname string <%=repoHostname%>
 # Get directory from repo
 <% var repoDirectory = repo.replace(/^(https?:\/\/)?([a-zA-Z0-9\.:-]+)/g,"") -%>
 d-i mirror/http/directory string <%=repoDirectory%>
-d-i preseed/early_command string umount /media || true
+
+d-i preseed/early_command string \
+<%_ if( typeof progressMilestones !== 'undefined' && progressMilestones.preConfigUri ) { _%>
+wget 'http://<%=server%>:<%=port%><%-progressMilestones.preConfigUri%>' || true; \
+<%_ } _%>
+umount /media || true;
+
 d-i apt-setup/restricted boolean false
 d-i mirror/http/proxy string
 d-i apt-setup/universe boolean false
@@ -57,6 +63,11 @@ d-i time/zone string US/Pacific
 d-i clock-setup/ntp boolean true
 
 ### Partitioning
+d-i partman/early_command string \
+<%_ if( typeof progressMilestones !== 'undefined' && progressMilestones.startPartitionUri ) { _%>
+wget 'http://<%=server%>:<%=port%><%-progressMilestones.startPartitionUri%>' || true;
+<%_ } _%>
+
 d-i partman-auto/disk string <%=installDisk%>
 d-i partman-auto/method string lvm
 
@@ -166,7 +177,7 @@ d-i finish-install/reboot_in_progress note
 xserver-xorg xserver-xorg/autodetect_monitor boolean true
 #### Advanced options
 ### Running custom commands during the installation
-# d-i pretemplateing is inherently not secure. Nothing in the installer checks
+# d-i preseeding is inherently not secure. Nothing in the installer checks
 # for attempts at buffer overflows or other exploits of the values of a
 # preconfiguration file like this one. Only use preconfiguration files from
 # trusted locations! To drive that home, and because it's generally useful,
@@ -174,20 +185,24 @@ xserver-xorg xserver-xorg/autodetect_monitor boolean true
 # automatically.
 
 # This first command is run as early as possible, just after
-# pretemplateing is read.
-#d-i pretemplate/early_command string anna-install some-udeb
+# preseed is read.
+#d-i preseed/early_command string anna-install some-udeb
 # This command is run immediately before the partitioner starts. It may be
-# useful to apply dynamic partitioner pretemplateing that depends on the state
-# of the disks (which may not be visible when pretemplate/early_command runs).
+# useful to apply dynamic partitioner preseeding that depends on the state
+# of the disks (which may not be visible when preseed/early_command runs).
 #d-i partman/early_command
 #       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
 # This command is run just before the install finishes, but when there is
 # still a usable /target directory. You can chroot to /target and use it
 # directly, or use the apt-install and in-target commands to easily install
 # packages and run commands in the target system.
-#d-i pretemplate/late_command string apt-install zsh; in-target chsh -s /bin/zsh
+#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 
 d-i preseed/late_command string \
+<%_ if( typeof progressMilestones !== 'undefined' && progressMilestones.postConfigUri ) { _%>
+in-target curl -X POST -H 'Content-Type:application/json' 'http://<%=server%>:<%=port%><%-progressMilestones.postConfigUri%>' || true; \
+<%_ } _%>
+
 #enable root ssh
 in-target sed -i 's/PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config; \
 
