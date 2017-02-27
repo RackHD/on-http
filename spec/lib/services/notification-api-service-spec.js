@@ -4,6 +4,7 @@
 
 describe('Http.Api.Notification', function () {
     var notificationApiService;
+    var graphProgressService;
     var eventsProtocol;
     var waterline;
     var _;
@@ -38,6 +39,7 @@ describe('Http.Api.Notification', function () {
             helper.require("/lib/services/notification-api-service.js"),
         ]);
         notificationApiService = helper.injector.get('Http.Services.Api.Notification');
+        graphProgressService = helper.injector.get('Services.GraphProgress');
         _ = helper.injector.get('_');
         eventsProtocol = helper.injector.get('Protocol.Events');
         waterline = helper.injector.get('Services.Waterline');
@@ -130,11 +132,11 @@ describe('Http.Api.Notification', function () {
         });
 
         it('should call postProgressNotification', function () {
-            this.sandbox.stub(notificationApiService, 'postProgressNotification').resolves();
+            this.sandbox.stub(graphProgressService, 'postProgressNotification').resolves();
             return notificationApiService.postNotification(progressData)
             .then(function () {
-                expect(notificationApiService.postProgressNotification).to.have.been.calledOnce;
-                expect(notificationApiService.postProgressNotification)
+                expect(graphProgressService.postProgressNotification).to.have.been.calledOnce;
+                expect(graphProgressService.postProgressNotification)
                     .to.have.been.calledWith(progressData.taskId, progressData.progress);
             });
         });
@@ -169,7 +171,7 @@ describe('Http.Api.Notification', function () {
             this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves(task);
             this.sandbox.stub(waterline.graphobjects, 'findOne').resolves(graph);
             this.sandbox.stub(eventsProtocol, 'publishProgressEvent').resolves();
-            return notificationApiService.postProgressNotification(progressData.taskId,
+            return graphProgressService.postProgressNotification(progressData.taskId,
                                                                    progressData.progress)
             .then(function () {
                 expect(waterline.taskdependencies.findOne).to.be.calledOnce;
@@ -192,7 +194,7 @@ describe('Http.Api.Notification', function () {
             this.sandbox.spy(waterline.graphobjects, 'findOne');
             this.sandbox.spy(eventsProtocol, 'publishProgressEvent');
             return expect(
-                notificationApiService.postProgressNotification(
+                graphProgressService.postProgressNotification(
                     progressData.taskId,
                     progressData.progress
                 )
@@ -208,7 +210,7 @@ describe('Http.Api.Notification', function () {
             this.sandbox.stub(waterline.graphobjects, 'findOne').resolves({});
             this.sandbox.spy(eventsProtocol, 'publishProgressEvent');
             return expect(
-                notificationApiService.postProgressNotification(progressData.taskId, {})
+                graphProgressService.postProgressNotification(progressData.taskId, {})
             ).to.be.rejected;
         });
 
