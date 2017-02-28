@@ -47,13 +47,6 @@
                         "type": "string",
                         "uniqueItems": true
                     }
-                },
-                "identifiers": {
-                    "description": "Node Macs",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             },
             "additionalProperties": false
