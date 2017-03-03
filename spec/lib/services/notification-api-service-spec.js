@@ -191,13 +191,12 @@ describe('Http.Api.Notification', function () {
             this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves([]);
             this.sandbox.spy(waterline.graphobjects, 'findOne');
             this.sandbox.spy(eventsProtocol, 'publishProgressEvent');
-            return notificationApiService.postProgressNotification(progressData.taskId,
-                                                                   progressData.progress)
-            .then(function () {
-                expect(waterline.taskdependencies.findOne).to.be.calledOnce;
-                expect(waterline.graphobjects.findOne).to.have.not.been.called;
-                expect(eventsProtocol.publishProgressEvent).to.have.not.been.called;
-            });
+            return expect(
+                notificationApiService.postProgressNotification(
+                    progressData.taskId,
+                    progressData.progress
+                )
+            ).to.be.rejected;
         });
 
         it('should not update graph progress if can not fnd graph object', function () {
@@ -208,12 +207,9 @@ describe('Http.Api.Notification', function () {
             this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves(task);
             this.sandbox.stub(waterline.graphobjects, 'findOne').resolves({});
             this.sandbox.spy(eventsProtocol, 'publishProgressEvent');
-            return notificationApiService.postProgressNotification(progressData.taskId, {})
-            .then(function () {
-                expect(waterline.taskdependencies.findOne).to.be.calledOnce;
-                expect(waterline.graphobjects.findOne).to.have.been.called;
-                expect(eventsProtocol.publishProgressEvent).to.have.not.been.called;
-            });
+            return expect(
+                notificationApiService.postProgressNotification(progressData.taskId, {})
+            ).to.be.rejected;
         });
 
     });

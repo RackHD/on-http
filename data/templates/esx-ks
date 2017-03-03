@@ -33,6 +33,10 @@ reboot
 
 %firstboot --interpreter=busybox
 
+<% if( typeof progressMilestones !== 'undefined' && progressMilestones.firstBootUri ) { %>
+    wget "http://<%=server%>:<%=port%><%-progressMilestones.firstBootUri%>" || true
+<% } %>
+
 # enable VHV (Virtual Hardware Virtualization to run nested 64bit Guests + Hyper-V VM)
 grep -i "vhv.enable" /etc/vmware/config || echo "vhv.enable = \"TRUE\"" >> /etc/vmware/config
 
@@ -234,7 +238,23 @@ fi
 #reboot the system after host configuration
 esxcli system shutdown reboot -d 10 -r "Rebooting after first boot host configuration"
 
+%pre --interpreter=busybox
+
+#notify the current progress
+<% if( typeof progressMilestones !== 'undefined' && progressMilestones.preConfigUri ) { %>
+    # the url may contain query, the symbol '&' will mess the command line logic, so the whole url need be wrapped in quotation marks
+    wget "http://<%=server%>:<%=port%><%-progressMilestones.preConfigUri%>" || true
+<% } %>
+
+
 %post --interpreter=busybox
+
+#notify the current progress
+<% if( typeof progressMilestones !== 'undefined' && progressMilestones.postConfigUri ) { %>
+    # the url may contain query, the symbol '&' will mess the command line logic, so the whole url need be wrapped in quotation marks
+    wget "http://<%=server%>:<%=port%><%-progressMilestones.postConfigUri%>" || true
+<% } %>
+
 #disable firewall
 localcli network firewall set --enabled no
 #signify ORA the installation completed
