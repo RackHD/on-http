@@ -80,7 +80,15 @@ definitions:
     description: Hook post schema 
     type: object
     properties:
-      $ref: "#/definitions/hooks.2.0_HookBase/properties"
+      url:
+        type: string
+        format: uri
+      name:
+        type: string
+      filters:
+        type: array
+        items:
+          type: object
     required:
       - url
   ipmi-obm-service_Obm:
