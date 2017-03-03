@@ -13,25 +13,18 @@ describe('Http.Api.Notification', function () {
     var postBroadcastNotification;
 
     var nodeNotificationMessage = {
-        nodeId: "57a86b5c36ec578876878294",
+        nodeId: '57a86b5c36ec578876878294',
         data: 'dummy data'
     };
-
     var broadcastNotificationMessage = {
         data: 'dummy data'
     };
-
-    var progressData = {
-        taskId: "57a86b5c36ec578876878294",
-        progress: {
-            description: "test",
-            maximum: "100",
-            value: "10",
-            percentage: "100%"
-        }
-    };
-
     var node = {_id: nodeNotificationMessage.nodeId};
+
+    var graphId;
+    var taskId;
+    var progressData;
+    var message;
 
     before('Setup mocks', function () {
         helper.setupInjector([
@@ -53,6 +46,23 @@ describe('Http.Api.Notification', function () {
         needByIdentifier.resolves(node);
         postNodeNotification = sinon.spy(notificationApiService, 'postNodeNotification');
         postBroadcastNotification = sinon.spy(notificationApiService, 'postBroadcastNotification');
+        var uuid = helper.injector.get('uuid');
+        graphId = uuid.v4();
+        taskId = uuid.v4();
+    });
+
+    beforeEach(function() {
+        progressData = {
+            description: 'test',
+            maximum: 100,
+            value: 10,
+        };
+        message = {
+            taskId: taskId,
+            description: 'test',
+            maximum: '100',
+            value: '10',
+        };
     });
 
     after('Reset mocks', function () {
@@ -131,58 +141,17 @@ describe('Http.Api.Notification', function () {
             });
         });
 
-        it('should call postProgressNotification', function () {
-            this.sandbox.stub(graphProgressService, 'postProgressNotification').resolves();
-            return notificationApiService.postNotification(progressData)
-            .then(function () {
-                expect(graphProgressService.postProgressNotification).to.have.been.calledOnce;
-                expect(graphProgressService.postProgressNotification)
-                    .to.have.been.calledWith(progressData.taskId, progressData.progress);
-            });
-        });
-
-        it('should update graph progress percentage', function () {
-            var task = {graphId: 'graphId'},
-                graph = {
-                    instanceId: 'graphId',
-                    name: 'Test Graph',
-                    node: 'nodeId',
-                    tasks: {'57a86b5c36ec578876878294': {friendlyName: 'Test Task'}}
-                },
-                data = {
-                    graphId: graph.instanceId,
-                    graphName: graph.name,
-                    nodeId: 'nodeId',
-                    progress: {
-                        maximum: 1,
-                        value: 1,
-                        percentage: '100%',
-                        description: progressData.progress.description
-                    },
-                    taskProgress: {
-                        taskId: progressData.taskId,
-                        taskName: graph.tasks[progressData.taskId].friendlyName,
-                        progress: progressData.progress
-                    }
-                };
-            this.sandbox.restore();
+        it('should call publishTaskProgressNotCatch', function () {
+            var task = {graphId: 'graphId'};
+            this.sandbox.stub(graphProgressService, 'publishTaskProgressNotCatch').resolves();
             waterline.taskdependencies = {findOne: function() {}};
             waterline.graphobjects = {findOne: function() {}};
             this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves(task);
-            this.sandbox.stub(waterline.graphobjects, 'findOne').resolves(graph);
-            this.sandbox.stub(eventsProtocol, 'publishProgressEvent').resolves();
-            return graphProgressService.postProgressNotification(progressData.taskId,
-                                                                   progressData.progress)
+            return notificationApiService.publishTaskProgress(message)
             .then(function () {
-                expect(waterline.taskdependencies.findOne).to.be.calledOnce;
-                expect(waterline.taskdependencies.findOne).to.be.calledWith({
-                    taskId: progressData.taskId});
-                expect(waterline.graphobjects.findOne).to.be.calledOnce;
-                expect(waterline.graphobjects.findOne).to.be.calledWith({
-                    instanceId: task.graphId});
-                expect(eventsProtocol.publishProgressEvent).to.be.calledOnce;
-                expect(eventsProtocol.publishProgressEvent)
-                    .to.be.calledWith(graph.instanceId, data);
+                expect(graphProgressService.publishTaskProgressNotCatch).to.have.been.calledOnce;
+                expect(graphProgressService.publishTaskProgressNotCatch)
+                    .to.have.been.calledWith(task.graphId, message.taskId, progressData);
             });
         });
 
@@ -194,25 +163,8 @@ describe('Http.Api.Notification', function () {
             this.sandbox.spy(waterline.graphobjects, 'findOne');
             this.sandbox.spy(eventsProtocol, 'publishProgressEvent');
             return expect(
-                graphProgressService.postProgressNotification(
-                    progressData.taskId,
-                    progressData.progress
-                )
+                notificationApiService.publishTaskProgress(message)
             ).to.be.rejected;
         });
-
-        it('should not update graph progress if can not fnd graph object', function () {
-            var task = {graphId: "graphId"};
-            this.sandbox.restore();
-            waterline.taskdependencies = {findOne: function() {}};
-            waterline.graphobjects = {findOne: function() {}};
-            this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves(task);
-            this.sandbox.stub(waterline.graphobjects, 'findOne').resolves({});
-            this.sandbox.spy(eventsProtocol, 'publishProgressEvent');
-            return expect(
-                graphProgressService.postProgressNotification(progressData.taskId, {})
-            ).to.be.rejected;
-        });
-
     });
 });
