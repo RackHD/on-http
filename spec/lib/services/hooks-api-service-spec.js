@@ -6,8 +6,8 @@ describe('Http.Services.Api.Hooks', function () {
     var Errors;
     var hooksApiService;
     var waterline;
-    var body = {url: 'test', filters: [{nodeId: 'nodeId'}]};
-    var hook = {url: 'test', id: 'hookId'};
+    var body = {url: '0.0.0.0', filters: [{nodeId: 'nodeId'}]};
+    var hook = {url: '0.0.0.0', id: 'hookId'};
     var _;
     
     before('Http.Services.Api.Hooks before', function() {
@@ -64,6 +64,17 @@ describe('Http.Services.Api.Hooks', function () {
             expect(waterline.hooks.create).to.be.calledOnce;
             expect(waterline.hooks.create).to.be.calledWith(body);
             expect(result).to.be.deep.equal(hook);
+        });
+    });
+
+    it('should throw error if hook url string is not a url', function (done) {
+        return hooksApiService.createHook({url: 'abcd'})
+        .then(function() {
+            done(new Error('Test should fail'));
+        })
+        .catch(function(err){
+            expect(err.name).equals('AssertionError');
+            done();
         });
     });
 
