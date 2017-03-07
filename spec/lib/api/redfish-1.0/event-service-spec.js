@@ -22,7 +22,9 @@ describe('Redfish Event Service', function () {
             'ResourceRemoved'
         ],
         Context: 'Event Context',
-        Protocol: 'Redfish'
+        Protocol: 'Redfish',
+        Id: '123',
+        Name: 'abc'
     };
     var events = {
         value: [{

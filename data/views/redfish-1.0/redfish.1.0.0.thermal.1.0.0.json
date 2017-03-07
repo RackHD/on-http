@@ -30,7 +30,7 @@
 			{
 				"Oem": {},
 				"FanName": "<%= sdr['sensorId'] %>",
-				"ReadingRPM": <%= _.isNaN(parseFloat(sdr['sensorReading'])) ? 'null' : parseFloat(sdr['sensorReading']) %>,
+				"Reading": <%= _.isNaN(parseFloat(sdr['sensorReading'])) ? 'null' : parseFloat(sdr['sensorReading']) %>,
 				"UpperThresholdNonCritical": <%= _.isNaN(parseFloat(sdr['upperNonCritical'])) ? 'null' : parseFloat(sdr['upperNonCritical']) %>,
 				"UpperThresholdCritical": <%= _.isNaN(parseFloat(sdr['upperCritical'])) ? 'null' : parseFloat(sdr['upperCritical']) %>,
 				"UpperThresholdFatal": null,

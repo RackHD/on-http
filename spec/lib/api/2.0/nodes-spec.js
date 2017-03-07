@@ -25,6 +25,7 @@ describe('2.0 Http.Api.Nodes', function () {
 
             waterline = helper.injector.get('Services.Waterline');
             sinon.stub(waterline.nodes);
+            sinon.stub(waterline.ibms);
             sinon.stub(waterline.catalogs);
             sinon.stub(waterline.workitems);
             sinon.stub(waterline.graphobjects);
@@ -81,6 +82,17 @@ describe('2.0 Http.Api.Nodes', function () {
         service: "noop-obm-service"
     }];
 
+    var ibm =[{
+        config: {
+            host: '1234',
+            user: 'fake-password',
+            password: 'fake-password'
+        },
+        id: "11111111111111111111111111",
+        node: "12341234abcd123412341234",
+        service: "ssh-ibm-service"
+    }];
+
     var relations =[{
         relationType: "enclosedBy",
         targets: [ "5678abcd5678abcd5678abcd" ]
@@ -103,6 +115,10 @@ describe('2.0 Http.Api.Nodes', function () {
             service: 'noop-obm-service',
             ref: '/api/2.0/obms/574dcd5794ab6e2506fd107a'
         }],
+        ibms: [{
+            service: 'ssh-ibm-service',
+            ref: '/api/2.0/ibms/11111111111111111111111111'
+        }],
         type: 'compute',
         workflows: '/api/2.0/nodes/1234abcd1234abcd1234abcd/workflows'
     };
@@ -119,6 +135,7 @@ describe('2.0 Http.Api.Nodes', function () {
         identifiers: [],
         relations: relations,
         obms: obm,
+        ibms: ibm,
         type: 'compute'
     };
 
@@ -352,27 +369,26 @@ describe('2.0 Http.Api.Nodes', function () {
 
     describe('GET /nodes/:identifier/ssh', function () {
         var sshNode = _.cloneDeep(node);
-        sshNode.sshSettings = {
+        sshNode.ibms = {
+            service: "ssh-ibm-service",
+            config:{
             host: '1.2.3.4',
             user: 'myuser',
             password: 'mypass'
-        };
-        var serializedSshSettings = {
-            host: '1.2.3.4',
-            user: 'myuser',
-            password: 'REDACTED'
+            }
         };
 
         it('should return a list of the node\'s ssh settings', function () {
-            waterline.nodes.needByIdentifier.resolves(sshNode);
+            waterline.nodes.getNodeById.resolves(sshNode);
+            waterline.ibms.findAllByNode.resolves(ibm);
 
             return helper.request().get('/api/2.0/nodes/1234/ssh')
                 .expect('Content-Type', /^application\/json/)
-                .expect(200, serializedSshSettings);
+                .expect(200, ibm);
         });
-
+        
         it('should return a 404 if the node was not found', function () {
-            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+            waterline.nodes.getNodeById.rejects(new Errors.NotFoundError('Not Found'));
 
             return helper.request().get('/api/2.0/nodes/1234/ssh')
                 .expect('Content-Type', /^application\/json/)
@@ -380,85 +396,86 @@ describe('2.0 Http.Api.Nodes', function () {
         });
 
         it('should return a 404 if the node has no ssh settings', function () {
-            waterline.nodes.needByIdentifier.resolves({ id: node.id });
+            waterline.nodes.getNodeById.resolves({ id: node.id });
+            waterline.ibms.findAllByNode.rejects(new Errors.NotFoundError('Not Found'));
 
             return helper.request().get('/api/2.0/nodes/1234/ssh')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
+
     });
 
     describe('POST /nodes/:identifier/ssh', function () {
         var sshNode = _.cloneDeep(node);
-        sshNode.sshSettings = {
-            host: '1.2.3.4',
-            user: 'myuser',
-            password: 'mypass'
-        };
-        var updatedSshSettings = {
-            'host': '5.5.5.5',
-            'user': 'myuser2',
-            'password': 'mypassword2'
+        sshNode.ibms = [{
+            service: "ssh-ibm-service",
+            ref: '/api/2.0/ibms/1234'
+        }];
+
+        var sendSsh = {
+            service: "ssh-ibm-service",
+            config:{
+                host: "5.5.5.5",
+                user: "myuser2",
+                password: 'mypass'
+            }
         };
 
+        var tempNode = 
+        {
+            autoDiscover: "false",
+            catalogs:'/api/2.0/nodes/1234abcd1234abcd1234abcd/catalogs',
+            id: '1234foo',
+            name: 'name',
+            identifiers: []
+        };
+        
         it('should replace existing settings with a new set of ssh settings', function () {
-            var updated = _.cloneDeep(node);
-            updated.sshSettings = updatedSshSettings;
-            waterline.nodes.needByIdentifier.resolves(node);
-            waterline.nodes.updateByIdentifier.resolves(updated);
-            return helper.request().post('/api/2.0/nodes/1234/ssh')
-                .send(updatedSshSettings)
+            waterline.nodes.getNodeById.resolves(node);
+            waterline.ibms.upsertByNode.resolves(sshNode);
+            return helper.request().post('/api/2.0/nodes/1234abcd1234abcd1234abcd/ssh')
+                .send(sendSsh)
                 .expect('Content-Type', /^application\/json/)
                 .expect(201)
                 .expect(function (data) {
-                    expect(data.body.sshSettings).to.deep.equal(updatedSshSettings);
-                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledOnce;
-                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledWith(node.id);
-                    expect(waterline.nodes.updateByIdentifier.firstCall.args[1].sshSettings.host)
-                        .to.equal(updatedSshSettings.host);
+                    expect(data.body.ibms).to.deep.equal(sshNode.ibms);
+                    expect(waterline.nodes.getNodeById).to.have.been.calledOnce;
                 });
         });
 
         it('should add a new set of ssh settings if none exist', function () {
-            waterline.nodes.needByIdentifier.resolves({ id: node.id });
-            var updated = _.cloneDeep(node);
-            updated.sshSettings = updatedSshSettings;
-            waterline.nodes.updateByIdentifier.resolves(updated);
-            return helper.request().post('/api/2.0/nodes/1234/ssh')
-                .send(updatedSshSettings)
+            waterline.nodes.getNodeById.resolves(tempNode);
+            waterline.ibms.upsertByNode.resolves(sendSsh);
+            return helper.request().post('/api/2.0/nodes/1234foo/ssh')
+                .send(sendSsh)
                 .expect('Content-Type', /^application\/json/)
                 .expect(201)
                 .expect(function (data) {
-                    expect(data.body.sshSettings).to.deep.equal(updatedSshSettings);
-                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledOnce;
-                    expect(waterline.nodes.updateByIdentifier).to.have.been.calledWith(node.id);
-                    expect(waterline.nodes.updateByIdentifier.firstCall.args[1].sshSettings.host)
-                        .to.equal(updatedSshSettings.host);
+                    expect(data.body).to.deep.equal(sendSsh);
+                    expect(waterline.nodes.getNodeById).to.have.been.calledOnce;
                 });
         });
 
         it('should not add a new unsupported ssh settings', function () {
-            waterline.nodes.needByIdentifier.resolves(node);
+            waterline.nodes.getNodeById.resolves(node);
             var invalidSetting = {
                 'host': '5.5.5.5'
             };
 
-            waterline.nodes.needByIdentifier.resolves(node);
+            waterline.nodes.getNodeById.resolves(node);
 
             return helper.request().post('/api/2.0/nodes/1234/ssh')
                 .send(invalidSetting)
                 .expect('Content-Type', /^application\/json/)
-                .expect(400)
-                .expect(function () {
-                    expect(waterline.nodes.updateByIdentifier).to.not.have.been.called;
-                });
+                .expect(400);
         });
 
         it('should return a 404 if the node was not found', function () {
-            waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
+            waterline.nodes.getNodeById.rejects(new Errors.NotFoundError('Not Found'));
 
             return helper.request().post('/api/2.0/nodes/1234/ssh')
-                .send(updatedSshSettings)
+                .send(sendSsh)
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
@@ -905,4 +922,5 @@ describe('2.0 Http.Api.Nodes', function () {
                 });
         });
     });
+
 });
