@@ -88,7 +88,7 @@ describe('Http.Api.Notification', function () {
     });
 
     describe('POST /notification/progress', function () {
-        describe('should return 200', function() {
+        describe('stub publishTaskProgress', function() {
             var body;
             beforeEach(function() {
                 body = {
@@ -118,6 +118,14 @@ describe('Http.Api.Notification', function () {
                 });
             });
 
+            it('should be success if description is missing in body', function() {
+                return helper.request()
+                .post('/api/2.0/notification/progress')
+                .send(body)
+                .set('Content-Type', 'application/json')
+                .expect(200);
+            });
+
             it('should post progress notification via query', function () {
                 return helper.request()
                 .post('/api/2.0/notification/progress?taskId=testid&maximum=5&value=2&description=foo%20bar%20%202') //jshint ignore: line
@@ -135,9 +143,16 @@ describe('Http.Api.Notification', function () {
                     });
                 });
             });
+
+            it('should be success if description is missing in query', function() {
+                return helper.request()
+                .post('/api/2.0/notification/progress?taskId=testid&maximum=4&value=2')
+                .set('Content-Type', 'application/json')
+                .expect(200);
+            });
         });
 
-        describe('should return 400', function() {
+        describe('not stub publishTaskProgress', function() {
             it('should return 400 if taskid is missing in query', function() {
                 return helper.request()
                 .post('/api/2.0/notification/progress?maximum=5&value=2&description=foo')
@@ -197,7 +212,7 @@ describe('Http.Api.Notification', function () {
     });
 
     describe('GET /notification/progress', function () {
-        describe('should return 200', function() {
+        describe('stub publishTaskProgress', function() {
             beforeEach(function() {
                 sinon.stub(notificationApiService, 'publishTaskProgress').resolves();
             });
@@ -222,9 +237,15 @@ describe('Http.Api.Notification', function () {
                     });
                 });
             });
+
+            it('should be success if description is missing', function() {
+                return helper.request()
+                .get('/api/2.0/notification/progress?taskId=testid&maximum=4&value=2')
+                .expect(200);
+            });
         });
 
-        describe('should return 400', function() {
+        describe('not stub publishTaskProgress', function() {
             it('should return 400 if taskId is missing', function() {
                 return helper.request()
                 .get('/api/2.0/notification/progress?maximum=5&value=2&description=foo')

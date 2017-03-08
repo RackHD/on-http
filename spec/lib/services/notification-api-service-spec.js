@@ -141,20 +141,6 @@ describe('Http.Api.Notification', function () {
             });
         });
 
-        it('should call publishTaskProgressNotCatch', function () {
-            var task = {graphId: 'graphId'};
-            this.sandbox.stub(graphProgressService, 'publishTaskProgressNotCatch').resolves();
-            waterline.taskdependencies = {findOne: function() {}};
-            waterline.graphobjects = {findOne: function() {}};
-            this.sandbox.stub(waterline.taskdependencies, 'findOne').resolves(task);
-            return notificationApiService.publishTaskProgress(message)
-            .then(function () {
-                expect(graphProgressService.publishTaskProgressNotCatch).to.have.been.calledOnce;
-                expect(graphProgressService.publishTaskProgressNotCatch)
-                    .to.have.been.calledWith(task.graphId, message.taskId, progressData);
-            });
-        });
-
         it('should not update graph progress if no active task found', function () {
             this.sandbox.restore();
             waterline.taskdependencies = {findOne: function() {}};

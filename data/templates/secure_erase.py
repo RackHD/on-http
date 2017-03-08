@@ -226,7 +226,7 @@ class Progress:
         counter = 0
         total_percent = 0.00
         if not self.parameters["address"]:
-            self.parameters["address"] = "http://172.31.128.1:9080/api/current/notification"
+            self.parameters["address"] = "http://172.31.128.1:9080/api/current/notification/progress"
         while True:
             for (index, value) in enumerate(self.disk_list):
                 value = value.split("/")[-1]
