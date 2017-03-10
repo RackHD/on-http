@@ -29,14 +29,19 @@
                         <%_ numSize = 0; _%>
                     <%_ } _%>
                     <%_ if (par.fsType === "swap") { _%>
-                        <%_ if (i === length ) { _%>
-        {"size": <%=numSize%>, "filesystem": "<%=par.fsType%>"}
-                        <%_ } else { _%>
-        {"size": <%=numSize%>, "filesystem": "<%=par.fsType%>"},
+                        <%# Through experiments, swap partition should always be the last one in %>
+                        <%# "partition" field of ks file, otherwise GUI will display inproperly %>
+                        <%_ swapPar = par; _%>
+                        <%_ swapParSize = numSize; _%>
+                        <%_ if (i === length) { _%>
+                            {"size": <%=swapParSize%>, "filesystem": "<%=swapPar.fsType%>"}
                         <%_ } _%>
                     <%_ } else { _%>
-                        <%_ if (i === length ) { _%>
+                        <%_ if (i === length && typeof swapPar === 'undefined') { _%>
         {"mountpoint": "<%=par.mountPoint%>", "size": <%=numSize%>, "filesystem": "<%=par.fsType%>"}
+                        <%_ } else if (i === length && typeof swapPar !== 'undefined') { _%>
+        {"mountpoint": "<%=par.mountPoint%>", "size": <%=numSize%>, "filesystem": "<%=par.fsType%>"},
+        {"size": <%=swapParSize%>, "filesystem": "<%=swapPar.fsType%>"}
                         <%_ } else { _%>
         {"mountpoint": "<%=par.mountPoint%>", "size": <%=numSize%>, "filesystem": "<%=par.fsType%>"},
                         <%_ } _%>
