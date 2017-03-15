@@ -1,3 +1,16 @@
+#notify the current progress
+<% if( typeof progressMilestones !== 'undefined' && progressMilestones.postConfigUri ) { %>
+# the url may contain query, the symbol '&' will mess the command line logic, so the whole url need be wrapped in quotation marks
+try
+{
+    curl -Method POST -ContentType 'application/json' "http://<%=server%>:<%=port%><%-progressMilestones.postConfigUri%>"
+}
+catch
+{
+    echo "Failed to notify the current progress: <%=progressMilestones.postConfig.description%>"
+}
+<% } %>
+
 <% if ( typeof networkDevices !== 'undefined' ) { %>
             <% networkDevices.forEach(function(n) { %>
                   <% if(   typeof n.ipv4.vlanIds !== 'undefined') { %>

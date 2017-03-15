@@ -1,6 +1,6 @@
 info:
   title: rackhd api 
-  version: "2.0.0" 
+  version: "2.1.0" 
 basePath: /api/2.0
 consumes:
 - application/json
@@ -80,7 +80,15 @@ definitions:
     description: Hook post schema 
     type: object
     properties:
-      $ref: "#/definitions/hooks.2.0_HookBase/properties"
+      url:
+        type: string
+        format: uri
+      name:
+        type: string
+      filters:
+        type: array
+        items:
+          type: object
     required:
       - url
   ipmi-obm-service_Obm:
@@ -238,18 +246,26 @@ definitions:
           $ref: '#/definitions/tag_rule'
         type: array
     type: object
-  ssh_settings:
+  ssh-ibm-service_Ibm:
     description: SSH settings
     properties:
-      host:
-        type: string
-      password:
-        type: string
-      user:
+      config:
+        properties:
+          host:
+            description: IP address
+            type: string
+          password:
+            description: Password
+            type: string
+          user:
+            description: Username
+            type: string
+        type: object
+      service:
         type: string
     required:
-    - host
-    - user
+    - service
+    - config
     type: object
   tag_rule:
     properties:
@@ -670,6 +686,212 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+  /ibms:
+    get:
+      description: Get a list of all In Band Management settings that have been associated
+        with nodes.
+      operationId: ibmsGet
+      responses:
+        200:
+          description: Successfully retrieved the list of IBMS service instances
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get list of all IBM service instances
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Read
+      - ibmsRead
+      x-view: ibms.2.0.json
+    put:
+      description: Create or update a single IBM service, and
+        associate it with a node.
+      operationId: ibmsPut
+      parameters:
+      - description: The IBM settings information to create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/ssh-ibm-service_Ibm'
+      responses:
+        201:
+          description: Successfully put the IBM service
+          schema:
+            type: object
+        500:
+          description: IBM service creation failed
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Put an IBM service
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Write
+      - ibmsWrite
+      x-swagger-schema: ibm
+      x-view: ibms.2.0.json
+    x-swagger-router-controller: ibms
+  /ibms/definitions:
+    get:
+      description:
+        Get a list of IBMS schemas, which define the properties
+        required to create IBMS settings.
+      operationId: ibmsDefinitionsGetAll
+      responses:
+        200:
+          description: Successfully retrieved a list of IBMS schemas
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get list of IBMS services
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Read
+      - ibmsRead
+    x-swagger-router-controller: ibms
+  /ibms/definitions/{name}:
+    get:
+      description: Get the contents of the specified IBMS service schema.
+      operationId: ibmsDefinitionsGetByName
+      parameters:
+      - description: The IBMS service name
+        in: path
+        name: name
+        required: true
+        type: string
+      responses:
+        200:
+          description: Successfully retrieved the specified IBMS shcema
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get an IBMS service definition
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Read
+      - ibmsRead
+    x-swagger-router-controller: ibms
+  /ibms/{identifier}:
+    delete:
+      description: Delete the IBMS settings with the specified identifier.
+      operationId: ibmsDeleteById
+      parameters:
+      - description: The IBMS service identifier
+        in: path
+        name: identifier
+        required: true
+        type: string
+      responses:
+        204:
+          description: Successfully deleted the specified IBMS settings
+          schema:
+            type: object
+        404:
+          description: The IBMS service with the specified identifier was not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Delete IBMS settings
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Write
+      - ibmsRemove
+    get:
+      description: Get the IBMS settings associated with the specified identifier
+      operationId: ibmsGetById
+      parameters:
+      - description: The IBMS service identifier
+        in: path
+        name: identifier
+        required: true
+        type: string
+      responses:
+        200:
+          description: Successfully retrieved the specified IBMS service
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get an IBMS service
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Read
+      - ibmsRead
+      x-view: ibms.2.0.json
+    patch:
+      description: Update the properties of the IBMS settings with the specified identifier.
+      operationId: ibmsPatchById
+      parameters:
+      - description: The IBMS service identifier
+        in: path
+        name: identifier
+        required: true
+        type: string
+      - description: The IBMS properties to patch
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/ssh-ibm-service_Ibm'
+      responses:
+        200:
+          description: Successfully patched the specified IBMS settings
+          schema:
+            type: object
+        500:
+          description: IBMS patch failed
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Patch IBMS settings
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Write
+      - ibmsModify
+      x-swagger-schema: ibm
+    x-swagger-router-controller: ibms
   /hooks:
     get:
       description: Get all hooks
@@ -1495,7 +1717,6 @@ paths:
       x-privileges:
       - Read
       - nodesRead
-      x-swagger-serializer: nodes
     post:
       description: Create the ssh settings associated with the specified node.
       operationId: nodesPostSshById
@@ -1510,7 +1731,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/ssh_settings'
+          $ref: '#/definitions/ssh-ibm-service_Ibm'
       responses:
         201:
           description: Successfull created ssh settings
@@ -1530,6 +1751,7 @@ paths:
       x-privileges:
       - Write
       - nodesWrite
+      x-swagger-schema: ibm
       x-swagger-deserializer: nodes
     x-swagger-router-controller: nodes
   /nodes/{identifier}/tags:

@@ -32,6 +32,8 @@ user=$(<%=user%>)
 check=0
 #The i variable is an index to determine the userID from the cmdReturn(userList)
 i=0
+#UserID used for adding new user
+newUserNumber=0
 
 for x in $cmdReturn; do
    if [ <%=user%> == $x ]; then
@@ -47,14 +49,37 @@ for x in $cmdReturn; do
   i=$((i+1))
 done
 
+function get_newUserNumber()
+{
+  cmdReturn=$(sudo ipmitool user summary $channel)
+  myarray=(${cmdReturn//$'\n'/ })
+  maxCount=${myarray[3]}
+  if [ $userNumber -lt $maxCount ]; then
+    #try to find out the empty user id
+    maxLength=${#userlist[@]}
+    for ((i=1;i<$maxLength;i++)) do
+      id=`echo ${userlist[i]} | awk '{print $1}'`
+      if [ $id != $i ]; then
+        newUserNumber=$i
+        break
+      fi
+    done
+    if [ $newUserNumber -eq 0 ]; then
+      newUserNumber=$((userNumber + 1))
+    fi
+  else
+    echo 'reach max user count'
+    exit 1
+  fi
+}
 
 if [ $check == 0 ]; then
  echo "Creating a new user"
- userNumber=$((userNumber + 1))
- ipmitool user set name $userNumber <%=user%>
- ipmitool user set password $userNumber <%=password%>
- ipmitool channel setaccess $channel $userNumber callin=on ipmi=on link=on privilege=4
- ipmitool user enable $userNumber
+ get_newUserNumber
+ ipmitool user set name $newUserNumber <%=user%>
+ ipmitool user set password $newUserNumber <%=password%>
+ ipmitool channel setaccess $channel $newUserNumber callin=on ipmi=on link=on privilege=4
+ ipmitool user enable $newUserNumber
 exit
 fi
 echo "Done"

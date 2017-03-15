@@ -158,29 +158,73 @@ paths:
             $ref: '#/definitions/Error'
   /notification/progress:
     x-swagger-router-controller: notification
+# In some environment (such as ipxe), the avaiable http client doesn't support POST, so we have
+# to compromise to define below GET api to update progress information, but actually it does the
+# job of verb "POST"
     get:
-      operationId: notificationProgressGet
+      operationId: notificationProgressPost
       summary: |
-        notification for task to get progress info
+        Send progress notification to task
       description: |
-        send taskid, total setps and current step sequence to rackhd via notification get function
+        This API is used to update the progress information for a task instance
       parameters:
         - name: taskId
           in: query
           description: |
-            Task instance identifier
-          required: true 
-          type: string
-        - name: totalSteps
-          in: query
-          description: |
-            Task instance identifier
+            The identifier of task instance which the progress applies to
           required: false
           type: string
-        - name: currentStep
+        - name: maximum
           in: query
           description: |
-            Task instance identifier
+            The maximum progress value
+          required: false
+          type: string
+        - name: value
+          in: query
+          description: |
+            The current progress value
+          required: false
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        201:
+          description: |
+            Specifics of the notification
+          schema:
+            type: object
+        400:
+          description: |
+            bad request parameter passed or no active task or taskgraph.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      operationId: notificationProgressPost
+      summary: |
+        Send progress notification to task
+      description: |
+        This API is used to update the progress information for a task instance
+      parameters:
+        - name: taskId
+          in: query
+          description: |
+            The identifier of task instance which the progress applies to
+          required: false
+          type: string
+        - name: maximum
+          in: query
+          description: |
+            The maximum progress value
+          required: false
+          type: string
+        - name: value
+          in: query
+          description: |
+            The current progress value
           required: false
           type: string
       tags: [ "/api/2.0" ]
