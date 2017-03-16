@@ -17,6 +17,8 @@ describe('Http.Services.Api.Workflows', function () {
     var Promise;
     var TaskGraph;
     var eventsProtocol;
+    var graphId;
+    var nodeId;
 
     before('Http.Services.Api.Workflows before', function() {
         helper.setupInjector([
@@ -31,6 +33,9 @@ describe('Http.Services.Api.Workflows', function () {
         Promise = helper.injector.get('Promise');
         TaskGraph = helper.injector.get('TaskGraph.TaskGraph');
         eventsProtocol = helper.injector.get('Protocol.Events');
+        var uuid = helper.injector.get('uuid');
+        graphId = uuid.v4();
+        nodeId = uuid.v4();
     });
 
     beforeEach(function() {
@@ -51,7 +56,10 @@ describe('Http.Services.Api.Workflows', function () {
         waterline.taskdefinitions = {
             destroy: sinon.stub().resolves({ injectableName: 'test' })
         };
-        graph = { instanceId: 'testgraphid' };
+        graph = {
+            instanceId: graphId,
+            name: 'Graph.Test'
+        };
         task = { instanceId: 'testtaskid' };
         workflow = { id: 'testid', _status: 'cancelled' };
         graphDefinition = { injectableName: 'Graph.Test' };
@@ -76,6 +84,7 @@ describe('Http.Services.Api.Workflows', function () {
         this.sandbox.stub(workflowApiService, 'runTaskGraph');
         this.sandbox.stub(env, 'get');
         this.sandbox.stub(eventsProtocol, 'publishProgressEvent').resolves();
+        this.sandbox.stub(eventsProtocol, 'publishGraphStarted').resolves();
     });
 
     afterEach('Http.Services.Api.Profiles afterEach', function() {
@@ -88,9 +97,10 @@ describe('Http.Services.Api.Workflows', function () {
 
     it('should create and run a graph not against a node', function () {
         graph = {
-            instanceId: 'testgraphid',
+            instanceId: graphId,
+            _status: 'running',
             name: 'testGraph',
-            node: null,
+            node: nodeId,
             tasks: {
                 task1: {
                     state: 'pending',
@@ -103,7 +113,7 @@ describe('Http.Services.Api.Workflows', function () {
         var data = {
             graphId: graph.instanceId,
             graphName: graph.name,
-            nodeId: null,
+            nodeId: nodeId,
             progress: {
                 maximum: 2,
                 value: 0,
@@ -129,6 +139,9 @@ describe('Http.Services.Api.Workflows', function () {
             expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
                 graphDefinition, { test: 1 }, { test: 2 }, 'test'
             );
+            expect(eventsProtocol.publishGraphStarted).to.have.been.calledOnce;
+            expect(eventsProtocol.publishGraphStarted)
+                .to.have.been.calledWith(graph.instanceId, 'running', nodeId);
             expect(eventsProtocol.publishProgressEvent).to.have.been.calledOnce;
             expect(eventsProtocol.publishProgressEvent)
                 .to.have.been.calledWith(graph.instanceId, data);
