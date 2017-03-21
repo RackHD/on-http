@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Systems/<%= identifier %>/Bios/Settings",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Bios.1.0.0.Bios",
+    "AttributeRegistry": "",
+    "Attributes": {
+        <% bios.attributes.forEach(function(item, i, arr) { %>
+            "<%= item.attributeName.value %>": %> "<%= item.currentValue[0].value %>"
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    },
+    "Description": "BIOS Configuration Current Settings",
+    "Id": "Bios",
+    "Name": "BIOS Configuration Current Settings",
+    "Oem": {}
+}

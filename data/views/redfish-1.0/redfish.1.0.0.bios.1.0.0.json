@@ -1,0 +1,36 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Systems/<%= identifier %>/Bios",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Bios.1.0.0.Bios",
+    "Actions": {
+        "Oem": {}
+    },
+    "@Redfish.Settings": {
+        "@odata.type": "#Settings.v1_0_0.Settings",
+        "ETag": "",
+        "Messages": [],
+        "SettingsObject": {
+            "@odata.id": "/redfish/v1/Systems/<%= identifier %>/Bios/Settings"
+        },
+        "Time": ""
+    },
+    "AttributeRegistry": "",
+    "Attributes": {
+        <% bios.attributes.forEach(function(item, i, arr) { %>
+            "<%= item.attributeName.value %>": %> "<%= item.currentValue[0].value %>"
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    },
+    "Description": "BIOS Configuration Current Settings",
+    "Id": "Bios",
+    "Name": "BIOS Configuration Current Settings",
+    "Oem": {},
+    "Actions": {
+        "#Bios.ResetBios": {
+            "target": "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
+        },
+        "#Bios.ChangePassword": {
+            "target": "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword"
+        }
+    }
+}
