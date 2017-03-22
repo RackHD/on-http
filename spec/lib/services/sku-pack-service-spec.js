@@ -153,7 +153,7 @@ describe("SKU Pack Service", function() {
             populate: function() {
                 return {
                     populate: sinon.stub().resolves('123')
-                }
+                };
             }
         });
         return skuService.getNodesSkusById('456').then(function(val){
