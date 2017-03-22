@@ -16,16 +16,6 @@ describe('Redfish Update Service', function () {
             }
         }
     ];
-    var obmSettingsNoIpmi = [
-        {
-            service: 'snmp-obm-service',
-            config: {
-                host: '1.2.3.4',
-                user: 'myuser',
-                password: 'mypass'
-            }
-        }
-    ];
     var badPayload = {"junk": "junk"};
     var goodPayload = {
         "ImageURI": "/home/rackhd/tmp/installer.exe",
@@ -88,7 +78,7 @@ describe('Redfish Update Service', function () {
     });
 
     it('should return an error if a node is not found', function () {
-        waterline.nodes.getNodeById.rejects();
+        waterline.nodes.getNodeById.resolves(undefined);
         return helper.request().post(
             '/redfish/v1/UpdateService/Actions/UpdateService.SimpleUpdate'
         )
@@ -101,31 +91,4 @@ describe('Redfish Update Service', function () {
             });
     });
 
-    it('should return an error if OBM settings are not set', function () {
-        waterline.obms.findAllByNode.rejects();
-        return helper.request().post(
-            '/redfish/v1/UpdateService/Actions/UpdateService.SimpleUpdate'
-        )
-            .send(goodPayload)
-            .expect('Content-Type', /^application\/json/)
-            .expect(400)
-            .expect(function (response) {
-                expect(response.body).to.have.property('error');
-                expect(redfish.handleError).to.have.been.calledOnce;
-            });
-    });
-
-    it('should return an error if no IPMI OBM settings exist', function () {
-        waterline.obms.findAllByNode.resolves(obmSettingsNoIpmi);
-        return helper.request().post(
-            '/redfish/v1/UpdateService/Actions/UpdateService.SimpleUpdate'
-        )
-            .send(goodPayload)
-            .expect('Content-Type', /^application\/json/)
-            .expect(400)
-            .expect(function (response) {
-                expect(response.body).to.have.property('error');
-                expect(redfish.handleError).to.have.been.calledOnce;
-            });
-    });
 });
