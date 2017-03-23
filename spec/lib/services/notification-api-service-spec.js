@@ -11,6 +11,7 @@ describe('Http.Api.Notification', function () {
     var needByIdentifier;
     var postNodeNotification;
     var postBroadcastNotification;
+    var lookup;
 
     var nodeNotificationMessage = {
         nodeId: '57a86b5c36ec578876878294',
@@ -20,6 +21,44 @@ describe('Http.Api.Notification', function () {
         data: 'dummy data'
     };
     var node = {_id: nodeNotificationMessage.nodeId};
+
+    var bmc = {
+        'IP Address': '10.240.19.130',
+        node : "abc",
+        data : {'MAC Address': "jill"}
+    };
+    var deviceInfoCatalog ={
+        data : {
+            'Builtin FRU Device (ID 0)' : {
+                'Board Product' : "bernie",
+                'Product Serial' : "hillary",
+                'Board Serial' : "theDonald"
+            }
+        }
+    };
+    var alert = {
+        "Severity":"Critical"
+    };
+    var amqpMessage ={action: "alerts",
+        data: {
+            ChassisName: "bernie",
+            SN: "theDonald",
+            ServiceTag: "hillary",
+            Severity: "Critical",
+            macAddress: "jill",
+            nodeId: "abc",
+            sourceIpAddress: "127.0.0.1"
+        },
+        severity: "critical",
+        type: "node",
+        typeId: "abc"
+    };
+    var req = {
+        headers : {
+            'x-forwarded-for' :"127.0.0.1"
+        },
+        swagger: { query: alert}
+    };
 
     var graphId;
     var taskId;
@@ -35,12 +74,14 @@ describe('Http.Api.Notification', function () {
         graphProgressService = helper.injector.get('Services.GraphProgress');
         _ = helper.injector.get('_');
         eventsProtocol = helper.injector.get('Protocol.Events');
+        lookup = helper.injector.get('Services.Lookup');
         waterline = helper.injector.get('Services.Waterline');
         waterline.nodes = {
             needByIdentifier: function() {}
         };
         sinon.stub(eventsProtocol, 'publishNodeNotification').resolves();
         sinon.stub(eventsProtocol, 'publishBroadcastNotification').resolves();
+        sinon.stub(eventsProtocol, 'publishExternalEvent').resolves();
         this.sandbox = sinon.sandbox.create();
         needByIdentifier = sinon.stub(waterline.nodes, 'needByIdentifier');
         needByIdentifier.resolves(node);
@@ -49,6 +90,13 @@ describe('Http.Api.Notification', function () {
         var uuid = helper.injector.get('uuid');
         graphId = uuid.v4();
         taskId = uuid.v4();
+
+        waterline.catalogs = {
+            findMostRecent: sinon.stub()
+        };
+        waterline.obms = {
+            findOne: sinon.stub()
+        };
     });
 
     beforeEach(function() {
@@ -63,6 +111,8 @@ describe('Http.Api.Notification', function () {
             maximum: '100',
             value: '10',
         };
+        waterline.catalogs.findMostRecent = sinon.stub().resolves();
+        waterline.obms.findOne = sinon.stub().resolves();
     });
 
     after('Reset mocks', function () {
@@ -74,6 +124,7 @@ describe('Http.Api.Notification', function () {
             }).value();
         }
         resetMocks(eventsProtocol);
+        resetMocks(lookup);
     });
 
     describe('POST /notification', function () {
@@ -151,6 +202,76 @@ describe('Http.Api.Notification', function () {
             return expect(
                 notificationApiService.publishTaskProgress(message)
             ).to.be.rejected;
+        });
+
+        it('should post an alert notification successfully(from catalog collection & Ip)', function () {// jshint ignore:line
+            this.sandbox.restore();
+            sinon.stub(lookup, 'lookupByIP').resolves();
+            waterline.obms.findOne.onCall(0).resolves(undefined);
+            waterline.obms.findOne.onCall(1).resolves(undefined);
+            waterline.catalogs.findMostRecent.onCall(0).resolves(bmc);
+            waterline.catalogs.findMostRecent.onCall(1).resolves(deviceInfoCatalog);
+            return notificationApiService.redfishAlertProcessing(req)
+                .then(function (resp) {
+                    expect(resp).to.deep.equal(amqpMessage);
+                });
+        });
+
+        it('should post an alert notification successfully(from obms collection & MAc)', function () {// jshint ignore:line
+            this.sandbox.restore();
+            waterline.obms.findOne.onCall(0).resolves({config : {host: "0.0.0.0"}});
+            waterline.catalogs.findMostRecent.onCall(0).resolves(bmc);
+            waterline.catalogs.findMostRecent.onCall(1).resolves(deviceInfoCatalog);
+            return notificationApiService.redfishAlertProcessing(req)
+                .then(function (resp) {
+                    expect(resp).to.deep.equal(amqpMessage);
+                });
+        });
+
+        it('should post an alert notification successfully(from obms collection)', function () {
+            this.sandbox.restore();
+            waterline.obms.findOne.onCall(0).resolves({config : {host: "00:00:00:00:00"}});
+            waterline.catalogs.findMostRecent.onCall(0).resolves(bmc);
+            waterline.catalogs.findMostRecent.onCall(1).resolves(deviceInfoCatalog);
+            return notificationApiService.redfishAlertProcessing(req)
+                .then(function (resp) {
+                    expect(resp).to.deep.equal(amqpMessage);
+                });
+        });
+
+
+        it('should NOT post an alert notification for an unrecognized node', function (done) {
+            this.sandbox.restore();
+            waterline.catalogs.findMostRecent.onCall(0).resolves(undefined);
+            waterline.obms.findOne.onCall(0).resolves(undefined);
+            return notificationApiService.redfishAlertProcessing(req)
+                .then(function(){
+                    done(new Error('should NOT have posted the alert!'));
+                })
+                .catch(function (e) {
+                    expect(e).to.have.property('message').that.equals('unrecognized node');
+                    done();
+                });
+        });
+
+        it('should NOT post an alert notification for unexpected decoded data', function (done) {
+            var badReq = {
+                headers : {
+                    'x-forwarded-for' :"127.0.0.1"
+                },
+                swagger: { query: {}}
+            };
+            this.sandbox.restore();
+            waterline.catalogs.findMostRecent.onCall(0).resolves(bmc);
+            waterline.obms.findOne.onCall(0).resolves(deviceInfoCatalog);
+            return notificationApiService.redfishAlertProcessing(badReq)
+                .then(function(){
+                    done(new Error('should NOT have posted the alert!'));
+                })
+                .catch(function (e) {
+                    expect(e).to.have.property('message').that.equals('Unexpected alert data');// jshint ignore:line
+                    done();
+                });
         });
     });
 });
