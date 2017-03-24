@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "1.0.7"
+  version: "1.1.0"
   title: rackhd redfish v1
 # during dev, should point to your local machine
 #host: localhost:8080
@@ -1699,6 +1699,36 @@ paths:
           description: Success
           schema:
             $ref: "#/definitions/TaskCollection_TaskCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /UpdateService/Actions/UpdateService.SimpleUpdate:
+    x-swagger-router-controller: update-service
+    post:
+      x-privileges: [ 'ConfigureComponents' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: update firmware on a node
+      operationId: updateFirmware
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateService.1.0.0_UpdateService.post"
+      responses:
+        201:
+          description: Success
+          $ref: "#/responses/status_201"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -5939,3 +5969,17 @@ definitions:
         type: string
   testEvent:
     type: object
+  UpdateService.1.0.0_UpdateService.post:
+    properties:
+      ImageURI:
+        description: The URI of the firmware update package.
+        type: string
+      Targets:
+        description: The identifiers of the nodes on which to perform the firmware update.
+        items:
+          type: string
+        type: array
+    type: object
+    required:
+    - ImageURI
+    - Targets
