@@ -8,7 +8,7 @@
                 "type": {
                     "description": "Type of poller",
                     "type": "string",
-                    "enum": ["ipmi", "snmp", "redfish"]
+                    "enum": ["ipmi", "snmp", "redfish","wsman"]
                 },
                 "pollInterval": {
                     "description": "Interval at which poller will run",
