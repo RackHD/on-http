@@ -3001,20 +3001,11 @@ paths:
       description: Get the specified task schema.
       operationId: taskSchemasIdGet
       parameters:
-      - description: The filename of the task schema
+      - description: The name of task schema
         in: path
         name: identifier
         required: true
         type: string
-      - description: >
-          The reference resolve flag.
-          false - a simple schema with any internal reference only in the response.
-          true - all the internal references will be resolved and fully defined in
-          the response.
-        in: query
-        name: resolveRef
-        required: false
-        type: boolean
       responses:
         200:
           description: Successfully retrieved the task schema
