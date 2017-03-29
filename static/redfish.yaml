@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "1.1.0"
+  version: "1.1.1"
   title: rackhd redfish v1
 # during dev, should point to your local machine
 #host: localhost:8080
@@ -633,7 +633,8 @@ paths:
       responses:
         202:
           description: Success
-          $ref: "#/responses/status_202"
+          schema:
+            $ref: "#/definitions/odata.4.0.0_idRef"
         400:
           $ref: "#/responses/status_400"
         401:
