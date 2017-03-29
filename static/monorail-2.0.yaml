@@ -3318,6 +3318,7 @@ paths:
       x-privileges:
       - Read
       - skusRead
+      x-view: node.2.0.json
     x-swagger-router-controller: skus
   /skus/{identifier}/pack:
     delete:
