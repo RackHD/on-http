@@ -176,6 +176,7 @@ definitions:
         - ipmi
         - snmp
         - redfish
+        - wsman
         type: string
     type: object
   post_node_workflow:
