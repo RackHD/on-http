@@ -102,7 +102,7 @@ describe('2.0 Http.Api.Nodes', function () {
     }];
 
     var node = {
-        autoDiscover: "false",
+        autoDiscover: false,
         catalogs:'/api/2.0/nodes/1234abcd1234abcd1234abcd/catalogs',
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
@@ -132,7 +132,7 @@ describe('2.0 Http.Api.Nodes', function () {
     };
 
     var rawNode = {
-        autoDiscover: "false",
+        autoDiscover: false,
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
@@ -427,7 +427,7 @@ describe('2.0 Http.Api.Nodes', function () {
 
         var tempNode = 
         {
-            autoDiscover: "false",
+            autoDiscover: false,
             catalogs:'/api/2.0/nodes/1234abcd1234abcd1234abcd/catalogs',
             id: '1234foo',
             name: 'name',

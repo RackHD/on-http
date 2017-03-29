@@ -166,17 +166,20 @@ describe("Http.Services.Api.Nodes", function () {
             var switchNode = {
                 id: '1234abcd1234abcd1234abcd',
                 name: 'name',
-                snmpSettings: {
-                    host: '1.2.3.4',
-                    community: 'community'
-                },
+                ibms: [{
+                    service: 'snmp-ibm-service',
+                    config: {
+                        host: '1.2.3.4',
+                        community: 'community'
+                    }
+                }],
                 autoDiscover: true,
                 type: 'switch'
             };
 
             waterline.nodes.create.resolves(switchNode);
             waterline.ibms.upsertByNode.resolves({});
-            waterline.ibms.findByNode.resolves(switchNode.snmpSettings);
+            waterline.ibms.findByNode.resolves(switchNode.ibms);
             this.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves({});
 
             return nodeApiService.postNode(switchNode)
@@ -187,7 +190,7 @@ describe("Http.Services.Api.Nodes", function () {
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledWith(
                     {
                         name: 'Graph.Switch.Discovery',
-                        options: { defaults: switchNode.snmpSettings }
+                        options: { defaults: switchNode.ibms }
                     },
                     switchNode.id
                 );
@@ -244,16 +247,19 @@ describe("Http.Services.Api.Nodes", function () {
             var pduNode = {
                 id: '1234abcd1234abcd1234abcd',
                 name: 'name',
-                snmpSettings: {
-                    host: '1.2.3.4',
-                    community: 'community'
-                },
+                ibms: [{
+                    service: 'snmp-ibm-service',
+                    config: {
+                        host: '1.2.3.4',
+                        community: 'community'
+                    }
+                }],
                 autoDiscover: true,
                 type: 'pdu'
             };
             waterline.nodes.create.resolves(pduNode);
             waterline.ibms.upsertByNode.resolves({});
-            waterline.ibms.findByNode.resolves(pduNode.snmpSettings);
+            waterline.ibms.findByNode.resolves(pduNode.ibms);
             this.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves({});
 
             return nodeApiService.postNode(pduNode)
@@ -263,7 +269,7 @@ describe("Http.Services.Api.Nodes", function () {
                 expect(workflowApiService.createAndRunGraph).to.have.been.calledWith(
                     {
                         name: 'Graph.PDU.Discovery',
-                        options: { defaults: pduNode.snmpSettings }
+                        options: { defaults: pduNode.ibms }
                     },
                     pduNode.id
                 );
