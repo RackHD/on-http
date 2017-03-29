@@ -67,7 +67,7 @@ describe('Http.Api.Skus.2.0', function() {
         id: '1234abcd1234abcd1234abcd',
         name: 'sku test node',
         type: 'compute',
-        obmSettings: [
+        obms: [
             {
                 service: 'ipmi-obm-service',
                 config: {
@@ -77,11 +77,13 @@ describe('Http.Api.Skus.2.0', function() {
                 }
             }
         ],
+        ibms: [],
         autoDiscover: "false",
         identifiers: [],
         createdAt: '010101',
         updatedAt: '010101',
         tags: [],
+        relations: [],
         sku: '0987'
     };
 

@@ -149,7 +149,13 @@ describe("SKU Pack Service", function() {
 
     it('should get the nodes with a certain sku id ', function() {
         waterline.skus.needByIdentifier.resolves({id: 'abc', sku: 'sku'});
-        waterline.nodes.find.resolves('123');
+        waterline.nodes.find.returns({
+            populate: function() {
+                return {
+                    populate: sinon.stub().resolves('123')
+                };
+            }
+        });
         return skuService.getNodesSkusById('456').then(function(val){
             expect(waterline.skus.needByIdentifier).to.have.been.called;
             expect(val).equal('123');
