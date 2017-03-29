@@ -132,10 +132,24 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
   <% }); %>
 <% } %>
 
+#parameters:vmkName, portgroup, switchName
+createVmk () {
+    vmkMac=`esxcli network ip interface list | sed -ne '/^.*\Name: $1.*$/{N;s/.*MAC Address: //;p}'`
+    esxcli network vswitch standard portgroup add -p $2 -v $3
+    esxcli network ip interface remove -i $1
+    if [ -z $vmkMac ]
+    then
+      esxcli network ip interface add -i $1 -p $2
+    else
+      esxcli network ip interface add -i $1 -p $2 -M $vmkMac
+    fi
+}
+
 <% vmkid = 0 %>
 <% if( typeof networkDevices !== 'undefined' ) { %>
   <% networkDevices.forEach(function(n) { %>
     currdev=<%=n.device%>
+    esxSwitchName=<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
     <% if (n.device.substring(0,5) != 'vmnic') { %>
        currdev=`esxcli network nic list | grep <%=n.device%> | cut -d ' ' -f 1`
     <% } %>
@@ -143,30 +157,14 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
       <% if( undefined !== n.ipv4.vlanIds ) { %>
         <% n.ipv4.vlanIds.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
-          vmkMac=`esxcli network ip interface list | sed -ne '/^.*\Name: <%=vmkname%>.*$/{N;s/.*MAC Address: //;p}'`
-          esxcli network vswitch standard portgroup add -p $currdev.<%=vid%> -v "<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>"
-          esxcli network ip interface remove -i <%=vmkname%>
-          if [ -z $vmkMac ]
-          then
-            esxcli network ip interface add -i <%=vmkname%> -p $currdev.<%=vid%>
-          else
-            esxcli network ip interface add -i <%=vmkname%> -p $currdev.<%=vid%> -M $vmkMac
-          fi
+          createVmk <%=vmkname%> $currdev.<%=vid%> $esxSwitchName
           esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
           esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
           esxcli network vswitch standard portgroup set -p $currdev.<%=vid%> -v <%=vid %>
         <% }); %>
       <% } else { %>
         <% vmkname = 'vmk' + vmkid++ %>
-        vmkMac=`esxcli network ip interface list | sed -ne '/^.*\Name: <%=vmkname%>.*$/{N;s/.*MAC Address: //;p}'`
-        esxcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-        esxcli network ip interface remove -i <%=vmkname%>
-        if [ -z $vmkMac ]
-        then
-          esxcli network ip interface add -i <%=vmkname%> -p $currdev
-        else
-          esxcli network ip interface add -i <%=vmkname%> -p $currdev -M $vmkMac
-        fi
+        createVmk <%=vmkname%> $currdev $esxSwitchName
         esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
         esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
       <% } %>
@@ -175,43 +173,19 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
       <% if( undefined !== n.ipv6.vlanIds ) { %>
         <% n.ipv6.vlanIds.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
-          vmkMac=`esxcli network ip interface list | sed -ne '/^.*\Name: <%=vmkname%>.*$/{N;s/.*MAC Address: //;p}'`
-          esxcli network vswitch standard portgroup add -p $currdev.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-          esxcli network ip interface remove -i <%=vmkname%>
-          if [ -z $vmkMac ]
-          then
-            esxcli network ip interface add -i <%=vmkname%> -p $currdev.<%=vid%>
-          else
-            esxcli network ip interface add -i <%=vmkname%> -p $currdev.<%=vid%> -M $vmkMac
-          fi
+          createVmk <%=vmkname%> $currdev.<%=vid%> $esxSwitchName
           esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
           esxcli network vswitch standard portgroup set -p $currdev.<%=vid%> -v <%=vid %>
         <% }); %>
       <% } else { %>
         <% vmkname = 'vmk' + vmkid++ %>
-        vmkMac=`esxcli network ip interface list | sed -ne '/^.*\Name: <%=vmkname%>.*$/{N;s/.*MAC Address: //;p}'`
-        esxcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-        esxcli network ip interface remove -i <%=vmkname%>
-        if [ -z $vmkMac ]
-        then
-          esxcli network ip interface add -i <%=vmkname%> -p $currdev
-        else
-          esxcli network ip interface add -i <%=vmkname%> -p $currdev -M $vmkMac
-        fi
+        createVmk <%=vmkname%> $currdev $esxSwitchName
         esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
       <% } %>
     <% } %>
     <% if( (undefined === n.ipv6) && (undefined === n.ipv4) ) { %>
       <% vmkname = 'vmk' + vmkid++ %>
-      vmkMac=`esxcli network ip interface list | sed -ne '/^.*\Name: <%=vmkname%>.*$/{N;s/.*MAC Address: //;p}'`
-      esxcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-      esxcli network ip interface remove -i <%=vmkname%>
-      if [ -z $vmkMac ]
-      then
-        esxcli network ip interface add -i <%=vmkname%> -p $currdev
-      else
-        esxcli network ip interface add -i <%=vmkname%> -p $currdev -M $vmkMac
-      fi
+      createVmk <%=vmkname%> $currdev $esxSwitchName
       esxcli network ip interface ipv4 set -i <%=vmkname%> -t dhcp
     <% } %>
   <% }); %>
