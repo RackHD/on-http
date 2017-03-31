@@ -254,7 +254,8 @@ describe('Http.Api.Profiles', function () {
                 .query({ macs: '00:00:de:ad:be:ef', ips: '172.31.128.5' })
                 .expect(503)
                 .then(function(resp) {
-                    expect(resp.body.message).to.equal('Error: Unable to retrieve workflow properties');
+                    expect(resp.body.message).to.equal(
+                        'Error: Unable to retrieve workflow properties or profiles');
                 });
         });
 
@@ -334,7 +335,8 @@ describe('Http.Api.Profiles', function () {
             return helper.request().get('/api/2.0/profiles/switch/testswitchvendor')
                 .expect(503)
                 .then(function(resp) {
-                    expect(resp.body.message).to.equal('Error: Unable to retrieve workflow properties');
+                    expect(resp.body.message).to.equal(
+                        'Error: Unable to retrieve workflow properties or profiles');
                 });
         });
 
