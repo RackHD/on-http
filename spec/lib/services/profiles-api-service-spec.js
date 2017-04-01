@@ -347,7 +347,8 @@ describe("Http.Services.Api.Profiles", function () {
 
             var promise = profileApiService.getProfileFromTaskOrNode(node);
 
-            return expect(promise).to.be.rejectedWith('Unable to retrieve workflow properties')
+            return expect(promise).to.be.rejectedWith(
+                'Unable to retrieve workflow properties or profiles')
             .then(function() {
                 expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
                 expect(taskProtocol.requestProfile).to.have.been.calledOnce;
