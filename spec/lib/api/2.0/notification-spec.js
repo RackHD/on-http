@@ -26,6 +26,7 @@ describe('Http.Api.Notification', function () {
                 .resolves(nodeNotificationMessage);
             sinon.stub(notificationApiService, 'postBroadcastNotification')
                 .resolves(broadcastNotificationMessage);
+            //sinon.stub(notificationApiService, 'redfishAlertProcessing').resolves();
         });
 
     });
@@ -265,4 +266,39 @@ describe('Http.Api.Notification', function () {
             });
         });
     });
+
+    describe('POST /notification/alerts', function () {
+        var alert = {
+            "Severity":"Critical"
+        };
+        beforeEach(function(){
+            sinon.stub(notificationApiService, 'redfishAlertProcessing').resolves();
+        });
+        afterEach(function(){
+            notificationApiService.redfishAlertProcessing.restore();
+        });
+
+        it('should post alert notification successfully(json) ', function () {
+            return helper.request()
+                .post('/api/2.0/notification/alerts')
+                .set('Content-Type', 'application/json')
+                .send(alert)
+                .expect(201)
+                .then(function () {
+                    expect(notificationApiService.redfishAlertProcessing).to.have.been.calledOnce;// jshint ignore:line
+                });
+        });
+
+        it('should post alert notification successfully(x-www-form-urlencoded)', function () {
+            return helper.request()
+                .post('/api/2.0/notification/alerts')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .send({})
+                .expect(201)  
+                .then(function () {
+                    expect(notificationApiService.redfishAlertProcessing).to.have.been.calledOnce;// jshint ignore:line
+                });
+        });
+    });
+
 });

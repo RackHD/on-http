@@ -4734,6 +4734,39 @@ paths:
       - Write
       - workflowsModify
     x-swagger-router-controller: workflows
+  /notification/alerts:
+      post:
+        operationId: notificationAlertsPost
+        consumes:
+          - application/x-www-form-urlencoded
+          - application/json
+        summary: |
+          Publishes alerts(redfish) received to rackHD
+        description: |
+          Publishes alerts(redfish) received to rackHD
+        responses:
+          201:
+            description: |
+              Specifics of the alert
+            schema:
+              type: object
+          400:
+            description: |
+              bad request parameter passed
+            schema:
+              $ref: '#/definitions/Error'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+        tags:
+        - /api/2.0
+        x-authentication-type:
+        - jwt
+        x-privileges:
+        - Write
+        - notificationPost
+      x-swagger-router-controller: notification
 produces:
 - application/json
 schemes:
