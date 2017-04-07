@@ -138,7 +138,7 @@ definitions:
       relations:
         type: array
         items:
-          $ref: "#/definitions/relations.2.0_Relation"
+          $ref: "#/definitions/relations_obj"
       tags:
         items:
           type: string
@@ -178,6 +178,8 @@ definitions:
     type: object
     properties:
       id:
+        type: string
+      node:
         type: string
       config:
         type: object  
@@ -247,23 +249,19 @@ definitions:
             type: object
         type: object
     type: object
-  relations.2.0_Relation:
-    description: A key value set of relations.
+  relations_obj:
+    description: A key value set of node relations.
     properties:
-      containedBy:
-        description: The rack containing the node.
+      relationType:
+        description: Relation Type with the node.
+        type: string
+      info:
+        type: string
+      targets:
+        description: Array of targets.
         items:
           type: string
-        minItems: 1
         type: array
-        uniqueItems: true
-      contains:
-        description: An array of nodes contained by the rack.
-        items:
-          type: string
-        minItems: 1
-        type: array
-        uniqueItems: true
     type: object
   role_obj:
     properties:
@@ -1674,7 +1672,7 @@ paths:
           description: Successfully retrieved the nodes relations
           schema:
             items:
-              $ref: '#/definitions/relations.2.0_Relation'
+              $ref: '#/definitions/relations_obj'
             type: array
         404:
           description: The specified node was not found.
@@ -1710,7 +1708,7 @@ paths:
         name: content
         required: true
         schema:
-          $ref: '#/definitions/relations.2.0_Relation'
+          $ref: '#/definitions/generic_obj'
       responses:
         200:
           description: Node relations update succeeded.
@@ -3132,7 +3130,7 @@ paths:
           schema:
             type: array
             items:
-             $ref: '#/definitions/skus.2.0_SkusUpsert'
+              $ref: '#/definitions/skus.2.0_SkusUpsert'
         default:
           description: Unexpected error
           schema:
@@ -3357,7 +3355,7 @@ paths:
           schema:
             type: array
             items:
-             $ref: '#/definitions/node.2.0_PartialNode'
+              $ref: '#/definitions/node.2.0_PartialNode'
         404:
           description: The SKU with the specified identifier was not found
           schema:
