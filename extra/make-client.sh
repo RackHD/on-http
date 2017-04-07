@@ -10,7 +10,7 @@
 
 #changing directory to on-http
 SCRIPT_DIR=$(cd $(dirname $0) && pwd)
-cd $SCRIPT_DIR/..
+pushd $SCRIPT_DIR/..
 
 # help function to show usage of this script
 # 1>&2 redirects stdout to stderr
@@ -69,31 +69,29 @@ fi
 if [ $CLIENT_LIB == "go" ]; then
 
 #2.0 API Client Library
-    mkdir on-http-api2.0 && cd on-http-api2.0
+    mkdir on-http-api2.0 && pushd on-http-api2.0
     apt-get install jq
     LATESTV=$(curl -s https://api.github.com/repos/go-swagger/go-swagger/releases/latest | jq -r .tag_name)
     if [ -d swagger_linux_amd64 ]; then
         rm -rf swagger_linux_amd64
-    else
-        wget https://github.com/go-swagger/go-swagger/releases/download/$LATESTV/swagger_linux_amd64
     fi
+    wget https://github.com/go-swagger/go-swagger/releases/download/$LATESTV/swagger_linux_amd64
     chmod +x swagger_linux_amd64
     cp ../static/monorail-2.0.yaml .
     swagger generate client -f ./monorail-2.0.yaml -A on-http-api2.0
-    cd $SCRIPT_DIR/..
+    popd
 
 #Redfish API Client Library
-    mkdir on-http-redfish-1.0 && cd on-http-redfish-1.0
+    mkdir on-http-redfish-1.0 && pushd on-http-redfish-1.0
     LATESTV=$(curl -s https://api.github.com/repos/go-swagger/go-swagger/releases/latest | jq -r .tag_name)
     if [ -d swagger_linux_amd64 ]; then
         rm -rf swagger_linux_amd64
-    else
-        wget https://github.com/go-swagger/go-swagger/releases/download/$LATESTV/swagger_linux_amd64
     fi
+    wget https://github.com/go-swagger/go-swagger/releases/download/$LATESTV/swagger_linux_amd64
     chmod +x swagger_linux_amd64
     cp ../static/redfish.yaml .
     swagger generate client -f ./redfish.yaml -A on-http-redfish-1.0
-    cd $SCRIPT_DIR/..
+    popd
 
 #if not go, use swagger-codegen to generate client libraries
 else
@@ -116,3 +114,5 @@ else
         -l $CLIENT_LIB \
         --additional-properties packageName=on_http_redfish_1_0,packageVersion=${VERSION}
 fi
+
+popd
