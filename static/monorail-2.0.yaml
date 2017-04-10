@@ -1,6 +1,6 @@
 info:
   title: rackhd api 
-  version: "2.1.0" 
+  version: "2.1.1"
 basePath: /api/2.0
 consumes:
 - application/json
@@ -120,6 +120,13 @@ definitions:
     properties:
       autoDiscover:
         type: string
+      bootSettings:
+        type: object
+      identifiers:
+        items:
+          type: string
+          uniqueItems: true
+        type: array
       name:
         description: Name of the node
         type: string
@@ -128,6 +135,15 @@ definitions:
         type: array
         items:
             $ref: "#/definitions/nodes_post_obm_by_id"
+      relations:
+        type: array
+        items:
+          $ref: "#/definitions/relations_obj"
+      tags:
+        items:
+          type: string
+          uniqueItems: true
+        type: array
       type:
         description: Type of node
         enum:
@@ -158,6 +174,17 @@ definitions:
         type: string
       value:
         type: boolean
+  obm:
+    type: object
+    properties:
+      id:
+        type: string
+      node:
+        type: string
+      config:
+        type: object  
+      service:
+        type: string
   poller.2.0_PartialPoller:
     description: A poller for periodic collection of telemetry data
     properties:
@@ -192,6 +219,7 @@ definitions:
   post_tags:
     properties:
       name:
+        minLength: 1
         type: string
       rules:
         items:
@@ -221,6 +249,20 @@ definitions:
                 type: string
             type: object
         type: object
+    type: object
+  relations_obj:
+    description: A key value set of node relations.
+    properties:
+      relationType:
+        description: Relation Type with the node.
+        type: string
+      info:
+        type: string
+      targets:
+        description: Array of targets.
+        items:
+          type: string
+        type: array
     type: object
   role_obj:
     properties:
@@ -1068,7 +1110,7 @@ paths:
           description: Successfully retrieved the list of lookups
           schema:
             items:
-              type: object
+              $ref: '#/definitions/Lookups.2.0_LookupBase'
             type: array
         default:
           description: Unexpected error
@@ -1096,7 +1138,7 @@ paths:
         201:
           description: Successfully created new lookup
           schema:
-            type: object
+            $ref: '#/definitions/Lookups.2.0_LookupBase'
         default:
           description: Unexpected error
           schema:
@@ -1154,7 +1196,7 @@ paths:
           description: Successfully retrieved the lookup
           schema:
             items:
-              type: object
+              $ref: '#/definitions/Lookups.2.0_LookupBase'
             type: array
         default:
           description: Unexpected error
@@ -1187,7 +1229,7 @@ paths:
         200:
           description: Successfully modified the lookup
           schema:
-            type: object
+            $ref: '#/definitions/Lookups.2.0_LookupBase'
         404:
           description: The specified lookup was not found
           schema:
@@ -1232,7 +1274,7 @@ paths:
           description: Successfully retrieved the list of nodes
           schema:
             items:
-              type: object
+              $ref: '#/definitions/node.2.0_PartialNode'
             type: array
         400:
           description: Bad Request
@@ -1348,7 +1390,7 @@ paths:
           description: Successfully retrieved the specified node
           schema:
             items:
-              type: object
+              $ref: '#/definitions/node.2.0_PartialNode'
             type: array
         404:
           description: The specified node was not found
@@ -1386,7 +1428,7 @@ paths:
         200:
           description: Successfully modified the specified node
           schema:
-            type: object
+            $ref: '#/definitions/node.2.0_PartialNode'
         404:
           description: The specified node was not found
           schema:
@@ -1490,7 +1532,9 @@ paths:
         200:
           description: Successfully retrieved the specified OBM service
           schema:
-            type: object
+            type: array
+            items:
+              $ref: '#/definitions/obm'
         default:
           description: Unexpected error
           schema:
@@ -1557,7 +1601,9 @@ paths:
         200:
           description: Successfully retrieved the pollers of specified node
           schema:
-            type: object
+            type: array
+            items:
+              type: object
         404:
           description: The specified node was not found
           schema:
@@ -1627,7 +1673,7 @@ paths:
           description: Successfully retrieved the nodes relations
           schema:
             items:
-              type: object
+              $ref: '#/definitions/relations_obj'
             type: array
         404:
           description: The specified node was not found.
@@ -1993,7 +2039,9 @@ paths:
         200:
           description: Successfully retrieved the list of OBM service instances
           schema:
-            type: object
+            type: array
+            items:
+              $ref: '#/definitions/obm'
         default:
           description: Unexpected error
           schema:
@@ -2249,7 +2297,9 @@ paths:
         200:
           description: Successful retrieval of the list of pollers
           schema:
-            type: object
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
@@ -3079,7 +3129,9 @@ paths:
         200:
           description: Successfully retrieved the list of SKUs
           schema:
-            type: object
+            type: array
+            items:
+              $ref: '#/definitions/skus.2.0_SkusUpsert'
         default:
           description: Unexpected error
           schema:
@@ -3302,7 +3354,9 @@ paths:
         200:
           description: Successfully retrieved the nodes associated with the specified SKU
           schema:
-            type: object
+            type: array
+            items:
+              $ref: '#/definitions/node.2.0_PartialNode'
         404:
           description: The SKU with the specified identifier was not found
           schema:
@@ -4681,6 +4735,39 @@ paths:
       - Write
       - workflowsModify
     x-swagger-router-controller: workflows
+  /notification/alerts:
+      post:
+        operationId: notificationAlertsPost
+        consumes:
+          - application/x-www-form-urlencoded
+          - application/json
+        summary: |
+          Publishes alerts(redfish) received to rackHD
+        description: |
+          Publishes alerts(redfish) received to rackHD
+        responses:
+          201:
+            description: |
+              Specifics of the alert
+            schema:
+              type: object
+          400:
+            description: |
+              bad request parameter passed
+            schema:
+              $ref: '#/definitions/Error'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+        tags:
+        - /api/2.0
+        x-authentication-type:
+        - jwt
+        x-privileges:
+        - Write
+        - notificationPost
+      x-swagger-router-controller: notification
 produces:
 - application/json
 schemes:
