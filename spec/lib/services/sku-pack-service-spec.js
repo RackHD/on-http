@@ -1,4 +1,4 @@
-// Copyright 2015, EMC, Inc.
+// Copyright © 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
 
 'use strict';
 
@@ -22,6 +22,7 @@ describe("SKU Pack Service", function() {
             dihelper.simpleWrapper({}, 'TaskGraph.TaskGraph'),
             helper.require("/lib/services/workflow-api-service"),
             helper.require("/lib/services/sku-pack-service"),
+            helper.require('/lib/services/taskgraph-api-service'),
             dihelper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),
             dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf'),
             dihelper.requireWrapper('fs-extra', 'fs', undefined, __dirname)

@@ -1,4 +1,4 @@
-// Copyright 2015-2016, EMC, Inc.
+// Copyright © 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
 
 'use strict';
 
@@ -9,6 +9,7 @@ describe('Http.Api.Profiles', function () {
     var profiles;
     var presenter;
     var profileApiService;
+    var taskgraphApiService;
     var Errors;
     var waterline;
 
@@ -30,7 +31,9 @@ describe('Http.Api.Profiles', function () {
 
         workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
         sinon.stub(workflowApiService, 'findActiveGraphForTarget').resolves({});
-        sinon.stub(workflowApiService, 'createActiveGraph').resolves({ instanceId: 'test' });
+
+        taskgraphApiService = helper.injector.get('Http.Services.Api.Taskgraph.Scheduler');
+        sinon.stub(taskgraphApiService, 'workflowsPost').resolves({ instanceId: 'test' });
 
         presenter = helper.injector.get('common-api-presenter');
 
@@ -68,6 +71,7 @@ describe('Http.Api.Profiles', function () {
         resetMocks(presenter.CommonApiPresenter.prototype);
         resetMocks(profiles);
         resetMocks(profileApiService);
+        resetMocks(taskgraphApiService);
         resetMocks(waterline.lookups);
     });
 
