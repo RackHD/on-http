@@ -16,14 +16,12 @@ describe('Http.Services.Api.Workflows', function () {
     var workflow;
     var Promise;
     var TaskGraph;
-    var eventsProtocol;
-    var graphId;
-    var nodeId;
+    var taskGraphService;
 
     before('Http.Services.Api.Workflows before', function() {
         helper.setupInjector([
-            onHttpContext.prerequisiteInjectables,
-            helper.require('/lib/services/workflow-api-service')
+            onHttpContext.injectables,
+            onHttpContext.prerequisiteInjectables
         ]);
         Errors = helper.injector.get('Errors');
         workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
@@ -32,10 +30,8 @@ describe('Http.Services.Api.Workflows', function () {
         env = helper.injector.get('Services.Environment');
         Promise = helper.injector.get('Promise');
         TaskGraph = helper.injector.get('TaskGraph.TaskGraph');
-        eventsProtocol = helper.injector.get('Protocol.Events');
-        var uuid = helper.injector.get('uuid');
-        graphId = uuid.v4();
-        nodeId = uuid.v4();
+        taskGraphService = helper.injector.get('Http.Services.Api.Taskgraph.Scheduler');
+
     });
 
     beforeEach(function() {
@@ -56,10 +52,7 @@ describe('Http.Services.Api.Workflows', function () {
         waterline.taskdefinitions = {
             destroy: sinon.stub().resolves({ injectableName: 'test' })
         };
-        graph = {
-            instanceId: graphId,
-            name: 'Graph.Test'
-        };
+        graph = { instanceId: 'testgraphid' };
         task = { instanceId: 'testtaskid' };
         workflow = { id: 'testid', _status: 'cancelled' };
         graphDefinition = { injectableName: 'Graph.Test' };
@@ -71,59 +64,39 @@ describe('Http.Services.Api.Workflows', function () {
                                active: sinon.spy()
                               };
         this.sandbox = sinon.sandbox.create();
-        this.sandbox.stub(store, 'findActiveGraphForTarget');
-        this.sandbox.stub(store, 'getGraphDefinitions');
-        this.sandbox.stub(store, 'persistGraphDefinition');
-        this.sandbox.stub(store, 'deleteGraph');
-        this.sandbox.stub(store, 'destroyGraphDefinition');
-        this.sandbox.stub(store, 'persistTaskDefinition');
-        this.sandbox.stub(store, 'getTaskDefinitions');
-        this.sandbox.stub(store, 'deleteTaskByName');
-        this.sandbox.stub(workflowApiService, 'findGraphDefinitionByName');
-        this.sandbox.stub(workflowApiService, 'createActiveGraph');
-        this.sandbox.stub(workflowApiService, 'runTaskGraph');
         this.sandbox.stub(env, 'get');
-        this.sandbox.stub(eventsProtocol, 'publishProgressEvent').resolves();
-        this.sandbox.stub(eventsProtocol, 'publishGraphStarted').resolves();
+        this.sandbox.stub(taskGraphService, 'workflowsPost');
+        this.sandbox.stub(taskGraphService, 'workflowsGet');
+        this.sandbox.stub(taskGraphService, 'workflowsPutGraphs');
+        this.sandbox.stub(taskGraphService, 'workflowsGetByInstanceId');
+        this.sandbox.stub(taskGraphService, 'workflowsGetTasksByName');
+        this.sandbox.stub(taskGraphService, 'workflowsDeleteGraphsByName');
+        this.sandbox.stub(taskGraphService, 'workflowsPutTask');
+        this.sandbox.stub(taskGraphService, 'workflowsAction');
+        this.sandbox.stub(taskGraphService, 'workflowsDeleteTasksByName');
     });
 
     afterEach('Http.Services.Api.Profiles afterEach', function() {
         this.sandbox.restore();
     });
 
-    after(function() {
-        sinon.stub(workflowApiService, 'createAndRunGraph');
-    });
-
     it('should create and run a graph not against a node', function () {
+        taskGraphService.workflowsPost.resolves(graphDefinition);
+
         graph = {
-            instanceId: graphId,
-            _status: 'running',
+            instanceId: 'testgraphid',
             name: 'testGraph',
-            node: nodeId,
+            node: null,
             tasks: {
                 task1: {
-                    state: 'pending',
+                    state: 'pending'
                 },
                 task2: {
-                    state: 'pending',
+                    state: 'pending'
                 }
             }
         };
-        var data = {
-            graphId: graph.instanceId,
-            graphName: graph.name,
-            nodeId: nodeId,
-            progress: {
-                maximum: 2,
-                value: 0,
-                percentage: '0%',
-                description: 'Graph "' + graph.name + '" started'
-            }
-        };
-        workflowApiService.findGraphDefinitionByName.resolves(graphDefinition);
-        workflowApiService.createActiveGraph.resolves(graph);
-        workflowApiService.runTaskGraph.resolves();
+
         return workflowApiService.createAndRunGraph({
             name: 'Graph.Test',
             options: { test: 1 },
@@ -131,32 +104,19 @@ describe('Http.Services.Api.Workflows', function () {
             domain: 'test'
         })
         .then(function() {
-            expect(workflowApiService.findGraphDefinitionByName).to.have.been.calledOnce;
-            expect(workflowApiService.findGraphDefinitionByName)
-                .to.have.been.calledWith('Graph.Test');
-            expect(store.findActiveGraphForTarget).to.not.have.been.called;
-            expect(workflowApiService.createActiveGraph).to.have.been.calledOnce;
-            expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
-                graphDefinition, { test: 1 }, { test: 2 }, 'test'
+            expect(taskGraphService.workflowsPost).to.have.been.calledOnce;
+            expect(taskGraphService.workflowsPost).to.have.been.calledWith(
+                {
+                    name: 'Graph.Test',
+                    options: { test: 1 },
+                    context: { test: 2 },
+                    domain: 'test'
+                }
             );
-            expect(eventsProtocol.publishGraphStarted).to.have.been.calledOnce;
-            expect(eventsProtocol.publishGraphStarted)
-                .to.have.been.calledWith(graph.instanceId, 'running', nodeId);
-            expect(eventsProtocol.publishProgressEvent).to.have.been.calledOnce;
-            expect(eventsProtocol.publishProgressEvent)
-                .to.have.been.calledWith(graph.instanceId, data);
-            expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
-            expect(workflowApiService.runTaskGraph)
-                .to.have.been.calledWith(graph.instanceId, 'test');
         });
     });
 
     it('should create and run a graph against a node', function () {
-        workflowApiService.findGraphDefinitionByName.resolves(graphDefinition);
-        workflowApiService.createActiveGraph.resolves(graph);
-        workflowApiService.runTaskGraph.resolves();
-        store.findActiveGraphForTarget.resolves();
-
         return workflowApiService.createAndRunGraph({
             name: 'Graph.Test',
             options: { test: 1 },
@@ -164,131 +124,17 @@ describe('Http.Services.Api.Workflows', function () {
             domain: 'test'
         }, 'testnodeid')
         .then(function() {
-            expect(workflowApiService.findGraphDefinitionByName).to.have.been.calledOnce;
-            expect(workflowApiService.findGraphDefinitionByName)
-                .to.have.been.calledWith('Graph.Test');
-            expect(store.findActiveGraphForTarget).to.have.been.calledOnce;
-            expect(store.findActiveGraphForTarget).to.have.been.calledWith('testnodeid');
-            expect(workflowApiService.createActiveGraph).to.have.been.calledOnce;
-            expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
-                graphDefinition, { test: 1 }, { target: 'testnodeid', test: 2 }, 'test'
+            expect(taskGraphService.workflowsPost).to.have.been.calledOnce;
+            expect(taskGraphService.workflowsPost).to.have.been.calledWith(
+                {
+                    name: 'Graph.Test',
+                    options: { test: 1 },
+                    context: { test: 2 },
+                    domain: 'test'
+                },
+                'testnodeid'
             );
-            expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
-            expect(workflowApiService.runTaskGraph)
-                .to.have.been.calledWith(graph.instanceId, 'test');
-            expect(env.get).to.not.be.called;
         });
-    });
-
-    it('should create and run a graph against a node with a proxy', function () {
-        workflowApiService.findGraphDefinitionByName.resolves(graphDefinition);
-        workflowApiService.createActiveGraph.resolves(graph);
-        workflowApiService.runTaskGraph.resolves();
-        store.findActiveGraphForTarget.resolves();
-        waterline.lookups.findOneByTerm.resolves({id: 'testnodeid', proxy: 'proxy'});
-
-        return workflowApiService.createAndRunGraph({
-            name: 'Graph.Test',
-            options: { test: 1 },
-            context: { test: 2 },
-            domain: 'test'
-        }, 'testnodeid')
-        .then(function() {
-            expect(workflowApiService.findGraphDefinitionByName).to.have.been.calledOnce;
-            expect(workflowApiService.findGraphDefinitionByName)
-                .to.have.been.calledWith('Graph.Test');
-            expect(store.findActiveGraphForTarget).to.have.been.calledOnce;
-            expect(store.findActiveGraphForTarget).to.have.been.calledWith('testnodeid');
-            expect(workflowApiService.createActiveGraph).to.have.been.calledOnce;
-            expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
-                graphDefinition,
-                { test: 1 },
-                { target: 'testnodeid', test: 2, proxy: 'proxy' },
-                'test'
-            );
-            expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
-            expect(workflowApiService.runTaskGraph)
-                .to.have.been.calledWith(graph.instanceId, 'test');
-            expect(env.get).to.not.be.called;
-        });
-    });
-
-    it('should create and run a graph against a node with a sku', function () {
-        workflowApiService.findGraphDefinitionByName.resolves(graphDefinition);
-        workflowApiService.createActiveGraph.resolves(graph);
-        workflowApiService.runTaskGraph.resolves();
-        store.findActiveGraphForTarget.resolves();
-        waterline.nodes.needByIdentifier.resolves({ id: 'testnodeid', sku: 'skuid' });
-        env.get.withArgs('config.Graph.Test').resolves('Graph.Test');
-
-        return workflowApiService.createAndRunGraph({
-            name: 'Graph.Test',
-            options: { test: 1 },
-            context: { test: 2 },
-            domain: 'test'
-        }, 'testnodeid')
-        .then(function() {
-            expect(workflowApiService.findGraphDefinitionByName).to.have.been.calledOnce;
-            expect(workflowApiService.findGraphDefinitionByName)
-                .to.have.been.calledWith('Graph.Test');
-            expect(store.findActiveGraphForTarget).to.have.been.calledOnce;
-            expect(store.findActiveGraphForTarget).to.have.been.calledWith('testnodeid');
-            expect(workflowApiService.createActiveGraph).to.have.been.calledOnce;
-            expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
-                graphDefinition, { test: 1 }, { target: 'testnodeid', test: 2 }, 'test'
-            );
-            expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
-            expect(workflowApiService.runTaskGraph)
-                .to.have.been.calledWith(graph.instanceId, 'test');
-            expect(env.get).to.have.been.calledWith('config.Graph.Test', 'Graph.Test', 
-                ['skuid', "global"]);
-        });
-    });
-
-    it('should create and run a graph against a node with a sku', function () {
-        workflowApiService.findGraphDefinitionByName.resolves(graphDefinition);
-        workflowApiService.createActiveGraph.resolves(graph);
-        workflowApiService.runTaskGraph.resolves();
-        store.findActiveGraphForTarget.resolves();
-        waterline.nodes.needByIdentifier.resolves({ id: 'testnodeid', sku: 'skuid' });
-        env.get.withArgs('config.Graph.Test').resolves('Graph.Test.skuid');
-
-        return workflowApiService.createAndRunGraph({
-            name: 'Graph.Test',
-            options: { test: 1 },
-            context: { test: 2 },
-            domain: 'test'
-        }, 'testnodeid')
-        .then(function() {
-            expect(workflowApiService.findGraphDefinitionByName).to.have.been.calledOnce;
-            expect(workflowApiService.findGraphDefinitionByName)
-                .to.have.been.calledWith('Graph.Test.skuid');
-            expect(store.findActiveGraphForTarget).to.have.been.calledOnce;
-            expect(store.findActiveGraphForTarget).to.have.been.calledWith('testnodeid');
-            expect(workflowApiService.createActiveGraph).to.have.been.calledOnce;
-            expect(workflowApiService.createActiveGraph).to.have.been.calledWith(
-                graphDefinition, { test: 1 }, { target: 'testnodeid', test: 2 }, 'test'
-            );
-            expect(workflowApiService.runTaskGraph).to.have.been.calledOnce;
-            expect(workflowApiService.runTaskGraph)
-                .to.have.been.calledWith(graph.instanceId, 'test');
-            expect(env.get).to.have.been.calledWith('config.Graph.Test', 'Graph.Test',
-                ['skuid', "global"]);
-        });
-    });
-
-    it('should not create a graph against a node if there is an existing one active', function () {
-        workflowApiService.findGraphDefinitionByName.resolves(graphDefinition);
-        store.findActiveGraphForTarget.resolves({});
-
-        return expect(
-            workflowApiService.createAndRunGraph({
-                name: 'Graph.Test',
-                options: { test: 1 },
-                context: { test: 2 },
-                domain: 'test'
-            }, 'testnodeid')
-        ).to.be.rejectedWith(/Unable to run multiple task graphs against a single target/);
     });
 
     it('should throw error if the graph name is missing', function() {
@@ -315,153 +161,88 @@ describe('Http.Services.Api.Workflows', function () {
         });
     });
 
-    it('should return a NotFoundError if the node was not found', function () {
-        waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
-        return expect(
-            workflowApiService.createAndRunGraph({
-                name: 'graph.not.exist',
-                options: { test: 1 },
-                context: { test: 2 },
-                domain: 'test'
-            }, 'testnodeid')
-        ).to.be.rejectedWith(Errors.NotFoundError);
-    });
-
-    it('should return a BadRequestError on a graph creation/validation failure', function () {
-        workflowApiService.createActiveGraph.restore();
-        workflowApiService.findGraphDefinitionByName.resolves({
-            tasks: [
-                { label: 'duplicate' },
-                { label: 'duplicate' }
-            ]
-        });
-
-        return expect(
-            workflowApiService.createAndRunGraph({
-                name: 'Graph.Test',
-                options: { test: 1 },
-                context: { test: 2 },
-                domain: 'test'
-            }, 'testnodeid')
-        ).to.be.rejectedWith(Errors.BadRequestError,
-                /The task label \'duplicate\' is used more than once/);
-    });
-
-    it('should return a NotFoundError if the node was not found', function () {
-        waterline.graphobjects.findOne.rejects(new Errors.NotFoundError('Not Found'));
-        return expect(workflowApiService.findActiveGraphForTarget('testnodeid'))
-            .to.be.rejectedWith(Errors.NotFoundError);
+    it('should call taskgraph service to find active graph', function () {
+        taskGraphService.workflowsGet.resolves([workflow]);
+        return workflowApiService.findActiveGraphForTarget('testnodeid')
+            .then(function() {
+                expect(taskGraphService.workflowsGet).to.have.been.calledOnce;
+            });
     });
 
     it('should persist a graph definition', function () {
-        store.persistGraphDefinition.resolves({ injectableName: 'test' });
-        this.sandbox.stub(TaskGraph, 'validateDefinition').resolves();
+        taskGraphService.workflowsPutGraphs.resolves();
         return workflowApiService.defineTaskGraph(graphDefinition)
         .then(function() {
-            expect(store.persistGraphDefinition).to.have.been.calledOnce;
-            expect(store.persistGraphDefinition).to.have.been.calledWith(graphDefinition);
-            expect(TaskGraph.validateDefinition).to.have.been.calledOnce;
+            expect(taskGraphService.workflowsPutGraphs).to.have.been.calledOnce;
+            expect(taskGraphService.workflowsPutGraphs).to.have.been.calledWith(graphDefinition);
         });
-    });
-
-    it('should validate a graph definition', function () {
-        store.persistGraphDefinition.resolves();
-        var badDefinition = {
-            tasks: [
-                { label: 'duplicate' },
-                { label: 'duplicate' }
-            ]
-        };
-
-        return expect(workflowApiService.defineTaskGraph(badDefinition))
-            .to.be.rejectedWith(Errors.BadRequestError, /duplicate/);
     });
 
     it('should throw a NotFoundError if a graph definition does not exist', function() {
-        workflowApiService.findGraphDefinitionByName.restore();
-        store.getGraphDefinitions.resolves(null);
+        taskGraphService.workflowsGetByInstanceId.resolves({});
         return expect(workflowApiService.findGraphDefinitionByName('test'))
-            .to.be.rejectedWith(Errors.NotFoundError);
-    });
-
-    it('should create and persist a graph', function() {
-        var persistStub = sinon.stub().resolves(graph);
-        workflowApiService.createActiveGraph.restore();
-        this.sandbox.stub(workflowApiService, 'createGraph').resolves({ persist: persistStub });
-        return workflowApiService.createActiveGraph(graphDefinition, null, null, null)
-        .then(function(_graph) {
-            expect(workflowApiService.createGraph).to.have.been.calledOnce;
-            expect(workflowApiService.createGraph).to.have.been.calledWith(
-                graphDefinition, null, null, null);
-            expect(_graph).to.equal(graph);
-            expect(persistStub).to.have.been.calledOnce;
-        });
+                .to.be.rejectedWith(Errors.NotFoundError, /not found/);
     });
 
     it('should get workflows tasks by name', function () {
-        store.getTaskDefinitions.resolves({ injectableName: 'test' });
+        taskGraphService.workflowsGetTasksByName.resolves({ injectableName: 'test' });
         return workflowApiService.getWorkflowsTasksByName(taskDefinition)
         .then(function() {
-            expect(store.getTaskDefinitions).to.have.been.calledOnce;
-            expect(store.getTaskDefinitions).to.have.been.calledWith(taskDefinition);
+            expect(taskGraphService.workflowsGetTasksByName).to.have.been.calledOnce;
+            expect(taskGraphService.workflowsGetTasksByName).to.have.been.calledWith(taskDefinition);  //jshint ignore:line
         });
     });
 
 
     it('should delete/destroy graph', function () {
-        waterline.graphdefinitions.destroy.resolves(graph);
-        store.destroyGraphDefinition.resolves({ injectableName: 'test' });
+        taskGraphService.workflowsDeleteGraphsByName.resolves(graph);
         return workflowApiService.destroyGraphDefinition(taskDefinition)
         .then(function() {
-            expect(store.destroyGraphDefinition).to.have.been.calledOnce;
-            expect(store.destroyGraphDefinition).to.have.been.calledWith(taskDefinition);
+            expect(taskGraphService.workflowsDeleteGraphsByName).to.have.been.calledOnce;
+            expect(taskGraphService.workflowsDeleteGraphsByName).to.have.been.calledWith(taskDefinition); //jshint ignore:line
         });
     });
 
 
     it('should put workflows tasks by name', function () {
-        store.getTaskDefinitions.resolves(task);
-        return workflowApiService.putWorkflowsTasksByName(taskDefinition, task)
+        taskGraphService.workflowsPutTask.resolves(task);
+        return workflowApiService.defineTask(taskDefinition)
         .then(function() {
-            expect(store.getTaskDefinitions).to.have.been.calledOnce;
-            expect(store.getTaskDefinitions).to.have.been.calledWith(task);
-            expect(store.persistTaskDefinition).to.have.been.calledOnce;
-            expect(store.persistTaskDefinition).to.have.been.calledWith(taskDefinition);
+            expect(taskGraphService.workflowsPutTask).to.have.been.calledOnce;
+            expect(taskGraphService.workflowsPutTask).to.have.been.calledWith(taskDefinition);
         });
     });
 
-    it('should throw error, when cancelling an non-active workflow ', function () {
-        var mockWorkflowError = new Errors.TaskCancellationError(
-            "testid is not an active workflow"
-        );
-        waterline.graphobjects.needOne.rejects(mockWorkflowError);
-        return workflowApiService.cancelTaskGraph()
-            .should.be.rejectedWith(mockWorkflowError);
+    it('should cancel a workflow ', function () {
+        taskGraphService.workflowsAction.resolves();
+        return workflowApiService.cancelTaskGraph('test')
+            .then(function() {
+                expect(taskGraphService.workflowsAction).to.have.been.calledOnce;
+            });
     });
 
 
     it('should delete workflows tasks by name', function () {
-        store.getTaskDefinitions.resolves(task);
+        taskGraphService.workflowsDeleteTasksByName.resolves(task);
         return workflowApiService.deleteWorkflowsTasksByName(task)
         .then(function() {
-            expect(store.getTaskDefinitions).to.have.been.calledOnce;
-            expect(store.getTaskDefinitions).to.have.been.calledWith(task);
-            expect(store.deleteTaskByName).to.have.been.calledOnce;
-            expect(store.deleteTaskByName).to.have.been.calledWith(task);
+            expect(taskGraphService.workflowsDeleteTasksByName).to.have.been.calledOnce;
+            expect(taskGraphService.workflowsDeleteTasksByName).to.have.been.calledWith(task);
         });
     });
 
     it('should return workflow by instanceId ', function() {
-        waterline.graphobjects.needOne.resolves(workflow);
-        return workflowApiService.getWorkflowByInstanceId().then(function (workflows) {
+        taskGraphService.workflowsGet.resolves([workflow]);
+        return workflowApiService.getWorkflowByInstanceId()
+            .then(function (workflows) {
             expect(workflows).to.deep.equal(workflow);
         });
     });
 
     it('should return Not Found Error when invalid instanceId is passed', function() {
-        waterline.graphobjects.needOne.rejects(new Errors.NotFoundError('Not Found'));
+        taskGraphService.workflowsGet.resolves({});
         return expect(workflowApiService.getWorkflowByInstanceId())
-               .to.be.rejectedWith(Errors.NotFoundError);
+            .to.be.rejectedWith(Errors.NotFoundError, /not found/);
     });
 
     it('should return active workflows ', function() {
@@ -469,7 +250,7 @@ describe('Http.Services.Api.Workflows', function () {
                                id      : 'testgraphid',
                                _status : 'pending'
                              };
-        waterline.graphobjects.find.resolves(activeWorkflow);
+        taskGraphService.workflowsGet.resolves([activeWorkflow]);
         return expect(workflowApiService.getWorkflowByInstanceId()).to.become(activeWorkflow);
     });
 });

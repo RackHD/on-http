@@ -68,7 +68,7 @@ describe('Http.Api.Notification', function () {
     before('Setup mocks', function () {
         helper.setupInjector([
             onHttpContext.prerequisiteInjectables,
-            helper.require("/lib/services/notification-api-service.js"),
+            helper.require("/lib/services/notification-api-service.js")
         ]);
         notificationApiService = helper.injector.get('Http.Services.Api.Notification');
         graphProgressService = helper.injector.get('Services.GraphProgress');

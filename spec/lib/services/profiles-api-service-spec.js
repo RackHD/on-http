@@ -1,4 +1,4 @@
-// Copyright 2015-2016, EMC, Inc.
+// Copyright © 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
 
 "use strict";
 
@@ -21,7 +21,8 @@ describe("Http.Services.Api.Profiles", function () {
             helper.require("/lib/services/profiles-api-service"),
             helper.require("/lib/services/swagger-api-service"),
             helper.require("/lib/api/view/view"),
-            helper.require("/lib/services/schema-api-service")
+            helper.require("/lib/services/schema-api-service"),
+            helper.require("/lib/services/taskgraph-api-service")
         ]);
         profileApiService = helper.injector.get("Http.Services.Api.Profiles");
         Errors = helper.injector.get("Errors");

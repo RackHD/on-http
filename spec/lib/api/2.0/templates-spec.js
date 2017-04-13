@@ -1,5 +1,4 @@
-// Copyright 2015-2016, EMC, Inc.
-
+// Copyright © 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
 'use strict';
 
 describe('Http.Api.Templates', function () {
@@ -48,9 +47,6 @@ describe('Http.Api.Templates', function () {
         workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
         findActiveGraphForTarget = this.sandbox.stub(
             workflowApiService, 'findActiveGraphForTarget');
-
-
-        sinon.stub(workflowApiService, 'createActiveGraph').resolves({ instanceId: 'test' });
 
         templates = helper.injector.get('Templates');
         sinon.stub(templates, 'getAll').resolves();

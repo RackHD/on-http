@@ -1,4 +1,4 @@
-// Copyright 2016, EMC, Inc.
+// Copyright © 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
 /* jshint node:true */
 
 'use strict';
@@ -6,6 +6,8 @@
 describe('Http.Api.Tasks', function () {
     var taskProtocol;
     var tasksApiService;
+    var taskGraphApiService;
+    var sandbox;
     var lookupService;
     var templates;
 
@@ -26,12 +28,14 @@ describe('Http.Api.Tasks', function () {
 
         tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
         tasksApiService.getNode = sinon.stub();
+        taskGraphApiService = helper.injector.get("Http.Services.Api.Taskgraph.Scheduler");
 
         lookupService = helper.injector.get('Services.Lookup');
         lookupService.ipAddressToMacAddress = sinon.stub().resolves('00:11:22:33:44:55');
 
         templates = helper.injector.get('Templates');
 
+        sandbox = sinon.sandbox.create();
         return helper.reset().then(function(){
           return helper.injector.get('Views').load();
           });
@@ -51,6 +55,8 @@ describe('Http.Api.Tasks', function () {
         resetStubs(taskProtocol.respondCommands);
         resetStubs(tasksApiService.getNode);
         resetStubs(lookupService.ipAddressToMacAddress);
+
+        sandbox.restore();
     });
 
     after('stop HTTP server', function () {
@@ -61,7 +67,10 @@ describe('Http.Api.Tasks', function () {
 
     describe('GET /tasks/:id', function () {
         it("should send down tasks", function() {
-            taskProtocol.activeTaskExists.resolves(null);
+            sandbox.stub(taskGraphApiService, 'getTasksById').resolves({
+                "identifier":"1234", 
+                "tasks": [ {"cmd": "testfoo"}
+            ]});
             return helper.request().get('/api/2.0/tasks/testnodeid')
             .expect(200)
             .expect(function (res) {
@@ -83,7 +92,7 @@ describe('Http.Api.Tasks', function () {
         });
 
         it("should error if an active task exists but no commands are sent", function() {
-            taskProtocol.requestCommands.rejects(new Error(''));
+            sandbox.stub(taskGraphApiService, 'getTasksById').rejects(new Error(''));
             return helper.request().get('/api/2.0/tasks/testnodeid')
             .expect(404);
         });
@@ -130,18 +139,12 @@ describe('Http.Api.Tasks', function () {
 
     describe("POST /tasks/:id", function () {
         it("should accept a large entity response", function() {
-            function createBigString() {
-                var x = "";
-                for (var i = 0; i < 200000; i+=1) {
-                    x += "1";
-                }
-                return x;
-            }
+            var data = { foo: new Array(200000).join('1') };
 
-            var data = {"identifier": createBigString(),"tasks": [{"cmd": "testfoo"}]};
-
+            sandbox.stub(taskGraphApiService, 'postTaskById').resolves({});
             return helper.request().post('/api/2.0/tasks/123')
             .send(data)
+            .expect(201)
             .expect(function () {
                 expect(taskProtocol.respondCommands).to.have.been.calledWith('123', data);
             })

@@ -12,7 +12,6 @@ RUN mkdir -p ./node_modules \
   && apt-get install -y unzip curl \
   && npm install --ignore-scripts \
   && npm install apidoc \
-  && npm run apidoc \
   && npm run taskdoc \
   && /RackHD/on-http/install-web-ui.sh \
   && /RackHD/on-http/install-swagger-ui.sh \
