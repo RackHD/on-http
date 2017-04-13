@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/RackHD/on-http.git"
+    "url": "https://github.com/Dell-SMI/on-http.git"
   },
   "author": "",
   "license": "Apache-2.0",
@@ -42,8 +42,8 @@
     "multer": "~1.1.0",
     "node-cache": "^4.1.0",
     "node-ssdp": "~2.7.0",
-    "on-core": "git+https://github.com/RackHD/on-core.git",
-    "on-tasks": "git+https://github.com/RackHD/on-tasks.git",
+    "on-core": "git+https://github.com/Dell-SMI/on-core.git",
+    "on-tasks": "git+https://github.com/Dell-SMI/on-tasks.git",
     "on-finished": "^2.2.0",
     "os-tmpdir": "~1.0.1",
     "passport": "^0.3.2",
