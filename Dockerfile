@@ -10,7 +10,7 @@ RUN mkdir -p ./node_modules \
   && ln -s /RackHD/on-core ./node_modules/on-core \
   && ln -s /RackHD/on-core/node_modules/di ./node_modules/di \
   && apt-get install -y unzip curl \
-  && npm install --ignore-scripts \
+  && npm install \
   && npm install apidoc \
   && npm run taskdoc \
   && /RackHD/on-http/install-web-ui.sh \
