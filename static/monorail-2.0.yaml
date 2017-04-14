@@ -63,6 +63,12 @@ definitions:
         type: string
       username:
         type: string
+  patch_user_obj:
+    properties:
+      role:
+        type: string
+      password:
+        type: string
   hooks.2.0_HookBase:
     description: Hook base schema
     type: object
@@ -4172,7 +4178,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/get_user_obj'
+          $ref: '#/definitions/patch_user_obj'
       responses:
         200:
           description: Successfully modified the specified user.
