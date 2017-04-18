@@ -280,6 +280,23 @@ describe('Http.Api.Profiles', function () {
     });
 
     describe("2.0 GET /profiles/switch/:vendor", function() {
+        it("should get switch profile via proxy", function() {
+            sinon.stub(profileApiService, 'getProfilesSwitchVendor').resolves(
+                'switch_node_profile');
+            sinon.stub(profileApiService, 'renderProfile').resolves('#!ipxe\n');
+
+            return helper.request()
+                .get('/api/2.0/profiles/switch/testswitchvendor')
+                .set("X-Real-IP", "188.1.1.1")
+                .set("X-RackHD-API-proxy-ip", "127.0.0.1")
+                .set("X-RackHD-API-proxy-port", "7180")
+                .expect(200)
+                .then(function(res) {
+                    expect(profileApiService.getProfilesSwitchVendor).to.have.been.calledWith(
+                        "188.1.1.1", "testswitchvendor");
+                });
+        });
+
         it("should get switch profile", function() {
             sinon.stub(profileApiService, 'getProfilesSwitchVendor').resolves(
                 'switch_node_profile');
