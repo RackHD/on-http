@@ -81,17 +81,7 @@ describe('Http.Api.Tasks', function () {
             });
         });
 
-        it("should return 404 if no active task exists", function() {
-            var tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
-            taskProtocol.activeTaskExists.rejects(new tasksApiService.NoActiveTaskError());
-            return helper.request().get('/api/2.0/tasks/testnodeid')
-            .expect(404)
-            .expect(function (res) {
-                expect(res.body.message).to.deep.equal('Not Found');
-            });
-        });
-
-        it("should error if an active task exists but no commands are sent", function() {
+        it("should error if no task available", function() {
             sandbox.stub(taskGraphApiService, 'getTasksById').rejects(new Error(''));
             return helper.request().get('/api/2.0/tasks/testnodeid')
             .expect(404);
