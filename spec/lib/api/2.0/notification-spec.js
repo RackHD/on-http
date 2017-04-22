@@ -237,7 +237,7 @@ describe('Http.Api.Notification', function () {
                 .expect(400);
             });
 
-            it('should return 400 if maximum is invalid in body', function() {
+            it('should return 400 if value is invalid in body', function() {
                 return helper.request()
                 .post('/api/2.0/notification/progress')
                 .send({
