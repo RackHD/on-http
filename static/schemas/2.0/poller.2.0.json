@@ -21,6 +21,10 @@
                 "config": {
                     "description": "Poller configuration object",
                     "type": "object"
+                },
+                "node": {
+                    "description": "Id of node to post poller to",
+                    "type": "string"
                 }
             },
             "additionalProperties": false
