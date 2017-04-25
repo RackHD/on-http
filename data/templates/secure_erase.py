@@ -71,7 +71,7 @@ else:
     PATH = os.getcwd()
 
 
-class Progress:
+class Progress(object):
     """
     Secure erase job progress class.
     """
@@ -109,9 +109,10 @@ class Progress:
         log = open(self.path + drive + '.log', 'r')
         MAX_DOT_COUNT = 50
         # Scrub pass counts for different scrub methods, default pass count is 1
+        pass_count_key = self.parameters["option"] or "nnsa"
         pass_counts = {"nnsa": 4, "dod": 4, "gutmann": 35, "schneier":7, "pfitzner7":7,
                        "pfitzner33": 33, "usarmy": 3, "random2": 2, "old": 6, "fastold": 5}
-        pass_count = pass_counts[self.parameters["option"]]
+        pass_count = pass_counts.get(pass_count_key, 1)
         line_count = 0
         dot_count = 0
         patterna = re.compile("^scrub: \w{4,6}\s*\|\.+\|$")
@@ -151,6 +152,7 @@ class Progress:
         :param drive: drive name
         :return: a float digital of percentage
         """
+        self.parameters["option"] = self.parameters["option"] or "security-erase"
         log = open(self.path + drive + '.log', 'r')
         percent = 0.0
         if not self.duration.has_key(drive) or self.duration[drive] == 0:
@@ -218,15 +220,14 @@ class Progress:
         erase_start_flags = [False]*disk_count
         payload = {
             "taskId": self.parameters["taskId"],
-            "progress": {
-                "value": 0,
-                "maximum": 100
-            }
+            "value": 0,
+            "maximum": 100
         }
         counter = 0
         total_percent = 0.00
         if not self.parameters["address"]:
-            self.parameters["address"] = "http://172.31.128.1:9080/api/current/notification/progress"
+            self.parameters["address"] = \
+                "http://172.31.128.1:9080/api/current/notification/progress"
         while True:
             for (index, value) in enumerate(self.disk_list):
                 value = value.split("/")[-1]
@@ -244,12 +245,12 @@ class Progress:
                     erase_start_flags[index] = os.path.exists(self.path + value + '.log')
             total_percent = sum(percentage_list)/disk_count
             if total_percent == float('+inf'):
-                payload["progress"]["percentage"] = "Not Available"
+                payload["percentage"] = "Not Available"
             else:
-                payload["progress"]["percentage"] = str("%.2f" % total_percent) + "%"
-                payload["progress"]["value"] = int(total_percent)
+                payload["percentage"] = str("%.2f" % total_percent) + "%"
+                payload["value"] = int(total_percent)
             counter += 1
-            payload["progress"]["description"] = "This is the {}th polling with {}s interval" \
+            payload["description"] = "This is the {}th polling with {}s interval" \
                 .format(str(counter), str(self.interval))
             cmd = 'curl -X POST -H "Content-Type:application/json" ' \
                 '-d \'{}\' {}'.format(json.dumps(payload), self.parameters["address"])
@@ -755,7 +756,7 @@ if __name__ == '__main__':
     pool.join()
 
     if progress_result["exitcode"]:
-        print progress_result["Message"]
+        print progress_result["message"]
 
     print erase_result_list
     for erase_result in erase_result_list:

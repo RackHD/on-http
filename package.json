@@ -1,6 +1,6 @@
 {
   "name": "on-http",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "OnRack Http Server",
   "main": "index.js",
   "scripts": {
@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "apidoc": "^0.12.1",
-    "bootprint": "~0.8.5",
+    "bootprint": "^1.0.0",
     "bootprint-swagger": "~0.13.1",
     "chai": "^2.0.0",
     "chai-as-promised": "^4.2.0",
@@ -90,10 +90,7 @@
     "sinon-as-promised": "^2.0.3",
     "sinon-chai": "^2.7.0",
     "supertest": "^1.2.0",
-    "xunit-file": "0.0.6",
-    "bootprint-swagger": "~0.13.1",
-    "bootprint": "^1.0.0",
-    "html-pdf": "~2.1.0"
+    "xunit-file": "0.0.6"
   },
   "apidoc": {
     "name": "RackHD API Documentation",
