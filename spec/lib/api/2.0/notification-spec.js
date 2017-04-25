@@ -127,6 +127,20 @@ describe('Http.Api.Notification', function () {
                 .expect(200);
             });
 
+            it('should be success if value is 0 in body', function() {
+                return helper.request()
+                .post('/api/2.0/notification/progress')
+                .send({
+                    taskId: 'test',
+                    value: 0,
+                    maximum: '100',
+                    description: 'foo bar'
+                })
+                .send(body)
+                .set('Content-Type', 'application/json')
+                .expect(200);
+            });
+
             it('should post progress notification via query', function () {
                 return helper.request()
                 .post('/api/2.0/notification/progress?taskId=testid&maximum=5&value=2&description=foo%20bar%20%202') //jshint ignore: line
@@ -198,11 +212,37 @@ describe('Http.Api.Notification', function () {
                 .expect(400);
             });
 
+            it('should return 400 if maximum is invalid in body', function() {
+                return helper.request()
+                .post('/api/2.0/notification/progress')
+                .send({
+                    taskId: 'test',
+                    value: 2,
+                    maximum: 'abc',
+                    description: 'foo bar'
+                })
+                .set('Content-Type', 'application/json')
+                .expect(400);
+            });
+
             it('should return 400 if value is missing in body', function() {
                 return helper.request()
                 .post('/api/2.0/notification/progress')
                 .send({
                     taskId: 'test',
+                    maximum: 5,
+                    description: 'foo bar'
+                })
+                .set('Content-Type', 'application/json')
+                .expect(400);
+            });
+
+            it('should return 400 if value is invalid in body', function() {
+                return helper.request()
+                .post('/api/2.0/notification/progress')
+                .send({
+                    taskId: 'test',
+                    value: 'a2',
                     maximum: 5,
                     description: 'foo bar'
                 })
