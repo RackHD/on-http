@@ -7,7 +7,7 @@
             "properties": {
                 "autoDiscover": {
                     "description": "Enable automatic discovery",
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "name": {
                     "description": "Name of the node",
@@ -20,6 +20,13 @@
                 },
                 "obms": {
                     "description": "OBM settings",
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "ibms": {
+                    "description": "IBM settings",
                     "type": "array",
                     "items": {
                         "type": "object"

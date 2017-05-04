@@ -1,6 +1,6 @@
 info:
   title: rackhd api 
-  version: "2.1.1"
+  version: "2.1.2"
 basePath: /api/2.0
 consumes:
 - application/json
@@ -125,7 +125,7 @@ definitions:
     description: Post a node into RackHD
     properties:
       autoDiscover:
-        type: string
+        type: boolean
       bootSettings:
         type: object
       identifiers:

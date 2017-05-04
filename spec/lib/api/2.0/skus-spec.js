@@ -78,7 +78,7 @@ describe('Http.Api.Skus.2.0', function() {
             }
         ],
         ibms: [],
-        autoDiscover: "false",
+        autoDiscover: false,
         identifiers: [],
         createdAt: '010101',
         updatedAt: '010101',

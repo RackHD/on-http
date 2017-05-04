@@ -138,7 +138,7 @@ describe('Redfish Systems Root', function () {
     }];
     // Node new mock data with OBM model change
     var node = {
-        autoDiscover: "false",
+        autoDiscover: false,
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
@@ -153,7 +153,7 @@ describe('Redfish Systems Root', function () {
         ]
     };
     var rawNode = {
-        autoDiscover: "false",
+        autoDiscover: false,
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         identifiers: [],
