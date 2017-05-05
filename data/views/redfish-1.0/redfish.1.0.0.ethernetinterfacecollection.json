@@ -1,9 +1,9 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/EthernetInterfaces/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#<%= baseprofile %>/Links/Members/<%= identifier %>/EthernetInterfaces/$entity",
     "@odata.id": "<%= url %>",
     "@odata.type": "#EthernetInterfaceCollection.EthernetInterfaceCollection",
     "Oem" : {},
-    "Name": "Ethernet Interface Collection",
+    "Name": "<%= name %>",
     "Members@odata.count": <%= net.length %>,
     "Members": [
         <% net.forEach(function(n, i, arr) { %>
