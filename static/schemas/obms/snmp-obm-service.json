@@ -1,9 +1,10 @@
 {
-    "title": "snmp-ibm-service",
+    "title": "snmp-obm-service",
     "definitions": {
-        "Ibm": {
-            "description": "IBM settings",
+        "ObmPatch": {
+            "description": "OBM settings",
             "type": "object",
+            "additionalProperties": false,
             "properties": {
                 "required": [ "service", "config" ],
                 "nodeId": {
@@ -26,7 +27,14 @@
                         }
                     }
                 }
-            }
+            },
+            "required": ["service", "config"]
+        },
+        "Obm": {
+            "allOf": [
+                {"$ref": "#/definitions/ObmPatch"},
+                {"required": ["nodeId", "service", "config"]}
+            ]
         }
     }
 }

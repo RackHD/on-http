@@ -2253,7 +2253,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/ipmi-obm-service_Obm'
+          $ref: '#/definitions/generic_obj'
       responses:
         200:
           description: Successfully patched the specified OBM settings
