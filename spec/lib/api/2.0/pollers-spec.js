@@ -182,6 +182,26 @@ describe('Http.Api.Pollers', function () {
             defaultsTo: 'admin'
         }
         ]
+    },
+    {
+        name: 'wsman',
+        config: [
+            {
+                key: 'host',
+                type: 'string',
+                required: true
+            },
+            {
+                key: 'user',
+                type: 'string',
+                defaultsTo: 'root'
+            },
+            {
+                key: 'password',
+                type: 'string',
+                defaultsTo: 'calvin'
+            }
+        ]
     }
     ];
 
