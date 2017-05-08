@@ -209,6 +209,7 @@ definitions:
         - ipmi
         - snmp
         - redfish
+        - wsman
         type: string
     type: object
   post_node_workflow:
@@ -457,6 +458,35 @@ paths:
       - Read
       - catalogsRead
       x-view: catalogs.2.0.json
+    x-swagger-router-controller: catalogs
+  /catalogs/{identifier}/firmware:
+    get:
+      description: Get a catalog based on its node identifier.
+      operationId: firmwareCatalogsIdGet
+      parameters:
+      - description: node identifier
+        in: path
+        name: identifier
+        required: true
+        type: string
+      responses:
+        200:
+          description: Successfully retrieved the catalog
+          schema:
+            type: object
+                       
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Get a firmware catalog
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Read
+      - catalogsRead
     x-swagger-router-controller: catalogs
   /config:
     get:

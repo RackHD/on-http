@@ -1,0 +1,26 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/Processors/Members/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Processor.1.0.0.Processor",
+    "Oem" : {},
+    "Id": "<%=socketId%>",
+    "Name": "",
+    "Socket": "<%= hardware.data.cpus[socketId].deviceDescription %>",
+    "ProcessorType": "CPU",
+    "ProcessorArchitecture": "x86",
+    "InstructionSet": "x86-64",
+    "Manufacturer": "<%= hardware.data.cpus[socketId].manufacturer %>",
+    "Model": "<%= hardware.data.cpus[socketId].model %>",
+    "MaxSpeedMHz": <%= hardware.data.cpus[socketId].maxClockSpeed %>,
+    "TotalCores": <%= hardware.data.cpus[socketId].numberOfProcessorCores %>,
+    "TotalThreads": <%= hardware.data.cpus[socketId].hyperThreadingEnabled == 1 ? hardware.data.cpus[socketId].numberOfProcessorCores * 2 : hardware.data.cpus[socketId].numberOfProcessorCores %>,
+    "Status": {},
+    "ProcessorId" : {
+        "VendorId": "<%= hardware.data.cpus[socketId].manufacturer %>",
+        "IdentificationRegisters": "",
+        "EffectiveFamily": "<%= hardware.data.cpus[socketId].cpuFamily %>",
+        "EffectiveModel": "<%= hardware.data.cpus[socketId].model %>",
+        "Step": "",
+        "MicrocodeInfo": ""
+    }
+}

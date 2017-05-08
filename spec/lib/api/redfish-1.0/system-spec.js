@@ -92,10 +92,13 @@ describe('Redfish Systems Root', function () {
         waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd')
         .resolves(Promise.resolve({
             id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd'
+            name: '1234abcd1234abcd1234abcd',
+            identifiers: ['1234']
         }));
         waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
-        waterline.nodes.getNodeById.resolves([]);
+        waterline.nodes.getNodeById.resolves({
+	    identifiers: ['1234']
+        });
         waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
         nodeApi.setNodeWorkflowById.resolves({instanceId: 'abcdef'});
     });
@@ -156,7 +159,7 @@ describe('Redfish Systems Root', function () {
         autoDiscover: false,
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
-        identifiers: [],
+        identifiers: ['1234'],
         tags: [],
         obms: obm,
         type: 'compute',

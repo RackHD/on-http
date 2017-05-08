@@ -1,0 +1,36 @@
+{
+    "title": "wsman-obm-service",
+    "definitions": {
+        "Obm": {
+            "description": "WSMAN OBM settings",
+            "type": "object",
+            "properties": {
+                "nodeId": {
+                    "type": "string"
+                },
+                "service": {
+                    "type": "string"
+                },
+                "config": {
+                    "type": "object",
+                    "properties": {
+                        "host": {
+                            "description": "iDRAC address",
+                            "type": "string"
+                        },
+                        "user": {
+                            "description": "iDRAC username",
+                            "type": "string"
+                        },
+                        "password": {
+                            "description": "iDRAC password",
+                            "type": "string"
+                        }
+                    },
+                    "required": ["host", "user", "password"]
+                }
+            },
+            "required": ["service", "config"]
+        }
+    }
+}

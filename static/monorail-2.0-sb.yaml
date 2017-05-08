@@ -243,6 +243,37 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /wsmanCallback/{identifier}:
+    x-swagger-router-controller: callback
+    post:
+      consumes:
+      - application/json
+      description: Receives callback from wsman based microservices.
+      operationId: callbackPost
+      parameters:
+      - description: identifier
+        in: path
+        name: identifier
+        required: true
+        type: string
+      - description: data
+        in: body
+        name: body
+        required: true
+        schema:
+          type: object
+      responses:
+        201:
+          description: Received data from service
+          schema:
+            $ref: '#/definitions/VersionsResponse'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Async microservice response
+      tags:
+      - /api/2.0
   /swagger:
     x-swagger-pipe: swagger_raw
 
