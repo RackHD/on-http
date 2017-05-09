@@ -14,6 +14,7 @@ describe('Redfish Systems Root', function () {
     var fs;
     var nodeApi;
     var Errors;
+    var racadm;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -43,6 +44,7 @@ describe('Redfish Systems Root', function () {
             sinon.stub(waterline.nodes);
             sinon.stub(waterline.catalogs);
             sinon.stub(waterline.workitems);
+            sinon.stub(waterline.obms);
 
             Promise = helper.injector.get('Promise');
             Errors = helper.injector.get('Errors');
@@ -54,6 +56,9 @@ describe('Redfish Systems Root', function () {
             sinon.stub(nodeApi, "setNodeWorkflowById");
             sinon.stub(nodeApi, "getAllNodes");
             sinon.stub(nodeApi, "getNodeById");
+
+            racadm = helper.injector.get('JobUtils.RacadmTool');
+            sinon.stub(racadm, "runCommand");
 
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
@@ -68,8 +73,8 @@ describe('Redfish Systems Root', function () {
         validator.validate.reset();
         redfish.render.reset();
         redfish.validateSchema.reset();
-
         nodeApi.setNodeWorkflowById.reset();
+        racadm.runCommand.reset();
 
         function resetStubs(obj) {
             _(obj).methods().forEach(function (method) {
@@ -82,7 +87,9 @@ describe('Redfish Systems Root', function () {
         resetStubs(waterline.nodes);
         resetStubs(waterline.catalogs);
         resetStubs(waterline.workitems);
+        resetStubs(waterline.obms);
         resetStubs(taskProtocol);
+
 
         waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd')
         .resolves(Promise.resolve({
@@ -101,6 +108,16 @@ describe('Redfish Systems Root', function () {
         });
         waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
         nodeApi.setNodeWorkflowById.resolves({instanceId: 'abcdef'});
+        waterline.obms.findByNode.resolves({
+            id: '12341234',
+            node: '12345678',
+            service: 'ipmi-obm-service',
+            config: {
+                host: '1.1.1.1',
+                user: 'user',
+                password: 'passw'
+            }
+        });
     });
 
     afterEach('tear down mocks', function () {
@@ -239,7 +256,7 @@ describe('Redfish Systems Root', function () {
                 Version: "Not Specified",
                 "Voltage": "Unknown"
             }
-        ],
+        ]
     };
 
     var catalogDataWithBadProcessor = {
@@ -307,7 +324,7 @@ describe('Redfish Systems Root', function () {
 
         taskProtocol.requestPollerCache.resolves([{
             chassis: { power: "Unknown", uid: "Reserved"}
-        }])
+        }]);
         nodeApi.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(rawNode);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id)
@@ -730,6 +747,46 @@ describe('Redfish Systems Root', function () {
             .send(minimumInvalidBody)
             .expect('Content-Type', /^application\/json/)
             .expect(400);
+    });
+
+    it('should return valid SecureBoot status', function() {
+        racadm.runCommand.resolves( "test=SecureBoot=Disabled" );
+
+        return helper.request().get('/redfish/v1/Systems/12345678/SecureBoot')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 500 on bad command', function() {
+        racadm.runCommand.rejects("ERROR");
+        return helper.request().get('/redfish/v1/Systems/12345678/SecureBoot')
+            .expect('Content-Type', /^application\/json/)
+            .expect(500);
+    });
+
+    it('should return 202 after setting Secure Boot', function() {
+        racadm.runCommand.resolves( "test=SecureBoot=Disabled" );
+        return helper.request().post('/redfish/v1/Systems/12345678/SecureBoot')
+            .send({"SecureBootEnable": true})
+            .expect(202);
+    });
+
+    it('should 400 on bad request command', function() {
+        return helper.request().post('/redfish/v1/Systems/12345678/SecureBoot')
+            .send({"zzzSecureBootEnable": true})
+            .expect(400);
+    });
+
+    it('should 500 on failure', function() {
+        racadm.runCommand.rejects("ERROR");
+        return helper.request().post('/redfish/v1/Systems/12345678/SecureBoot')
+            .send({"SecureBootEnable": true})
+            .expect(500);
     });
 });
 
