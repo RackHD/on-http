@@ -111,9 +111,11 @@ describe('Http.Api.Obms', function () {
                 .expect(function (res) {
                     expect(res.body).to.have.property('title', 'ipmi-obm-service');
                     expect(res.body).to.have.deep.property(
-                        'definitions.ObmPatch.properties.service').that.is.an('object');
+                        'definitions.ObmBase.properties.service').that.is.an('object');
                     expect(res.body).to.have.deep.property(
-                        'definitions.ObmPatch.properties.config').that.is.an('object');
+                        'definitions.ObmBase.properties.config').that.is.an('object');
+                    expect(res.body).to.have.deep.property(
+                        'definitions.ObmPatch').that.is.an('object');
                     expect(res.body).to.have.deep.property(
                         'definitions.Obm').that.is.an('object');
                 });
@@ -126,9 +128,11 @@ describe('Http.Api.Obms', function () {
                 .expect(function (res) {
                     expect(res.body).to.have.property('title', 'panduit-obm-service');
                     expect(res.body).to.have.deep.property(
-                        'definitions.ObmPatch.properties.service').that.is.an('object');
+                        'definitions.ObmBase.properties.service').that.is.an('object');
                     expect(res.body).to.have.deep.property(
-                        'definitions.ObmPatch.properties.config').that.is.an('object');
+                        'definitions.ObmBase.properties.config').that.is.an('object');
+                    expect(res.body).to.have.deep.property(
+                        'definitions.ObmPatch').that.is.an('object');
                     expect(res.body).to.have.deep.property(
                         'definitions.Obm').that.is.an('object');
                 });

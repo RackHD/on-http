@@ -1,7 +1,7 @@
 {
     "title": "apc-obm-service",
     "definitions": {
-        "ObmPatch": {
+        "ObmBase": {
             "description": "APC OBM settings",
             "type": "object",
             "additionalProperties": false,
@@ -30,12 +30,18 @@
                     },
                     "required": ["host", "community", "port"]
                 }
-            },
-            "required": ["service", "config"]
+            }
+        },
+        "ObmPatch": {
+            "type": "object",
+            "allOf": [
+                {"$ref": "#/definitions/ObmBase"}
+            ]
         },
         "Obm": {
+            "type": "object",
             "allOf": [
-                {"$ref": "#/definitions/ObmPatch"},
+                {"$ref": "#/definitions/ObmBase"},
                 {"required": ["nodeId", "service", "config"]}
             ]
         }

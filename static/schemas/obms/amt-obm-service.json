@@ -1,7 +1,7 @@
 {
     "title": "amt-obm-service",
     "definitions": {
-        "ObmPatch": {
+        "ObmBase": {
             "description": "AMT OBM settings",
             "type": "object",
             "additionalProperties": false,
@@ -26,12 +26,18 @@
                     },
                     "required": ["host", "password"]
                 }
-            },
-            "required": ["service", "config"]
+            }
+        },
+        "ObmPatch": {
+            "type": "object",
+            "allOf": [
+                {"$ref": "#/definitions/ObmBase"}
+            ]
         },
         "Obm": {
+            "type": "object",
             "allOf": [
-                {"$ref": "#/definitions/ObmPatch"},
+                {"$ref": "#/definitions/ObmBase"},
                 {"required": ["nodeId", "service", "config"]}
             ]
         }

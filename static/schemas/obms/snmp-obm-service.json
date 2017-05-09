@@ -1,12 +1,11 @@
 {
     "title": "snmp-obm-service",
     "definitions": {
-        "ObmPatch": {
+        "ObmBase": {
             "description": "OBM settings",
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "required": [ "service", "config" ],
                 "nodeId": {
                     "type": "string"
                 },
@@ -27,12 +26,18 @@
                         }
                     }
                 }
-            },
-            "required": ["service", "config"]
+            }
+        },
+        "ObmPatch": {
+            "type": "object",
+            "allOf": [
+                {"$ref": "#/definitions/ObmBase"}
+            ]
         },
         "Obm": {
+            "type": "object",
             "allOf": [
-                {"$ref": "#/definitions/ObmPatch"},
+                {"$ref": "#/definitions/ObmBase"},
                 {"required": ["nodeId", "service", "config"]}
             ]
         }
