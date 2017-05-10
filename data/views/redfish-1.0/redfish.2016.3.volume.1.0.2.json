@@ -1,0 +1,68 @@
+{
+  "@odata.context": "<%= basepath %>/$metadata#Systems/Members/<%= identifier %>/Storage/Members/<%= index%>/Volumes/$entity",
+  "@odata.id": "<%= url %>",
+  "@odata.type": "#Volume.1.0.2.Volume",
+  "Oem": {},
+  "Id": "<%= volumeIndex %>",
+  "Description": "<%= volume.DeviceDescription %>",
+  "Name": "<%= volume.name %>",
+  "Status": {
+    "Health": <%
+    switch(volume.primaryStatus){
+      case '1': %>
+        "OK"
+    <%  break;
+      case '2': %>
+        "Warning"
+    <%  break;
+      case '3': %>
+        "Critical"
+    <%  break;
+      default: %>
+        "OK"
+    <%} %>
+  },
+  "CapacityBytes": <%= volume.sizeInBytes %>,
+  "VolumeType": <%
+  switch(volume.raidTypes){
+    case '1': %>
+      "RawDevice",
+    <% break;
+    case '2': %>
+      "NonRedundant",
+    <% break;
+    case '4': %>
+      "Mirrored",
+    <% break;
+    case '64': %>
+      "StripedWithParity",
+    <% break;
+    case '2048': %>
+      "SpannedMirrors",
+    <% break;
+    case '8192': %>
+      "SpannedStripesWithParity",
+    <% break;
+    default: %>
+      "RawDevice",
+  <%} %>
+  "Identifiers": [],
+  "BlockSizeBytes": <%= volume.blockSizeInBytes %>,
+
+  "Operations": [
+    {"OperationName": "<%= volume.operationName %>",
+     "PercentageComplete": <%= volume.operationPercentComplete %>
+    }
+   ],
+  "Links": {
+    "Drives@odata.count": <%= driveIds.length %>,
+    "Drives": [
+        <% driveIds.forEach(function(n, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/Storage/<%=index%>/Drives/<%=n%>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+  }
+}
