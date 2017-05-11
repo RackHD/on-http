@@ -125,7 +125,7 @@ definitions:
     description: Post a node into RackHD
     properties:
       autoDiscover:
-        type: boolean
+        type: string
       bootSettings:
         type: object
       identifiers:
@@ -514,6 +514,27 @@ paths:
       - application/json
       description: Modify the RackHD server configuration.
       operationId: configPatch
+      parameters:
+      - description: The configuration properties to be modified
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/generic_obj'
+      responses:
+        200:
+          description: Successfully modified the configuration
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      consumes:
+      - application/json
+      description: Modify the RackHD server configuration.
+      operationId: configPut
       parameters:
       - description: The configuration properties to be modified
         in: body
