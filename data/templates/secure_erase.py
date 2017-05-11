@@ -341,6 +341,8 @@ def convert_raid_to_jbod():
     """
 
     disk_argument_list = []
+    raid_controller_vendor = ""
+    disk_list_without_raid = []
     # ARG_LIST.d should include at least following items as a string
     #   {
     #   "diskName": "/dev/sdx"
@@ -353,20 +355,20 @@ def convert_raid_to_jbod():
         disk_argument_list.append(json.loads(arg))
     assert disk_argument_list != [], "no disk arguments includes"
 
-    # Idenfity tools used for raid operation
-    raid_controller_vendor = ARG_LIST.v
-    assert raid_controller_vendor in RAID_VENDOR_LIST.keys(), \
-        "RAID controller vendor info is invalid"
-    raid_tool = RAID_VENDOR_LIST[raid_controller_vendor]
-    assert os.path.exists(raid_tool), "Overlay doesn't include tool path: " + raid_tool
-
-    disk_list_without_raid = []
     for disk_argument in disk_argument_list:
         # if virtualDisk doesn't exit, push disk directly into disk list
         if not disk_argument["virtualDisk"]:
             # disk_list_without_raid.append("/dev/" + disk_argument["diskName"])
             disk_list_without_raid.append(disk_argument["diskName"])
         else:
+            # Idenfity tools used for raid operation
+            # Tool will be validated once and only when RAID exists
+            if not raid_controller_vendor:
+                raid_controller_vendor = ARG_LIST.v or "lsi"
+                assert raid_controller_vendor in RAID_VENDOR_LIST.keys(), \
+                    "RAID controller vendor info is invalid"
+                raid_tool = RAID_VENDOR_LIST[raid_controller_vendor]
+                assert os.path.exists(raid_tool), "Overlay doesn't include tool path: " + raid_tool
             command = [raid_tool, "/c0", "set", "jbod=on"]
             subprocess.check_output(command, shell=False)
             command = [raid_tool, disk_argument["virtualDisk"], "del", "force"]
