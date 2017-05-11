@@ -125,7 +125,7 @@ definitions:
     description: Post a node into RackHD
     properties:
       autoDiscover:
-        type: string
+        type: boolean
       bootSettings:
         type: object
       identifiers:
