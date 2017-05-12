@@ -530,6 +530,14 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+      summary: Patch server configuration
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Write
+      - configModify
     put:
       consumes:
       - application/json
