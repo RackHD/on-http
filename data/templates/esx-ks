@@ -51,6 +51,12 @@ esxcli system settings advanced set -o /UserVars/SuppressShellWarning -i 1
 #Set the ESXi Shell Interactive idle time logout
 esxcli system settings advanced set -o /UserVars/ESXiShellInteractiveTimeout -i 3600
 
+#Set Console port redirect
+esxcli system settings kernel set -s="gdbPort" -v=<%=gdbPort%>
+esxcli system settings kernel set -s="logPort" -v=<%=logPort%>
+esxcli system settings kernel set -s="tty2Port" -v=<%=comport%>
+esxcli system settings kernel set -s="debugLogToSerial" -v=<%=debugLogToSerial%>
+
 # disable firewall
 esxcli network firewall set --default-action false --enabled no
 
