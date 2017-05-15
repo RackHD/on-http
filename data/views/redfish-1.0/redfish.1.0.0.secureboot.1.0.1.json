@@ -1,0 +1,8 @@
+{
+    "@odata.context": "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/SecureBoot",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#SecureBoot.1.0.1.SecureBoot",
+    "SecureBootCurrentBoot": "<%= SecureBoot%>",
+    "Id": "<%= identifier %>",
+    "Name": "Secure Boot Current Status"
+}

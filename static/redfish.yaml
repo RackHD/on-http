@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "1.1.1"
+  version: "1.2.0"
   title: rackhd redfish v1
 # during dev, should point to your local machine
 #host: localhost:8080
@@ -706,6 +706,75 @@ paths:
           description: Success
           schema:
             $ref: "#/definitions/EthernetInterface.1.0.0_EthernetInterface"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/SecureBoot:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve the current secure boot status
+      description: >
+        Gets the current UEFI Secure Boot status
+        present on the system described by identifier
+      operationId: getSecureBoot
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+      responses:
+        200:
+          description: Success
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      x-privileges: [ 'ConfigureComponents' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: enable or disable UEFI Secure Boot
+      description: >
+        Setting this property to true enables UEFI Secure Boot, and setting it to
+        false disables it. This property can be enabled only in UEFI boot mode.
+      operationId: setSecureBoot
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/SecureBoot.1.0.1_SecureBoot.post"
+      responses:
+        202:
+          description: Success
+          schema:
+            $ref: "#/definitions/odata.4.0.0_idRef"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -5984,3 +6053,11 @@ definitions:
     required:
     - ImageURI
     - Targets
+  SecureBoot.1.0.1_SecureBoot.post:
+    properties:
+      SecureBootEnable:
+        description: The desired Secure Boot setting.
+        type: boolean
+    type: object
+    required:
+    - SecureBootEnable
