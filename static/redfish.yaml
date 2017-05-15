@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "1.2.1"
+  version: "1.2.0"
   title: rackhd redfish v1
 # during dev, should point to your local machine
 #host: localhost:8080
