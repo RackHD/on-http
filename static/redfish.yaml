@@ -369,6 +369,326 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Storage:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve the storage collection
+      description: >
+        Defines a collection of simple storage collections that are
+        present on the system described by identifier
+      operationId: listStorage
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/StorageCollection_StorageCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Storage/{index}:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: Retrieve the specific storage instance based on the index
+      description: >
+        Defines a storage subsystem on the device specified by
+        identifier that are present on the system described by identifier
+      operationId: getStorage
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: index
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Storage.1.1.1_Storage"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Storage/{index}/Drives/{driveIndex}:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: Retrieve the specific drive instance based on the driveIndex
+      description: >
+        Defines a Drive specified by the driveIndex within a Storage subsystem
+        specified by the index
+      operationId: getDrive
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: index
+          in: path
+          required: true
+          type: string
+        - name: driveIndex
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Drive.1.1.1_Drive"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: Add a hot spare the specific drive instance based on the driveIndex
+      description: >
+        Defines a Drive specified by the driveIndex within a Storage subsystem
+        specified by the index
+      operationId: addHotspare
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: index
+          in: path
+          required: true
+          type: string
+        - name: driveIndex
+          in: path
+          required: true
+          type: string
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Drive.addHotspare"
+      responses:
+        200:
+          description: Success
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Storage/{index}/Volumes:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: Retrieve the collection of volumes contained in the storage subsystem
+      description: >
+        Defines a collection of volumes contained within a resource
+      operationId: listVolume
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: index
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/VolumeCollection_VolumeCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: Add a volume to the collection of volumes contained in the storage subsystem
+      description: >
+        Defines a collection of volumes contained within a resource
+      operationId: addVolume
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: index
+          in: path
+          required: true
+          type: string
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Volume.add"
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/VolumeCollection_VolumeCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /Systems/{identifier}/Storage/{index}/Volumes/{volumeIndex}:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: Retrieve the specific volume instance based on the volumeIndex
+      description: >
+        Defines a Volume specified by the volumeIndex within a Storage subsystem
+        specified by the index
+      operationId: getVolume
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: index
+          in: path
+          required: true
+          type: string
+        - name: volumeIndex
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Volume.1.0.2_Volume"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: Retrieve the specific volume instance based on the volumeIndex
+      description: >
+        Defines a Volume specified by the volumeIndex within a Storage subsystem
+        specified by the index
+      operationId: deleteVolume
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: index
+          in: path
+          required: true
+          type: string
+        - name: volumeIndex
+          in: path
+          required: true
+          type: string
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Volume.delete"
+      responses:
+        200:
+          description: Success
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /Systems/{identifier}/LogServices:
     x-swagger-router-controller: systems
     get:
@@ -1857,8 +2177,7 @@ responses:
       and is not capable of supporting the method for any resource.
 definitions:
   AccountService.1.0.0_AccountService:
-    description: This is the schema definition for the Account Service.  It represents
-      the properties for the service itself and has links to the actual list of accounts.
+    description: This is the schema definition for the Account Service.  It represents the properties for the service itself and has links to the actual list of accounts.
     properties:
       '@odata.context':
         format: uri
@@ -2493,6 +2812,8 @@ definitions:
         description: This is the manufacturer/provider specific extension moniker
           used to divide the Oem object into sections.
     type: object
+  Drive.1.1.1_Drive: #TODO
+    description: This schema defines a single physical disk
   EthernetInterface.1.0.0_EthernetInterface:
     description: This schema defines a simple ethernet NIC resource.
     properties:
@@ -5432,6 +5753,48 @@ definitions:
         description: This is the manufacturer/provider specific extension moniker
           used to divide the Oem object into sections.
     type: object
+  Storage.1.1.1_Storage: #TODO
+    description: This is the schema definition for the Storage resource. It represents a set
+      of storage controllers (physical or virtual) and the resources such as volumes that can
+      be accessed from that subsystem.
+  StorageCollection_StorageCollection:
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Description:
+        description: Provides a description of this resource and is used for commonality  in
+          the schema definitions.
+        readOnly: true
+        type: string
+      Members:
+        description: Contains the members of this collection.
+        items:
+          $ref: '#/definitions/odata.4.0.0_idRef'
+        readOnly: true
+        type: array
+      Members@odata.count:
+        readOnly: true
+        type: number
+      Members@odata.navigationLink:
+        $ref: '#/definitions/odata.4.0.0_idRef'
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+    type: object
   Task.1.0.0_Task:
     description: This is the schema definition for a Task resource.
     properties:
@@ -6024,6 +6387,203 @@ definitions:
         description: This is the manufacturer/provider specific extension moniker
           used to divide the Oem object into sections.
     type: object
+  VolumeCollection_VolumeCollection:
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Description:
+        description: Provides a description of this resource and is used for commonality  in
+          the schema definitions.
+        readOnly: true
+        type: string
+      Members:
+        description: Contains the members of this collection.
+        items:
+          $ref: '#/definitions/odata.4.0.0_idRef'
+        readOnly: true
+        type: array
+      Members@odata.count:
+        readOnly: true
+        type: number
+      Members@odata.navigationLink:
+        $ref: '#/definitions/odata.4.0.0_idRef'
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+    type: object
+  Volume.1.0.2_Volume: #TODO
+    type: object
+    properties: 
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+      Id:
+        description: Uniquely identifies the resource within the collection of like resources.
+        readOnly: true
+        type: string
+      Description:
+        description: Provides a description of this resource and is used for commonality in the schema definitions.
+        readOnly: true
+        type: string
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Status:
+        $ref: '#/definitions/Resource_Status'
+      CapacityBytes: 
+        type: number
+        readOnly: true
+        description: The size in bytes of this Volume.
+      VolumeType: 
+        enum:
+        - RawDevice
+        - NonRedundant
+        - Mirrored
+        - StripedWithParity
+        - SpannedMirrors
+        - SpannedStripesWithParity
+        type: string
+        readOnly: true
+        description: The type of this volume.
+      Encrypted:
+        type: boolean
+        readOnly: false
+        description: Is this Volume encrypted.
+      EncryptionTypes:
+        type: array
+        items:
+          enum:
+          - NativeDriveEncryption
+          - ControllerAssisted
+          - SoftwareAssisted
+        readOnly: false
+        description: The types of encryption used by this Volume.
+      BlockSizeBytes:
+        type: number
+        readOnly: true
+        description: The size of the smallest addressible unit (Block) of this volume in bytes.
+      Operations: 
+        type: array
+        items:
+          properties:
+            OperationName:
+              type: string
+              readOnly: true
+              description: The name of the operation.
+            PercentageComplete:
+              type: number
+              readOnly: true
+              description: The percentage of the operation that has been completed.
+            AssociatedTask:
+              $ref: '#/definitions/Task.1.0.0_Task'
+              readOnly: true
+              description: A reference to the task associated with the operation if any.
+        description: The operations currently running on the Volume.
+      OptimumIOSizeBytes:
+        type: number
+        readOnly: true
+        description: The size in bytes of this Volume's optimum IO size.
+      Links:
+        properties:
+          Oem:
+            $ref: '#/definitions/Resource_Oem'
+            description: This is the manufacturer/provider specific extension moniker
+              used to divide the Oem object into sections.
+          Drives@odata.count:
+            readOnly: true
+            type: number
+          Drives@odata.navigationLink:
+            $ref: '#/definitions/odata.4.0.0_idRef'
+          Drives:
+            description: An array of references to the drives which contain this volume. This will reference Drives that either wholly or only partly contain this volume.
+            items:
+              $ref: '#/definitions/odata.4.0.0_idRef'
+            readOnly: true
+            type: array  
+        description: Contains references to other resources that are related to this resource.
+      Actions:
+        type: object
+        properties:
+          Oem:
+            $ref: '#/definitions/Resource_Oem'
+            description: This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.
+          "#Volume.Initialize":
+            type: object
+            properties:
+              title:
+                type: string
+                description: Friendly action name
+              target: 
+                type: string
+                format: uri
+                description: Link to invoke action
+            description: This action is used to prepare the contents of the volume for use by the system.
+        description: The available actions for this resource.
+    required:
+    - Id
+    - Name
+    description: Volume contains properties used to describe a volume, virtual disk, LUN, or other logical storage entity for any system.
+  Volume.delete:
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+    required:
+    - username
+    - password
+  Volume.add:
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+      volume:
+        $ref: '#/definitions/Volume.1.0.2_Volume'
+    required:
+    - username
+    - password
+  Drive.addHotspare:
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+      hotspareType:
+        type: string
+      volumeId:
+        type: string
+    required:
+    - username
+    - password
+    - hotspareType
   odata.4.0.0_idRef:
     properties:
       '@odata.id':

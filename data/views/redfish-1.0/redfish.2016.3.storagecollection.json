@@ -1,0 +1,15 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#StorageCollection.StorageCollection",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#StorageCollection.StorageCollection",
+    "Description": "",
+    "Oem" : {},
+    "Name": "Storage Collection",
+    "Members@odata.count": 1,
+    "Members@odata.navigationLink": "",
+    "Members": [
+        {
+            "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/Storage/1"
+        }
+    ]
+}
