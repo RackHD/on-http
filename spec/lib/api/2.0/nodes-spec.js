@@ -895,6 +895,7 @@ describe('2.0 Http.Api.Nodes', function () {
 
         var obm = {
             service: 'ipmi-obm-service',
+            nodeId: '123',
             config: {
                 host: '1.2.3.4',
                 user: 'myuser',

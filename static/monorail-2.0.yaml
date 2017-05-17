@@ -538,6 +538,35 @@ paths:
       x-privileges:
       - Write
       - configModify
+    put:
+      consumes:
+      - application/json
+      description: Modify the RackHD server configuration.
+      operationId: configPut
+      parameters:
+      - description: The configuration properties to be modified
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/generic_obj'
+      responses:
+        200:
+          description: Successfully modified the configuration
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Patch server configuration
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Write
+      - configModify
     x-swagger-router-controller: config
   /files:
     get:
@@ -2283,7 +2312,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/ipmi-obm-service_Obm'
+          $ref: '#/definitions/generic_obj'
       responses:
         200:
           description: Successfully patched the specified OBM settings

@@ -45,7 +45,7 @@ describe('Http.Api.Notification', function () {
             SN: "theDonald",
             ServiceTag: "hillary",
             Severity: "Critical",
-            macAddress: "jill",
+            sourceMacAddress: "jill",
             nodeId: "abc",
             sourceIpAddress: "127.0.0.1"
         },
