@@ -828,6 +828,111 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/LogServices/lc:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of the logs for a computer system
+      description: >
+        Defines a collection of SEL entries for the system described by
+        identifier.
+      operationId: getLcLogService
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/LogService.1.0.0_LogService"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/LogServices/lc/Entries:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of the logs entries for associated for log service
+      description: >
+        Defines a collection of entries for the system described by identifier
+      operationId: listLcLogServiceEntries
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/LogEntryCollection_LogEntryCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/LogServices/lc/Entries/{entryId}:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve log entry by logId associated for log service
+      description: >
+        Defines a log entry specified by entryId within the LogService of the
+        specified type for the system described by identifier
+      operationId: getLcLogServiceEntry
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: entryId
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/LogEntry.1.0.0_LogEntry"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /Systems/{identifier}/Actions/ComputerSystem.Reset:
     x-swagger-router-controller: systems
     get:
