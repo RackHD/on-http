@@ -1384,7 +1384,6 @@ paths:
       x-privileges:
       - Write
       - nodesWrite
-      x-swagger-deserializer: nodes
       x-swagger-schema: node.2.0.json#/definitions/Node
     x-swagger-router-controller: nodes
   /nodes/tags/{tagName}:
@@ -1509,7 +1508,6 @@ paths:
       x-privileges:
       - Write
       - nodesModify
-      x-swagger-deserializer: nodes
     x-swagger-router-controller: nodes
   /nodes/{identifier}/catalogs:
     get:
@@ -1863,7 +1861,6 @@ paths:
       - Write
       - nodesWrite
       x-swagger-schema: ibm
-      x-swagger-deserializer: nodes
     x-swagger-router-controller: nodes
   /nodes/{identifier}/tags:
     get:
