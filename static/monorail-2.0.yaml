@@ -1,6 +1,6 @@
 info:
   title: rackhd api 
-  version: "2.1.2"
+  version: "3.0.0"
 basePath: /api/2.0
 consumes:
 - application/json
@@ -120,6 +120,50 @@ definitions:
     - nodeId
     - service
     - config
+    type: object
+  node.2.0_GetNode:
+    description: Get a node from RackHD
+    properties:
+      identifier:
+        type: string
+      autoDiscover:
+        type: boolean
+      bootSettings:
+        type: object
+      identifiers:
+        items:
+          type: string
+          uniqueItems: true
+        type: array
+      name:
+        description: Name of the node
+        type: string
+      obms:
+        description: The list of obm settings
+        type: array
+        items:
+            $ref: "#/definitions/nodes_post_obm_by_id"
+      relations:
+        type: array
+        items:
+          $ref: "#/definitions/relations_obj"
+      tags:
+        items:
+          type: string
+          uniqueItems: true
+        type: array
+      type:
+        description: Type of node
+        enum:
+        - compute
+        - compute-container
+        - switch
+        - dae
+        - pdu
+        - mgmt
+        - enclosure
+        - rack
+        type: string
     type: object
   node.2.0_PartialNode:
     description: Post a node into RackHD
@@ -1338,7 +1382,7 @@ paths:
           description: Successfully retrieved the list of nodes
           schema:
             items:
-              $ref: '#/definitions/node.2.0_PartialNode'
+              $ref: '#/definitions/node.2.0_GetNode'
             type: array
         400:
           description: Bad Request
@@ -1453,7 +1497,7 @@ paths:
           description: Successfully retrieved the specified node
           schema:
             items:
-              $ref: '#/definitions/node.2.0_PartialNode'
+              $ref: '#/definitions/node.2.0_GetNode'
             type: array
         404:
           description: The specified node was not found
@@ -3408,7 +3452,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/node.2.0_PartialNode'
+              $ref: '#/definitions/node.2.0_GetNode'
         404:
           description: The SKU with the specified identifier was not found
           schema:
