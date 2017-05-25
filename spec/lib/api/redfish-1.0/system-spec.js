@@ -28,7 +28,7 @@ describe('Redfish Systems Root', function () {
     }
 
     before('start HTTP server', function () {
-        this.timeout(5000);
+        this.timeout(10000);
         return helper.startServer([]).then(function () {
             view = helper.injector.get('Views');
             sinon.stub(view, "get", redirectGet);
@@ -55,7 +55,7 @@ describe('Redfish Systems Root', function () {
             nodeApi = helper.injector.get('Http.Services.Api.Nodes');
             sinon.stub(nodeApi, "setNodeWorkflowById");
             sinon.stub(nodeApi, "getAllNodes");
-            sinon.stub(nodeApi, "getNodeById");
+            // sinon.stub(nodeApi, "getNodeById");
 
             racadm = helper.injector.get('JobUtils.RacadmTool');
             sinon.stub(racadm, "runCommand");
@@ -102,6 +102,7 @@ describe('Redfish Systems Root', function () {
             name: '1234abcd1234abcd1234abcd',
             identifiers: ['1234']
         }));
+        waterline.nodes.getNodeById.withArgs('bad' + '1234abcd1234abcd1234abcd').resolves();
         waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
         waterline.nodes.getNodeById.resolves({
 	    identifiers: ['1234']
@@ -325,7 +326,7 @@ describe('Redfish Systems Root', function () {
         taskProtocol.requestPollerCache.resolves([{
             chassis: { power: "Unknown", uid: "Reserved"}
         }]);
-        nodeApi.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(rawNode);
+        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(rawNode);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id)
             .expect('Content-Type', /^application\/json/)
@@ -359,7 +360,7 @@ describe('Redfish Systems Root', function () {
             chassis: { power: "Unknown", uid: "Reserved"}
         }]);
 
-        nodeApi.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(rawNode);
+        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(rawNode);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id)
             .expect('Content-Type', /^application\/json/)
@@ -372,7 +373,6 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 404 an invalid system', function() {
-        nodeApi.getNodeById.withArgs('bad'+node.id).resolves([]);
         return helper.request().get('/redfish/v1/Systems/bad' + node.id)
             .expect('Content-Type', /^application\/json/)
             .expect(404);
@@ -641,7 +641,7 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 404 a reset type list on an invalid node', function() {
-        nodeApi.getNodeById.resolves();
+        waterline.nodes.getNodeById.resolves();
         return helper.request().get('/redfish/v1/Systems/' + node.id +
                                     'invalid/Actions/ComputerSystem.Reset')
             .expect(404);
@@ -661,7 +661,7 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 404 a reset on an invalid node', function() {
-        nodeApi.getNodeById.resolves();
+        waterline.nodes.getNodeById.resolves();
         return helper.request().post('/redfish/v1/Systems/' + node.id +
                                     'invalid/Actions/ComputerSystem.Reset')
             .send({ reset_type: "ForceRestart"})
