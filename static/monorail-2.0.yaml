@@ -1,6 +1,6 @@
 info:
   title: rackhd api 
-  version: "3.0.0"
+  version: "4.0.0"
 basePath: /api/2.0
 consumes:
 - application/json
@@ -148,10 +148,7 @@ definitions:
         items:
           $ref: "#/definitions/relations_obj"
       tags:
-        items:
-          type: string
-          uniqueItems: true
-        type: array
+        type: string
       type:
         description: Type of node
         enum:
