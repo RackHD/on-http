@@ -15,6 +15,7 @@ describe('Redfish Systems Root', function () {
     var nodeApi;
     var Errors;
     var racadm;
+    var wsman;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -28,7 +29,7 @@ describe('Redfish Systems Root', function () {
     }
 
     before('start HTTP server', function () {
-        this.timeout(5000);
+        this.timeout(10000);
         return helper.startServer([]).then(function () {
             view = helper.injector.get('Views');
             sinon.stub(view, "get", redirectGet);
@@ -59,6 +60,10 @@ describe('Redfish Systems Root', function () {
 
             racadm = helper.injector.get('JobUtils.RacadmTool');
             sinon.stub(racadm, "runCommand");
+
+            wsman = helper.injector.get('Http.Services.Wsman');
+            sinon.stub(wsman, "getLog");
+            sinon.stub(wsman, "isDellSystem");
 
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
@@ -118,6 +123,7 @@ describe('Redfish Systems Root', function () {
                 password: 'passw'
             }
         });
+        wsman.isDellSystem.rejects(new Errors.NotFoundError('Not Found'));
     });
 
     afterEach('tear down mocks', function () {
@@ -297,6 +303,43 @@ describe('Redfish Systems Root', function () {
         }
     ];
 
+    var wsmanSelLog = [
+        {
+            "creationTimeStamp": "20161206135247.000000-360",
+            "elementName": "System Event Log Entry",
+            "instanceID": "DCIM:SEL:Entry:23",
+            "logInstanceID": "DCIM:SEL:1",
+            "logName": "System Event Log",
+            "perceivedSeverity": "2",
+            "recordData": "Drive 0 is installed in disk drive bay 1.",
+            "recordFormat": "string Description",
+            "recordID": "23"
+        }
+    ];
+
+    var wsmanLcLog = [
+        {
+            "recordId": 1234567,
+            "logName": "LifeCycle Log",
+            "creationTimeStamp": "20170520141756.000000-300",
+            "message": "Successfully logged in using root, from 100.68.124.32 and REDFISH.",
+            "severity": "2",
+            "category": "Audit",
+            "messageId": "USR0030",
+            "elementName": "USR0030",
+            "instanceId": "DCIM:LifeCycleLog:2173760",
+            "logInstanceId": "DCIM:LifeCycleLog",
+            "comment": "[set comment here]",
+            "agentId": "RACLOG",
+            "configResultsAvailable": "false",
+            "fqdd": "iDRAC.Embedded.1",
+            "messageArguments": "REDFISH",
+            "owningEntity": "DCIM",
+            "rawEventData": "",
+            "sequenceNumber": 2173760
+        }
+    ];
+
     it('should return a valid system root', function () {
         waterline.nodes.find.resolves([node]);
         return helper.request().get('/redfish/v1/Systems')
@@ -312,6 +355,10 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid system', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: false, isRedfishCapable: false
+        });
+
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
@@ -510,6 +557,10 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid sel log service', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: false, isRedfishCapable: false
+        });
+
         waterline.workitems.findPollers.resolves([{
             config: { command: 'selInformation' }
         }]);
@@ -517,6 +568,24 @@ describe('Redfish Systems Root', function () {
         taskProtocol.requestPollerCache.resolves([{
             selInformation: { '# of Alloc Units': 10, uid: "Reserved"}
         }]);
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/sel')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should return a valid iDRAC sel log service', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: true, isRedfishCapable: false
+        });
+
+        wsman.getLog.withArgs(node, 'SEL').resolves(wsmanSelLog);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id +
                                     '/LogServices/sel')
@@ -565,6 +634,24 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid iDRAC sel log service entry collection', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: true, isRedfishCapable: false
+        });
+
+        wsman.getLog.withArgs(node, 'SEL').resolves(wsmanSelLog);
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/sel/Entries')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
     it('should return an empty sel log service entry collection', function() {
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
@@ -595,6 +682,10 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid sel log service entry', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: false, isRedfishCapable: false
+        });
+
         waterline.nodes.find.resolves([node]);
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
@@ -623,7 +714,42 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid iDrac sel log service entry', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: true, isRedfishCapable: false
+        });
+
+        wsman.getLog.withArgs(node, 'SEL').resolves(wsmanSelLog);
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/sel/Entries/23')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
     it('should 404 an invalid sel log service entry', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: false, isRedfishCapable: false
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/sel/Entries/abcdefg')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should 404 an invalid iDRAC sel log service entry', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: true, isRedfishCapable: false
+        });
+
+        wsman.getLog.withArgs(node, 'SEL').resolves(wsmanSelLog);
+
         return helper.request().get('/redfish/v1/Systems/' + node.id +
                                     '/LogServices/sel/Entries/abcdefg')
             .expect('Content-Type', /^application\/json/)
@@ -788,5 +914,123 @@ describe('Redfish Systems Root', function () {
             .send({"SecureBootEnable": true})
             .expect(500);
     });
+
+    it('should return a valid lc log service', function() {
+
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: true, isRedfishCapable: false
+        });
+
+        wsman.getLog.withArgs(node, 'LC').resolves(wsmanLcLog);
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/lc')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid lc log service', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id +
+                                    '/LogServices/lc')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return a valid lc log service entry collection', function() {
+
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: true, isRedfishCapable: false
+        });
+
+        wsman.getLog.withArgs(node, 'LC').resolves(wsmanLcLog);
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/lc/Entries')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid lc log service entry collection', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id +
+                                    '/LogServices/lc/Entries')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return a valid lc log service entry', function() {
+
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: true, isRedfishCapable: false
+        });
+
+        wsman.getLog.withArgs(node, 'LC').resolves(wsmanLcLog);
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/lc/Entries/1234567')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid lc log service entry', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: true, isRedfishCapable: false
+        });
+
+        wsman.getLog.withArgs(node, 'LC').resolves(wsmanLcLog);
+        
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/lc/Entries/abcdefg')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should 501 on lc service not supported', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: false, isRedfishCapable: false
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/lc')
+            .expect('Content-Type', /^application\/json/)
+            .expect(501);
+    });
+
+    it('should 501 on lc entries not supported', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: false, isRedfishCapable: false
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/lc/Entries')
+            .expect('Content-Type', /^application\/json/)
+            .expect(501);
+    });
+
+    it('should 501 on lc entry not supported', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: false, isRedfishCapable: false
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/lc/Entries/abcdefg')
+            .expect('Content-Type', /^application\/json/)
+            .expect(501);
+    });
+
 });
 
