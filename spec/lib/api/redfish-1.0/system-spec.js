@@ -15,6 +15,7 @@ describe('Redfish Systems Root', function () {
     var nodeApi;
     var Errors;
     var racadm;
+    var configuration;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -55,10 +56,11 @@ describe('Redfish Systems Root', function () {
             nodeApi = helper.injector.get('Http.Services.Api.Nodes');
             sinon.stub(nodeApi, "setNodeWorkflowById");
             sinon.stub(nodeApi, "getAllNodes");
-            // sinon.stub(nodeApi, "getNodeById");
 
             racadm = helper.injector.get('JobUtils.RacadmTool');
             sinon.stub(racadm, "runCommand");
+
+            configuration = helper.injector.get('Services.Configuration');
 
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
@@ -89,7 +91,7 @@ describe('Redfish Systems Root', function () {
         resetStubs(waterline.workitems);
         resetStubs(waterline.obms);
         resetStubs(taskProtocol);
-
+        resetStubs(nodeApi);
 
         waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd')
         .resolves(Promise.resolve({
@@ -119,6 +121,19 @@ describe('Redfish Systems Root', function () {
                 password: 'passw'
             }
         });
+
+        waterline.nodes.getNodeById.withArgs('DELLabcd1234abcd1234abcd')
+        .resolves(Promise.resolve({
+            id: 'DELLabcd1234abcd1234abcd',
+            name: 'DELLabcd1234abcd1234abcd',
+            identifiers: [ "ABCDEFG" ]
+        }));
+
+        waterline.nodes.needByIdentifier.withArgs('DELLabcd1234abcd1234abcd')
+        .resolves(Promise.resolve({
+            id: 'DELLabcd1234abcd1234abcd',
+            name: 'DELLabcd1234abcd1234abcd'
+        }));
     });
 
     afterEach('tear down mocks', function () {
@@ -260,6 +275,39 @@ describe('Redfish Systems Root', function () {
         ]
     };
 
+    var dellCatalogData =
+    {
+        bios: {
+            "dcimBIOSEnumerationTypeList": [
+                {
+                    "any": [],
+                    "attributeDisplayName": {
+                        "otherAttributes": {},
+                        "value": "System Memory Testing"
+                    },
+                    "attributeName": {
+                        "otherAttributes": {},
+                        "value": "MemTest"
+                    },
+                    "caption": null,
+                    "currentValue": [
+                        {
+                            "otherAttributes": {},
+                            "value": "Disabled"
+                        }
+                    ],
+                    "isReadOnly": {
+                        "otherAttributes": {},
+                        "value": "false"
+                    }
+                }
+            ]
+        },
+        DeviceSummary: {
+            id: "1.2.3.4"
+        }
+    };
+
     var catalogDataWithBadProcessor = {
         'Processor Information' : [
             {
@@ -295,6 +343,17 @@ describe('Redfish Systems Root', function () {
             Controller: {
                 controller_PCI_BDF : "0000:00:01.1"
             }
+        }
+    ];
+
+    var httpEndpoints = [
+        {
+            "address": "172.31.128.1",
+            "authEnabled": false,
+            "httpsEnabled": false,
+            "port": 9080,
+            "proxiesEnabled": true,
+            "routers": "southbound-api-router"
         }
     ];
 
@@ -376,6 +435,90 @@ describe('Redfish Systems Root', function () {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id)
             .expect('Content-Type', /^application\/json/)
             .expect(404);
+    });
+
+    it('should 404 an invalid identifier for bios query', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Bios')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should 404 a non-Dell identifier for bios query', function() {
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Bios')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return a valid bios block for Dell-based catalog', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs('DELLabcd1234abcd1234abcd', 'bios').resolves(Promise.resolve({
+            node: 'DELLabcd1234abcd1234abcd',
+            source: 'bios',
+            data: dellCatalogData.bios
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + 'DELLabcd1234abcd1234abcd' + '/Bios')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid identifier for bios settings query', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Bios/Settings')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should 404 a non-Dell identifier for bios settings query', function() {
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Bios/Settings')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return a valid bios settings block for Dell-based catalog', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs('DELLabcd1234abcd1234abcd', 'bios').resolves(Promise.resolve({
+            node: 'DELLabcd1234abcd1234abcd',
+            source: 'bios',
+            data: dellCatalogData.bios
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + 'DELLabcd1234abcd1234abcd' + '/Bios/Settings')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid system for bios settings patch', function() {
+        return helper.request().patch('/redfish/v1/Systems/bad' + node.id + '/Bios/Settings')
+            .send({ Name: "bogusname", Id: "someid"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should 404 an non-Dell identifier for bios settings patch', function() {
+        return helper.request().patch('/redfish/v1/Systems/' + node.id + '/Bios/Settings')
+            .send({ Name: "bogusname", Id: "someid"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return a 202 for a Dell-based bios settings patch', function() {
+        // Force a southbound interface through httpEndpoints
+        configuration.set('httpEndpoints', httpEndpoints);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs('DELLabcd1234abcd1234abcd', 'DeviceSummary').resolves(Promise.resolve({
+            node: 'DELLabcd1234abcd1234abcd',
+            source: 'DeviceSummary',
+            data: dellCatalogData.DeviceSummary
+        }));
+        return helper.request().patch('/redfish/v1/Systems/' + 'DELLabcd1234abcd1234abcd' + '/Bios/Settings')
+            .send({ "@odata.context": "string", "@odata.id": "string", "@odata.type": "string", "Actions": { "Oem": {} }, "AttributeRegistry": "string", "Attributes": { "X": "y"}, "Description": "string", "Id": "string", "Name": "string", "Oem": {} })
+            .expect('Content-Type', /^application\/json/)
+            .expect(202);
     });
 
     it('should return a valid processor list', function() {

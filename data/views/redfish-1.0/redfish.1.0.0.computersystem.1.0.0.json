@@ -17,6 +17,7 @@
     "HostName": "",
     "IndicatorLED": "<%= chassisData.uid %>",
     "PowerState": "<%= chassisData.power==='Unknown' ? 'On' : chassisData.power %>",
+    "Bios": {},
     "Boot": {},
     "BiosVersion": "<%= ohai.data.dmi.bios.version.trim() %> <%= ohai.data.dmi.bios.bios_revision.trim() %> <%= ohai.data.dmi.bios.release_date.trim() %>",
     "ProcessorSummary": {

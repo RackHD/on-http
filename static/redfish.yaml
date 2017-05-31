@@ -227,6 +227,107 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Bios:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve the current bios settings for a specified identifier
+      description: >
+        defines a set of bios resources
+      operationId: listSystemBios
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Bios.v1_0_1.Bios"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Bios/Settings:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve the pending bios settings for a specified identifier
+      description: >
+        defines a set of bios resources that are pending
+      operationId: listSystemBiosSettings
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Bios.v1_0_1.Bios"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    patch:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: patch the pending bios settings for a specified identifier
+      description: >
+        patch a set of bios resources
+      operationId: patchSystemBiosSettings
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Bios.v1_0_1.Bios"
+      responses:
+        202:
+          description: Success
+          $ref: "#/responses/status_202"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /Systems/{identifier}/Processors:
     x-swagger-router-controller: systems
     get:
@@ -2258,6 +2359,74 @@ definitions:
       Status:
         $ref: '#/definitions/Resource_Status'
     type: object
+#  Bios.ChangePassword:
+#    description: This action is used to change the BIOS passwords.
+#    properties:
+#      target: {}
+#      title: {}
+#    type: object
+#  Bios.ResetBios:
+#    description: This action is used to reset the BIOS attributes to default.
+#    properties:
+#      target: {}
+#      title: {}
+#    type: object
+  Bios.v1_0_0.Actions:
+    properties:
+      Oem:
+        $ref: '#/definitions/Bios.v1_0_0.OemActions'
+    type: object
+  Bios.v1_0_0.Attributes:
+    properties: {}
+    type: object
+  Bios.v1_0_0.OemActions:
+    properties: {}
+    type: object
+  Bios.v1_0_1.Bios:
+    description: Bios contains properties surrounding a BIOS Attribute Registry (where
+      the system-specific BIOS attributes are described) and the Actions needed to
+      perform changes to BIOS settings, which typically require a system reset to
+      apply.
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Actions:
+        $ref: '#/definitions/Bios.v1_0_0.Actions'
+        description: The available actions for this resource.
+      AttributeRegistry:
+        description: The Resource ID of the Attribute Registry for the BIOS Attributes
+          resource.
+        readOnly: true
+        type: string
+      Attributes:
+        $ref: '#/definitions/Bios.v1_0_0.Attributes'
+        description: This is the manufacturer/provider specific list of BIOS attributes.
+      Description:
+        readOnly: true
+        type: string
+      Id:
+        readOnly: true
+        type: string
+      Name:
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+    required:
+    - Id
+    - Name
+    type: object
   Chassis.1.0.0_Chassis:
     description: This is the schema definition for the Chassis resource.  It represents
       the properties for physical components for any system.  This one object is intended
@@ -2568,6 +2737,10 @@ definitions:
           system for inventory or other client purposes
         readOnly: false
         type: string
+      Bios:
+        $ref: "#/definitions/Bios.v1_0_1.Bios"
+        description: A reference to the BIOS settings associated with this system.
+        readOnly: true
       BiosVersion:
         description: The version of the system BIOS or primary system firmware.
         type: string
