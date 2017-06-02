@@ -122,17 +122,17 @@ describe('Redfish Systems Root', function () {
             }
         });
 
-        waterline.nodes.getNodeById.withArgs('DELLabcd1234abcd1234abcd')
+        waterline.nodes.getNodeById.withArgs(dellNode.id)
         .resolves(Promise.resolve({
-            id: 'DELLabcd1234abcd1234abcd',
-            name: 'DELLabcd1234abcd1234abcd',
+            id: dellNode.id,
+            name: dellNode.id,
             identifiers: [ "ABCDEFG" ]
         }));
 
-        waterline.nodes.needByIdentifier.withArgs('DELLabcd1234abcd1234abcd')
+        waterline.nodes.needByIdentifier.withArgs(dellNode.id)
         .resolves(Promise.resolve({
-            id: 'DELLabcd1234abcd1234abcd',
-            name: 'DELLabcd1234abcd1234abcd'
+            id: dellNode.id,
+            name: dellNode.id
         }));
     });
 
@@ -177,6 +177,22 @@ describe('Redfish Systems Root', function () {
         autoDiscover: false,
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
+        identifiers: [],
+        tags: [],
+        obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a'}],
+        type: 'compute',
+        relations: [
+            {
+                relationType: 'enclosedBy',
+                targets: [ '4567efgh4567efgh4567efgh' ]
+            }
+        ]
+    };
+    // Node new mock data with OBM model change
+    var dellNode = {
+        autoDiscover: false,
+        id: 'DELLabcd1234abcd1234abcd',
+        name: 'dell node',
         identifiers: [],
         tags: [],
         obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a'}],
@@ -560,12 +576,12 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid bios block for Dell-based catalog', function() {
-        waterline.catalogs.findLatestCatalogOfSource.withArgs('DELLabcd1234abcd1234abcd', 'bios').resolves(Promise.resolve({
-            node: 'DELLabcd1234abcd1234abcd',
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'bios').resolves(Promise.resolve({
+            node: dellNode.id,
             source: 'bios',
             data: dellCatalogData.bios
         }));
-        return helper.request().get('/redfish/v1/Systems/' + 'DELLabcd1234abcd1234abcd' + '/Bios')
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Bios')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -588,12 +604,12 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid bios settings block for Dell-based catalog', function() {
-        waterline.catalogs.findLatestCatalogOfSource.withArgs('DELLabcd1234abcd1234abcd', 'bios').resolves(Promise.resolve({
-            node: 'DELLabcd1234abcd1234abcd',
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'bios').resolves(Promise.resolve({
+            node: dellNode.id,
             source: 'bios',
             data: dellCatalogData.bios
         }));
-        return helper.request().get('/redfish/v1/Systems/' + 'DELLabcd1234abcd1234abcd' + '/Bios/Settings')
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Bios/Settings')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -620,12 +636,12 @@ describe('Redfish Systems Root', function () {
     it('should return a 202 for a Dell-based bios settings patch', function() {
         // Force a southbound interface through httpEndpoints
         configuration.set('httpEndpoints', httpEndpoints);
-        waterline.catalogs.findLatestCatalogOfSource.withArgs('DELLabcd1234abcd1234abcd', 'DeviceSummary').resolves(Promise.resolve({
-            node: 'DELLabcd1234abcd1234abcd',
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'DeviceSummary').resolves(Promise.resolve({
+            node: dellNode.id,
             source: 'DeviceSummary',
             data: dellCatalogData.DeviceSummary
         }));
-        return helper.request().patch('/redfish/v1/Systems/' + 'DELLabcd1234abcd1234abcd' + '/Bios/Settings')
+        return helper.request().patch('/redfish/v1/Systems/' + dellNode.id + '/Bios/Settings')
             .send({ "@odata.context": "string", "@odata.id": "string", "@odata.type": "string", "Actions": { "Oem": {} }, "AttributeRegistry": "string", "Attributes": { "X": "y"}, "Description": "string", "Id": "string", "Name": "string", "Oem": {} })
             .expect('Content-Type', /^application\/json/)
             .expect(202);
@@ -644,12 +660,12 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid ethernet block for Dell-based catalog', function() {
-        waterline.catalogs.findLatestCatalogOfSource.withArgs('DELLabcd1234abcd1234abcd', 'nics').resolves(Promise.resolve({
-            node: 'DELLabcd1234abcd1234abcd',
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
+            node: dellNode.id,
             source: 'nics',
             data: dellCatalogData.nics
         }));
-        return helper.request().get('/redfish/v1/Systems/' + 'DELLabcd1234abcd1234abcd' + '/EthernetInterfaces')
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -678,7 +694,7 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 404 a valid identifier for ethernet index query with invalid index', function() {
-        return helper.request().get('/redfish/v1/Systems/' + 'DELLabcd1234abcd1234abcd' + '/EthernetInterfaces/' + "BADNIC.Integrated.1-1-1")
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces/' + "BADNIC.Integrated.1-1-1")
             .expect('Content-Type', /^application\/json/)
             .expect(404)
             .expect(function(res) {
@@ -687,12 +703,12 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid ethernet index block for Dell-based catalog with valid index', function() {
-        waterline.catalogs.findLatestCatalogOfSource.withArgs('DELLabcd1234abcd1234abcd', 'nics').resolves(Promise.resolve({
-            node: 'DELLabcd1234abcd1234abcd',
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
+            node: dellNode.id,
             source: 'nics',
             data: dellCatalogData.nics
         }));
-        return helper.request().get('/redfish/v1/Systems/' + 'DELLabcd1234abcd1234abcd' + '/EthernetInterfaces/' + 'NIC.Integrated.1-1-1')
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces/' + 'NIC.Integrated.1-1-1')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
