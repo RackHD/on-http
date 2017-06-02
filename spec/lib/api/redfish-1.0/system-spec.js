@@ -122,17 +122,17 @@ describe('Redfish Systems Root', function () {
             }
         });
 
-        waterline.nodes.getNodeById.withArgs(dellNode.id)
+        waterline.nodes.getNodeById.withArgs('DELLabcd1234abcd1234abcd')
         .resolves(Promise.resolve({
-            id: dellNode.id,
-            name: dellNode.id,
+            id: 'DELLabcd1234abcd1234abcd',
+            name: 'DELLabcd1234abcd1234abcd',
             identifiers: [ "ABCDEFG" ]
         }));
 
-        waterline.nodes.needByIdentifier.withArgs(dellNode.id)
+        waterline.nodes.needByIdentifier.withArgs('DELLabcd1234abcd1234abcd')
         .resolves(Promise.resolve({
-            id: dellNode.id,
-            name: dellNode.id
+            id: 'DELLabcd1234abcd1234abcd',
+            name: 'DELLabcd1234abcd1234abcd' 
         }));
     });
 
