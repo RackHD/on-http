@@ -44,7 +44,7 @@ describe('Http.Api.Notification', function () {
 
     describe('POST /notification', function () {
         it('should return node notification detail', function () {
-            return helper.request()
+            return helper.request('http://localhost:8091')
             .post('/api/2.0/notification?nodeId=' +
                   nodeNotificationMessage.nodeId +
                   '&randomData=' +
@@ -59,7 +59,7 @@ describe('Http.Api.Notification', function () {
             });
         });
         it('should return broadcast notification detail', function () {
-            return helper.request()
+            return helper.request('http://localhost:8091')
             .post('/api/2.0/notification')
             .send(broadcastNotificationMessage)
             .set('Content-Type', 'application/json')
@@ -72,7 +72,7 @@ describe('Http.Api.Notification', function () {
             });
         });
         it('should pass with nodeId in query body', function () {
-            return helper.request()
+            return helper.request('http://localhost:8091')
             .post('/api/2.0/notification')
             .send({ nodeId: nodeNotificationMessage.nodeId })
             .expect('Content-Type', /^application\/json/)
@@ -80,7 +80,7 @@ describe('Http.Api.Notification', function () {
         });
 
         it('should pass with nodeId in query body', function () {
-            return helper.request()
+            return helper.request('http://localhost:8091')
             .post('/api/2.0/notification')
             .send(nodeNotificationMessage)
             .expect('Content-Type', /^application\/json/)
@@ -106,7 +106,7 @@ describe('Http.Api.Notification', function () {
             });
 
             it('should post progress notification via body', function () {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress')
                 .set('Content-Type', 'application/json')
                 .send(body)
@@ -120,7 +120,7 @@ describe('Http.Api.Notification', function () {
             });
 
             it('should be success if description is missing in body', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress')
                 .send(body)
                 .set('Content-Type', 'application/json')
@@ -128,7 +128,7 @@ describe('Http.Api.Notification', function () {
             });
 
             it('should be success if value is 0 in body', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress')
                 .send({
                     taskId: 'test',
@@ -142,7 +142,7 @@ describe('Http.Api.Notification', function () {
             });
 
             it('should post progress notification via query', function () {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress?taskId=testid&maximum=5&value=2&description=foo%20bar%20%202') //jshint ignore: line
                 .set('Content-Type', 'application/json')
                 .expect(200)
@@ -160,7 +160,7 @@ describe('Http.Api.Notification', function () {
             });
 
             it('should be success if description is missing in query', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress?taskId=testid&maximum=4&value=2')
                 .set('Content-Type', 'application/json')
                 .expect(200);
@@ -169,27 +169,27 @@ describe('Http.Api.Notification', function () {
 
         describe('not stub publishTaskProgress', function() {
             it('should return 400 if taskid is missing in query', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress?maximum=5&value=2&description=foo')
                 .set('content-type', 'application/json')
                 .expect(400);
             });
 
             it('should return 400 if maximum is missing in query', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress?taskid=testid&value=2&description=foo')
                 .set('content-type', 'application/json')
                 .expect(400);
             });
 
             it('should return 400 if value is missing in query', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress?taskid=testid&maximum=4&description=foo')
                 .set('content-type', 'application/json')
                 .expect(400);
             });
             it('should return 400 if taskId is missing in body', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress')
                 .send({
                     maximum: 5,
@@ -201,7 +201,7 @@ describe('Http.Api.Notification', function () {
             });
 
             it('should return 400 if maximum is missing in body', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress')
                 .send({
                     taskId: 'test',
@@ -213,7 +213,7 @@ describe('Http.Api.Notification', function () {
             });
 
             it('should return 400 if maximum is invalid in body', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress')
                 .send({
                     taskId: 'test',
@@ -226,7 +226,7 @@ describe('Http.Api.Notification', function () {
             });
 
             it('should return 400 if value is missing in body', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress')
                 .send({
                     taskId: 'test',
@@ -238,7 +238,7 @@ describe('Http.Api.Notification', function () {
             });
 
             it('should return 400 if value is invalid in body', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .post('/api/2.0/notification/progress')
                 .send({
                     taskId: 'test',
@@ -263,7 +263,7 @@ describe('Http.Api.Notification', function () {
             });
 
             it('should update progress notification via query', function () {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .get('/api/2.0/notification/progress?taskId=testid&maximum=5&value=2&description=foo%20bar%20%202') //jshint ignore: line
                 .expect(200)
                 .expect(function(res){
@@ -280,7 +280,7 @@ describe('Http.Api.Notification', function () {
             });
 
             it('should be success if description is missing', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .get('/api/2.0/notification/progress?taskId=testid&maximum=4&value=2')
                 .expect(200);
             });
@@ -288,19 +288,19 @@ describe('Http.Api.Notification', function () {
 
         describe('not stub publishTaskProgress', function() {
             it('should return 400 if taskId is missing', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .get('/api/2.0/notification/progress?maximum=5&value=2&description=foo')
                 .expect(400);
             });
 
             it('should return 400 if maximum is missing', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .get('/api/2.0/notification/progress?taskId=testid&value=2&description=foo')
                 .expect(400);
             });
 
             it('should return 400 if value is missing', function() {
-                return helper.request()
+                return helper.request('http://localhost:8091')
                 .get('/api/2.0/notification/progress?taskId=testid&maximum=4&description=foo')
                 .expect(400);
             });
