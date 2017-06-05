@@ -1,38 +1,103 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems/Members/$entity",
-    "@odata.id": "<%= url %>",
-    "@odata.type": "#EthernetInterface.1.0.0.EthernetInterface",
-    "Oem" : {},
-    "Id": "<%= index %>",
-    "Description": "",
-    "Name": "Manager Ethernet Interface",
-    "Status": {},
-    "InterfaceEnabled": true,
-    <% if(typeof hostMAC !== 'undefined') { %>
-    "PermanentMACAddress": "<%= hostMAC %>",
-    "MACAddress": "<%= hostMAC %>",
+    "@odata.context" : "<%= basepath %>/$metadata#<%= baseprofile %>/Members/$entity"
+    ,"@odata.id": "<%= url %>"
+    ,"@odata.type": "#EthernetInterface.1.2.0.EthernetInterface"
+    <% if (typeof autoneg !== 'undefined') { %>
+        ,"AutoNeg": <%= autoneg %>
+    <% } %>
+    <% if (typeof description !== 'undefined') { %>
+        ,"Description": "<%= description %>"
+    <% } %>
+    <% if (typeof fqdn !== 'undefined') { %>
+        ,"FQDN": "<%= fqdn %>"
+    <% } %>
+    <% if (typeof fullduplex !== 'undefined') { %>
+        ,"FullDuplex": <%= fullduplex %>
+    <% } %>
+    <% if (typeof hostname !== 'undefined') { %>
+        ,"HostName": "<%= hostname %>"
+    <% } %>
+    <% if (typeof ipv4 !== 'undefined') { %>
+        ,"IPv4Addresses" : [
+        <% ipv4.forEach(function(ipv4, i, arr) { %>
+            {
+                "Address": "<%= ipv4.ipaddr %>"
+                <% if(typeof ipv4.ipsubnet !== 'undefined') { %>
+                ,"SubnetMask": "<%= ipv4.ipsubnet %>"
+                <% } %>
+                <% if(typeof ipv4.ipsrc !== 'undefined') { %>
+                ,"AddressOrigin": "<%= ipv4.ipsrc %>"
+                <% } %>
+                <% if(typeof ipv4.ipgateway !== 'undefined') { %>
+                ,"Gateway": "<%= ipv4.ipgateway %>"
+                <% } %>
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+        ]
+    <% } %>
+    <% if (typeof ipv6addresspolicytable !== 'undefined') { %>
+        ,"IPv6AddressPolicyTable": []
+    <% } %>
+    <% if (typeof ipv6addresses !== 'undefined') { %>
+        ,"IPv6Addresses": []
+    <% } %>
+    <% if (typeof ipv6defaultgateway !== 'undefined') { %>
+        ,"IPv6DefaultGateway": null
+    <% } %>
+    <% if (typeof ipv6staticaddresses !== 'undefined') { %>
+        ,"IPv6StaticAddresses" : []
+    <% } %>
+    ,"Id": "<%= index %>"
+    <% if(typeof interfaceenabled !== 'undefined') { %>
+        ,"InterfaceEnabled": <%= interfaceenable %>
+    <% } %>
+    <% if(typeof linkstatus !== 'undefined') { %>
+        <% if(typeof linkstatus === 'string') { %>
+            ,"LinkStatus": "<%= linkstatus %>"
+        <% } else { %>
+            ,"LinkStatus": null
+        <% } %>
+    <% } %>
+    <% if(typeof links !== 'undefined') { %>
+        ,"Links": <%= links %>
+    <% } %>
+    <% if(typeof permanentmacaddress !== 'undefined') { %>
+        ,"PermanentMACAddress": "<%= permanentmacaddress %>"
+    <% } %>
+    <% if(typeof macaddress !== 'undefined') { %>
+        ,"MACAddress": "<%= macaddress %>"
+    <% } %>
+    <% if(typeof mtusize !== 'undefined') { %>
+        ,"MTUSize": <%= mtusize %>
+    <% } %>
+    <% if(typeof maxipv6staticadresses !== 'undefined') { %>
+        ,"MaxIPv6StaticAddresses": <%= maxipv6staticadresses %>
+    <% } %>
+    ,"Name": "<%= name %>"
+    <% if(typeof nameservers !== 'undefined') { %>
+        ,"NameServers": []
+    <% } %>
+    <% if(typeof oem !== 'undefined') { %>
+        ,"Oem": {}
+    <% } %>
+    <% if(typeof speedmbps !== 'undefined') { %>
+        ,"SpeedMbps": <%= speedmbps %>
+    <% } %>
+    <% if(typeof status !== 'undefined') { %>
+        ,"Status": {}
+    <% } %>
+    <% if(typeof uefidevicepath !== 'undefined') { %>
+        ,"UefiDevicePath": "<%= uefidevicepath %>"
     <% } %>
     <% if (typeof vlan !== 'undefined') { %>
-    "VLAN": {
-        "VLANEnable": true,
-        "VLANId": <%= vlan %>
-    },
-    <% } %>
-    "IPv4Addresses" : [
-    <% ipv4.forEach(function(ipv4, i, arr) { %>
-        {
-            "Address": "<%= ipv4.ipaddr %>"
-            <% if(typeof ipv4.ipsubnet !== 'undefined') { %>
-            ,"SubnetMask": "<%= ipv4.ipsubnet %>"
-            <% } %>
-            <% if(typeof ipv4.ipsrc !== 'undefined') { %>
-            ,"AddressOrigin": "<%= ipv4.ipsrc %>"
-            <% } %>
-            <% if(typeof ipv4.ipgateway !== 'undefined') { %>
-            ,"Gateway": "<%= ipv4.ipgateway %>"
-            <% } %>
+        ,"VLAN": {
+            "VLANEnable": true,
+            "VLANId": <%= vlan %>
         }
-        <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
-    <% }); %>
-    ]
+    <% } %>
+    <% if (typeof vlans !== 'undefined') { %>
+        ,"VLANs": {}
+    <% } %>
 }
+
