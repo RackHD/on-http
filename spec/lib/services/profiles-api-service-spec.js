@@ -234,6 +234,7 @@ describe("Http.Services.Api.Profiles", function () {
         this.sandbox.stub(profileApiService, 'waitForDiscoveryStart').resolves();
         this.sandbox.stub(configuration, 'get').withArgs('discoveryGraph')
             .returns('from.config.graph');
+        configuration.get.withArgs('skipResetPostDiscovery').returns('false');
         configuration.get.withArgs('autoCreateObm').returns('false');
         configuration.get.withArgs('skipPollersCreation').returns('false');
         return profileApiService.runDiscovery(node)
