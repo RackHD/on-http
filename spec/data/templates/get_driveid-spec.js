@@ -26,18 +26,19 @@ describe('get_driveid script', function() {
         '[7:2:0:0]    disk    LSI      MRROMB           4.26  /dev/sdc\n' +
         '[7:0:1:0]    disk    LSI      MRROMB           4.26  /dev/sdg\n' +
         '[8:0:0:0]   disk    SMART    eUSB             0298  /dev/sdd';
-    var mockVdInfoStd =
+    
+    var mockVdInfoStd, mockWwidStd, mockSataRawInfoStd, mockSataRawInfoWithEmpty;
+    
     //jshint ignore: start
+    mockVdInfoStd =
         'total 0\n' +
         'drwxr-xr-x 2 root root 360 Dec 22 10:02 ./\n' +
         'drwxr-xr-x 5 root root 100 Dec 22 10:02 ../\n' +
         'lrwxrwxrwx 1 root root   9 Dec 24 11:05 pci-0000:03:00.0-scsi-7:2:0:0 -> ../../sdc\n' +
         'lrwxrwxrwx 1 root root   9 Dec 24 11:05 pci-0000:03:00.0-scsi-7:0:1:0 -> ../../sdg\n' +
         'lrwxrwxrwx 1 root root  9 May 15 08:45 pci-0000:00:14.0-usb-0:5:1.0-scsi-0:0:0:0 -> ../../sdd';
-    //jshint ignore: end
 
-    var mockWwidStd =
-    //jshint ignore: start
+    mockWwidStd =
         'total 0\n' +
         'drwxr-xr-x 2 root root 360 Dec 22 10:02 ./\n' +
         'drwxr-xr-x 5 root root 100 Dec 22 10:02 ../\n' +
@@ -49,16 +50,23 @@ describe('get_driveid script', function() {
         'lrwxrwxrwx 1 root root   9 Dec 22 10:03 wwn-0x5000cca23de98340 -> ../../sda\n' +
         'lrwxrwxrwx 1 root root   9 Dec 24 11:05 wwn-0x600163600196c0401e0c0e6511cec3c0 -> ../../sdc\n' +//
         'lrwxrwxrwx 1 root root  9 May 15 08:45 usb-SMART_eUSB_SPG143500HQ-0:0 -> ../../sdd';
-    //jshint ignore: end
-
-    var mockSataRawInfoStd =
-    //jshint ignore: start
+    
+    mockSataRawInfoStd =
         'dev/sda:\n' +
         '0040 3fff 0000 0010 7e00 0200 003f 0000\n' +
         '0000 0000 514d 3030 3030 3120 2020 2020\n' +
         '2020 2020 2020 2020 0003 0200 0004 322e\n' +
         '322e 3120 2020 5145 4d55 2048 4152 4444\n' +
         '4953 4b20 2020 2020 2020 2020 2020 2020\n' +
+        '2020 2020 2020 2020 2020 2020 2020 8010\n'
+    
+    mockSataRawInfoWithEmpty =
+        'dev/sda:\n' +
+        '0040 3fff 0000 0010 7e00 0200 003f 0000\n' +
+        '0000 0000 514d 3030 3030 3120 2020 2020\n' +
+        '2020 2020 2020 2020 0003 0200 0004 322e\n' +
+        '322e 3120 2020 5145 4d55 2048 4152 4444\n' +
+        '492D 4b00 2020 2020 2020 2020 2020 2020\n' +
         '2020 2020 2020 2020 2020 2020 2020 8010\n'
     //jshint ignore: end
 
@@ -72,7 +80,6 @@ describe('get_driveid script', function() {
         getDriveId.__set__('execSync', mockExec);
 
         it('should discard DVD info', function() {
-
             var result = buildDriveMap(mockWwidDvd, mockVdInfoDvd, mockScsiDvd);
             expect(result).to.deep.equal(JSON.stringify(
                 //jshint ignore: start
@@ -98,7 +105,7 @@ describe('get_driveid script', function() {
                     {
                         "scsiId":"6:0:0:0",
                         "virtualDisk":"",
-                        "esxiWwid":"t10.ATA_____32GB_SATA2DFlash_Drive___________________QM00001_____________",
+                        "esxiWwid":"t10.ATA_____QEMU_HARDDISK___________________________QM00001_____________",
                         "devName":"sdb",
                         "identifier":0,
                         "linuxWwid":"/dev/disk/by-id/ata-32GB_SATA-Flash_Drive_QM00001"
@@ -134,6 +141,28 @@ describe('get_driveid script', function() {
                         "devName":"sdd",
                         "identifier":4,
                         "linuxWwid":"/dev/disk/by-id/usb-SMART_eUSB_SPG143500HQ-0:0"
+                    }
+                ]
+                //jshint ignore: end
+            ));
+        });
+
+        it('should parser raw SATA data with ASCII code 0x00', function() {
+            var mockExec = function() {
+                return mockSataRawInfoWithEmpty;
+            };
+            getDriveId.__set__('execSync', mockExec);
+            var result = buildDriveMap(mockWwidDvd, mockVdInfoDvd, mockScsiDvd);
+            expect(result).to.deep.equal(JSON.stringify(
+                //jshint ignore: start
+                [
+                    {
+                        "scsiId":"0:0:0:0",
+                        "virtualDisk":"",
+                        "esxiWwid":"t10.ATA_____QEMU_HARDDI2DK00__________________________QM00001_____________",
+                        "devName":"sda",
+                        "identifier":0,
+                        "linuxWwid":"/dev/disk/by-id/ata-QEMU_HARDDISK_QM00001"
                     }
                 ]
                 //jshint ignore: end

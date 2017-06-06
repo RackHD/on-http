@@ -14,11 +14,12 @@ var options = {
 };
 
 /**
- * Get SATA drive's SN string.
+ * Get SATA drive's logic unit name 
  * @param {String} sataDrive SATA drive's name, eg. 'sda'
- * @return {String} SATA drive's SN string with 20 characters like 'QM00007_____________'
+ * @return {String} SATA drive's logic unit name with 60 characters like:
+ *  'SATADOM2-ML_3SE_________________________20160623AA106710169E'
  */
-function getSataSnStr(sataDrive) {
+function getSataNameStr(sataDrive) {
     var output = execSync(cmdSataRawInfo + ' /dev/' + sataDrive);
     /*  output data like below:
      *  $ sudo hdparm --Istdout /dev/sda
@@ -32,33 +33,39 @@ function getSataSnStr(sataDrive) {
      *  2020 2020 2020 2020 2020 2020 2020 8010
      *  .....
      *
-     *  snHexStr is from 21 to 40 bytes, total 20 bytes, shown as below
-     *
-     *  .....
-     *            514d 3030 3030 3520 2020 2020
-     *  2020 2020 2020 2020
-     *  .....
+     *  Among those raw data:
+     *  Serial number hex string is from Word 10 to 19, total 20 bytes
+     *  Model number hex string is from Word  27 to 46, total 40 bytes
      */
     var lines = output.toString().split('\n');
     var hexLineMatch = /^([0-9A-Fa-f]{4}\s+){7}[0-9A-Fa-f]{4}$/;
-    var snHexStr = lines.reduce(function (result,line) {
+
+    var rawHexStr = lines.reduce(function (result,line) {
         if(hexLineMatch.test(line)) {
             result.push(line);
         }
         return result;
-    },[]).join(' ').split(' ').slice(10, 20).join('');
+    },[]).join(' ').split(' ');
 
-    var snStr = '';
-    for(var i = 0; i < snHexStr.length; i+=2) {
-        var ascii = Number('0x' + snHexStr.charAt(i) + snHexStr.charAt(i+1));
-        var snChar = String.fromCharCode(ascii);
-        if(snChar === ' ') {
-            snStr += '_';
+    //Logic unit name string should be: Model Number String + Serial Number String
+    var snHexStr = rawHexStr.slice(10, 20).join('');
+    var modelHexStr = rawHexStr.slice(27, 47).join('');
+    var nameHexStr = modelHexStr + snHexStr;
+
+    var nameStr = '';
+    for(var i = 0; i < nameHexStr.length; i+=2) {
+        var ascii = Number('0x' + nameHexStr.charAt(i) + nameHexStr.charAt(i+1));
+        var nameChar = String.fromCharCode(ascii);
+        if(nameChar === ' ') {
+            nameStr += '_';  // All space should be filled with '_'
+        } else if(nameChar === '\u0000') { // ASCII code 0x00 is parsed as nameChar '\u0000'
+            nameStr += '00';  // ESXi parses ASCII code 0x00 as string '00'
         } else {
-            snStr += snChar;
+            nameStr += nameChar;
         }
     }
-    return snStr;
+
+    return nameStr;
 }
 
 /**
@@ -78,7 +85,7 @@ function parseDriveWwid(idList) {
 
     //According to SCSI-3 spec, vendor specified logic unit name string is 60
 	//Only IDE and SCSI disk will be retrieved
-    var scsiLines = [], sataLines = [], wwnLines = [], usbLines = [], requiredStrLen = 60;
+    var scsiLines = [], sataLines = [], wwnLines = [], usbLines = [];
     lines.forEach(function(line){
         if ( line && !(line.match('part')) && line.match(/[sh]d[a-z]?[a-z]$/i)){
             var nameIndex = line.lastIndexOf('/'), idIndex = line.lastIndexOf('->');
@@ -105,32 +112,26 @@ function parseDriveWwid(idList) {
         return [wwnLine[0], 'naa.' + split[1].slice(2)];
     });
 
-    //ESXi SATA WWID should be ('t10.ATA_____' + VendorInfo + Sub + SerialNumber)
-    //VendorInfo + Sub + SerialNumber should be 60 characters.
-    //Sub is made of N(N = 60 - VendorInfo - SerialNumber) underline '_' symbols
-    //ESXi SATA WWID should finally replace remaing dashs '-' with '2D', '3D' ...
+    //ESXi SATA WWID should be ('t10.ATA_____' + logic unit name)
+    //ESXi SATA WWID should finally replace remaing dashs '-' with '2D', '3D' ..., 'ND', N means
+    //it is the Nth dash.
     //esxiLine example:
     //["sda", "ata-32GB_SATA_Flash_Drive_B061430580090000000F"]
     //esxiSata example
     //["sda", "t10.ATA_____32GB_SATA_Flash_Drive___________________B061430580090000000F"]
-    //Todo: confrim above analysis is correct for all SATA disks.
+    //TODO: confrim above analysis is correct for all SATA disks.
     var esxiSata = sataLines.map(function(esxiLine) {
         var line = esxiLine[1];
-        var headIndex = line.indexOf('-'), snIndex = line.lastIndexOf('_');
+        var headIndex = line.indexOf('-');
         var headStr = ['t10.', line.slice(0, headIndex).toUpperCase(), '_____'].join(''),
-            vendorStr = line.slice(headIndex + 1, snIndex + 1),
-            snStr = getSataSnStr(esxiLine[0]),
-            dashStr = '';
-        for (var i = 0; i< requiredStrLen - vendorStr.length - snStr.length; i += 1){
-            dashStr += '_';
-        }
-        var strLine = [headStr, vendorStr, dashStr, snStr].join('');
+            nameStr = getSataNameStr(esxiLine[0]);
+        var strLine = headStr + nameStr;
         //return strLine.replace('-', '2D');
         //ESXi driveid replaces Nth '-' with 'ND' like 2D, 3D
         var strArray = strLine.split('-');
         if (strArray.length !== 1) {
             strLine = strArray[0];
-            for (i = 0; i < strArray.length -1; i += 1){
+            for (var i = 0; i < strArray.length -1; i += 1){
                 strLine = [strLine, (i + 2).toString(), 'D', strArray[i + 1]].join('');
             }
         }
