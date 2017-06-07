@@ -45,8 +45,7 @@ helper.startServer = function (overrides, endpointOpt) {
         .set('httpEndpoints', [ _.merge( {}, 
             {
                 'port': 8089,
-                'httpsEnabled': false,
-                'yamlName': ["monorail-2.0.yaml", "redfish.yaml", "monorail-2.0-sb.yaml"]
+                'httpsEnabled': false
             },
             endpointOpt )
         ]);
