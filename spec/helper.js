@@ -42,12 +42,20 @@ helper.startServer = function (overrides, endpointOpt) {
     helper.injector.get('Services.Configuration')
         .set('enableUPnP', false)
         .set('skuPackRoot', 'spec/lib/services/sku-static')
-        .set('httpEndpoints', [ _.merge( {}, 
+        .set('httpEndpoints', [_.merge({},
             {
-                'port': 8089,
-                'httpsEnabled': false
+                'port': 8091,
+                'httpsEnabled': false,
+                "yamlName": ["monorail-2.0-sb.yaml"]
             },
-            endpointOpt )
+            endpointOpt),
+            _.merge({},
+                {
+                    'port': 8089,
+                    'httpsEnabled': false,
+                    "yamlName": ["monorail-2.0.yaml", "redfish.yaml"]
+                },
+                endpointOpt)
         ]);
 
     index.injector = helper.injector;

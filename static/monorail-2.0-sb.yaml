@@ -276,7 +276,147 @@ paths:
       - /api/2.0
   /swagger:
     x-swagger-pipe: swagger_raw
-
+  /profiles:
+      get:
+        description: >
+          Get the list of currently defined profiles. Profiles are scripts
+          used by RackHD to control how a node PXE boots.
+        operationId: profilesGet
+        parameters:
+        - collectionFormat: multi
+          description: List of valid MAC addresses to lookup
+          in: query
+          items:
+            type: string
+          name: macs
+          required: false
+          type: array
+        - collectionFormat: multi
+          description: List of IP addresses to lookup
+          in: query
+          items:
+            type: string
+          name: ips
+          required: false
+          type: array
+        - description:
+            When macs parameter is not passed, passed with IP adds MAC address to lookup
+          in: query
+          name: mac
+          required: false
+          type: string
+        - description:
+            When macs parameters is not passed, passed with MAC adds IP address to lookup
+          in: query
+          name: ip
+          required: false
+          type: string
+        responses:
+          200:
+            description: Successfully retrieved a list of profiles for specified mac / ip
+            schema:
+              type: object
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+        summary: Get list of profiles
+        tags:
+        - /api/2.0
+        x-authentication-type:
+        - jwt
+        x-privileges:
+        - Read
+        - profilesRead
+      x-swagger-router-controller: profiles
+  /templates/{name}:
+      get:
+        description: Get the template with the specified name.
+        operationId: templatesGetByName
+        parameters:
+        - description: The name of the template
+          in: path
+          name: name
+          required: true
+          type: string
+        - description: The node identifier
+          in: query
+          name: nodeId
+          required: false
+          type: string
+        - collectionFormat: multi
+          description: List of valid MAC addresses to lookup
+          in: query
+          items:
+            type: string
+          name: macs
+          required: false
+          type: array
+        responses:
+          200:
+            description: Successfuly retrieved the specified template
+            schema:
+              type: object
+          404:
+            description: The template with specified identifier was not found
+            schema:
+              $ref: '#/definitions/Error'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+        summary: Get the specified template
+        tags:
+        - /api/2.0
+        x-authentication-type:
+        - jwt
+        x-privileges:
+        - Read
+        - templatesRead
+      head:
+        description: Get the template headers with the specified name. Only gets headers
+          and returns no body.
+        operationId: templatesHeadByName
+        parameters:
+        - description: The name of the template
+          in: path
+          name: name
+          required: true
+          type: string
+        - description: The node identifier
+          in: query
+          name: nodeId
+          required: false
+          type: string
+        - collectionFormat: multi
+          description: List of valid MAC addresses to lookup
+          in: query
+          items:
+            type: string
+          name: macs
+          required: false
+          type: array
+        responses:
+          200:
+            description: Successfuly retrieved the specified template headers
+            schema:
+              type: object
+          404:
+            description: The template with specified identifier was not found
+            schema:
+              $ref: '#/definitions/Error'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+        summary: Get headers of the specified template
+        tags:
+        - /api/2.0
+        x-authentication-type:
+        - jwt
+        x-privileges:
+        - Read
+      x-swagger-router-controller: templates
 definitions:
   ErrorResponse:
     required:

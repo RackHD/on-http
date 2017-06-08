@@ -182,7 +182,7 @@ describe('Http.Api.Templates', function () {
             };
             findActiveGraphForTarget.resolves(graph);
             taskProtocol.requestProperties.resolves({});
-            return helper.request()
+            return helper.request('http://localhost:8091')
                 .get('/api/2.0/templates/123?nodeId=583ae29c68896e275779e2ff')
                 .expect(200)
                 .then(function () {
@@ -197,7 +197,7 @@ describe('Http.Api.Templates', function () {
             };
             findActiveGraphForTarget.resolves(graph);
             taskProtocol.requestProperties.resolves({});
-            return helper.request()
+            return helper.request('http://localhost:8091')
                 .get('/api/2.0/templates/123?macs=00:50:56:aa:7d:85')
                 .expect(200)
                 .then(function () {
@@ -207,7 +207,8 @@ describe('Http.Api.Templates', function () {
         });
 
         it('should return 400 when nodeId is not provided', function () {
-            return helper.request().get('/api/2.0/templates/123')
+            return helper.request('http://localhost:8091')
+                .get('/api/2.0/templates/123')
                 .expect('Content-Type', /^application\/json/)
                 .expect(400)
                 .expect(function (req) {
