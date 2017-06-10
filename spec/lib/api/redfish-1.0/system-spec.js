@@ -511,6 +511,9 @@ describe('Redfish Systems Root', function () {
             "owningEntity": "DCIM",
             "rawEventData": "",
             "sequenceNumber": 2173760
+        }
+    ];
+	    
     var httpEndpoints = [
         {
             "address": "172.31.128.1",
