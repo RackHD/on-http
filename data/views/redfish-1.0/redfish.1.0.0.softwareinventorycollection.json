@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Systems",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#SoftwareInventoryCollection.SoftwareInventoryCollection",
+    "Oem" : {},
+    "Name": "Software Inventory Collection",
+    "Members@odata.count": <%= fwItems.length %>,
+    "Members": [
+        <% fwItems.forEach(function(fwItem, i, arr) { %>
+{
+    "@odata.id": "<%= basepath %>/UpdateService/FirmwareInventory/<%=fwItem %>"
+}
+<%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+<% }); %>
+]
+}

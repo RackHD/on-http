@@ -2232,6 +2232,66 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /UpdateService/FirmwareInventory:
+    x-swagger-router-controller: update-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: get a list of firmware installed on all nodes managed by this instance of RackHD
+      operationId: getFirmwareInventoryList
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateService.1.0.0_UpdateService"
+      responses:
+        201:
+          description: Success
+          $ref: "#/responses/status_201"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /UpdateService/FirmwareInventory/{identifier}:
+    x-swagger-router-controller: update-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve information about a specific firmware
+      operationId: getFirmwareInventoryById
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          description: node identifier
+      responses:
+        201:
+          description: Success
+          $ref: "#/responses/status_201"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 
@@ -6922,6 +6982,12 @@ definitions:
       message:
         type: string
   testEvent:
+    type: object
+  UpdateService.1.0.0_UpdateService:
+    properties:
+      FirmwareInventory:
+        description: The value of this property shall be a link to a resource of type SoftwareInventoryCollection.
+        type: string
     type: object
   UpdateService.1.0.0_UpdateService.post:
     properties:
