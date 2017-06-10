@@ -7,26 +7,27 @@
     "Description": "",
     "Name": "Computer System",
     "SystemType": "<%= systemType %>",
-    "AssetTag": "<%= ohai.data.dmi.chassis.asset_tag %>",
-    "Manufacturer": "<%= ohai.data.dmi.system.Manufacturer %>",
-    "Model": "<%= ohai.data.dmi.system.product_name %>",
-    "SKU": "<%= ohai.data.dmi.system.sku_number %>",
-    "SerialNumber": "<%= ohai.data.dmi.system.serial_number %>",
+    "AssetTag": "<%= catData.dmi.chassis.asset_tag %>",
+    "Manufacturer": "<%= catData.dmi.system.Manufacturer %>",
+    "Model": "<%= catData.dmi.system.product_name %>",
+    "SKU": "<%= catData.dmi.system.sku_number %>",
+    "SerialNumber": "<%= catData.dmi.system.serial_number %>",
     "PartNumber": "",
-    "UUID": "<%= ohai.data.dmi.system.uuid.toLowerCase() %>",
+    "UUID": "<%= catData.dmi.system.uuid.toLowerCase() %>",
     "HostName": "",
     "IndicatorLED": "<%= chassisData.uid %>",
     "PowerState": "<%= chassisData.power==='Unknown' ? 'On' : chassisData.power %>",
+    "Bios": {},
     "Boot": {},
-    "BiosVersion": "<%= ohai.data.dmi.bios.version.trim() %> <%= ohai.data.dmi.bios.bios_revision.trim() %> <%= ohai.data.dmi.bios.release_date.trim() %>",
+    "BiosVersion": "<%= catData.dmi.bios.version.trim() %> <%= catData.dmi.bios.bios_revision.trim() %> <%= catData.dmi.bios.release_date.trim() %>",
     "ProcessorSummary": {
-        "Count": <%= ohai.data.cpu.real %>,
-        "Model": "<%= ohai.data.dmi.processor.version %>",
+        "Count": <%= catData.cpu.real %>,
+        "Model": "<%= catData.dmi.processor.version %>",
         "Status": {}
     },
     "MemorySummary": {
         <% var memsize = 0; %>
-        <% dmi.data['Memory Device'].forEach(function(dev) { %>
+        <% catData['Memory Device'].forEach(function(dev) { %>
         <%     var size = dev.Size.split(' ')[0]; %>
         <%     var units = dev.Size.split(' ')[1]; %>
         <%     size = isNaN(size) ? 0 : size; %>

@@ -7,11 +7,11 @@
     "Description": "",
     "Name": "Chassis",
     "ChassisType": "<%= chassisType %>",
-    "AssetTag" : "<%= ohai.data.dmi.chassis.asset_tag %>",
-    "Manufacturer": "<%= ohai.data.dmi.chassis.manufacturer %>",
-    "Model": "<%= ohai.data.dmi.system.product_name %>",
-    "SKU": "<%= ohai.data.dmi.chassis.sku_number %>",
-    "SerialNumber": "<%= ohai.data.dmi.chassis.serial_number %>",
+    "AssetTag" : "<%= catData.chassis.asset_tag %>",
+    "Manufacturer": "<%= catData.chassis.manufacturer %>",
+    "Model": "<%= catData.system.product_name %>",
+    "SKU": "<%= catData.chassis.sku_number %>",
+    "SerialNumber": "<%= catData.chassis.serial_number %>",
     "Actions": {
         "Oem": {},
         "#Chassis.Reset": {}

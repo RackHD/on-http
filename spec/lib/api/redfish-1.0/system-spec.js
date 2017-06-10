@@ -16,6 +16,7 @@ describe('Redfish Systems Root', function () {
     var Errors;
     var racadm;
     var wsman;
+    var configuration;
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -56,7 +57,6 @@ describe('Redfish Systems Root', function () {
             nodeApi = helper.injector.get('Http.Services.Api.Nodes');
             sinon.stub(nodeApi, "setNodeWorkflowById");
             sinon.stub(nodeApi, "getAllNodes");
-            // sinon.stub(nodeApi, "getNodeById");
 
             racadm = helper.injector.get('JobUtils.RacadmTool');
             sinon.stub(racadm, "runCommand");
@@ -64,6 +64,7 @@ describe('Redfish Systems Root', function () {
             wsman = helper.injector.get('Http.Services.Wsman');
             sinon.stub(wsman, "getLog");
             sinon.stub(wsman, "isDellSystem");
+            configuration = helper.injector.get('Services.Configuration');
 
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
@@ -94,7 +95,7 @@ describe('Redfish Systems Root', function () {
         resetStubs(waterline.workitems);
         resetStubs(waterline.obms);
         resetStubs(taskProtocol);
-
+        resetStubs(nodeApi);
 
         waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd')
         .resolves(Promise.resolve({
@@ -125,6 +126,19 @@ describe('Redfish Systems Root', function () {
             }
         });
         wsman.isDellSystem.rejects(new Errors.NotFoundError('Not Found'));
+
+        waterline.nodes.getNodeById.withArgs('DELLabcd1234abcd1234abcd')
+        .resolves(Promise.resolve({
+            id: 'DELLabcd1234abcd1234abcd',
+            name: 'DELLabcd1234abcd1234abcd',
+            identifiers: [ "ABCDEFG" ]
+        }));
+
+        waterline.nodes.needByIdentifier.withArgs('DELLabcd1234abcd1234abcd')
+        .resolves(Promise.resolve({
+            id: 'DELLabcd1234abcd1234abcd',
+            name: 'DELLabcd1234abcd1234abcd' 
+        }));
     });
 
     afterEach('tear down mocks', function () {
@@ -168,6 +182,22 @@ describe('Redfish Systems Root', function () {
         autoDiscover: false,
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
+        identifiers: [],
+        tags: [],
+        obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a'}],
+        type: 'compute',
+        relations: [
+            {
+                relationType: 'enclosedBy',
+                targets: [ '4567efgh4567efgh4567efgh' ]
+            }
+        ]
+    };
+    // Node new mock data with OBM model change
+    var dellNode = {
+        autoDiscover: false,
+        id: 'DELLabcd1234abcd1234abcd',
+        name: 'dell node',
         identifiers: [],
         tags: [],
         obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a'}],
@@ -266,6 +296,149 @@ describe('Redfish Systems Root', function () {
         ]
     };
 
+    var dellCatalogData =
+    {
+        bios: {
+            "dcimBIOSEnumerationTypeList": [
+                {
+                    "any": [],
+                    "attributeDisplayName": {
+                        "otherAttributes": {},
+                        "value": "System Memory Testing"
+                    },
+                    "attributeName": {
+                        "otherAttributes": {},
+                        "value": "MemTest"
+                    },
+                    "caption": null,
+                    "currentValue": [
+                        {
+                            "otherAttributes": {},
+                            "value": "Disabled"
+                        }
+                    ],
+                    "isReadOnly": {
+                        "otherAttributes": {},
+                        "value": "false"
+                    }
+                }
+            ]
+        },
+        DeviceSummary: {
+            id: "1.2.3.4"
+        },
+        nics: [
+            {
+                "autoNegotiation": "2",
+                "busNumber": "5",
+                "controllerBiosVersion": null,
+                "currentMACAddress": "F8:BC:12:0B:0B:40",
+                "dataBusWidth": "0002",
+                "deviceDescription": "Integrated NIC 1 Port 1 Partition 1",
+                "deviceNumber": "0",
+                "familyDriverVersion": "16.5.20",
+                "familyVersion": "16.5.20",
+                "fcoEOffloadMode": "3",
+                "fcoEWwnn": null,
+                "fqdd": "NIC.Integrated.1-1-1",
+                "id": 0,
+                "iscsiBootMode": null,
+                "iscsiInitiatorGateway": null,
+                "iscsiInitiatorIpAddress": null,
+                "iscsiInitiatorName": null,
+                "iscsiInitiatorPrimaryDns": null,
+                "iscsiInitiatorSecondryDns": null,
+                "iscsiInitiatorSubnet": null,
+                "iscsiMacAddress": null,
+                "iscsiOffloadMode": "3",
+                "iscsiOffloadSupport": null,
+                "legacyBootProtocol": null,
+                "linkDuplex": "1",
+                "linkSpeed": "3",
+                "linkStatus": null,
+                "macAddress": null,
+                "maxBandwidth": "0",
+                "mediaType": "Base T",
+                "minBandwidth": "0",
+                "nicMode": "3",
+                "osDriverState": null,
+                "pciDeviceID": "1521",
+                "pciSubDeviceID": "1028",
+                "permanentFcoMacAddress": "F8:BC:12:0B:0B:40",
+                "permanentMacAddress": "F8:BC:12:0B:0B:40",
+                "permanentiScsiMacAddress": "",
+                "productName": "Intel(R) Gigabit 4P X710/I350 rNDC - F8:BC:12:0B:0B:40",
+                "receiveFlowControl": "2",
+                "slotLength": "0002",
+                "slotType": "0002",
+                "teaming": "< NIC # > , < NIC # >",
+                "toeSupport": null,
+                "transmitFlowControl": "3",
+                "vendorName": "Intel Corp",
+                "virtWwn": null,
+                "virtWwpn": null,
+                "virtualIscsiMacAddress": null,
+                "virtualMacAddress": null,
+                "wwn": null,
+                "wwpn": null
+            },
+            {
+                "autoNegotiation": "2",
+                "busNumber": "5",
+                "controllerBiosVersion": null,
+                "currentMACAddress": "F8:BC:12:0B:0B:41",
+                "dataBusWidth": "0002",
+                "deviceDescription": "Integrated NIC 1 Port 2 Partition 1",
+                "deviceNumber": "0",
+                "familyDriverVersion": "16.5.20",
+                "familyVersion": "16.5.20",
+                "fcoEOffloadMode": "3",
+                "fcoEWwnn": null,
+                "fqdd": "NIC.Integrated.1-2-1",
+                "id": 0,
+                "iscsiBootMode": null,
+                "iscsiInitiatorGateway": null,
+                "iscsiInitiatorIpAddress": null,
+                "iscsiInitiatorName": null,
+                "iscsiInitiatorPrimaryDns": null,
+                "iscsiInitiatorSecondryDns": null,
+                "iscsiInitiatorSubnet": null,
+                "iscsiMacAddress": null,
+                "iscsiOffloadMode": "3",
+                "iscsiOffloadSupport": null,
+                "legacyBootProtocol": null,
+                "linkDuplex": "1",
+                "linkSpeed": "3",
+                "linkStatus": null,
+                "macAddress": null,
+                "maxBandwidth": "0",
+                "mediaType": "Base T",
+                "minBandwidth": "0",
+                "nicMode": "3",
+                "osDriverState": null,
+                "pciDeviceID": "1521",
+                "pciSubDeviceID": "1028",
+                "permanentFcoMacAddress": "F8:BC:12:0B:0B:41",
+                "permanentMacAddress": "F8:BC:12:0B:0B:41",
+                "permanentiScsiMacAddress": "",
+                "productName": "Intel(R) Gigabit 4P X710/I350 rNDC - F8:BC:12:0B:0B:41",
+                "receiveFlowControl": "2",
+                "slotLength": "0002",
+                "slotType": "0002",
+                "teaming": "< NIC # > , < NIC # >",
+                "toeSupport": null,
+                "transmitFlowControl": "3",
+                "vendorName": "Intel Corp",
+                "virtWwn": null,
+                "virtWwpn": null,
+                "virtualIscsiMacAddress": null,
+                "virtualMacAddress": null,
+                "wwn": null,
+                "wwpn": null
+            }
+        ]
+    };
+
     var catalogDataWithBadProcessor = {
         'Processor Information' : [
             {
@@ -338,6 +511,14 @@ describe('Redfish Systems Root', function () {
             "owningEntity": "DCIM",
             "rawEventData": "",
             "sequenceNumber": 2173760
+    var httpEndpoints = [
+        {
+            "address": "172.31.128.1",
+            "authEnabled": false,
+            "httpsEnabled": false,
+            "port": 9080,
+            "proxiesEnabled": true,
+            "routers": "southbound-api-router"
         }
     ];
 
@@ -423,6 +604,161 @@ describe('Redfish Systems Root', function () {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id)
             .expect('Content-Type', /^application\/json/)
             .expect(404);
+    });
+
+    it('should 404 an invalid identifier for bios query', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Bios')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should 404 a non-Dell identifier for bios query', function() {
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Bios')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return a valid bios block for Dell-based catalog', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'bios').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'bios',
+            data: dellCatalogData.bios
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Bios')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid identifier for bios settings query', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Bios/Settings')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should 404 a non-Dell identifier for bios settings query', function() {
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Bios/Settings')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return a valid bios settings block for Dell-based catalog', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'bios').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'bios',
+            data: dellCatalogData.bios
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Bios/Settings')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid system for bios settings patch', function() {
+        return helper.request().patch('/redfish/v1/Systems/bad' + node.id + '/Bios/Settings')
+            .send({ Name: "bogusname", Id: "someid"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should 404 an non-Dell identifier for bios settings patch', function() {
+        return helper.request().patch('/redfish/v1/Systems/' + node.id + '/Bios/Settings')
+            .send({ Name: "bogusname", Id: "someid"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return a 202 for a Dell-based bios settings patch', function() {
+        // Force a southbound interface through httpEndpoints
+        configuration.set('httpEndpoints', httpEndpoints);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'DeviceSummary').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'DeviceSummary',
+            data: dellCatalogData.DeviceSummary
+        }));
+        return helper.request().patch('/redfish/v1/Systems/' + dellNode.id + '/Bios/Settings')
+            .send({ "@odata.context": "string", "@odata.id": "string", "@odata.type": "string", "Actions": { "Oem": {} }, "AttributeRegistry": "string", "Attributes": { "X": "y"}, "Description": "string", "Id": "string", "Name": "string", "Oem": {} })
+            .expect('Content-Type', /^application\/json/)
+            .expect(202);
+    });
+
+    it('should 404 an invalid identifier for ethernet query', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/EthernetInterfaces')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should 404 a non-Dell identifier for ethernet query', function() {
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return a valid ethernet block for Dell-based catalog', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'nics',
+            data: dellCatalogData.nics
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid identifier for ethernet index query with valid index', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/EthernetInterfaces/' + "NIC.Integrated.1-1-1")
+            .expect('Content-Type', /^application\/json/)
+            .expect(404)
+            .expect(function(res) {
+                expect(res.text).contains("Node not Found bad1234abcd1234abcd1234abcd");
+            });
+    });
+
+    it('should 404 a non-Dell identifier for ethernet index query with valid index', function() {
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + "NIC.Integrated.1-1-1")
+            .expect('Content-Type', /^application\/json/)
+            .expect(404)
+            .expect(function(res) {
+                expect(res.text).contains("No Ethernet found for node " + node.id);
+            });
+    });
+
+    it('should 404 a valid identifier for ethernet index query with invalid index', function() {
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces/' + "BADNIC.Integrated.1-1-1")
+            .expect('Content-Type', /^application\/json/)
+            .expect(404)
+            .expect(function(res) {
+                expect(res.text).contains("No Ethernet index found for node " + "BADNIC.Integrated.1-1-1");
+            });
+    });
+
+    it('should return a valid ethernet index block for Dell-based catalog with valid index', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'nics',
+            data: dellCatalogData.nics
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces/' + 'NIC.Integrated.1-1-1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
     });
 
     it('should return a valid processor list', function() {

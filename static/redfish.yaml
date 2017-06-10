@@ -227,6 +227,107 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Bios:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve the current bios settings for a specified identifier
+      description: >
+        defines a set of bios resources
+      operationId: listSystemBios
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Bios.v1_0_1.Bios"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Bios/Settings:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve the pending bios settings for a specified identifier
+      description: >
+        defines a set of bios resources that are pending
+      operationId: listSystemBiosSettings
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Bios.v1_0_1.Bios"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    patch:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: patch the pending bios settings for a specified identifier
+      description: >
+        patch a set of bios resources
+      operationId: patchSystemBiosSettings
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Bios.v1_0_1.Bios"
+      responses:
+        202:
+          description: Success
+          $ref: "#/responses/status_202"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /Systems/{identifier}/Processors:
     x-swagger-router-controller: systems
     get:
@@ -1073,7 +1174,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /Systems/{identifier}/EthernetInterfaces:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: systems
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
@@ -1081,7 +1182,7 @@ paths:
       description: >
         Defines a collection of ethernet interfaces that are
         present on the system described by identifier
-      operationId: unimplemented
+      operationId: listSystemEthernetInterfaces
       tags: [ "/redfish/v1" ]
       parameters:
         - name: identifier
@@ -1093,7 +1194,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: "#/definitions/EthernetInterfaceCollection_EthernetInterfaceCollection"
+            $ref: "#/definitions/EthernetInterfaceCollection.EthernetInterfaceCollection"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -1107,14 +1208,14 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /Systems/{identifier}/EthernetInterfaces/{index}:
-    x-swagger-router-controller: unimplemented
+    x-swagger-router-controller: systems
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: Retrieve the ethernet interface by device identifier
       description: >
         Defines an ethernet interface present on the system described by identifier
-      operationId: unimplemented
+      operationId: listSystemEthernetInterfacesById
       tags: [ "/redfish/v1" ]
       parameters:
         - name: identifier
@@ -1130,7 +1231,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: "#/definitions/EthernetInterface.1.0.0_EthernetInterface"
+            $ref: "#/definitions/EthernetInterface.v1_2_0.EthernetInterface"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -1583,7 +1684,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: "#/definitions/EthernetInterfaceCollection_EthernetInterfaceCollection"
+            $ref: "#/definitions/EthernetInterfaceCollection.EthernetInterfaceCollection"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -1613,7 +1714,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: "#/definitions/EthernetInterfaceCollection_EthernetInterfaceCollection"
+            $ref: "#/definitions/EthernetInterfaceCollection.EthernetInterfaceCollection"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -1643,7 +1744,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: "#/definitions/EthernetInterface.1.0.0_EthernetInterface"
+            $ref: "#/definitions/EthernetInterface.v1_2_0.EthernetInterface"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -1677,7 +1778,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: "#/definitions/EthernetInterface.1.0.0_EthernetInterface"
+            $ref: "#/definitions/EthernetInterface.v1_2_0.EthernetInterface"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -2363,6 +2464,74 @@ definitions:
       Status:
         $ref: '#/definitions/Resource_Status'
     type: object
+#  Bios.ChangePassword:
+#    description: This action is used to change the BIOS passwords.
+#    properties:
+#      target: {}
+#      title: {}
+#    type: object
+#  Bios.ResetBios:
+#    description: This action is used to reset the BIOS attributes to default.
+#    properties:
+#      target: {}
+#      title: {}
+#    type: object
+  Bios.v1_0_0.Actions:
+    properties:
+      Oem:
+        $ref: '#/definitions/Bios.v1_0_0.OemActions'
+    type: object
+  Bios.v1_0_0.Attributes:
+    properties: {}
+    type: object
+  Bios.v1_0_0.OemActions:
+    properties: {}
+    type: object
+  Bios.v1_0_1.Bios:
+    description: Bios contains properties surrounding a BIOS Attribute Registry (where
+      the system-specific BIOS attributes are described) and the Actions needed to
+      perform changes to BIOS settings, which typically require a system reset to
+      apply.
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Actions:
+        $ref: '#/definitions/Bios.v1_0_0.Actions'
+        description: The available actions for this resource.
+      AttributeRegistry:
+        description: The Resource ID of the Attribute Registry for the BIOS Attributes
+          resource.
+        readOnly: true
+        type: string
+      Attributes:
+        $ref: '#/definitions/Bios.v1_0_0.Attributes'
+        description: This is the manufacturer/provider specific list of BIOS attributes.
+      Description:
+        readOnly: true
+        type: string
+      Id:
+        readOnly: true
+        type: string
+      Name:
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+    required:
+    - Id
+    - Name
+    type: object
   Chassis.1.0.0_Chassis:
     description: This is the schema definition for the Chassis resource.  It represents
       the properties for physical components for any system.  This one object is intended
@@ -2673,6 +2842,10 @@ definitions:
           system for inventory or other client purposes
         readOnly: false
         type: string
+      Bios:
+        $ref: "#/definitions/Bios.v1_0_1.Bios"
+        description: A reference to the BIOS settings associated with this system.
+        readOnly: true
       BiosVersion:
         description: The version of the system BIOS or primary system firmware.
         type: string
@@ -2685,7 +2858,7 @@ definitions:
         readOnly: true
         type: string
       EthernetInterfaces:
-        $ref: '#/definitions/EthernetInterfaceCollection_EthernetInterfaceCollection'
+        $ref: '#/definitions/EthernetInterfaceCollection.EthernetInterfaceCollection'
         description: A reference to the collection of Ethernet interfaces associated
           with this system
         readOnly: true
@@ -2919,7 +3092,125 @@ definitions:
     type: object
   Drive.1.1.1_Drive: #TODO
     description: This schema defines a single physical disk
-  EthernetInterface.1.0.0_EthernetInterface:
+  Endpoint.Endpoint:
+    description: This is the schema definition for the Endpoint resource.  It represents
+      the properties of an entity that sends or receives protocol defined messages
+      over a transport.
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Description:
+        description: Provides a description of this resource and is used for commonality  in
+          the schema definitions.
+        readOnly: true
+      Id:
+        description: Uniquely identifies the resource within the collection of like resources.
+        readOnly: true
+        type: string
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+    required:
+    - Name
+    - Id
+    type: object
+  EthernetInterface.EthernetInterface:
+    description: Contains the properties needed to describe and configure a single,
+      logical Ethernet Interface.
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Description:
+        description: Provides a description of this resource and is used for commonality  in
+          the schema definitions.
+        readOnly: true
+        type: string
+      Id:
+        description: Uniquely identifies the resource within the collection of like resources.
+        readOnly: true
+        type: string
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+    required:
+    - Name
+    - Id
+    type: object
+  EthernetInterface.v1_0_0.IPv6AddressPolicyEntry:
+    properties:
+      Label:
+        description: The IPv6 Label (as defined in RFC 6724 section 2.1).
+        maximum: 100
+        minimum: 0
+        readOnly: false
+        type: number
+      Precedence:
+        description: The IPv6 Precedence (as defined in RFC 6724 section 2.1.
+        maximum: 100
+        minimum: 1
+        readOnly: false
+        type: number
+      Prefix:
+        description: The IPv6 Address Prefix (as defined in RFC 6724 section 2.1).
+        readOnly: false
+        type: string
+    type: object
+  EthernetInterface.v1_0_0.MACAddress:
+    pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
+    type: string
+  EthernetInterface.v1_1_0.LinkStatus:
+    enum:
+    - LinkUp
+    - NoLink
+    - LinkDown
+    type: string
+  EthernetInterface.v1_1_0.Links:
+    properties:
+      Endpoints:
+        description: An array of references to the endpoints that connect to this
+          ethernet interface.
+        items:
+          $ref: '#/definitions/Endpoint.Endpoint'
+        readOnly: true
+        type: array
+      Endpoints@odata.count:
+        readOnly: true
+        type: number
+      Endpoints@odata.navigationLink:
+        $ref: '#/definitions/odata.4.0.0_idRef'
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: Oem extension object.
+    type: object
+  EthernetInterface.v1_2_0.EthernetInterface:
     description: This schema defines a simple ethernet NIC resource.
     properties:
       '@odata.context':
@@ -2936,39 +3227,41 @@ definitions:
       AutoNeg:
         description: This indicates if the speed and duplex are automatically negotiated
           and configured on this interface.
+        readOnly: false
         type: boolean
       Description:
-        description: Provides a description of this resource and is used for commonality  in
-          the schema definitions.
+        description: Uniquely identifies the resource within the collection of like
+          resources.
         readOnly: true
         type: string
       FQDN:
         description: This is the complete, fully qualified domain name obtained by
           DNS for this interface.
+        readOnly: false
         type: string
       FullDuplex:
         description: This indicates if the interface is in Full Duplex mode or not.
+        readOnly: false
         type: boolean
       HostName:
-        description: The DNS Host Name, without any domain information
+        description: The DNS Host Name, without any domain information.
+        readOnly: false
         type: string
       IPv4Addresses:
-        description: The IPv4 addresses assigned to this interface
+        description: The IPv4 addresses assigned to this interface.
         items:
-          $ref: '#/definitions/IPAddresses.1.0.0_IPv4Address'
-        readOnly: true
+          $ref: '#/definitions/IPAddresses.v1_0_0.IPv4Address'
         type: array
       IPv6AddressPolicyTable:
-        description: An array representing the RFC3484 Address Selection Policy Table.
+        description: An array representing the RFC 6724 Address Selection Policy Table.
         items:
-          $ref: '#/definitions/EthernetInterface.1.0.0_IPv6AddressPolicyEntry'
+          $ref: '#/definitions/EthernetInterface.v1_0_0.IPv6AddressPolicyEntry'
         type: array
       IPv6Addresses:
         description: This array of objects enumerates all of the currently assigned
           IPv6 addresses on this interface.
         items:
-          $ref: '#/definitions/IPAddresses.1.0.0_IPv6Address'
-        readOnly: true
+          $ref: '#/definitions/IPAddresses.v1_0_0.IPv6Address'
         type: array
       IPv6DefaultGateway:
         description: This is the IPv6 default gateway address that is currently in
@@ -2979,8 +3272,7 @@ definitions:
         description: This array of objects represents all of the IPv6 static addresses
           to be assigned on this interface.
         items:
-          $ref: '#/definitions/IPAddresses.1.0.0_IPv6StaticAddress'
-        readOnly: true
+          $ref: '#/definitions/IPAddresses.v1_0_0.IPv6StaticAddress'
         type: array
       Id:
         description: Uniquely identifies the resource within the collection of like
@@ -2989,15 +3281,25 @@ definitions:
         type: string
       InterfaceEnabled:
         description: This indicates whether this interface is enabled.
+        readOnly: false
         type: boolean
+      LinkStatus:
+        $ref: '#/definitions/EthernetInterface.v1_1_0.LinkStatus'
+        description: The link status of this interface (port).
+        readOnly: true
+      Links:
+        $ref: '#/definitions/EthernetInterface.v1_1_0.Links'
+        description: Contains references to other resources that are related to this
+          resource.
       MACAddress:
+        $ref: '#/definitions/EthernetInterface.v1_0_0.MACAddress'
         description: This is the currently configured MAC address of the (logical
           port) interface.
-        pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
-        type: string
+        readOnly: false
       MTUSize:
         description: This is the currently configured Maximum Transmission Unit (MTU)
           in bytes on this interface.
+        readOnly: false
         type: number
       MaxIPv6StaticAddresses:
         description: This indicates the maximum number of Static IPv6 addresses that
@@ -3006,8 +3308,8 @@ definitions:
         type: number
       Name:
         description: The name of the resource or array element.
-        readOnly: true
         type: string
+        readOnly: true
       NameServers:
         description: This represents DNS name servers that are currently in use on
           this interface.
@@ -3020,69 +3322,46 @@ definitions:
         description: This is the manufacturer/provider specific extension moniker
           used to divide the Oem object into sections.
       PermanentMACAddress:
+        $ref: '#/definitions/EthernetInterface.v1_0_0.MACAddress'
         description: This is the permanent MAC address assigned to this interface
-          (port)
-        pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
+          (port).
         readOnly: true
-        type: string
       SpeedMbps:
         description: This is the current speed in Mbps of this interface.
+        readOnly: false
         type: number
       Status:
         $ref: '#/definitions/Resource_Status'
       UefiDevicePath:
-        description: The UEFI device path for this interface
+        description: The UEFI device path for this interface.
         readOnly: true
         type: string
       VLAN:
-        $ref: '#/definitions/VLanNetworkInterface.1.0.0_VLAN'
+        $ref: '#/definitions/VLanNetworkInterface.v1_0_0.VLAN'
         description: If this Network Interface supports more than one VLAN, this property
           will not be present and the client should look for VLANs collection in the
           link section of this resource.
       VLANs:
-        $ref: '#/definitions/VLanNetworkInterfaceCollection_VLanNetworkInterfaceCollection'
+        $ref: '#/definitions/VLanNetworkInterfaceCollection.VLanNetworkInterfaceCollection'
         description: This is a reference to a collection of VLANs and is only used
           if the interface supports more than one VLANs.
         readOnly: true
+    required:
+    - Name
+    - Id
     type: object
-  EthernetInterface.1.0.0_IPv6AddressPolicyEntry:
+  EthernetInterfaceCollection.EthernetInterfaceCollection:
+    description: A Collection of EthernetInterface resource instances.
     properties:
-      Label:
-        description: The IPv6 Label (as defined in RFC 6724 section 2.1)
-        maximum: 100
-        minimum: 0
-        type: number
-      Precedence:
-        description: The IPv6 Precedence (as defined in RFC 6724 section 2.1
-        maximum: 100
-        minimum: 1
-        type: number
-      Prefix:
-        description: The IPv6 Address Prefix (as defined in RFC 3484 section 2.1)
-        type: string
-    type: object
-  EthernetInterfaceCollection_EthernetInterfaceCollection:
-    properties:
-      '@odata.context':
-        format: uri
-        readOnly: true
-        type: string
-      '@odata.id':
-        format: uri
-        readOnly: true
-        type: string
-      '@odata.type':
-        readOnly: true
-        type: string
       Description:
-        description: Provides a description of this resource and is used for commonality  in
-          the schema definitions.
+        description: Uniquely identifies the resource within the collection of like
+          resources.
         readOnly: true
         type: string
       Members:
         description: Contains the members of this collection.
         items:
-          $ref: '#/definitions/odata.4.0.0_idRef'
+          $ref: '#/definitions/EthernetInterface.EthernetInterface'
         readOnly: true
         type: array
       Members@odata.count:
@@ -3092,8 +3371,8 @@ definitions:
         $ref: '#/definitions/odata.4.0.0_idRef'
       Name:
         description: The name of the resource or array element.
-        readOnly: true
         type: string
+        readOnly: true
       Oem:
         $ref: '#/definitions/Resource_Oem'
         description: This is the manufacturer/provider specific extension moniker
@@ -3299,82 +3578,96 @@ definitions:
         description: Friendly action name
         type: string
     type: object
-  IPAddresses.1.0.0_IPv4Address:
+  IPAddresses.v1_0_0.AddressState:
+    enum:
+    - Preferred
+    - Deprecated
+    - Tentative
+    - Failed
+    type: string
+  IPAddresses.v1_0_0.IPv4Address:
     properties:
       Address:
         description: This is the IPv4 Address.
         pattern: ^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$
+        readOnly: false
         type: string
       AddressOrigin:
+        $ref: '#/definitions/IPAddresses.v1_0_0.IPv4AddressOrigin'
         description: This indicates how the address was determined.
-        enum:
-        - Static
-        - DHCP
-        - BOOTP
-        - IPv4LinkLocal
         readOnly: true
-        type: string
       Gateway:
         description: This is the IPv4 gateway for this address.
+        pattern: ^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$
+        readOnly: false
         type: string
       Oem:
         $ref: '#/definitions/Resource_Oem'
       SubnetMask:
+        $ref: '#/definitions/IPAddresses.v1_0_0.SubnetMask'
         description: This is the IPv4 Subnet mask.
-        pattern: ^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$
-        type: string
+        readOnly: false
     type: object
-  IPAddresses.1.0.0_IPv6Address:
+  IPAddresses.v1_0_0.IPv4AddressOrigin:
+    enum:
+    - Static
+    - DHCP
+    - BOOTP
+    - IPv4LinkLocal
+    type: string
+  IPAddresses.v1_0_0.IPv6Address:
     properties:
       Address:
         description: This is the IPv6 Address.
+        readOnly: false
         type: string
       AddressOrigin:
+        $ref: '#/definitions/IPAddresses.v1_0_0.IPv6AddressOrigin'
         description: This indicates how the address was determined.
-        enum:
-        - Static
-        - DHCPv6
-        - LinkLocal
-        - SLAAC
         readOnly: true
-        type: string
       AddressState:
+        $ref: '#/definitions/IPAddresses.v1_0_0.AddressState'
         description: The current state of this address as defined in RFC 4862.
-        enum:
-        - Preferred
-        - Deprecated
-        - Tentative
-        - Failed
         readOnly: true
-        type: string
       Oem:
         $ref: '#/definitions/Resource_Oem'
       PrefixLength:
+        $ref: '#/definitions/IPAddresses.v1_0_0.PrefixLength'
         description: This is the IPv6 Address Prefix Length.
-        maximum: 128
-        minimum: 1
         readOnly: true
-        type: number
     type: object
-  IPAddresses.1.0.0_IPv6StaticAddress:
+  IPAddresses.v1_0_0.IPv6AddressOrigin:
+    enum:
+    - Static
+    - DHCPv6
+    - LinkLocal
+    - SLAAC
+    type: string
+  IPAddresses.v1_0_0.IPv6StaticAddress:
     description: This object represents a single IPv6 static address to be assigned
       on a network interface.
     properties:
       Address:
         description: A valid IPv6 address.
+        readOnly: false
         type: string
       Oem:
         $ref: '#/definitions/Resource_Oem'
       PrefixLength:
+        $ref: '#/definitions/IPAddresses.v1_0_0.PrefixLength'
         description: The Prefix Length of this IPv6 address.
-        maximum: 128
-        minimum: 1
         readOnly: true
-        type: number
     required:
-    - Address
     - PrefixLength
+    - Address
     type: object
+  IPAddresses.v1_0_0.PrefixLength:
+    maximum: 128
+    minimum: 1
+    type: number
+  IPAddresses.v1_0_0.SubnetMask:
+    pattern: ^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$
+    type: string
   JsonSchemaFile.1.0.0_JsonSchemaFile:
     description: This is the schema definition for the Schema File locator resource.
     properties:
@@ -3985,7 +4278,7 @@ definitions:
         readOnly: true
         type: string
       EthernetInterfaces:
-        $ref: '#/definitions/EthernetInterfaceCollection_EthernetInterfaceCollection'
+        $ref: '#/definitions/EthernetInterfaceCollection.EthernetInterfaceCollection'
         description: This is a reference to a collection of NICs that this manager
           uses for network communication.  It is here that clients will find NIC configuration
           options and settings.
@@ -6336,18 +6629,9 @@ definitions:
       Temperatures@odata.navigationLink:
         $ref: '#/definitions/odata.4.0.0_idRef'
     type: object
-  VLanNetworkInterface.1.0.0_VLAN:
-    properties:
-      VLANEnable:
-        description: This indicates if this VLAN is enabled.
-        type: boolean
-      VLANId:
-        description: This indicates the VLAN identifier for this VLAN.
-        maximum: 4095
-        minimum: 0
-        type: number
-    type: object
-  VLanNetworkInterfaceCollection_VLanNetworkInterfaceCollection:
+  VLanNetworkInterface.VLanNetworkInterface:
+    description: This resource contains information for a Virtual LAN (VLAN) network
+      instance available on a manager, system or other device.
     properties:
       '@odata.context':
         format: uri
@@ -6361,14 +6645,54 @@ definitions:
         readOnly: true
         type: string
       Description:
-        description: Provides a description of this resource and is used for commonality  in
-          the schema definitions.
+        description: Uniquely identifies the resource within the collection of like
+          resources.
+        readOnly: true
+        type: string
+      Id:
+        description: Uniquely identifies the resource within the collection of like
+          resources.
+        readOnly: true
+        type: string
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+    required:
+    - Name
+    - Id
+    type: object
+  VLanNetworkInterface.v1_0_0.VLAN:
+    properties:
+      VLANEnable:
+        description: This indicates if this VLAN is enabled.
+        readOnly: false
+        type: boolean
+      VLANId:
+        $ref: '#/definitions/VLanNetworkInterface.v1_0_0.VLANId'
+        description: This indicates the VLAN identifier for this VLAN.
+        readOnly: false
+    type: object
+  VLanNetworkInterface.v1_0_0.VLANId:
+    maximum: 4094
+    minimum: 0
+    type: number
+  VLanNetworkInterfaceCollection.VLanNetworkInterfaceCollection:
+    description: A Collection of VLanNetworkInterface resource instances.
+    properties:
+      Description:
+        description: Uniquely identifies the resource within the collection of like
+          resources.
         readOnly: true
         type: string
       Members:
         description: Contains the members of this collection.
         items:
-          $ref: '#/definitions/odata.4.0.0_idRef'
+          $ref: '#/definitions/VLanNetworkInterface.VLanNetworkInterface'
         readOnly: true
         type: array
       Members@odata.count:

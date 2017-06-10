@@ -17,6 +17,9 @@
     "HostName": "<% hardware.data.system.hostName %>",
     "IndicatorLED": "<%= hardware.data.leds[0] || 'Unknown' %>",
     "PowerState": "<%= hardware.data.system.powerState == 2 ? 'On' : 'Off' %>",
+    "Bios": {
+        "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/Bios"
+    },
     "Boot": {},
     "BiosVersion": "<%= hardware.data.system.biosVersionString.trim() %> <%= hardware.data.system.biosReleaseDate.trim() %> ",
     "ProcessorSummary": {
