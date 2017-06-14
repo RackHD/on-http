@@ -1274,6 +1274,8 @@ paths:
           $ref: "#/responses/status_403"
         404:
           $ref: "#/responses/status_404"
+        409:
+          $ref: "#/responses/status_409"
         500:
           description: Error
           schema:

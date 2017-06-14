@@ -298,4 +298,5 @@ describe('Http.Api.Users', function () {
                     .expect(401);
             });
     });
+
 });

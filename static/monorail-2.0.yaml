@@ -4168,6 +4168,10 @@ paths:
           description: Forbidden
           schema:
             type: object
+        409:
+          description: Conflict
+          schema:
+            type: object
         default:
           description: Unexpected error
           schema:
