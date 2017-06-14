@@ -298,4 +298,36 @@ describe('Http.Api.Users', function () {
                     .expect(401);
             });
     });
+
+    it('should 400 a bad username with spaces post without access', function() {
+        accountService.listUsers.resolves([ userObj ]);
+        return helper.request().post('/login')
+            .send({username: "read only", password: "read123"})
+            .expect(201)
+            .then(function(res) {
+                return res.body.token;
+            }).then(function(token) {
+                return helper.request().post('/api/2.0/users')
+                    .set("authorization", 'JWT ' + token)
+                    .send(readOnlyObj)
+                    .expect('Content-Type', /^application\/json/)
+                    .expect(400);
+            });
+    });
+
+    it('should 400 a bad username starting with digit post without access', function() {
+        accountService.listUsers.resolves([ userObj ]);
+        return helper.request().post('/login')
+            .send({username: "1readonly", password: "read123"})
+            .expect(201)
+            .then(function(res) {
+                return res.body.token;
+            }).then(function(token) {
+                return helper.request().post('/api/2.0/users')
+                    .set("authorization", 'JWT ' + token)
+                    .send(readOnlyObj)
+                    .expect('Content-Type', /^application\/json/)
+                    .expect(400);
+            });
+    });
 });

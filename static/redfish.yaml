@@ -4415,6 +4415,7 @@ definitions:
       UserName:
         description: This property contains the user name for the account.
         type: string
+        pattern: '^[A-Za-z][A-Za-z0-9._-]+$'
     type: object
   ManagerAccount.1.0.0_ManagerAccount.post:
     allOf:

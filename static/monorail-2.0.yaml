@@ -398,6 +398,7 @@ definitions:
         type: string
       username:
         type: string
+        pattern: ^[A-Za-z][0-9A-Za-z._-]+$
   workflow_graph:
     properties:
       friendlyName:
