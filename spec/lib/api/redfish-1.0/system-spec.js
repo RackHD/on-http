@@ -562,7 +562,7 @@ describe('Redfish Systems Root', function () {
         return helper.request().get('/redfish/v1/Systems/' + node.id)
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -774,7 +774,7 @@ describe('Redfish Systems Root', function () {
         return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -809,7 +809,7 @@ describe('Redfish Systems Root', function () {
         return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/0')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -838,7 +838,7 @@ describe('Redfish Systems Root', function () {
         return helper.request().get('/redfish/v1/Systems/' + node.id + '/SimpleStorage')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -869,7 +869,7 @@ describe('Redfish Systems Root', function () {
                                     '/SimpleStorage/0000_00_01_1')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -888,7 +888,7 @@ describe('Redfish Systems Root', function () {
                                     '/LogServices')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -912,7 +912,7 @@ describe('Redfish Systems Root', function () {
                                     '/LogServices/sel')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -930,7 +930,7 @@ describe('Redfish Systems Root', function () {
                                     '/LogServices/sel')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -966,7 +966,7 @@ describe('Redfish Systems Root', function () {
                                     '/LogServices/sel/Entries')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -984,7 +984,7 @@ describe('Redfish Systems Root', function () {
                                     '/LogServices/sel/Entries')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -1004,7 +1004,7 @@ describe('Redfish Systems Root', function () {
                                     '/LogServices/sel/Entries')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -1046,7 +1046,7 @@ describe('Redfish Systems Root', function () {
                                     '/LogServices/sel/Entries/abcd')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -1064,7 +1064,7 @@ describe('Redfish Systems Root', function () {
                                     '/LogServices/sel/Entries/23')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -1266,7 +1266,7 @@ describe('Redfish Systems Root', function () {
                                     '/LogServices/lc')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -1292,7 +1292,7 @@ describe('Redfish Systems Root', function () {
                                     '/LogServices/lc/Entries')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
@@ -1318,7 +1318,7 @@ describe('Redfish Systems Root', function () {
                                     '/LogServices/lc/Entries/1234567')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
