@@ -1053,6 +1053,39 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid sel log service entry despite no #', function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: false, isRedfishCapable: false
+        });
+
+        waterline.nodes.find.resolves([node]);
+        waterline.workitems.findPollers.resolves([{
+            config: { command: 'sel' }
+        }]);
+
+        taskProtocol.requestPollerCache.resolves([{
+            sel: [{
+                logId: 'abcd',
+                value: 'Assert',
+                sensorType: 'Temperature',
+                event: 'Thermal Event',
+                sensorNumber: '1',
+                date: '01/01/1970',
+                time: '01:01:01'
+            }]
+        }]);
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/sel/Entries/abcd')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
     it('should return a valid iDrac sel log service entry', function() {
         wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
             node: node, isDell: true, isRedfishCapable: false
