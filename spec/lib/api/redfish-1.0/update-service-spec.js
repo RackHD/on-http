@@ -33,7 +33,8 @@ describe('Redfish Update Service', function () {
                 "installationDate": "2016-08-31T04:18:55Z",
                 "currentVersion": "00.24.7A",
                 "rollbackVersion": "",
-                "availableVersion": ""
+                "availableVersion": "",
+                "componentType": "FIRMWARE"
             },
             "PSU2": {
                 "elementName": "Power Supply.Slot.2",
@@ -41,7 +42,8 @@ describe('Redfish Update Service', function () {
                 "installationDate": "2017-03-10T08:24:14Z",
                 "currentVersion": "00.24.7A",
                 "rollbackVersion": "",
-                "availableVersion": ""
+                "availableVersion": "",
+                "componentType": "FIRMWARE"
             },
             "iDRAC": {
                 "elementName": "Integrated Remote Access Controller",
@@ -49,17 +51,20 @@ describe('Redfish Update Service', function () {
                 "installationDate": "2017-03-30T09:10:51Z",
                 "currentVersion": "2.40.40.40",
                 "rollbackVersion": "2.30.30.30",
-                "availableVersion": ""
+                "availableVersion": "",
+                "componentType": "FIRMWARE"
             },
             "NIC1": {
                 "elementName": "Intel(R) Gigabit 4P X520/I350 rNDC - 24:6E:96:1F:51:8D",
                 "currentVersion": "21.1",
-                "FQDD": "NIC.Integrated.1-4-1"
+                "FQDD": "NIC.Integrated.1-4-1",
+                "componentType": "APPLICATION"
             },
             "NIC2": {
                 "elementName": "Intel(R) Gigabit 4P X520/I350 rNDC - 24:6E:96:1F:51:8c",
                 "currentVersion": "21.1",
-                "FQDD": "NIC.Integrated.1-4-2"
+                "FQDD": "NIC.Integrated.1-4-2",
+                "componentType": "APPLICATION"
             }
         }
     };
@@ -253,6 +258,7 @@ describe('Redfish Update Service', function () {
             });
     });
 
+
     it('should return a valid list of Firmware Inventory from RACADM catalog', function () {
         waterline.catalogs.find.resolves([mockCatalogRACADM]);
         waterline.catalogs.findMostRecent.resolves(mockCatalogRACADM);
@@ -261,13 +267,11 @@ describe('Redfish Update Service', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(201)
             .expect(function(res) {
-                expect(res.body['Members@odata.count']).to.equal(3);
+                expect(res.body['Members@odata.count']).to.equal(2);
                 expect(res.body.Members[0]['@odata.id'])
                     .to.equal("/redfish/v1/UpdateService/FirmwareInventory/PSU-00.24.7A");
                 expect(res.body.Members[1]['@odata.id'])
                     .to.equal("/redfish/v1/UpdateService/FirmwareInventory/iDRAC-2.40.40.40");
-                expect(res.body.Members[2]['@odata.id'])
-                    .to.equal("/redfish/v1/UpdateService/FirmwareInventory/NIC-21.1");
             });
     });
 
@@ -328,23 +332,6 @@ describe('Redfish Update Service', function () {
                     .to.equal("/redfish/v1/Chassis/593accd15a45b5dd76e24adf/Power#/PowerSupplies/1");
             });
     });
-
-    it('should return a valid root to RACADM Firmware Inventory by Id (enumeratable Entity)', function () {
-        waterline.catalogs.find.resolves([mockCatalogRACADM]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogRACADM);
-        waterline.nodes.findByIdentifier.resolves(node1);
-        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/NIC-21.1')
-            .expect('Content-Type', /^application\/json/)
-            .expect(201)
-            .expect(function(res) {
-                expect(res.body.RelatedItem.length).to.equal(2);
-                expect(res.body.RelatedItem[0]['@odata.id'])
-                    .to.equal("/redfish/v1/Systems/593acc7e5aa5beed6f1f3082/EthernetInterfaces/NIC.Integrated.1-4-1");
-                expect(res.body.RelatedItem[1]['@odata.id'])
-                    .to.equal("/redfish/v1/Systems/593acc7e5aa5beed6f1f3082/EthernetInterfaces/NIC.Integrated.1-4-2");
-            });
-    });
-
     it('should return a valid root to RACADM Firmware Inventory by Id (Non enumeratable Entity)', function () {
         waterline.catalogs.find.resolves([mockCatalogRACADM]);
         waterline.catalogs.findMostRecent.resolves(mockCatalogRACADM);
@@ -398,6 +385,49 @@ describe('Redfish Update Service', function () {
                 expect(res.body.RelatedItem.length).to.equal(1);
                 expect(res.body.RelatedItem[0]['@odata.id'])
                     .to.equal("/redfish/v1/Systems/5947d2cfe6b9b3e113d81984/SimpleStorage/");
+            });
+    });
+
+    it('should return a valid list of Software Inventory from RACADM catalog', function () {
+        waterline.catalogs.find.resolves([mockCatalogRACADM]);
+        waterline.catalogs.findMostRecent.resolves(mockCatalogRACADM);
+        waterline.nodes.findByIdentifier.resolves(node1);
+        return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory')
+            .expect('Content-Type', /^application\/json/)
+            .expect(201)
+            .expect(function(res) {
+                expect(res.body['Members@odata.count']).to.equal(1);
+                expect(res.body.Members[0]['@odata.id'])
+                    .to.equal("/redfish/v1/UpdateService/SoftwareInventory/NIC-21.1");
+            });
+    });
+
+
+    it('should return a valid list of Software Inventory from DMI catalog', function () {
+        waterline.catalogs.find.resolves([mockCatalogDMI]);
+        waterline.catalogs.findMostRecent.resolves(mockCatalogDMI);
+        waterline.nodes.findByIdentifier.resolves(node2);
+        return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory')
+            .expect('Content-Type', /^application\/json/)
+            .expect(201)
+            .expect(function(res) {
+                expect(res.body['Members@odata.count']).to.equal(1);
+                expect(res.body.Members[0]['@odata.id'])
+                    .to.equal("/redfish/v1/UpdateService/SoftwareInventory/BIOS-S2S_3A14");
+            });
+    });
+
+    it('should return a valid root to RACADM Software Inventory by Id (Non enumeratable Entity)', function () {
+        waterline.catalogs.find.resolves([mockCatalogRACADM]);
+        waterline.catalogs.findMostRecent.resolves(mockCatalogRACADM);
+        waterline.nodes.findByIdentifier.resolves(node1);
+        return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory/NIC-21.1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(201)
+            .expect(function(res) {
+                expect(res.body.RelatedItem.length).to.equal(2);
+                expect(res.body.RelatedItem[0]['@odata.id'])
+                    .to.equal("/redfish/v1/Systems/593acc7e5aa5beed6f1f3082/EthernetInterfaces/NIC.Integrated.1-4-1");
             });
     });
 
