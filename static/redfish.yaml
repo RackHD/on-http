@@ -328,6 +328,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+
   /Systems/{identifier}/Bios.ChangePassword:
     x-swagger-router-controller: systems
     post:
@@ -349,6 +350,43 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/Bios.ChangePassword"
+      responses:
+        202:
+          description: Success
+          $ref: "#/responses/status_202"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Bios.ResetBios:
+    x-swagger-router-controller: systems
+    post:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: Reset the bios to factory defaults for the given system identifier
+      description: >
+        resets the bios of a node
+      operationId: resetSystemBios
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Bios.ResetBios"
       responses:
         202:
           description: Success
@@ -2766,14 +2804,12 @@ definitions:
       target: {}
       title: {}
     type: object
-#  Bios.ResetBios:
-#    description: This action is used to reset the BIOS attributes to default.
-#    properties:
-#      Bios:
-#        $ref: '#/definitions/Bios.v1_0_0.Actions'
-#      target: {}
-#      title: {}
-#    type: object
+  Bios.ResetBios:
+    description: This action is used to reset the BIOS attributes to factory default.
+    properties:
+      target: {}
+      title: {}
+    type: object
   Bios.v1_0_0.Actions:
     properties:
       Oem:
