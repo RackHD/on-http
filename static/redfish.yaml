@@ -2343,7 +2343,7 @@ paths:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: get a list of firmware installed on all nodes managed by this instance of RackHD
-      operationId: getFirmwareInventoryList
+      operationId: getInventoryList
       tags: [ "/redfish/v1" ]
       parameters:
         - name: payload
@@ -2373,7 +2373,67 @@ paths:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve information about a specific firmware
-      operationId: getFirmwareInventoryById
+      operationId: getInventoryById
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          description: node identifier
+      responses:
+        201:
+          description: Success
+          $ref: "#/responses/status_201"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /UpdateService/SoftwareInventory:
+    x-swagger-router-controller: update-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: get a list of firmware installed on all nodes managed by this instance of RackHD
+      operationId: getInventoryList
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateService.1.0.0_UpdateService"
+      responses:
+        201:
+          description: Success
+          $ref: "#/responses/status_201"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /UpdateService/SoftwareInventory/{identifier}:
+    x-swagger-router-controller: update-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve information about a specific firmware
+      operationId: getInventoryById
       tags: [ "/redfish/v1" ]
       parameters:
         - name: identifier

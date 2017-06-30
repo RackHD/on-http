@@ -8,7 +8,7 @@
     "Members": [
         <% fwItems.forEach(function(fwItem, i, arr) { %>
 {
-    "@odata.id": "<%= basepath %>/UpdateService/FirmwareInventory/<%=fwItem %>"
+    "@odata.id": "<%=url%>/<%=fwItem %>"
 }
 <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
 <% }); %>
