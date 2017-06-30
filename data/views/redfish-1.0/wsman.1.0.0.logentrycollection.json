@@ -1,0 +1,38 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/LogServices/Members/<%=type%>/Entries",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#LogEntryCollection.LogEntryCollection",
+    "Oem" : {},
+    "Name": "Log Service Entry Collection",
+    "Members@odata.count": <%= logEntries.length %>,
+    "Members": [
+        <% logEntries.forEach(function(entry, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/LogServices/<%=type%>/Entries/<%= entry.recordID %>",
+                "@odata.type": "#LogEntry.1.0.0.LogEntry",
+                "Oem": {
+                    "Dell":{
+						"Log Name": "<%= entry.logName %>",
+                        "Instance Id": "<%= entry.instanceID %>",
+						"Perceived Severity": "<%= entry.perceivedSeverity %>"
+                    }
+                },
+                "Id": "<%= entry.recordID %>",
+                "Name": "<%= entry.elementName %>",
+                "EntryType": "<%= type %>",
+                "Created": "<%= entry.creationTimeStamp %>",
+                "OemRecordFormat": "",
+                "Message": "<%= entry.recordData %>",
+                "MessageId": "",
+                "MessageArgs": [],
+                "Links": {
+                    "Oem": {},
+                    "OriginOfCondition": {
+                        "@odata.id": "<%= entry.origin || 'null' %>"
+                    }
+                }
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}

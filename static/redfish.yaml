@@ -929,6 +929,111 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/LogServices/lc:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of the logs for a computer system
+      description: >
+        Defines a collection of SEL entries for the system described by
+        identifier.
+      operationId: getLcLogService
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/LogService.1.0.0_LogService"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/LogServices/lc/Entries:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of the logs entries for associated for log service
+      description: >
+        Defines a collection of entries for the system described by identifier
+      operationId: listLcLogServiceEntries
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/LogEntryCollection_LogEntryCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/LogServices/lc/Entries/{entryId}:
+    x-swagger-router-controller: systems
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve log entry by logId associated for log service
+      description: >
+        Defines a log entry specified by entryId within the LogService of the
+        specified type for the system described by identifier
+      operationId: getLcLogServiceEntry
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: entryId
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/LogEntry.1.0.0_LogEntry"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /Systems/{identifier}/Actions/ComputerSystem.Reset:
     x-swagger-router-controller: systems
     get:
@@ -2218,6 +2323,126 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/UpdateService.1.0.0_UpdateService.post"
+      responses:
+        201:
+          description: Success
+          $ref: "#/responses/status_201"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /UpdateService/FirmwareInventory:
+    x-swagger-router-controller: update-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: get a list of firmware installed on all nodes managed by this instance of RackHD
+      operationId: getInventoryList
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateService.1.0.0_UpdateService"
+      responses:
+        201:
+          description: Success
+          $ref: "#/responses/status_201"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /UpdateService/FirmwareInventory/{identifier}:
+    x-swagger-router-controller: update-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve information about a specific firmware
+      operationId: getInventoryById
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          description: node identifier
+      responses:
+        201:
+          description: Success
+          $ref: "#/responses/status_201"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /UpdateService/SoftwareInventory:
+    x-swagger-router-controller: update-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: get a list of firmware installed on all nodes managed by this instance of RackHD
+      operationId: getInventoryList
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateService.1.0.0_UpdateService"
+      responses:
+        201:
+          description: Success
+          $ref: "#/responses/status_201"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /UpdateService/SoftwareInventory/{identifier}:
+    x-swagger-router-controller: update-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve information about a specific firmware
+      operationId: getInventoryById
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          description: node identifier
       responses:
         201:
           description: Success
@@ -4417,6 +4642,7 @@ definitions:
       UserName:
         description: This property contains the user name for the account.
         type: string
+        pattern: '^[A-Za-z][A-Za-z0-9._-]+$'
     type: object
   ManagerAccount.1.0.0_ManagerAccount.post:
     allOf:
@@ -6924,6 +7150,12 @@ definitions:
       message:
         type: string
   testEvent:
+    type: object
+  UpdateService.1.0.0_UpdateService:
+    properties:
+      FirmwareInventory:
+        description: The value of this property shall be a link to a resource of type SoftwareInventoryCollection.
+        type: string
     type: object
   UpdateService.1.0.0_UpdateService.post:
     properties:

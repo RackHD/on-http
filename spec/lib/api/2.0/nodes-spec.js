@@ -315,7 +315,7 @@ describe('2.0 Http.Api.Nodes', function () {
                     expect(data.body[0].relations).to.deep.equal(updatedComputeNode.relations);
                     expect(data.body[1].relations).to.deep.equal(updatedRackNode.relations);
                     expect(nodeApiService.editNodeRelations).to.be.calledWithExactly(
-                        '1234',relationUpdate, nodeApiService._addRelation
+                        '1234',relationUpdate, nodeApiService.addRelation
                     );
                 });
 
@@ -356,7 +356,7 @@ describe('2.0 Http.Api.Nodes', function () {
                     expect(data.body[0].relations).to.deep.equal(updatedComputeNode.relations);
                     expect(data.body[1].relations).to.deep.equal(updatedRackNode.relations);
                     expect(nodeApiService.editNodeRelations).to.be.calledWithExactly(
-                        '1234', relationDeletion, nodeApiService._removeRelation
+                        '1234', relationDeletion, nodeApiService.removeRelation
                     );
                 });
         });
