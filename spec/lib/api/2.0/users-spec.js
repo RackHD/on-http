@@ -302,14 +302,14 @@ describe('Http.Api.Users', function () {
     it('should 400 a bad username with spaces post without access', function() {
         accountService.listUsers.resolves([ userObj ]);
         return helper.request().post('/login')
-            .send({username: "read only", password: "read123"})
-            .expect(201)
+            .send({username: "admin", password: "admin123"})
+            .expect(200)
             .then(function(res) {
                 return res.body.token;
             }).then(function(token) {
                 return helper.request().post('/api/2.0/users')
                     .set("authorization", 'JWT ' + token)
-                    .send(readOnlyObj)
+                    .send({username: "read only", password: "read123"})
                     .expect('Content-Type', /^application\/json/)
                     .expect(400);
             });
@@ -318,14 +318,14 @@ describe('Http.Api.Users', function () {
     it('should 400 a bad username starting with digit post without access', function() {
         accountService.listUsers.resolves([ userObj ]);
         return helper.request().post('/login')
-            .send({username: "1readonly", password: "read123"})
-            .expect(201)
+            .send({username: "admin", password: "admin123"})
+            .expect(200)
             .then(function(res) {
                 return res.body.token;
             }).then(function(token) {
                 return helper.request().post('/api/2.0/users')
                     .set("authorization", 'JWT ' + token)
-                    .send(readOnlyObj)
+                    .send({username: "1readonly", password: "read123"})
                     .expect('Content-Type', /^application\/json/)
                     .expect(400);
             });
