@@ -5,17 +5,25 @@
 
 describe('Http.Api.Ibms', function () {
     var waterline, stub, Errors;
-
-    var goodSendData = 
-        {
-            nodeId: '12345678',
-            service: 'ssh-ibm-service',
-            config: {
-                host: '1.1.1.1',
-                user: 'user',
-                password: 'passw'
-            }
-        };
+    var configuration;
+    var defaultCred =  {
+        id: '12341234',
+        node: '12345678',
+        service: 'ssh-ibm-service',
+        config: {
+            host: '1.1.1.1'
+        }
+    };
+    var goodSendData =
+    {
+        nodeId: '12345678',
+        service: 'ssh-ibm-service',
+        config: {
+            host: '1.1.1.1',
+            user: 'user',
+            password: 'passw'
+        }
+    };
 
     var goodData = [
         {
@@ -61,7 +69,9 @@ describe('Http.Api.Ibms', function () {
         this.timeout(5000);
         return helper.startServer().then(function() {
             waterline = helper.injector.get('Services.Waterline');
-            Errors = helper.injector.get('Errors');
+            Errors = helper.injector.get('Errors');helper.injector.get("Services.Configuration");
+            configuration = helper.injector.get("Services.Configuration");
+            //sinon.stub(configuration);
         });
     });
 
@@ -75,7 +85,7 @@ describe('Http.Api.Ibms', function () {
     after('stop HTTP server', function () {
         return helper.stopServer();
     });
-    
+
     describe('/api/2.0/ibms/definitions', function () {
         it('should return a list of IBM schemas', function () {
             return helper.request().get('/api/2.0/ibms/definitions')
@@ -100,7 +110,7 @@ describe('Http.Api.Ibms', function () {
         });
 
     });
-    
+
     describe('/api/2.0/ibms', function () {
         it('should return a list of IBM instances', function () {
             stub = sinon.stub(waterline.ibms, 'find').resolves(goodData);
@@ -116,7 +126,7 @@ describe('Http.Api.Ibms', function () {
                     expect(res.body.config).to.deep.equal(goodData.config);
                 });
         });
-        
+
         it('should put an IBM instance', function () {
             stub = sinon.stub(waterline.ibms, 'upsertByNode').resolves(goodData[0]);
 
@@ -127,6 +137,29 @@ describe('Http.Api.Ibms', function () {
                 .expect(function () {
                     expect(stub).to.have.been.called.once;
                 });
+        });
+
+        it('should PUT an IBM instance with default credential', function () {
+            this.sandbox = sinon.sandbox.create();
+            stub = sinon.stub(waterline.ibms, 'upsertByNode').resolves(defaultCred);
+            configuration.set('defaultIbms', {
+                "user": "monorail",
+                "password": "monorail"
+            });
+            return helper.request().put('/api/2.0/ibms')
+                .send(defaultCred)
+                .expect('Content-Type', /^application\/json/)
+                .expect(201);
+        });
+        it('should fail to PUT an IBM instance with default credential', function () {
+            this.sandbox.restore();
+            stub = sinon.stub(waterline.ibms, 'upsertByNode').resolves(defaultCred);
+            configuration.set('defaultIbms', undefined);
+
+            return helper.request().put('/api/2.0/ibms')
+                .send(defaultCred)
+                .expect('Content-Type', /^application\/json/)
+                .expect(400);
         });
 
         it('should 400 when put with unloaded schema', function () {
