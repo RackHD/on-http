@@ -417,6 +417,113 @@ paths:
         x-privileges:
         - Read
       x-swagger-router-controller: templates
+  /files/{fileidentifier}:
+    get:
+      description: Get file based on uuid or file name.
+      operationId: filesGet
+      parameters:
+      - description: The uuid or file name of a file as provided when you originally stored it
+        in: path
+        name: fileidentifier
+        required: true
+        type: string
+      responses:
+        200:
+          description: Successfully retrieved specified file
+          schema:
+            type: file
+        404:
+          description: File not found
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Failed to serve file request
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get a file
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Read
+      - filesRead
+    put:
+      consumes:
+      - application/octet-stream
+      - application/x-www-form-urlencoded
+      description: Put file based on its filename. Returns the uuid of the stored file.
+      operationId: filesPut
+      parameters:
+      - description: The filename of the file you want to store
+        in: path
+        name: fileidentifier
+        required: true
+        type: string
+      responses:
+        201:
+          description: Successfully stored file
+          schema:
+            type: string
+        500:
+          description: Failure serving file request
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Put a file
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Write
+      - filesWrite
+      x-view: file.2.0.json
+    x-swagger-router-controller: files
+  /files/{filename}/md5:
+    get:
+      description: Get md5sum based on file name.
+      operationId: filesMd5Get
+      parameters:
+      - description: File name of a file as provided when you originally stored it
+        in: path
+        name: filename
+        required: true
+        type: string
+      responses:
+        200:
+          description: Successfully retrieved the md5sum of the specified file
+          schema:
+            type: object
+        404:
+          description: File not found
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Failed to serve file request
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get md5sum of file
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Read
+      - filesRead
+      x-view: files.md5.2.0.json
+    x-swagger-router-controller: files
 definitions:
   ErrorResponse:
     required:
