@@ -2309,6 +2309,31 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /UpdateService:
+    x-swagger-router-controller: update-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: shows the status of the UpdateService feature
+      operationId: getUpdateService
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/UpdateService.1.0.0_UpdateService"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /UpdateService/Actions/UpdateService.SimpleUpdate:
     x-swagger-router-controller: update-service
     post:

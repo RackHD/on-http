@@ -21,6 +21,9 @@
     "Managers": {
         "@odata.id": "<%=basepath%>/Managers"
     },
+    "UpdateService": {
+        "@odata.id": "<%=basepath%>/UpdateService"
+    },
     "Tasks": {
         "@odata.id": "<%=basepath%>/TaskService"
     },
