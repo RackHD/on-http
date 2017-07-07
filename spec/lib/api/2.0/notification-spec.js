@@ -44,6 +44,8 @@ describe('Http.Api.Notification', function () {
 
     describe('POST /notification', function () {
         it('should return node notification detail', function () {
+            var _nodeNotificationMessage = _.cloneDeep(nodeNotificationMessage);
+            _nodeNotificationMessage.nodeIp = '127.0.0.1';
             return helper.request('http://localhost:8091')
             .post('/api/2.0/notification?nodeId=' +
                   nodeNotificationMessage.nodeId +
@@ -55,10 +57,12 @@ describe('Http.Api.Notification', function () {
             .then(function () {
                 expect(notificationApiService.postNodeNotification).to.have.been.calledOnce;
                 expect(notificationApiService.postNodeNotification)
-                    .to.have.been.calledWith(nodeNotificationMessage);
+                    .to.have.been.calledWith(_nodeNotificationMessage);
             });
         });
         it('should return broadcast notification detail', function () {
+            var _broadcastNotificationMessage = _.cloneDeep(broadcastNotificationMessage);
+            _broadcastNotificationMessage.nodeIp = '127.0.0.1';
             return helper.request('http://localhost:8091')
             .post('/api/2.0/notification')
             .send(broadcastNotificationMessage)
@@ -68,7 +72,7 @@ describe('Http.Api.Notification', function () {
             .then(function () {
                 expect(notificationApiService.postBroadcastNotification).to.have.been.calledOnce;
                 expect(notificationApiService.postBroadcastNotification)
-                    .to.have.been.calledWith(broadcastNotificationMessage);
+                    .to.have.been.calledWith(_broadcastNotificationMessage);
             });
         });
         it('should pass with nodeId in query body', function () {
