@@ -3,6 +3,8 @@
 'use strict';
 
 describe('Redfish Update Service', function () {
+    var tv4;
+    var validator;
     var redfish;
     var waterline;
     var workflow;
@@ -189,6 +191,8 @@ describe('Redfish Update Service', function () {
 
     before('start HTTP server', function () {
         var self = this;
+        tv4 = require('tv4');
+
         this.timeout(15000);
         this.sandbox = sinon.sandbox.create();
 
@@ -197,9 +201,12 @@ describe('Redfish Update Service', function () {
                 redfish = helper.injector.get('Http.Api.Services.Redfish');
                 waterline = helper.injector.get('Services.Waterline');
                 workflow = helper.injector.get('Http.Services.Api.Workflows');
-
+                validator = helper.injector.get('Http.Api.Services.Schema');
+                self.sandbox.spy(tv4, "validate");
+                self.sandbox.spy(validator, 'validate');
                 self.sandbox.spy(redfish, 'validateSchema');
                 self.sandbox.spy(redfish, 'handleError');
+                self.sandbox.spy(redfish, 'render');
                 self.sandbox.stub(waterline.obms, 'findAllByNode');
                 self.sandbox.stub(waterline.nodes, 'getNodeById');
                 self.sandbox.stub(waterline.nodes, 'findByIdentifier');
@@ -216,6 +223,17 @@ describe('Redfish Update Service', function () {
     after('stop HTTP server', function () {
         this.sandbox.restore();
         return helper.stopServer();
+    });
+
+    it('should return a valid updateService root', function () {
+        return helper.request().get('/redfish/v1/UpdateService')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
     });
 
     it('should run a graph', function () {
