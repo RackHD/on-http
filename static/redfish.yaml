@@ -2484,6 +2484,31 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /$metadata:
+    x-swagger-router-controller: metadata
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: This metadata document describes the resources available at the root,
+       and references additional metadata documents describing the full set of resource types exposed by the service.
+      operationId: getMetadata
+      tags: [ "/redfish/v1" ]
+      responses:
+        201:
+          description: Success
+          $ref: "#/responses/status_201"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 

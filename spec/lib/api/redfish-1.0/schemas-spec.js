@@ -7,6 +7,9 @@ describe('Redfish Schemas', function () {
     var tv4;
     var redfish;
     var validator;
+    var fs;
+    var Promise;
+    var fromRoot = process.cwd();
 
     before('start HTTP server', function () {
         this.timeout(5000);
@@ -15,6 +18,8 @@ describe('Redfish Schemas', function () {
             sinon.spy(redfish, 'render');
 
             validator = helper.injector.get('Http.Api.Services.Schema');
+            Promise = helper.injector.get('Promise');
+            fs = Promise.promisifyAll( helper.injector.get('fs') );
             sinon.spy(validator, 'validate');
         });
     });
@@ -49,7 +54,7 @@ describe('Redfish Schemas', function () {
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
                 expect(res.body['Members@odata.count']).to.equal(194);
-                
+
             });
     });
 
@@ -68,6 +73,37 @@ describe('Redfish Schemas', function () {
             });
     });
 
+    it('should return valid xml schema information ', function () {
+        return Promise.resolve()
+            .then(function(){
+                return fs.readFileAsync(fromRoot + '/static/DSP8010_2016.3/metadata/Bios_v1.xml', 'utf8');
+            })
+            .then(function(fileContent){
+                return helper.request().get('/redfish/v1/Schemas/Bios_v1.xml')
+                    .expect('Content-Type', "text/plain; charset=utf-8")
+                    .expect(200)
+                    .expect(function(res) {
+                        expect(res.text).to.equal(fileContent);
+                    });
+            });
+
+    });
+
+    it('should return invalid xml schema information ', function () {
+        return Promise.resolve()
+            .then(function(){
+                return helper.request().get('/redfish/v1/Schemas/invallid.xml');
+            })
+            .then(function(done){
+                done(new Error('should have Failed!'));
+            })
+            .catch(function (e) {
+                expect(e).to.have.property('message');// jshint ignore:line
+            });
+
+    });
+
+
     it('should return 404 on invalid schema information ', function () {
 
         return helper.request().get('/redfish/v1/Schemas/AccountService.1.0.01')
@@ -81,6 +117,5 @@ describe('Redfish Schemas', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
-
 
 });
