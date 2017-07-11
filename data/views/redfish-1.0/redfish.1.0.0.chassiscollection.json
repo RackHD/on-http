@@ -8,7 +8,7 @@
     "Members": [
         <% nodes.forEach(function(node, i, arr) { %>
             {
-                "@odata.id": "<%= basepath %>/Chassis/<%=node%>"
+                "@odata.id": "<%= basepath %>/Chassis/<%=node.identifiers[0] %>-<%= node.id %>"
             }
             <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
         <% }); %>
