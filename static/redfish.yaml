@@ -328,6 +328,43 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /Systems/{identifier}/Bios.ChangePassword:
+    x-swagger-router-controller: systems
+    post:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: Change the BIOS password for the given system identifier
+      description: >
+        changes the bios password of a node
+      operationId: changeSystemBiosPassword
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          x-param-handler: sku
+        - name: payload
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Bios.ChangePassword"
+      responses:
+        202:
+          description: Success
+          $ref: "#/responses/status_202"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /Systems/{identifier}/Processors:
     x-swagger-router-controller: systems
     get:
@@ -2636,15 +2673,28 @@ definitions:
       Status:
         $ref: '#/definitions/Resource_Status'
     type: object
-#  Bios.ChangePassword:
-#    description: This action is used to change the BIOS passwords.
-#    properties:
-#      target: {}
-#      title: {}
-#    type: object
+  Bios.ChangePassword:
+    description: This action is used to change the BIOS passwords.
+    properties:
+      Bios:
+        $ref: '#/definitions/Bios.v1_0_0.Actions'
+      NewPassword:
+        description: The value of the new BIOS password.
+        type: string
+      OldPassword:
+        description: The value of the existing password.
+        type: string
+      PasswordName:
+        description: The name of the BIOS password to change.
+        type: string
+      target: {}
+      title: {}
+    type: object
 #  Bios.ResetBios:
 #    description: This action is used to reset the BIOS attributes to default.
 #    properties:
+#      Bios:
+#        $ref: '#/definitions/Bios.v1_0_0.Actions'
 #      target: {}
 #      title: {}
 #    type: object

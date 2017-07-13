@@ -17,6 +17,17 @@ describe('Redfish Systems Root', function () {
     var racadm;
     var wsman;
     var configuration;
+    var mktemp = require('mktemp');
+
+    var xmlData = `<SystemConfiguration Model=" " ServiceTag=" " TimeStamp=" ">
+<Component FQDD="BIOS.Setup.1-1">
+    <Attribute Name="OldSetupPassword">xxxx</Attribute>
+    <Attribute Name="NewSetupPassword">xxxx</Attribute>
+    <Attribute Name="PasswordStatus">Unlocked</Attribute>
+</Component>
+
+</SystemConfiguration>`;
+
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -68,6 +79,10 @@ describe('Redfish Systems Root', function () {
 
             var nodeFs = helper.injector.get('fs');
             fs = Promise.promisifyAll(nodeFs);
+
+            sinon.stub(mktemp, 'createFile');
+            sinon.stub(fs, 'writeFile');
+
         });
 
     });
@@ -139,6 +154,10 @@ describe('Redfish Systems Root', function () {
             id: 'DELLabcd1234abcd1234abcd',
             name: 'DELLabcd1234abcd1234abcd' 
         }));
+        mktemp.createFile.withArgs('/nfs/XXXXXX.xml')
+        .resolves(Promise.resolve('/nfs/file.xml'));
+        fs.writeFile.withArgs('/nfs/file.xml',xmlData, function() {})
+        .resolves(Promise.resolve(undefined));
     });
 
     afterEach('tear down mocks', function () {
@@ -672,7 +691,7 @@ describe('Redfish Systems Root', function () {
             .expect(404);
     });
 
-    it('should 404 an non-Dell identifier for bios settings patch', function() {
+    it('should 404 non-Dell identifier for bios settings patch', function() {
         return helper.request().patch('/redfish/v1/Systems/' + node.id + '/Bios/Settings')
             .send({ Name: "bogusname", Id: "someid"})
             .expect('Content-Type', /^application\/json/)
@@ -691,6 +710,55 @@ describe('Redfish Systems Root', function () {
             .send({ "@odata.context": "string", "@odata.id": "string", "@odata.type": "string", "Actions": { "Oem": {} }, "AttributeRegistry": "string", "Attributes": { "X": "y"}, "Description": "string", "Id": "string", "Name": "string", "Oem": {} })
             .expect('Content-Type', /^application\/json/)
             .expect(202);
+    });
+
+    it('should 404 an invalid system for Bios.ChangePassword post', function() {
+        return helper.request().post('/redfish/v1/Systems/bad' + node.id + '/Bios.ChangePassword')
+            .send({ PasswordName: "bogusname", OldPassword: "somepass", NewPassword: "newpass"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should 404 an non-Dell system for Bios.ChangePassword post', function() {
+        return helper.request().post('/redfish/v1/Systems/' + node.id + '/Bios.ChangePassword')
+            .send({ PasswordName: "bogusname", OldPassword: "somepass", NewPassword: "newpass"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return a 202 for a Dell-based bios change password SysPassword', function() {
+        // Force a southbound interface through httpEndpoints
+        configuration.set('httpEndpoints', httpEndpoints);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'DeviceSummary').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'DeviceSummary',
+            data: dellCatalogData.DeviceSummary
+        }));
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id + '/Bios.ChangePassword')
+            .send({ PasswordName: "SysPassword", OldPassword: "somepass", NewPassword: "newpass"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(202);
+    });
+
+    it('should return a 202 for a Dell-based bios change password SetupPassword', function() {
+        // Force a southbound interface through httpEndpoints
+        configuration.set('httpEndpoints', httpEndpoints);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'DeviceSummary').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'DeviceSummary',
+            data: dellCatalogData.DeviceSummary
+        }));
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id + '/Bios.ChangePassword')
+            .send({ PasswordName: "SetupPassword", OldPassword: "somepass", NewPassword: "newpass"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(202);
+    });
+
+    it('should 400 an invalid password name for Bios.ChangePassword post', function() {
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id + '/Bios.ChangePassword')
+            .send({ PasswordName: "bogusname", OldPassword: "somepass", NewPassword: "newpass"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(400);
     });
 
     it('should 404 an invalid identifier for ethernet query', function() {
