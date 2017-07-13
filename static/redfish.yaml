@@ -2546,6 +2546,31 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /odata:
+    x-swagger-router-controller: odata
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: The OData Service Document serves as a top-level entry point for generic OData clients
+      operationId: getOdata
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Odata.1.0.1_System'
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 
@@ -7279,3 +7304,23 @@ definitions:
     type: object
     required:
     - SecureBootEnable
+  Odata.1.0.1_System:
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      value:
+        description: Array containing an entry for the service root and each resource that is a direct child of the service root.
+        items:
+          type: object
+          properties:
+            name:
+             type: string
+            kind:
+             type: string
+            url:
+             type: string
+          description: Service entries
+        type: array
+ 
