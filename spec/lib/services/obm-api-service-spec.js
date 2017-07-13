@@ -214,7 +214,7 @@ describe("Http.Services.Api.Obms", function () {
         "service": "vmrun-obm-service"
     },
     {
-        "service": 'wsman-obm-service',
+        "service": 'dell-wsman-obm-service',
         "config": {
             "host": {
                 "default": 'localhost',

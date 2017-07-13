@@ -1,8 +1,8 @@
 {
-    "title": "wsman-obm-service",
+    "title": "dell-wsman-obm-service",
     "definitions": {
         "Obm": {
-            "description": "WSMAN OBM settings",
+            "description": "DELL WSMAN OBM settings",
             "type": "object",
             "properties": {
                 "nodeId": {
