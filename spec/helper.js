@@ -53,7 +53,7 @@ helper.startServer = function (overrides, endpointOpt) {
                 {
                     'port': 8089,
                     'httpsEnabled': false,
-                    "yamlName": ["monorail-2.0.yaml", "redfish.yaml"]
+                    "yamlName": ["monorail-2.0.yaml", "redfish.yaml", "redfish-root.yaml"]
                 },
                 endpointOpt)
         ]);
