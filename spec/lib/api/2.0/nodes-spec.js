@@ -16,67 +16,37 @@ describe('2.0 Http.Api.Nodes', function () {
     var mockConsul;
     var mockGrpc = require('../../../mock-grpc.js');
 
-    before('start HTTP server', function () {
-        this.timeout(10000);
+    helper.httpServerBefore();
+
+    before(function () {
         mockConsul = new Consul();
-        return helper.startServer([
-        ]).then(function () {
-            configuration = helper.injector.get('Services.Configuration');
-            lookupService = helper.injector.get('Services.Lookup');
-            lookupService.ipAddressToMacAddress = sinon.stub().resolves();
-            lookupService.ipAddressToNodeId = sinon.stub().resolves();
-            sinon.stub(configuration);
-
-            waterline = helper.injector.get('Services.Waterline');
-            sinon.stub(waterline.nodes);
-            sinon.stub(waterline.ibms);
-            sinon.stub(waterline.catalogs);
-            sinon.stub(waterline.workitems);
-            sinon.stub(waterline.graphobjects);
-
-            ObmService = helper.injector.get('Task.Services.OBM');
-            sinon.stub(ObmService.prototype, 'identifyOn');
-            sinon.stub(ObmService.prototype, 'identifyOff');
-            nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
-            sinon.stub(nodeApiService, "getAllNodes");
-            sinon.stub(nodeApiService, "getNodeById");
-
-            Promise = helper.injector.get('Promise');
-            Constants = helper.injector.get('Constants');
-            Errors = helper.injector.get('Errors');
-            nodesApi = helper.injector.get('Http.Services.Api.Nodes');
-
-        });
-    });
-
-    afterEach('reset stubs', function () {
-        function resetStubs(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (obj[method] && obj[method].reset) {
-                  obj[method].reset();
-                }
-            }).value();
-        }
-
-        resetStubs(configuration);
-        resetStubs(lookupService);
-        resetStubs(waterline.lookups);
-        resetStubs(waterline.nodes);
-        resetStubs(waterline.catalogs);
-        resetStubs(waterline.workitems);
-        resetStubs(waterline.graphobjects);
-
-        ObmService.prototype.identifyOn.reset();
-        ObmService.prototype.identifyOff.reset();
-
+        configuration = helper.injector.get('Services.Configuration');
         lookupService = helper.injector.get('Services.Lookup');
-        lookupService.ipAddressToMacAddress = sinon.stub().resolves();
-        lookupService.ipAddressToNodeId = sinon.stub().resolves();
+        waterline = helper.injector.get('Services.Waterline');
+        ObmService = helper.injector.get('Task.Services.OBM');
+        nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
+        Promise = helper.injector.get('Promise');
+        Constants = helper.injector.get('Constants');
+        Errors = helper.injector.get('Errors');
+        nodesApi = helper.injector.get('Http.Services.Api.Nodes');
     });
 
-    after('stop HTTP server', function () {
-        return helper.stopServer();
+    beforeEach('set up mocks', function() {
+        lookupService.ipAddressToMacAddress = this.sandbox.stub().resolves();
+        lookupService.ipAddressToNodeId = this.sandbox.stub().resolves();
+        this.sandbox.stub(configuration);
+        this.sandbox.stub(waterline.nodes);
+        this.sandbox.stub(waterline.ibms);
+        this.sandbox.stub(waterline.catalogs);
+        this.sandbox.stub(waterline.workitems);
+        this.sandbox.stub(waterline.graphobjects);
+        this.sandbox.stub(ObmService.prototype, 'identifyOn');
+        this.sandbox.stub(ObmService.prototype, 'identifyOff');
+        this.sandbox.stub(nodeApiService, "getAllNodes");
+        this.sandbox.stub(nodeApiService, "getNodeById");
     });
+
+    helper.httpServerAfter();
 
     var obm =[{
         config: {},
@@ -156,11 +126,7 @@ describe('2.0 Http.Api.Nodes', function () {
 
     describe('2.0 POST /nodes', function () {
         beforeEach(function() {
-            sinon.stub(nodeApiService, 'postNode');
-        });
-
-        afterEach(function() {
-            nodeApiService.postNode.restore();
+            this.sandbox.stub(nodeApiService, 'postNode');
         });
 
         it('should create a node', function () {
@@ -233,11 +199,7 @@ describe('2.0 Http.Api.Nodes', function () {
 
     describe('DELETE /nodes/:identifier', function () {
         beforeEach(function() {
-            sinon.stub(nodeApiService, 'removeNode');
-        });
-
-        afterEach(function() {
-            nodeApiService.removeNode.restore();
+            this.sandbox.stub(nodeApiService, 'removeNode');
         });
 
         it('should delete a node', function () {
@@ -283,14 +245,10 @@ describe('2.0 Http.Api.Nodes', function () {
     describe('PUT /nodes/:identifier/relations', function() {
         var relationUpdate;
         beforeEach(function() {
-            sinon.stub(nodeApiService, 'editNodeRelations');
+            this.sandbox.stub(nodeApiService, 'editNodeRelations');
             relationUpdate = {
                 containedBy: ['rackNodeId']
             };
-        });
-
-        afterEach(function() {
-            nodeApiService.editNodeRelations.restore();
         });
 
         it('should add to and update a node\'s relations', function() {
@@ -333,14 +291,10 @@ describe('2.0 Http.Api.Nodes', function () {
     describe('DELETE /nodes/:identifier/relations', function() {
         var relationDeletion;
         beforeEach(function() {
-            sinon.stub(nodeApiService, 'editNodeRelations');
+            this.sandbox.stub(nodeApiService, 'editNodeRelations');
             relationDeletion = {
                 containedBy: ['rackNodeId']
             };
-        });
-
-        afterEach(function() {
-            nodeApiService.editNodeRelations.restore();
         });
 
         it('should delete the given relations from a node', function() {
@@ -661,10 +615,11 @@ describe('2.0 Http.Api.Nodes', function () {
                 .expect(200, node.workflows)
                 .then(function(res){
                     expect(res.body[0]).to.have.property('status', 'pending');
-		});
+            });
         });
 
         it('should return a 404 if the node was not found', function () {
+            waterline.nodes.needByIdentifier.resolves(node);
             mockGrpc.setResponse(new Errors.NotFoundError('Not Found'));
             waterline.graphobjects.find.rejects(new Errors.NotFoundError('Not Found'));
             return helper.request().get('/api/2.0/nodes/123/workflows')
@@ -679,11 +634,7 @@ describe('2.0 Http.Api.Nodes', function () {
         };
 
         beforeEach(function() {
-            sinon.stub(nodeApiService, 'setNodeWorkflow');
-        });
-
-        afterEach(function() {
-            nodeApiService.setNodeWorkflow.restore();
+            this.sandbox.stub(nodeApiService, 'setNodeWorkflow');
         });
 
         it('should create a workflow via the querystring', function () {
@@ -808,13 +759,7 @@ describe('2.0 Http.Api.Nodes', function () {
         var action = { command: 'cancel'};
 
         beforeEach(function() {
-            sinon.stub(nodeApiService, 'delActiveWorkflowById');
-        });
-
-        afterEach(function() {
-            if (nodeApiService.delActiveWorkflowById.restore) {
-                nodeApiService.delActiveWorkflowById.restore();
-            }
+            this.sandbox.stub(nodeApiService, 'delActiveWorkflowById');
         });
 
         it('should delete the currently active workflow', function () {
@@ -840,19 +785,12 @@ describe('2.0 Http.Api.Nodes', function () {
     });
 
     describe('Tag support', function() {
-        before(function() {
-            sinon.stub(nodesApi, 'getTagsById').resolves([]);
-            sinon.stub(nodesApi, 'addTagsById').resolves([]);
-            sinon.stub(nodesApi, 'removeTagsById').resolves([]);
-            sinon.stub(nodesApi, 'masterDelTagById')
+        beforeEach(function() {
+            this.sandbox.stub(nodesApi, 'getTagsById').resolves([]);
+            this.sandbox.stub(nodesApi, 'addTagsById').resolves([]);
+            this.sandbox.stub(nodesApi, 'removeTagsById').resolves([]);
+            this.sandbox.stub(nodesApi, 'masterDelTagById')
                 .resolves(['1234abcd1234abcd1234abcd', '5678efgh5678efgh5678efgh']);
-        });
-
-        after(function() {
-            nodesApi.getTagsById.restore();
-            nodesApi.addTagsById.restore();
-            nodesApi.removeTagsById.restore();
-            nodesApi.masterDelTagById.restore();
         });
 
         it('should call getTagsById', function() {
@@ -910,13 +848,8 @@ describe('2.0 Http.Api.Nodes', function () {
             config: {}
         };
 
-        after(function() {
-            nodesApi.getObmsByNodeId.restore();
-            nodesApi.putObmsByNodeId.restore();
-        });
-
         it('should call getObmsByNodeId', function() {
-            sinon.stub(nodesApi, 'getObmsByNodeId').resolves([obmRes]);
+            this.sandbox.stub(nodesApi, 'getObmsByNodeId').resolves([obmRes]);
 
             return helper.request().get('/api/2.0/nodes/123/obm')
                 .expect('Content-Type', /^application\/json/)
@@ -928,7 +861,7 @@ describe('2.0 Http.Api.Nodes', function () {
         });
 
         it('should call putObmsByNodeId', function() {
-            sinon.stub(nodesApi, 'putObmsByNodeId').resolves([]);
+            this.sandbox.stub(nodesApi, 'putObmsByNodeId').resolves([]);
 
             return helper.request().put('/api/2.0/nodes/123/obm')
                 .send(obm)

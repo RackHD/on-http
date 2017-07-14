@@ -81,7 +81,7 @@ describe('Http.Api.Login', function () {
     before('setup default admin user', function() {
         waterline = helper.injector.get('Services.Waterline');
         waterline.localusers = {
-            findOne: sinon.stub()
+            findOne: sandbox.stub()
         };
         waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
             username: 'admin',
@@ -90,9 +90,6 @@ describe('Http.Api.Login', function () {
         waterline.localusers.findOne.resolves();
     });
 
-    after('remove waterline definition', function() {
-        delete waterline.localusers;
-    });
     describe('test with authentication enabled', function () {
         before('start HTTPs server', function () {
             this.timeout(5000);

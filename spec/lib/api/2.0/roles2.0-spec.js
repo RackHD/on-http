@@ -16,25 +16,18 @@ describe('Http.Api.Roles', function () {
 
     var accountService;
 
-    before('start HTTP server', function () {
-        var self = this;
-        this.timeout(5000);
-        this.sandbox = sinon.sandbox.create();
-        return helper.startServer([])
-        .then(function () {
-            accountService = helper.injector.get('Http.Services.Api.Account');
-            self.sandbox.stub(accountService, 'listRoles').resolves([roleObj]);
-            self.sandbox.stub(accountService, 'getRoleByName').resolves(newRole);
-            self.sandbox.stub(accountService, 'createRole').resolves(newRole);
-            self.sandbox.stub(accountService, 'modifyRoleByRoleName').resolves(newRole);
-            self.sandbox.stub(accountService, 'removeRoleByName').resolves();
-        });
+    helper.httpServerBefore();
+
+    beforeEach('set up mocks', function () {
+        accountService = helper.injector.get('Http.Services.Api.Account');
+        this.sandbox.stub(accountService, 'listRoles').resolves([roleObj]);
+        this.sandbox.stub(accountService, 'getRoleByName').resolves(newRole);
+        this.sandbox.stub(accountService, 'createRole').resolves(newRole);
+        this.sandbox.stub(accountService, 'modifyRoleByRoleName').resolves(newRole);
+        this.sandbox.stub(accountService, 'removeRoleByName').resolves();
     });
 
-    after('stop HTTP server', function () {
-        this.sandbox.restore();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     it('should return a list of roles', function () {
         return helper.request().get('/api/2.0/roles')

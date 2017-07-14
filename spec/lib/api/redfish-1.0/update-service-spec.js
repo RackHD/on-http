@@ -189,41 +189,31 @@ describe('Redfish Update Service', function () {
         "type": "compute"
     };
 
-    before('start HTTP server', function () {
-        var self = this;
+    helper.httpServerBefore([], {authEnabled: false});
+
+    before(function () {
+        redfish = helper.injector.get('Http.Api.Services.Redfish');
+        waterline = helper.injector.get('Services.Waterline');
+        workflow = helper.injector.get('Http.Services.Api.Workflows');
+        validator = helper.injector.get('Http.Api.Services.Schema');
         tv4 = require('tv4');
-
-        this.timeout(15000);
-        this.sandbox = sinon.sandbox.create();
-
-        return helper.startServer([], {authEnabled: false})
-            .then(function () {
-                redfish = helper.injector.get('Http.Api.Services.Redfish');
-                waterline = helper.injector.get('Services.Waterline');
-                workflow = helper.injector.get('Http.Services.Api.Workflows');
-                validator = helper.injector.get('Http.Api.Services.Schema');
-                self.sandbox.spy(tv4, "validate");
-                self.sandbox.spy(validator, 'validate');
-                self.sandbox.spy(redfish, 'validateSchema');
-                self.sandbox.spy(redfish, 'handleError');
-                self.sandbox.spy(redfish, 'render');
-                self.sandbox.stub(waterline.obms, 'findAllByNode');
-                self.sandbox.stub(waterline.nodes, 'getNodeById');
-                self.sandbox.stub(waterline.nodes, 'findByIdentifier');
-                self.sandbox.stub(waterline.catalogs, 'find');
-                self.sandbox.stub(waterline.catalogs, 'findMostRecent');
-                self.sandbox.stub(workflow, 'createAndRunGraph');
-            });
     });
 
-    afterEach('tear down mocks', function () {
-        this.sandbox.reset();
+    beforeEach('set up mocks', function() {
+        this.sandbox.spy(tv4, "validate");
+        this.sandbox.spy(validator, 'validate');
+        this.sandbox.spy(redfish, 'validateSchema');
+        this.sandbox.spy(redfish, 'handleError');
+        this.sandbox.spy(redfish, 'render');
+        this.sandbox.stub(waterline.obms, 'findAllByNode');
+        this.sandbox.stub(waterline.nodes, 'getNodeById');
+        this.sandbox.stub(waterline.nodes, 'findByIdentifier');
+        this.sandbox.stub(waterline.catalogs, 'find');
+        this.sandbox.stub(waterline.catalogs, 'findMostRecent');
+        this.sandbox.stub(workflow, 'createAndRunGraph');
     });
 
-    after('stop HTTP server', function () {
-        this.sandbox.restore();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     it('should return a valid updateService root', function () {
         return helper.request().get('/redfish/v1/UpdateService')

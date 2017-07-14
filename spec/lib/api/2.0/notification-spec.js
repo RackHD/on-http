@@ -14,33 +14,22 @@ describe('Http.Api.Notification', function () {
         data: 'test data'
     };
 
-    before('start HTTP server', function () {
-        helper.setupInjector([
-             helper.require("/lib/services/notification-api-service.js"),
+    helper.httpServerBefore([
+        helper.require("/lib/services/notification-api-service.js")
+    ]);
 
-        ]);
-        this.timeout(5000);
-        return helper.startServer([]).then(function () {
-            notificationApiService = helper.injector.get('Http.Services.Api.Notification');
-            sinon.stub(notificationApiService, 'postNodeNotification')
-                .resolves(nodeNotificationMessage);
-            sinon.stub(notificationApiService, 'postBroadcastNotification')
-                .resolves(broadcastNotificationMessage);
-            //sinon.stub(notificationApiService, 'redfishAlertProcessing').resolves();
-        });
+    before(function () {
+        notificationApiService = helper.injector.get('Http.Services.Api.Notification');
+    });
 
+    beforeEach('set up mocks', function() {
+        this.sandbox.stub(notificationApiService, 'postNodeNotification')
+            .resolves(nodeNotificationMessage);
+        this.sandbox.stub(notificationApiService, 'postBroadcastNotification')
+            .resolves(broadcastNotificationMessage);
     });
-    after('stop HTTP server', function () {
-        function resetMocks(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (typeof obj[method].restore === 'function') {
-                    obj[method].restore();
-                }
-            }).value();
-        }
-        resetMocks(notificationApiService);
-        return helper.stopServer();
-    });
+
+    helper.httpServerAfter();
 
     describe('POST /notification', function () {
         it('should return node notification detail', function () {
@@ -102,11 +91,7 @@ describe('Http.Api.Notification', function () {
                     value: 2,
                     description: 'foo bar'
                 };
-                sinon.stub(notificationApiService, 'publishTaskProgress').resolves();
-            });
-
-            afterEach(function() {
-                notificationApiService.publishTaskProgress.restore();
+                this.sandbox.stub(notificationApiService, 'publishTaskProgress').resolves();
             });
 
             it('should post progress notification via body', function () {
@@ -259,11 +244,7 @@ describe('Http.Api.Notification', function () {
     describe('GET /notification/progress', function () {
         describe('stub publishTaskProgress', function() {
             beforeEach(function() {
-                sinon.stub(notificationApiService, 'publishTaskProgress').resolves();
-            });
-
-            afterEach(function() {
-                notificationApiService.publishTaskProgress.restore();
+                this.sandbox.stub(notificationApiService, 'publishTaskProgress').resolves();
             });
 
             it('should update progress notification via query', function () {
@@ -316,10 +297,7 @@ describe('Http.Api.Notification', function () {
             "Severity":"Critical"
         };
         beforeEach(function(){
-            sinon.stub(notificationApiService, 'redfishAlertProcessing').resolves();
-        });
-        afterEach(function(){
-            notificationApiService.redfishAlertProcessing.restore();
+            this.sandbox.stub(notificationApiService, 'redfishAlertProcessing').resolves();
         });
 
         it('should post alert notification successfully(json) ', function () {

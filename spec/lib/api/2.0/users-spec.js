@@ -18,52 +18,41 @@ describe('Http.Api.Users', function () {
 
     var accountService;
     var waterline;
-    
-    before('start HTTP server', function () {
-        var self = this;
-        this.timeout(5000);
-        this.sandbox = sinon.sandbox.create();
 
-        return helper.startServer([], { authEnabled: true })
-        .then(function() {
-            accountService = helper.injector.get('Http.Services.Api.Account');
-            self.sandbox.stub(accountService, 'listUsers');
-            self.sandbox.stub(accountService, 'getUserByName');
-            self.sandbox.stub(accountService, 'createUser');
-            self.sandbox.stub(accountService, 'modifyUserByName');
-            self.sandbox.stub(accountService, 'removeUserByName');
+    helper.httpServerBefore([], { authEnabled: true });
 
-            waterline = helper.injector.get('Services.Waterline');
-            self.sandbox.stub(waterline.localusers, 'findOne');
-            waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
-                username: userObj.username,
-                comparePassword: function(password) { return password === 'admin123'; },
-                role: userObj.role
-            });
-            waterline.localusers.findOne.withArgs({username: 'readonly'}).resolves({
-                username: readOnlyObj.username,
-                comparePassword: function(password) { return password === 'read123'; },
-                role: readOnlyObj.role
-            });
+    before(function () {
+        accountService = helper.injector.get('Http.Services.Api.Account');
+        waterline = helper.injector.get('Services.Waterline');
+    });
 
-            // Setup ACL rules that are missed during startServer
-            return Promise.all([
-                accountService.aclMethod('addUserRoles', 'admin', 'Administrator'),
-                accountService.aclMethod('addUserRoles', 'readonly', 'ReadOnly'),
-                accountService.aclMethod('addRoleParents', 'Administrator', ['Read', 'Write']),
-                accountService.aclMethod('addRoleParents', 'ReadOnly', ['Read'])
-            ]);
+    beforeEach('set up mocks', function() {
+        this.sandbox.stub(accountService, 'listUsers');
+        this.sandbox.stub(accountService, 'getUserByName');
+        this.sandbox.stub(accountService, 'createUser');
+        this.sandbox.stub(accountService, 'modifyUserByName');
+        this.sandbox.stub(accountService, 'removeUserByName');
+        this.sandbox.stub(waterline.localusers, 'findOne');
+        waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
+            username: userObj.username,
+            comparePassword: function(password) { return password === 'admin123'; },
+            role: userObj.role
         });
+        waterline.localusers.findOne.withArgs({username: 'readonly'}).resolves({
+            username: readOnlyObj.username,
+            comparePassword: function(password) { return password === 'read123'; },
+            role: readOnlyObj.role
+        });
+        // Setup ACL rules that are missed during startServer
+        return Promise.all([
+            accountService.aclMethod('addUserRoles', 'admin', 'Administrator'),
+            accountService.aclMethod('addUserRoles', 'readonly', 'ReadOnly'),
+            accountService.aclMethod('addRoleParents', 'Administrator', ['Read', 'Write']),
+            accountService.aclMethod('addRoleParents', 'ReadOnly', ['Read'])
+        ]);
     });
 
-    afterEach(function() {
-        this.sandbox.reset();
-    });
-
-    after('stop HTTP server', function () {
-        this.sandbox.restore();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     it('should 201 a user post attempt with localexception', function() {
         accountService.listUsers.resolves([]);
@@ -119,6 +108,7 @@ describe('Http.Api.Users', function () {
     });
 
     it('should 401 a user post attempt with invalid auth tokens', function() {
+        accountService.listUsers.resolves([ userObj ]);
         return helper.request().post('/login')
             .send({username: "admin", password: "admin123"})
             .expect(200)
@@ -151,7 +141,9 @@ describe('Http.Api.Users', function () {
                         expect(accountService.getUserByName)
                             .to.have.been.calledWith('admin');
                         expect(accountService.modifyUserByName)
-                            .to.have.been.calledWith('admin', {password:'admin456', role: 'Administrator'});
+                            .to.have.been.calledWith('admin', {
+                                password:'admin456', role: 'Administrator'
+                            });
                     });
             });
     });

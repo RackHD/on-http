@@ -21,48 +21,27 @@ describe('Redfish Managers', function () {
             });
     }
 
-    before('start HTTP server', function () {
-        this.timeout(10000);
-        return helper.startServer([]).then(function () {
-            view = helper.injector.get('Views');
-            sinon.stub(view, "get", redirectGet);
+    helper.httpServerBefore();
 
-            redfish = helper.injector.get('Http.Api.Services.Redfish');
-            sinon.spy(redfish, 'render');
-
-            validator = helper.injector.get('Http.Api.Services.Schema');
-            sinon.spy(validator, 'validate');
-
-            waterline = helper.injector.get('Services.Waterline');
-            sinon.stub(waterline.nodes);
-            sinon.stub(waterline.catalogs);
-
-            Promise = helper.injector.get('Promise');
-            Errors = helper.injector.get('Errors');
-
-            var nodeFs = helper.injector.get('fs');
-            fs = Promise.promisifyAll(nodeFs);
-        });
-
+    before(function () {
+        view = helper.injector.get('Views');
+        redfish = helper.injector.get('Http.Api.Services.Redfish');
+        validator = helper.injector.get('Http.Api.Services.Schema');
+        waterline = helper.injector.get('Services.Waterline');
+        Promise = helper.injector.get('Promise');
+        Errors = helper.injector.get('Errors');
+        var nodeFs = helper.injector.get('fs');
+        fs = Promise.promisifyAll(nodeFs);
+        tv4 = require('tv4');
     });
 
     beforeEach('set up mocks', function () {
-        tv4 = require('tv4');
-        sinon.spy(tv4, "validate");
-
-        validator.validate.reset();
-        redfish.render.reset();
-
-        function resetStubs(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (obj[method] && obj[method].reset) {
-                  obj[method].reset();
-                }
-            }).value();
-        }
-
-        resetStubs(waterline.nodes);
-        resetStubs(waterline.catalogs);
+        this.sandbox.spy(tv4, "validate");
+        this.sandbox.stub(view, "get", redirectGet);
+        this.sandbox.spy(redfish, 'render');
+        this.sandbox.spy(validator, 'validate');
+        this.sandbox.stub(waterline.nodes);
+        this.sandbox.stub(waterline.catalogs);
 
         waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd')
         .resolves(Promise.resolve({
@@ -95,27 +74,7 @@ describe('Redfish Managers', function () {
         waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
     });
 
-    afterEach('tear down mocks', function () {
-        tv4.validate.restore();
-    });
-
-    after('stop HTTP server', function () {
-        validator.validate.restore();
-        redfish.render.restore();
-        view.get.restore();
-        
-        function restoreStubs(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (obj[method] && obj[method].restore) {
-                  obj[method].restore();
-                }
-            }).value();
-        }
-
-        restoreStubs(waterline.nodes);
-        restoreStubs(waterline.catalogs);
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     var node = {
         id: '1234abcd1234abcd1234abcd',
@@ -219,6 +178,7 @@ describe('Redfish Managers', function () {
     });
 
     it('should return a valid manager', function() {
+        waterline.nodes.find.resolves([node]);
         waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd').resolves(node);
         waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(node);
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
@@ -343,6 +303,7 @@ describe('Redfish Managers', function () {
     });
 
     it('should return the RackHD manager', function() {
+        waterline.nodes.find.resolves([node]);
         return helper.request().get('/redfish/v1/Managers/RackHD')
             .expect('Content-Type', /^application\/json/)
             .expect(200)

@@ -4,71 +4,27 @@
 'use strict';
 
 describe('Http.Api.Workflows.2.0', function () {
-    var waterline;
     var Errors;
     var workflowApiService;
-    var arpCache = {
-        getCurrent: sinon.stub().resolves([])
-    };
 
-    before('start HTTP server', function () {
-        var self = this;
-        this.timeout(10000);
+    helper.httpServerBefore();
 
-        waterline = {
-            start: sinon.stub(),
-            stop: sinon.stub(),
-            lookups: {
-                setIndexes: sinon.stub()
-            }
-        };
-        this.sandbox = sinon.sandbox.create();
-
-        return helper.startServer([
-        ])
-        .then(function() {
-            Errors = helper.injector.get('Errors');
-            workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
-            self.sandbox.stub(workflowApiService, 'defineTask').resolves();
-            self.sandbox.stub(workflowApiService, 'getAllWorkflows').resolves();
-            self.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves();
-            self.sandbox.stub(workflowApiService, 'getWorkflowByInstanceId').resolves();
-            self.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves();
-            self.sandbox.stub(workflowApiService, 'deleteTaskGraph').resolves();
-
-        });
+    before(function () {
+        Errors = helper.injector.get('Errors');
+        workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
     });
 
     beforeEach('set up mocks', function () {
-        waterline.nodes = {
-            findByIdentifier: sinon.stub().resolves()
-        };
-        waterline.graphobjects = {
-            find: sinon.stub().resolves([]),
-            findOne: sinon.stub().resolves(),
-            findByIdentifier: sinon.stub().resolves(),
-            needByIdentifier: sinon.stub().resolves(),
-            count: sinon.stub().resolves()
-        };
-        waterline.lookups = {
-            // This method is for lookups only and it
-            // doesn't impact behavior whether it is a
-            // resolve or a reject since it's related
-            // to logging.
-            findOneByTerm: sinon.stub().rejects()
-        };
+        this.sandbox.stub(workflowApiService, 'defineTask').resolves();
+        this.sandbox.stub(workflowApiService, 'getAllWorkflows').resolves();
+        this.sandbox.stub(workflowApiService, 'createAndRunGraph').resolves();
+        this.sandbox.stub(workflowApiService, 'getWorkflowByInstanceId').resolves();
+        this.sandbox.stub(workflowApiService, 'cancelTaskGraph').resolves();
+        this.sandbox.stub(workflowApiService, 'deleteTaskGraph').resolves();
         return helper.injector.get('Views').load();
-
     });
 
-    afterEach('clean up mocks', function () {
-        this.sandbox.reset();
-    });
-
-    after('stop HTTP server', function () {
-        this.sandbox.restore();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     describe('workflowsGet', function () {
         it('should return a list of persisted graph objects', function () {

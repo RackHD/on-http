@@ -4,36 +4,23 @@
 'use strict';
 
 describe('Http.Api.Workflows.2.0', function () {
-    var workflowApiService;
-    var arpCache = {
-        getCurrent: sinon.stub().resolves([])
-    };
+    var workflowApiService = {};
+    var arpCache = {};
 
-    before('start HTTP server', function () {
-        this.timeout(5000);
-        workflowApiService = {
-            getGraphDefinitions: sinon.stub(),
-            workflowsGetGraphsByName: sinon.stub(),
-            defineTaskGraph: sinon.stub(),
-            destroyGraphDefinition: sinon.stub()
-        };
+    helper.httpServerBefore([
+        dihelper.simpleWrapper(workflowApiService, 'Http.Services.Api.Workflows'),
+        dihelper.simpleWrapper(arpCache, 'ARPCache')
+    ]);
 
-        return helper.startServer([
-            dihelper.simpleWrapper(workflowApiService, 'Http.Services.Api.Workflows'),
-            dihelper.simpleWrapper(arpCache, 'ARPCache')
-        ]);
+    beforeEach('set up mocks', function () {
+        workflowApiService.getGraphDefinitions = this.sandbox.stub();
+        workflowApiService.workflowsGetGraphsByName = this.sandbox.stub();
+        workflowApiService.defineTaskGraph = this.sandbox.stub();
+        workflowApiService.destroyGraphDefinition = this.sandbox.stub();
+        arpCache.getCurrent =  this.sandbox.stub().resolves([]);
     });
 
-    afterEach('set up mocks', function () {
-        workflowApiService.getGraphDefinitions.reset();
-        workflowApiService.workflowsGetGraphsByName.reset();
-        workflowApiService.defineTaskGraph.reset();
-        workflowApiService.destroyGraphDefinition.reset();
-    });
-
-    after('stop HTTP server', function () {
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     describe('workflowsGetGraphs', function () {
         it('should retrieve the workflow Graphs', function () {

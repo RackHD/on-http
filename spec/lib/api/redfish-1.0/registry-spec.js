@@ -19,41 +19,28 @@ describe('Redfish Registries', function () {
             });
     }
 
-    before('start HTTP server', function () {
-        this.timeout(5000);
-        return helper.startServer([]).then(function () {
-            redfish = helper.injector.get('Http.Api.Services.Redfish');
-            sinon.spy(redfish, 'render');
-            validator = helper.injector.get('Http.Api.Services.Schema');
-            sinon.spy(validator, 'validate');
-            view = helper.injector.get('Views');
-            sinon.stub(view, "get", redirectGet);
-            Promise = helper.injector.get('Promise');
-            var nodeFs = helper.injector.get('fs');
-            fs = Promise.promisifyAll(nodeFs);
-            env = helper.injector.get('Services.Environment');
-            sinon.stub(env, "get").resolves();
-        });
-    });
-    beforeEach('set up mocks', function () {
+    helper.httpServerBefore();
+
+    before(function () {
+        redfish = helper.injector.get('Http.Api.Services.Redfish');
+        validator = helper.injector.get('Http.Api.Services.Schema');
+        view = helper.injector.get('Views');
+        Promise = helper.injector.get('Promise');
+        var nodeFs = helper.injector.get('fs');
+        fs = Promise.promisifyAll(nodeFs);
+        env = helper.injector.get('Services.Environment');
         tv4 = require('tv4');
-        sinon.spy(tv4, "validateResult");
-
-        validator.validate.reset();
-        redfish.render.reset();
     });
 
-    afterEach('tear down mocks', function () {
-        tv4.validateResult.restore();
+    beforeEach('set up mocks', function () {
+        this.sandbox.spy(tv4, "validateResult");
+        this.sandbox.spy(redfish, 'render');
+        this.sandbox.spy(validator, 'validate');
+        this.sandbox.stub(view, "get", redirectGet);
+        this.sandbox.stub(env, "get").resolves();
     });
 
-    after('stop HTTP server', function () {
-        validator.validate.restore();
-        redfish.render.restore();
-        view.get.restore();
-        env.get.restore();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     it('should return a valid collection of registries', function() {
         return helper.request().get('/redfish/v1/Registries')

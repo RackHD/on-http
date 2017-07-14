@@ -11,29 +11,21 @@ describe('Http.Api.Hooks v2.0', function () {
         id: "testid",
         filters: []
     }];
-    var sandbox = sinon.sandbox.create();
-    before('start HTTP server', function () {
-        this.timeout(10000);
-        return helper.startServer([])
-        .then(function() {
-            hookService = helper.injector.get('Http.Services.Api.Hooks');
-            Errors = helper.injector.get('Errors');
-            _ = helper.injector.get('_');
-            hookPayload = _.omit(hookSample[0], 'id');
-        });
+
+    helper.httpServerBefore();
+
+    before(function () {
+        hookService = helper.injector.get('Http.Services.Api.Hooks');
+        Errors = helper.injector.get('Errors');
+        _ = helper.injector.get('_');
+        hookPayload = _.omit(hookSample[0], 'id');
     });
 
-    afterEach('tear down mocks', function () {
-        sandbox.restore();
-    });
-
-    after('stop HTTP server', function () {
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     it('should return hooks', function () {
         var hookList = _.cloneDeep(hookSample);
-        sandbox.stub(hookService, 'getHooks').resolves(hookList);
+        this.sandbox.stub(hookService, 'getHooks').resolves(hookList);
         return helper.request()
             .get('/api/2.0/hooks')
             .expect('Content-Type', /^application\/json/)
@@ -46,7 +38,7 @@ describe('Http.Api.Hooks v2.0', function () {
 
     it('should return hook by id', function () {
         var hook = _.cloneDeep(hookSample[0]);
-        sandbox.stub(hookService, 'getHookById').resolves(hook);
+        this.sandbox.stub(hookService, 'getHookById').resolves(hook);
         return helper.request()
             .get('/api/2.0/hooks/test')
             .expect('Content-Type', /^application\/json/)
@@ -59,7 +51,7 @@ describe('Http.Api.Hooks v2.0', function () {
 
     it('should post new hooks', function () {
         var hookList = _.cloneDeep(hookSample[0]);
-        sandbox.stub(hookService, 'createHook').resolves(hookList);
+        this.sandbox.stub(hookService, 'createHook').resolves(hookList);
         return helper.request()
             .post('/api/2.0/hooks')
             .send(hookPayload)
@@ -77,7 +69,7 @@ describe('Http.Api.Hooks v2.0', function () {
         var hookList = _.cloneDeep(hookSample[0]);
         var hookWithNoUrl = _.cloneDeep(hookList);
         delete hookWithNoUrl.url;
-        sandbox.stub(hookService, 'createHook').resolves(hookList);
+        this.sandbox.stub(hookService, 'createHook').resolves(hookList);
         return helper.request()
             .post('/api/2.0/hooks')
             .send(hookWithNoUrl)
@@ -86,7 +78,7 @@ describe('Http.Api.Hooks v2.0', function () {
     });
 
     it('should throw 400 with bad request error', function () {
-        sandbox.stub(hookService, 'createHook').rejects(new Errors.BadRequestError());
+        this.sandbox.stub(hookService, 'createHook').rejects(new Errors.BadRequestError());
         return helper.request()
             .post('/api/2.0/hooks')
             .send({})
@@ -98,7 +90,7 @@ describe('Http.Api.Hooks v2.0', function () {
 
     it('should patch hook', function () {
         var hookList = _.cloneDeep(hookSample[0]);
-        sandbox.stub(hookService, 'updateHookById').resolves(hookList);
+        this.sandbox.stub(hookService, 'updateHookById').resolves(hookList);
         return helper.request()
             .patch('/api/2.0/hooks/test')
             .send(hookPayload)
@@ -112,7 +104,7 @@ describe('Http.Api.Hooks v2.0', function () {
     });
 
     it('should delete hook', function () {
-        sandbox.stub(hookService, 'deleteHookById').resolves(hookSample);
+        this.sandbox.stub(hookService, 'deleteHookById').resolves(hookSample);
         return helper.request()
             .delete('/api/2.0/hooks/test')
             .expect(204)
@@ -123,7 +115,8 @@ describe('Http.Api.Hooks v2.0', function () {
     });
 
     it('should return a 404 if the hook was not found', function () {
-        sandbox.stub(hookService, 'deleteHookById').rejects(new Errors.NotFoundError('Not Found'));
+        this.sandbox.stub(hookService, 'deleteHookById')
+            .rejects(new Errors.NotFoundError('Not Found'));
         return helper.request()
             .delete('/api/2.0/hooks/test')
             .expect(404);

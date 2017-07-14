@@ -34,63 +34,53 @@ describe('Redfish Account Service', function () {
         role: 'ReadOnly'
     };
 
-    before('start HTTP server', function () {
-        var self = this;
-        this.timeout(5000);
-        this.sandbox = sinon.sandbox.create();
+    helper.httpServerBefore([], { authEnabled: true });
 
-        return helper.startServer([], { authEnabled: true })
-        .then(function() {
-            view = helper.injector.get('Views');
-            redfish = helper.injector.get('Http.Api.Services.Redfish');
-            validator = helper.injector.get('Http.Api.Services.Schema');
-            waterline = helper.injector.get('Services.Waterline');
-            Promise = helper.injector.get('Promise');
-            fs = Promise.promisifyAll( helper.injector.get('fs') );
-            tv4 = require('tv4');
-            accountService = helper.injector.get('Http.Services.Api.Account');
-            Errors = helper.injector.get('Errors');
+    before(function () {
+        view = helper.injector.get('Views');
+        redfish = helper.injector.get('Http.Api.Services.Redfish');
+        validator = helper.injector.get('Http.Api.Services.Schema');
+        waterline = helper.injector.get('Services.Waterline');
+        Promise = helper.injector.get('Promise');
+        fs = Promise.promisifyAll( helper.injector.get('fs') );
+        tv4 = require('tv4');
+        accountService = helper.injector.get('Http.Services.Api.Account');
+        Errors = helper.injector.get('Errors');
+    });
 
-            self.sandbox.stub(view, "get", redirectGet);
-            self.sandbox.spy(redfish, 'render');
-            self.sandbox.spy(validator, 'validate');
-            self.sandbox.stub(waterline.localusers, 'findOne');
-            self.sandbox.spy(tv4, "validate");
-            waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
-                username: userObj.username,
-                comparePassword: function(password) { return password === 'admin123'; },
-                role: userObj.role
-            });
-            waterline.localusers.findOne.withArgs({username: 'readonly'}).resolves({
-                username: readOnlyObj.username,
-                comparePassword: function(password) { return password === 'read123'; },
-                role: readOnlyObj.role
-            });
-
-            self.sandbox.stub(accountService, 'listUsers');
-            self.sandbox.stub(accountService, 'getUserByName');
-            self.sandbox.stub(accountService, 'createUser');
-            self.sandbox.stub(accountService, 'modifyUserByName');
-            self.sandbox.stub(accountService, 'removeUserByName');
-
-            // Setup ACL rules that are missed during startServer
-            return Promise.all([
-                accountService.aclMethod('addUserRoles', 'admin', 'Administrator'),
-                accountService.aclMethod('addUserRoles', 'readonly', 'ReadOnly'),
-                accountService.aclMethod('addRoleParents', 'Administrator', ['ConfigureUsers']),
-                accountService.aclMethod('addRoleParents', 'ReadOnly', ['ConfigureSelf'])
-            ]);
+    beforeEach('set up mocks', function() {
+        this.sandbox.stub(view, "get", redirectGet);
+        this.sandbox.spy(redfish, 'render');
+        this.sandbox.spy(validator, 'validate');
+        this.sandbox.stub(waterline.localusers, 'findOne');
+        this.sandbox.spy(tv4, "validate");
+        waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
+            username: userObj.username,
+            comparePassword: function(password) { return password === 'admin123'; },
+            role: userObj.role
         });
+        waterline.localusers.findOne.withArgs({username: 'readonly'}).resolves({
+            username: readOnlyObj.username,
+            comparePassword: function(password) { return password === 'read123'; },
+            role: readOnlyObj.role
+        });
+
+        this.sandbox.stub(accountService, 'listUsers');
+        this.sandbox.stub(accountService, 'getUserByName');
+        this.sandbox.stub(accountService, 'createUser');
+        this.sandbox.stub(accountService, 'modifyUserByName');
+        this.sandbox.stub(accountService, 'removeUserByName');
+
+        // Setup ACL rules that are missed during startServer
+        return Promise.all([
+            accountService.aclMethod('addUserRoles', 'admin', 'Administrator'),
+            accountService.aclMethod('addUserRoles', 'readonly', 'ReadOnly'),
+            accountService.aclMethod('addRoleParents', 'Administrator', ['ConfigureUsers']),
+            accountService.aclMethod('addRoleParents', 'ReadOnly', ['ConfigureSelf'])
+        ]);
     });
 
-    afterEach('tear down mocks', function () {
-        this.sandbox.reset();
-    });
-
-    after('stop HTTP server', function () {
-        this.sandbox.restore();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     it('should return a valid account service root', function () {
         return helper.request().get('/redfish/v1/AccountService')
@@ -101,7 +91,8 @@ describe('Redfish Account Service', function () {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
-                expect(res.body.Accounts['@odata.id']).to.equal('/redfish/v1/AccountService/Accounts');
+                expect(res.body.Accounts['@odata.id'])
+                    .to.equal('/redfish/v1/AccountService/Accounts');
                 expect(res.body.Roles['@odata.id']).to.equal('/redfish/v1/AccountService/Roles');
             });
     });
@@ -136,6 +127,7 @@ describe('Redfish Account Service', function () {
     it('should 201 a user post attempt with localexception', function() {
         accountService.listUsers.resolves([]);
         accountService.createUser.resolves(userObj);
+        accountService.getUserByName.withArgs('admin').resolves(userObj);
         return helper.request().post('/redfish/v1/AccountService/Accounts')
             .send({UserName: 'admin', Password: 'admin123', RoleId: 'Administrator'})
             .expect('Content-Type', /^application\/json/)
