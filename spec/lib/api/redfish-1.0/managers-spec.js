@@ -134,6 +134,34 @@ describe('Redfish Managers', function () {
         'Manufacturer Name' : 'Unknown (0x1291)',
         'Product Name' : 'Unknown (0xF02)'
     };
+    var dmiCatalogData = {
+        source: 'dmi',
+        data: {
+
+            'Port Connector Information': [{
+                'Internal Reference Designator': 'J26-B2B_CONN_0',
+                'Internal Connector Type': 'Other',
+                'External Reference Designator': 'Not Specified',
+                'External Connector Type': 'None',
+                'Port Type': 'Other'
+            },
+                {
+                    'Internal Reference Designator': 'Not Specified',
+                    'Internal Connector Type': 'None',
+                    'External Reference Designator': 'J21-COMA',
+                    'External Connector Type': 'DB-9 male',
+                    'Port Type': 'Serial Port 16550A Compatible'
+                },
+                {
+                    'Internal Reference Designator': 'Not Specified',
+                    'Internal Connector Type': 'None',
+                    'External Reference Designator': 'J6-BMC_MANAGEMENT_PORT',
+                    'External Connector Type': 'RJ-45',
+                    'Port Type': 'Network Port'
+                }]
+        }
+
+    };
 
     it('should return a valid manager root', function () {
         waterline.nodes.find.resolves([node]);
@@ -269,5 +297,34 @@ describe('Redfish Managers', function () {
         });
     });
 
+    it('should return the RackHD manager serial interface collection', function () {
+        waterline.catalogs.find.resolves(Promise.resolve({
+            data: dmiCatalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Managers/RackHD/SerialInterfaces')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function () {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should return the RackHD manager serial interface', function () {
+        waterline.catalogs.find.resolves(Promise.resolve({
+            data: dmiCatalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Managers/RackHD/SerialInterfaces')
+            .then(function (res) {
+                return Promise.map(res.body.Members, function (member) {
+                    return helper.request().get(member['@odata.id'])
+                        .expect('Content-Type', /^application\/json/)
+                        .expect(200);
+                });
+            });
+    });
 });
 
