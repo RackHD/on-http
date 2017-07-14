@@ -1862,19 +1862,40 @@ paths:
           $ref: "#/responses/status_404"
         501:
           $ref: "#/responses/status_501"
-  /Managers/{identifier}/SerialInterfaces/{index}:
-    x-swagger-router-controller: unimplemented
+  /Managers/RackHD/SerialInterfaces:
+    x-swagger-router-controller: managers
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve information about the ethernet interfaces
+      operationId: listManagerSerialInterfaces
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/EthernetInterfaceCollection.EthernetInterfaceCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /Managers/RackHD/SerialInterfaces/{index}:
+    x-swagger-router-controller: managers
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve information about the serial interface
-      operationId: unimplemented
+      operationId: getManagerSerialInterface
       tags: [ "/redfish/v1" ]
       parameters:
-        - name: identifier
-          in: path
-          required: true
-          type: string
         - name: index
           in: path
           required: true
