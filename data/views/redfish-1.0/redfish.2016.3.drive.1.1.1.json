@@ -1,7 +1,7 @@
 {
-  "@odata.context": "<%= basepath %>/$metadata#Systems/Members/<%= identifier %>/Storage/Members/<%= index%>/Drives/$entity",
+  "@odata.context": "<%= basepath %>/$metadata#Drive.Drive",
   "@odata.id": "<%= url %>",
-  "@odata.type": "#Drive.1.1.1.Drive",
+  "@odata.type": "#Drive.v1_1_1.Drive",
   "Oem": {},
   "Id": "<%= driveIndex %>",
   "Description": "<%= drive.deviceDescription %>",

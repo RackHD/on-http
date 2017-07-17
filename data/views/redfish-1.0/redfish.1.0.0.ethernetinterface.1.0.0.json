@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#<%= baseprofile %>/Members/$entity"
+    "@odata.context" : "<%= basepath %>/$metadata#EthernetInterface.EthernetInterface"
     ,"@odata.id": "<%= url %>"
-    ,"@odata.type": "#EthernetInterface.1.2.0.EthernetInterface"
+    ,"@odata.type": "#EthernetInterface.v1_2_0.EthernetInterface"
     <% if (typeof autoneg !== 'undefined') { %>
         ,"AutoNeg": <%= autoneg %>
     <% } %>

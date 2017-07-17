@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Managers/Members/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#Manager.Manager",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#Manager.1.0.0.Manager",
+    "@odata.type": "#Manager.v1_0_0.Manager",
     "Oem": {},
     "Id": "<%= identifier %>",
     "Name": "Manager",

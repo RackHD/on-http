@@ -1,7 +1,7 @@
 {
-	"@odata.context" : "<%= basepath %>/$metadata#Chassis/Links/Members/<%= identifier %>/Power/Members/$entity",
+	"@odata.context" : "<%= basepath %>/$metadata#Power.Power",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#Power.1.0.0.Power",
+    "@odata.type": "#Power.v1_0_0.Power",
     "Oem": {},
     "Id": "<%= identifier %>",
     "Description": "",

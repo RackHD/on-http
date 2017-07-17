@@ -1,5 +1,5 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#SessionService/Sessions/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#SessionCollection.SessionCollection",
     "@odata.id": "<%= url %>",
     "@odata.type": "#SessionCollection.SessionCollection",
     "Oem": {},

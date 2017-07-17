@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/LogServices/Members/<%=type%>/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#LogEntry.LogEntry",
     "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/LogServices/<%=type%>/Entries/<%= entry.logId %>",
-    "@odata.type": "#LogEntry.1.0.0.LogEntry",
+    "@odata.type": "#LogEntry.v1_0_0.LogEntry",
     "Oem": {},
     "Id": "<%= entry.logId %>",
     "Name": "name",

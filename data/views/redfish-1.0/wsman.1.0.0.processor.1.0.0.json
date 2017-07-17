@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/Processors/Members/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#Processor.Processor",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#Processor.1.0.0.Processor",
+    "@odata.type": "#Processor.v1_0_0.Processor",
     "Oem" : {},
     "Id": "<%=socketId%>",
     "Name": "",

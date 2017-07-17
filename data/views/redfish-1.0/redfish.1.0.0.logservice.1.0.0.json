@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/LogServices/Members/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#LogService.LogService",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#LogService.1.0.0.LogService",
+    "@odata.type": "#LogService.v1_0_0.LogService",
     "Oem" : {},
     "Id": "<%=type%>",
     "Description": "<%=description%>",

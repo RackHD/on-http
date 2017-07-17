@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#AccountService/Accounts/Members/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#ManagerAccount.ManagerAccount",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#ManagerAccount.1.0.0.ManagerAccount",
+    "@odata.type": "#ManagerAccount.v1_0_0.ManagerAccount",
     "Oem": {},
     "Id": "<%= user.id %>",
     "Description": "User Account",

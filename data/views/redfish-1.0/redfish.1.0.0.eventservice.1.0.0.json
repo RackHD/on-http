@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata/EventService",
+    "@odata.context" : "<%= basepath %>/$metadata#EventService.EventService",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#EventService.1.0.0.EventService",
+    "@odata.type": "#EventService.v1_0_0.EventService",
     "Id": "EventService",
     "Name": "Event Service",
     "Status": {},

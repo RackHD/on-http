@@ -1,5 +1,5 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems",
+    "@odata.context" : "<%= basepath %>/$metadata#SoftwareInventory.SoftwareInventory",
     "@odata.id": "<%= url %>",
     "@odata.type": "#SoftwareInventory.SoftwareInventory",
     "Oem" : {},

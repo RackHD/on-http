@@ -1,5 +1,5 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#EventService/Members/Events/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#EventDestinationCollection.EventDestinationCollection",
     "@odata.id": "<%= url %>",
     "@odata.type": "#EventDestinationCollection.EventDestinationCollection",
     "Name": "Event Subscription Collection",

@@ -1,7 +1,7 @@
 {
-  "@odata.context": "<%= basepath %>/$metadata#Systems/Members/<%= identifier %>/Storage/Members/<%= index%>/Volumes/$entity",
+  "@odata.context": "<%= basepath %>/$metadata#Volume.Volume",
   "@odata.id": "<%= url %>",
-  "@odata.type": "#Volume.1.0.2.Volume",
+  "@odata.type": "#Volume.v1_0_2.Volume",
   "Oem": {},
   "Id": "<%= volumeIndex %>",
   "Description": "<%= volume.DeviceDescription %>",

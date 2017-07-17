@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#TaskService/Tasks/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#TaskCollection.TaskCollection",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#TasksCollection.TaskCollection",
+    "@odata.type": "#TaskCollection.TaskCollection",
     "Oem" : {},
     "Name": "Task Collection",
     "Members@odata.count": <%= graphs.length %>,
