@@ -1088,7 +1088,7 @@ describe('Redfish Systems Root', function () {
             .expect(404);
     });
 
-    it('should return a valid sel log service entry', function() {
+    it('should return a valid sel log service entry with Created keyword', function() {
         wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
             node: node, isDell: false, isRedfishCapable: false
         });
@@ -1114,10 +1114,45 @@ describe('Redfish Systems Root', function () {
                                     '/LogServices/sel/Entries/abcd')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function() {
+            .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
+                expect(res.body.Created).to.exist;
+            });
+    });
+
+    it('should return a valid sel log service entry without Created keyword',function() {
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: false, isRedfishCapable: false
+        });
+
+        waterline.nodes.find.resolves([node]);
+        waterline.workitems.findPollers.resolves([{
+            config: { command: 'sel' }
+        }]);
+
+        taskProtocol.requestPollerCache.resolves([{
+            sel: [{
+                logId: 'abcd',
+                value: 'Assert',
+                sensorType: 'Temperature',
+                event: 'Thermal Event',
+                sensorNumber: '#0x01',
+                date: '',
+                time: ''
+            }]
+        }]);
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                    '/LogServices/sel/Entries/abcd')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+                expect(res.body.Created).to.not.exist;
             });
     });
 
