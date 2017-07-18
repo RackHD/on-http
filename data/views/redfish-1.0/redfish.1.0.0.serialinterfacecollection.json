@@ -1,0 +1,15 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#<%= baseprofile %>/Links/Members/<%= identifier %>/SerialInterfaceCollection/$entity",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#SerialInterfaceCollection.SerialInterfaceCollection",
+    "Name": "<%= name %>",
+    "Members@odata.count": <%= interface.length %>,
+    "Members": [
+        <% interface.forEach(function(n, i, arr) { %>
+            {
+                "@odata.id": "<%= url %>/<%= n['External Reference Designator']%>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}
