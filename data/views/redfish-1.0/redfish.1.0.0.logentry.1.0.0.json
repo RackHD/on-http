@@ -6,7 +6,9 @@
     "Id": "<%= entry.logId %>",
     "Name": "name",
     "EntryType": "<%= type %>",
+    <% if (entry.timestamp !== "") { %>
     "Created": "<%= entry.timestamp %>",
+    <% } %>
     "OemRecordFormat": "",
     "EntryCode": "<%= entry.value %>",
     "SensorType": "<%= entry.sensorType %>",
