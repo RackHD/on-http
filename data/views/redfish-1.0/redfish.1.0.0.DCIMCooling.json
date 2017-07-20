@@ -1,0 +1,42 @@
+{
+    "@odata.context" : "/redfish/v1/$metadata#DCIMCooling.DCIMCooling",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#DCIMCooling.v1_0_0.DCIMCooling",
+    "Chiller" : {
+        "@odata.id": "/redfish/v1/DCIMCooling/default/Chiller"
+    },
+    "CRAC" : {
+        "@odata.id": "/redfish/v1/DCIMCooling/default/CRAC"
+    },
+    "CRAH" : {
+        "@odata.id": "/redfish/v1/DCIMCooling/default/CRAH"
+    },
+    "CoolingTower" : {
+        "@odata.id": "/redfish/v1/DCIMCooling/default/CoolingTower"
+    },
+    "AirHandlingUnit" : {
+        "@odata.id": "/redfish/v1/DCIMCooling/default/AirHandlingUnit"
+    },
+    "DCIMCoolingType": "Domain",
+    "Id": "default",
+    "Links": {
+        "Chassis": [
+            {}
+        ],
+        "ManagedBy": [
+            {
+                "@odata.id": "/redfish/v1/Managers/BMC"
+            }
+        ],
+        "RelatedSystems": [
+            {}
+        ]
+    },
+    "Name": "DCIMCooling Default Domain",
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    }
+
+}
+

@@ -328,7 +328,6 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-
   /Systems/{identifier}/Bios.ChangePassword:
     x-swagger-router-controller: systems
     post:
@@ -2612,8 +2611,6 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-
-
   /$metadata:
     x-swagger-router-controller: metadata
     get:
@@ -2627,6 +2624,206 @@ paths:
         201:
           description: Success
           $ref: "#/responses/status_201"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMCooling:
+    x-swagger-router-controller: dcimcooling-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMCooling components
+      description: >
+        Defines a collection of DCIMCooling components managed by the service
+      operationId: listDCIMCooling
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMCooling/default:
+    x-swagger-router-controller: dcimcooling-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMCooling components
+      description: >
+        Defines a collection of DCIMCooling components managed by the service
+      operationId: listDCIMCoolingDefault
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMCooling/default/Chiller:
+    x-swagger-router-controller: dcimcooling-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMCooling components
+      description: >
+        Defines a collection of DCIMCooling components managed by the service
+      operationId: listDCIMCoolingDefaultChiller
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMCooling/default/CRAC:
+    x-swagger-router-controller: dcimcooling-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMCooling components
+      description: >
+        Defines a collection of DCIMCooling components managed by the service
+      operationId: listDCIMCoolingDefaultCRAC
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMCooling/default/CRAH:
+    x-swagger-router-controller: dcimcooling-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMCooling components
+      description: >
+        Defines a collection of DCIMCooling components managed by the service
+      operationId: listDCIMCoolingDefaultCRAH
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMCooling/default/CoolingTower:
+    x-swagger-router-controller: dcimcooling-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMCooling components
+      description: >
+        Defines a collection of DCIMCooling components managed by the service
+      operationId: listDCIMCoolingDefaultCoolingTower
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMCooling/default/AirHandlingUnit:
+    x-swagger-router-controller: dcimcooling-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMCooling components
+      description: >
+        Defines a collection of DCIMCooling components managed by the service
+      operationId: listDCIMCoolingDefaultAirHandlingUnit
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /odata:
+    x-swagger-router-controller: odata
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: The OData Service Document serves as a top-level entry point for generic OData clients
+      operationId: getOdata
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Odata.1.0.1_System'
         400:
           $ref: "#/responses/status_400"
         401:
@@ -6312,7 +6509,6 @@ definitions:
     required:
     - Links
     type: object
-
   Session.1.0.0_Session:
     description: This is the base type for resources and referenceable members.
     properties:
@@ -7523,6 +7719,44 @@ definitions:
     type: object
     required:
     - SecureBootEnable
+  DCIMCoolingCollection_DCIMCoolingCollection:
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Description:
+        description: Provides a description of this resource and is used for commonality  in
+          the schema definitions.
+        readOnly: true
+        type: string
+      Members:
+        description: Contains the members of this collection.
+        items:
+          $ref: '#/definitions/odata.4.0.0_idRef'
+        readOnly: true
+        type: array
+      Members@odata.count:
+        readOnly: true
+        type: number
+      Members@odata.navigationLink:
+        $ref: '#/definitions/odata.4.0.0_idRef'
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+    type: object
   Odata.1.0.1_System:
     properties:
       '@odata.context':
