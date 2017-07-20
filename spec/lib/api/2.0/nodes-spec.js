@@ -81,7 +81,7 @@ describe('2.0 Http.Api.Nodes', function () {
     var obm =[{
         config: {},
         id: "574dcd5794ab6e2506fd107a",
-        node: "1234abcd1234abcd1234abcd",
+        nodeId: "1234abcd1234abcd1234abcd",
         service: "noop-obm-service"
     }];
 
@@ -92,7 +92,7 @@ describe('2.0 Http.Api.Nodes', function () {
             password: 'fake-password'
         },
         id: "11111111111111111111111111",
-        node: "12341234abcd123412341234",
+        nodeId: "12341234abcd123412341234",
         service: "ssh-ibm-service"
     }];
 
