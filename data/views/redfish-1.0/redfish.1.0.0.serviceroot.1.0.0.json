@@ -20,6 +20,9 @@
     "Chassis": {
         "@odata.id": "<%=basepath%>/Chassis"
     },
+    "NetworkDevices": {
+        "@odata.id": "<%=basepath%>/NetworkDevices"
+    },
     "Managers": {
         "@odata.id": "<%=basepath%>/Managers"
     },

@@ -2554,6 +2554,66 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /NetworkDevices:
+    x-swagger-router-controller: networks
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of network devices
+      description: retrieve list of network devices
+      operationId: listNetworks
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/NetworkDeviceCollection_NetworkDeviceCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /NetworkDevices/{identifier}:
+    x-swagger-router-controller: networks
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve information for a specific network device
+      description: >
+        defines a network device and its respective properties.
+      operationId: getNetwork
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          description: node identifier
+          x-param-handler: sku
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/ComputerSystem.1.0.0_ComputerSystem"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+
   /$metadata:
     x-swagger-router-controller: metadata
     get:
@@ -3331,6 +3391,44 @@ definitions:
         type: string
     type: object
   ComputerSystemCollection_ComputerSystemCollection:
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Description:
+        description: Provides a description of this resource and is used for commonality  in
+          the schema definitions.
+        readOnly: true
+        type: string
+      Members:
+        description: Contains the members of this collection.
+        items:
+          $ref: '#/definitions/odata.4.0.0_idRef'
+        readOnly: true
+        type: array
+      Members@odata.count:
+        readOnly: true
+        type: number
+      Members@odata.navigationLink:
+        $ref: '#/definitions/odata.4.0.0_idRef'
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+    type: object
+  NetworkDeviceCollection_NetworkDeviceCollection:
     properties:
       '@odata.context':
         format: uri
