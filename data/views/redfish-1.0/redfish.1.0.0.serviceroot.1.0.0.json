@@ -23,6 +23,9 @@
     "NetworkDevices": {
         "@odata.id": "<%=basepath%>/NetworkDevices"
     },
+    "DCIMCooling": {
+        "@odata.id": "<%=basepath%>/DCIMCooling"
+    },
     "DCIMPower": {
         "@odata.id": "<%=basepath%>/DCIMPower"
     },
