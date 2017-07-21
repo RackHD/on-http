@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems/<%= identifier %>/Bios/Settings",
+    "@odata.context" : "<%= basepath %>/$metadata#Bios.Bios",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#Bios.1.0.0.Bios",
+    "@odata.type": "#Bios.v1_0_0.Bios",
     "AttributeRegistry": "",
     "Attributes": {
         <% bios.attributes.forEach(function(item, i, arr) { %>

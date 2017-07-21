@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems/Members/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#ComputerSystemC.ComputerSystem",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#ComputerSystem.1.0.0.ComputerSystem",
+    "@odata.type": "#ComputerSystem.v1_0_0.ComputerSystem",
     "Oem" : {},
     "Id": "<%= identifier %>",
     "Description": "",

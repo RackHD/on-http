@@ -1,5 +1,5 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems",
+    "@odata.context" : "<%= basepath %>/$metadata#ChassisCollection.ChassisCollection",
     "@odata.id": "<%= url %>",
     "@odata.type": "#ChassisCollection.ChassisCollection",
     "Oem" : {},

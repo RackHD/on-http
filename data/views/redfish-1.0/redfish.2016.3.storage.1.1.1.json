@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/Storage/Members/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#Storage.Storage",
     "@odata.id" : "<%= url %>",
-    "@odata.type" : "#Storage.1.1.1.Storage",
+    "@odata.type" : "#Storage.v1_1_1.Storage",
     "Id" : "<%= index %>",
     "Description" : "",
     "Name" : "",

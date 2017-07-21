@@ -1,7 +1,7 @@
 {
-  "@odata.context" : "<%= basepath %>/$metadata/Schemas/Members/$entity",
+  "@odata.context" : "<%= basepath %>/$metadata#JsonSchemaFile.JsonSchemaFile",
   "@odata.id": "<%= url %>",
-  "@odata.type": "#JsonSchemaFile.1.0.0.JsonSchemaFile",
+  "@odata.type": "#JsonSchemaFile.v1_0_0.JsonSchemaFile",
   "Name": "",
   "Description": "Schema Definition File for <%= identifier  %>",
   "Id": "<%= identifier  %>",

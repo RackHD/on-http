@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#ServiceRoot",
+    "@odata.context" : "<%= basepath %>/$metadata#ServiceRoot.ServiceRoot",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#ServiceRoot.1.0.0.ServiceRoot",
+    "@odata.type": "#ServiceRoot.v1_0_0.ServiceRoot",
     "Oem" : {},
     "Id": "<%= identifier %>",
     "Description": "",

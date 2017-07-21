@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata/TaskService",
+    "@odata.context" : "<%= basepath %>/$metadata#TaskService.TaskService",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#TaskService.1.0.0.TaskService",
+    "@odata.type": "#TaskService.v1_0_0.TaskService",
     "Oem" : {
         "RackHD" : {
             "SystemTaskCollection": {

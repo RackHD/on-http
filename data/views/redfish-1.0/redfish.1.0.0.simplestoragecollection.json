@@ -1,5 +1,5 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/SimpleStorage/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#SimpleStorageCollection.SimpleStorageCollection",
     "@odata.id": "<%= url %>",
     "@odata.type": "#SimpleStorageCollection.SimpleStorageCollection",
     "Oem" : {},

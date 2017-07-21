@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/Processors/#entity",
+    "@odata.context" : "<%= basepath %>/$metadata#ProcessorCollection.ProcessorCollection",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#Procssors.1.0.0.ProcessorsCollection",
+    "@odata.type": "#ProcessorCollection.v1_0_0.ProcessorCollection",
     "Oem" : {},
     "Name": "Processors Collection",
     "Members@odata.count": <%= dmi.data['Processor Information'].length %>,

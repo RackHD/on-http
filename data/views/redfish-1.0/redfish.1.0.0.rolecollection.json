@@ -1,5 +1,5 @@
 {
-  "@odata.context" : "<%= basepath %>/$metadata#Roles",
+  "@odata.context" : "<%= basepath %>/$metadata#RoleCollection.RoleCollection",
   "@odata.type": "#RoleCollection.RoleCollection",
   "Oem": {},
   "Members@odata.navigationLink": {

@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/SimpleStorage/Members/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#SimpleStorage.SimpleStorage",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#SimpleStorage.1.0.0.SimpleStorage",
+    "@odata.type": "#SimpleStorage.v1_0_0.SimpleStorage",
     "Oem" : {},
     "Name": "Simple Storage Controller",
     "Id": "<%= index %>",

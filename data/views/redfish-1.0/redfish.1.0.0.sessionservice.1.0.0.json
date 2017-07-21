@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#SessionService",
+    "@odata.context" : "<%= basepath %>/$metadata#SessionService.SessionService",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#SessionService.1.0.0.SessionService",
+    "@odata.type": "#SessionService.v1_0_0.SessionService",
     "Oem": {},
     "Id": "SessionService",
     "Description": "Session Service",

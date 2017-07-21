@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Registries/Members/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#MessageRegistryFile.MessageRegistryFile",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#MessageRegistryFile.1.0.0.MessageRegistryFile",
+    "@odata.type": "#MessageRegistryFile.v1_0_0.MessageRegistryFile",
     "Oem": {},
     "Id": "<%= identifier %>",
     "Description": "",
