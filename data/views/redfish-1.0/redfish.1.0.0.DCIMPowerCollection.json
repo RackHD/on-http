@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "/redfish/v1/$metadata#PowerCollection",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#PowerCollection.PowerCollection",
+    "Oem" : {},
+    "Name": "DCIMPower Collection",
+    "Members@odata.count": <%= nodes.length %>,
+    "Members": [
+        <% nodes.forEach(function(node, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/DCIMPower/default-<%=node.identifiers[0]%>-<%= node.id %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}

@@ -1,0 +1,11 @@
+{
+    "@odata.context" : "/redfish/v1/$metadata#DCIMPower.DCIMPower",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#<%= componentName %>Collection.<%= componentName %>Collection",
+    "Oem" : {},
+    "Name": "<%= componentName %> Collection",
+    "Members@odata.count": "<%= componentName %>",
+    "Members": {
+        "@odata.id": "<%= basepath %>/DCIMPower/default/<%= componentName %>/<%= componentId %>-<%= component %>-<%= nodeId %>"
+    }
+}
