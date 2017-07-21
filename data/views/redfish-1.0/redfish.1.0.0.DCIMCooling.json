@@ -2,9 +2,15 @@
     "@odata.context" : "/redfish/v1/$metadata#DCIMCooling.DCIMCooling",
     "@odata.id": "<%= url %>",
     "@odata.type": "#DCIMCooling.v1_0_0.DCIMCooling",
-    "Chiller" : {
-        "@odata.id": "/redfish/v1/DCIMCooling/default/Chiller"
-    },
+    "Chiller" : [
+        <% components.forEach(function(component, i, arr) { %>
+        {
+            <% console.log("Anitha, component.id is",component.id ) %>
+            "@odata.id": "/redfish/v1/DCIMCooling/default/<%= component.name %>"
+        }
+        <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ],
     "CRAC" : {
         "@odata.id": "/redfish/v1/DCIMCooling/default/CRAC"
     },

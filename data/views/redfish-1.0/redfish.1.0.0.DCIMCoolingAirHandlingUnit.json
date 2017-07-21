@@ -1,0 +1,31 @@
+{
+    "@odata.context" : "/redfish/v1/$metadata#DCIMCooling.DCIMCooling",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#DCIMCooling.v1_0_0.DCIMCooling",
+    "AirHandlingUnit" :
+     {
+            "@odata.id": "/redfish/v1/DCIMCooling/default/<%=component%>-<%= nodeId %>"
+     },
+    "DCIMCoolingType": "Domain",
+    "Id": "default",
+    "Links": {
+        "Chassis": [
+            {}
+        ],
+        "ManagedBy": [
+            {
+                "@odata.id": "/redfish/v1/Managers/BMC"
+            }
+        ],
+        "RelatedSystems": [
+            {}
+        ]
+    },
+    "Name": "DCIMCooling Default Domain",
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    }
+
+}
+
