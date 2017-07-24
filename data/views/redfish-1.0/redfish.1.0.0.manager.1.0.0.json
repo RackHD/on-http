@@ -39,6 +39,7 @@
     }
     <% if( typeof networkProtocol !== 'undefined') { %>
     , "NetworkProtocol" : {
+        "@odata.id": "<%= url %>",
         <% if (typeof networkProtocol.hostname !== 'undefined') { %>
         "HostName": "<%= networkProtocol.hostname %>",
         "FQDN": "<%= networkProtocol.fqdn %>",

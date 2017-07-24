@@ -9,7 +9,7 @@
         <% logEntries.forEach(function(entry, i, arr) { %>
             {
                 "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/LogServices/<%=type%>/Entries/<%= entry.logId %>",
-                "@odata.type": "#LogEntry.1.0.0.LogEntry",
+                "@odata.type": "#LogEntry.v1_0_0.LogEntry",
                 "Oem": {},
                 "Id": "<%= entry.logId %>",
                 "Name": "name",
@@ -23,10 +23,12 @@
                 "MessageId": "",
                 "MessageArgs": [],
                 "Links": {
-                    "Oem": {},
+                    <% if (entry.origin) { %>
                     "OriginOfCondition": {
-                        "@odata.id": "<%= entry.origin || 'null' %>"
-                    }
+                        "@odata.id": "<%= entry.origin %>"
+                    },
+                    <% } %>
+                    "Oem": {}
                 }
             }
             <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>

@@ -10,7 +10,9 @@
     "UUID": "<%=uuid%>",
     "Links": {
         "Oem": {},
-        "Sessions": {}
+        "Sessions": {
+            "@odata.id": "/redfish/v1/SessionService/Sessions"
+        }
     },
     "Systems": {
         "@odata.id": "<%=basepath%>/Systems"
