@@ -22,7 +22,7 @@ describe('Redfish Managers', function () {
     }
 
     before('start HTTP server', function () {
-        this.timeout(5000);
+        this.timeout(10000);
         return helper.startServer([]).then(function () {
             view = helper.injector.get('Views');
             sinon.stub(view, "get", redirectGet);
@@ -69,11 +69,27 @@ describe('Redfish Managers', function () {
             id: '1234abcd1234abcd1234abcd',
             name: '1234abcd1234abcd1234abcd'
         }));
+
         waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd')
         .resolves(Promise.resolve({
             id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd'
+            name: '1234abcd1234abcd1234abcd',
+            identifiers: ['1234']
         }));
+
+        waterline.nodes.getNodeById.withArgs('DELLabcd1234abcd1234abcd')
+        .resolves(Promise.resolve({
+            id: 'DELLabcd1234abcd1234abcd',
+            name: 'DELLabcd1234abcd1234abcd',
+            identifiers: ['ABCDEFG']
+        }));
+
+        waterline.nodes.needByIdentifier.withArgs('DELLabcd1234abcd1234abcd')
+        .resolves(Promise.resolve({
+            id: 'DELLabcd1234abcd1234abcd',
+            name: 'DELLabcd1234abcd1234abcd'
+        }));
+
         waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
         waterline.nodes.getNodeById.resolves([]);
         waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
@@ -105,6 +121,7 @@ describe('Redfish Managers', function () {
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
         type: 'compute',
+        identifiers: ['12345'],
         obms: [{
             id: "574dcd5794ab6e2506fd107a",
             node: "1234abcd1234abcd1234abcd",
@@ -123,6 +140,30 @@ describe('Redfish Managers', function () {
         ]
     };
 
+    var dellNode = {
+        id: 'DELLabcd1234abcd1234abcd',
+        name: 'dell node',
+        type: 'compute',
+        identifiers: ['ABCDEFG'],
+        obms: [{
+            id: "1234abcd1234abcd1234abcd",
+            node: "DELLabcd1234abcd1234abcd",
+            service: 'ipmi-obm-service',
+            config: {
+                host: '1.2.3.4',
+                user: 'myuser',
+                password: 'mypass'
+           }
+        }],
+        relations: [
+            {
+                relationType: 'enclosedBy',
+                targets: [ '4567efgh4567efgh4567efgh' ]
+            }
+        ]
+    };
+
+
     var catalogData = {
         'IP Address Source' : 'DHCP Address',
         'IP Address' : '127.0.0.1',
@@ -134,6 +175,8 @@ describe('Redfish Managers', function () {
         'Manufacturer Name' : 'Unknown (0x1291)',
         'Product Name' : 'Unknown (0xF02)'
     };
+
+
     var dmiCatalogData = {
         source: 'dmi',
         data: {
@@ -194,6 +237,25 @@ describe('Redfish Managers', function () {
             });
     });
     
+    it('should return a valid idrac manager', function() {
+        waterline.nodes.needByIdentifier.withArgs('DELLabcd1234abcd1234abcd').resolves(dellNode);
+        waterline.nodes.getNodeById.withArgs('DELLabcd1234abcd1234abcd').resolves(dellNode);
+        waterline.nodes.find.resolves([dellNode]);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: 'DELLabcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: catalogData
+        }));
+        return helper.request().get('/redfish/v1/Managers/' + dellNode.id + '.0')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
     it('should 404 an invalid manager', function() {
         return helper.request().get('/redfish/v1/Managers/invalid')
             .expect('Content-Type', /^application\/json/)
