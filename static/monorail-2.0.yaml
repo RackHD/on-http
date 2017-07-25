@@ -1,6 +1,6 @@
 info:
   title: rackhd api 
-  version: "4.0.0"
+  version: "5.0.0"
 basePath: /api/2.0
 consumes:
 - application/json
@@ -211,9 +211,12 @@ definitions:
         type: object
       service:
         type: string
+      nodeId:
+        type: string
     required:
     - service
     - config
+    - nodeId
     type: object
   obm_led:
     properties:
