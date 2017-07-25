@@ -23,12 +23,10 @@
                 "MessageId": "",
                 "MessageArgs": [],
                 "Links": {
-                    <% if (entry.origin) { %>
+                    "Oem": {},
                     "OriginOfCondition": {
-                        "@odata.id": "<%= entry.origin %>"
-                    },
-                    <% } %>
-                    "Oem": {}
+                        "@odata.id": "<%= entry.origin || 'null' %>"
+                    }
                 }
             }
             <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
