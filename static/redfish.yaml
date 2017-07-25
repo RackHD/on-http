@@ -861,7 +861,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /Systems/{identifier}/LogServices/SEL:
+  /Systems/{identifier}/LogServices/sel:
     x-swagger-router-controller: systems
     get:
       x-privileges: [ 'Login' ]
@@ -895,7 +895,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /Systems/{identifier}/LogServices/SEL/Entries:
+  /Systems/{identifier}/LogServices/sel/Entries:
     x-swagger-router-controller: systems
     get:
       x-privileges: [ 'Login' ]
@@ -928,7 +928,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /Systems/{identifier}/LogServices/SEL/Entries/{entryId}:
+  /Systems/{identifier}/LogServices/sel/Entries/{entryId}:
     x-swagger-router-controller: systems
     get:
       x-privileges: [ 'Login' ]
