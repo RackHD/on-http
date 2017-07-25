@@ -1507,5 +1507,66 @@ describe('Redfish Systems Root', function () {
             .expect(501);
     });
 
+    it('should return a valid  storage list', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: smartCatalog
+        }));
+
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: catalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Storage')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid simple storage', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Storage')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return a valid simple storage device', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart')
+            .resolves(Promise.resolve({
+                node: '1234abcd1234abcd1234abcd',
+                source: 'dummysource',
+                data: smartCatalog
+            }));
+
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: catalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                '/Storage/0000_00_01_1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid simple storage device', function() {
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+                '/Storage/bad')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
 });
 
