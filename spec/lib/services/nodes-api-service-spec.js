@@ -687,21 +687,12 @@ describe("Http.Services.Api.Nodes", function () {
             addListItemsIfNotExistByIdentifier.withArgs(rackNode.id, targetsToBeAadded)
             .resolves(rackNodeAfter2);
 
-            return Promise.all([
-                nodeApiService.addRelation(rackNode, 'contains', [computeNode, computeNode2])
-                .then(function(modifiedNode){
-                    expect(modifiedNode.relations).to.deep.equal(
-                        [{relationType: 'contains', targets: [computeNode.id, computeNode2.id]}]
-                    );
-                }),
-                nodeApiService.addRelation(
-                    rackNode, 'contains', [computeNode.id, computeNode2.id]
-                ).then(function(modifiedNode){
-                    expect(modifiedNode.relations).to.deep.equal(
-                        [{relationType: 'contains', targets: [computeNode.id, computeNode2.id]}]
-                    );
-                })
-            ]);
+            return nodeApiService.addRelation(rackNode, 'contains', [computeNode.id, computeNode2.id])
+            .then(function(modifiedNode){
+                expect(modifiedNode.relations).to.deep.equal(
+                    [{relationType: 'contains', targets: [computeNode.id, computeNode2.id]}]
+                );
+            });
         });
 
         it('shoud return node if node already has relations obj', function(){
