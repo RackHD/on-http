@@ -1,9 +1,9 @@
 {
     "@odata.context" : "<%= basepath %>/$metadata#ProcessorCollection.ProcessorCollection",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#ProcessorCollection.v1_0_0.ProcessorCollection",
+    "@odata.type": "#ProcessorCollection.ProcessorCollection",
     "Oem" : {},
-    "Name": "Processors Collection",
+    "Name": "Processor Collection",
     "Members@odata.count": <%= dmi.data['Processor Information'].length %>,
     "Members": [
         <% dmi.data['Processor Information'].forEach(function(chassis, i, arr) { %>

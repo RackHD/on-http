@@ -12,6 +12,8 @@
 		<% tempList.forEach(function(sdr, i, arr) { %>
 			{
 				"Oem": {},
+                                "@odata.id": "<%= url %>",
+                                "MemberId": "<%= sdr['sensorId'].replace(/ /g, '_') %>",
 				"Name": "<%= sdr['sensorId'] %>",
 				"ReadingCelsius": <%= _.isNaN(parseFloat(sdr['sensorReading'])) ? 'null' : parseFloat(sdr['sensorReading']) %>,
 				"UpperThresholdNonCritical": <%= _.isNaN(parseFloat(sdr['upperNonCritical'])) ? 'null' : parseFloat(sdr['upperNonCritical']) %>,
@@ -29,6 +31,8 @@
 		<% fanList.forEach(function(sdr, i, arr) { %>
 			{
 				"Oem": {},
+                                "@odata.id": "<%= url %>",
+                                "MemberId": "<%= sdr['sensorId'].replace(/ /g, '_') %>",
 				"FanName": "<%= sdr['sensorId'] %>",
 				"Reading": <%= _.isNaN(parseFloat(sdr['sensorReading'])) ? 'null' : parseFloat(sdr['sensorReading']) %>,
 				"UpperThresholdNonCritical": <%= _.isNaN(parseFloat(sdr['upperNonCritical'])) ? 'null' : parseFloat(sdr['upperNonCritical']) %>,

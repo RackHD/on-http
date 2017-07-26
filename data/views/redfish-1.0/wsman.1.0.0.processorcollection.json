@@ -1,7 +1,7 @@
 {
     "@odata.context" : "<%= basepath %>/$metadata#ProcessorCollection.ProcessorCollection",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#ProcessorCollection.v1_0_0.ProcessorCollection",
+    "@odata.type": "#ProcessorCollection.ProcessorCollection",
     "Oem" : {},
     "Name": "Processors Collection",
     "Members@odata.count": <%= hardware.data.cpus.length %>,

@@ -23,7 +23,6 @@
     "Power": {
         "@odata.id": "<%= basepath %>/Chassis/<%= identifier %>/Power"
     },
-    "LogServices": {},
     "IndicatorLED": "<%= chassisData.uid %>",
     "Links": {
         "Oem": {},
