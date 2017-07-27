@@ -805,6 +805,21 @@ describe('Redfish Systems Root', function () {
             .expect(404);
     });
 
+    it('should 200 a Dell identifier for ethernet query', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'nics',
+            data: dellCatalogData.nics
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
 
     it('should 200 a non-Dell identifier for ethernet query', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
