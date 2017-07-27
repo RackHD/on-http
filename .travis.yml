@@ -14,6 +14,7 @@ addons:
       - dh-make
       - devscripts
       - debhelper
+      - fakeroot
       - git
       - default-jdk
       - maven
