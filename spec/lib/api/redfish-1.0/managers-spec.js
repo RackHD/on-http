@@ -256,6 +256,22 @@ describe('Redfish Managers', function () {
             });
     });
 
+    it('should return a valid idrac manager', function() {
+        waterline.nodes.needByIdentifier.withArgs('DELLabcd1234abcd1234abcd').resolves(dellNode);
+        waterline.nodes.getNodeById.withArgs('DELLabcd1234abcd1234abcd').resolves(dellNode);
+        waterline.nodes.find.resolves([dellNode]);
+
+        return helper.request().get('/redfish/v1/Managers/' + dellNode.id + '.0/NetworkProtocol')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+
     it('should 404 an invalid manager', function() {
         return helper.request().get('/redfish/v1/Managers/invalid')
             .expect('Content-Type', /^application\/json/)
@@ -281,6 +297,20 @@ describe('Redfish Managers', function () {
             });
     });
     
+    it('should return a valid manager network protocol', function() {
+        waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd').resolves(node);
+        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(node);
+
+        return helper.request().get('/redfish/v1/Managers/' + node.id + '.0/NetworkProtocol')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
     it('should 404 an invalid manager ethernet interface collection', function() {
         return helper.request().get('/redfish/v1/Managers/invalid.0/EthernetInterfaces')
             .expect('Content-Type', /^application\/json/)
@@ -339,6 +369,17 @@ describe('Redfish Managers', function () {
 
     it('should return the RackHD manager ethernet interface collection', function() {
         return helper.request().get('/redfish/v1/Managers/RackHD/EthernetInterfaces')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should return the RackHD manager network protocol', function() {
+        return helper.request().get('/redfish/v1/Managers/RackHD/NetworkProtocol')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {

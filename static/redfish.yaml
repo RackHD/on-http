@@ -1281,6 +1281,36 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /Managers/{identifier}/NetworkProtocol:
+    x-swagger-router-controller: managers
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve information about the manager network protocol
+      operationId: listManagerNetworkProtocol
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/ManagerNetworkProtocol.1.0.0_ManagerNetworkProtocol"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /Systems/{identifier}/SecureBoot:
     x-swagger-router-controller: systems
     get:
