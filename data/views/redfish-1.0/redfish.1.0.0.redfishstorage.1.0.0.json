@@ -1,0 +1,31 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Storage.Storage",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Storage.v1_0_0.Storage",
+    "Oem" : {},
+    "Name": "Local Storage Controller",
+    "Id": "<%= index %>",
+    "Description": "Integrated RAID Controller %>",
+    "Links" : { },
+    "Status": {},
+    "StorageControllers@odata.count" : <%= controllers.length %>,
+    "StorageControllers" :[
+        <% controllers.forEach(function(device, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Storage/<%= index %>#/StorageController/<%= i %>",
+                "Status": {}
+            }
+        <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ],
+    "Drives@odata.count" : <%= devices.length %>,
+    "Drives" : [
+        <% devices.forEach(function(device, i, arr) { %>
+            {
+                "@odata.id" : "<%= url %>/Drives/<%= device["Name"].replace(/ /g,"") %>"
+            }
+        <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+
+}
