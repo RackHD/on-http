@@ -799,11 +799,19 @@ describe('Redfish Systems Root', function () {
             .expect(400);
     });
 
+    /*
+        **** EthernetInterface - General
+    */
+
     it('should 404 an invalid identifier for ethernet query', function() {
-        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/EthernetInterfaces')
+        return helper.request().get('/redfish/v1/Systems/' + 'bad' + node.id + '/EthernetInterfaces')
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
+
+    /*
+        **** EthernetInterface - DELL
+    */
 
     it('should 200 a Dell identifier for ethernet query', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
@@ -816,56 +824,6 @@ describe('Redfish Systems Root', function () {
             .expect(200)
             .expect(function() {
                 expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
-            });
-    });
-
-    it('should 200 a non-Dell identifier for ethernet query', function() {
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
-            node: node.id,
-            source: 'ohai',
-            data: catalogData.ohai
-        }));
-        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
-            });
-    });
-
-
-    it('should return a valid ethernet index block for non-Dell catalog with valid index', function() {
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
-            node: node.id,
-            source: 'ohai',
-            data: catalogData.ohai
-        }));
-        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth0')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
-            });
-    });
-
-
-    it('should 404 a non-delll with valid index and invalid ethernet index', function() {
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
-            node: node.id,
-            source: 'ohai',
-            data: catalogData.ohai
-        }));
-        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'BADeth0')
-            .expect('Content-Type', /^application\/json/)
-            .expect(404)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.false;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
             });
@@ -886,6 +844,78 @@ describe('Redfish Systems Root', function () {
                 expect(redfish.render.called).to.be.true;
             });
     });
+
+    it('should 404 a DELL with valid index and invalid ethernet index', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'nics',
+            data: dellCatalogData.nics
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces/' + 'BAD' + 'NIC.Integrated.1-1-1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.false;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    /* 
+        **** EthernetInterface - Non-DELL
+    */
+
+    it('should 200 a non-Dell identifier for ethernet query', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
+            node: node.id,
+            source: 'ohai',
+            data: catalogData.ohai
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should return a valid ethernet index block for non-Dell catalog with valid index', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
+            node: node.id,
+            source: 'ohai',
+            data: catalogData.ohai
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth0')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 a non-DELL with valid index and invalid ethernet index', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
+            node: node.id,
+            source: 'ohai',
+            data: catalogData.ohai
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'BADi' + 'eth0')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.false;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    /* 
+        **** Processors
+    */
 
     it('should return a valid processor list', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
