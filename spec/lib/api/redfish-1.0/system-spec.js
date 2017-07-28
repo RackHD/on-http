@@ -271,6 +271,9 @@ describe('Redfish Systems Root', function () {
                 vendor_id: 'test'
             }
         },
+        Redfish: [
+
+        ],
         kernel: {
             machine: 'x86_64'
         },
@@ -483,6 +486,109 @@ describe('Redfish Systems Root', function () {
             }
           ]
     };
+
+    var redfishCatalog = {
+        Redfish: {
+            "@odata_context": "/redfish/v1/$metadata#SimpleStorage.SimpleStorage",
+            "@odata_id": "/redfish/v1/Systems/System.Embedded.1/Storage/Controllers/AHCI.Embedded.1-1",
+            "@odata_type": "#SimpleStorage.v1_0_2.SimpleStorage",
+            "Description": "Simple Storage Controller",
+            "Devices": [
+                {
+                    "Manufacturer": "INTEL",
+                    "Model": "DSC2BX800G4R",
+                    "Name": "Solid State Disk 0:0",
+                    "Status": {
+                        "Health": null,
+                        "HealthRollUp": null,
+                        "State": "Enabled"
+                    }
+                },
+                {
+                    "Manufacturer": "INTEL",
+                    "Model": "DSC2BX800G4R",
+                    "Name": "Solid State Disk 1:1",
+                    "Status": {
+                        "Health": null,
+                        "HealthRollUp": null,
+                        "State": "Enabled"
+                    }
+                },
+                {
+                    "Manufacturer": "INTEL",
+                    "Model": "DSC2BX800G4R",
+                    "Name": "Solid State Disk 2:2",
+                    "Status": {
+                        "Health": null,
+                        "HealthRollUp": null,
+                        "State": "Enabled"
+                    }
+                }
+            ],
+            "Devices@odata_count": 3,
+            "Id": "AHCI.Embedded.1-1",
+            "Name": "C610/X99 series chipset sSATA Controller [AHCI mode]",
+            "Status": {
+                "Health": null,
+                "HealthRollUp": null,
+                "State": "Enabled"
+            },
+            "UEFIDevicePath": "PciRoot(0x0)/Pci(0x11,0x4)"
+        }
+    };
+    var redfishCatalogArray = [
+        {
+            data: {
+                "@odata_context": "/redfish/v1/$metadata#SimpleStorage.SimpleStorage",
+                "@odata_id": "/redfish/v1/Systems/System.Embedded.1/Storage/Controllers/AHCI.Embedded.1-1",
+                "@odata_type": "#SimpleStorage.v1_0_2.SimpleStorage",
+                "Description": "Simple Storage Controller",
+                "Devices": [
+                    {
+                        "Manufacturer": "INTEL",
+                        "Model": "DSC2BX800G4R",
+                        "Name": "Solid State Disk 0:0",
+                        "Status": {
+                            "Health": null,
+                            "HealthRollUp": null,
+                            "State": "Enabled"
+                        }
+                    },
+                    {
+                        "Manufacturer": "INTEL",
+                        "Model": "DSC2BX800G4R",
+                        "Name": "Solid State Disk 1:1",
+                        "Status": {
+                            "Health": null,
+                            "HealthRollUp": null,
+                            "State": "Enabled"
+                        }
+                    },
+                    {
+                        "Manufacturer": "INTEL",
+                        "Model": "DSC2BX800G4R",
+                        "Name": "Solid State Disk 2:2",
+                        "Status": {
+                            "Health": null,
+                            "HealthRollUp": null,
+                            "State": "Enabled"
+                        }
+                    }
+                ],
+                "Devices@odata_count": 3,
+                "Id": "AHCI.Embedded.1-1",
+                "Name": "C610/X99 series chipset sSATA Controller [AHCI mode]",
+                "Status": {
+                    "Health": null,
+                    "HealthRollUp": null,
+                    "State": "Enabled"
+                },
+                "UEFIDevicePath": "PciRoot(0x0)/Pci(0x11,0x4)"
+
+            }
+        }
+    ];
+
 
     var smartCatalog = [
         {
@@ -889,6 +995,7 @@ describe('Redfish Systems Root', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
+
 
     it('should return a valid simple storage list', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
@@ -1508,15 +1615,16 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid  storage list', function() {
+
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
-            source: 'dummysource',
+            source: 'dmi',
             data: smartCatalog
         }));
 
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
-            source: 'dummysource',
+            source: 'dmi',
             data: catalogData
         }));
 
@@ -1530,28 +1638,15 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    it('should 404 an invalid simple storage', function() {
-        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Storage')
-            .expect('Content-Type', /^application\/json/)
-            .expect(404);
-    });
-
-    it('should return a valid simple storage device', function() {
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart')
-            .resolves(Promise.resolve({
-                node: '1234abcd1234abcd1234abcd',
-                source: 'dummysource',
-                data: smartCatalog
-            }));
+    it('should return a valid  Redfish storage list', function() {
 
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
-            source: 'dummysource',
-            data: catalogData
+            source: 'Redfish',
+            data: redfishCatalog
         }));
 
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
-                '/Storage/0000_00_01_1')
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Storage')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -1561,12 +1656,60 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    it('should 404 an invalid simple storage device', function() {
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
-                '/Storage/bad')
+    it('should 404 an invalid storage', function() {
+        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Storage')
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
+
+    it('should return a valid storage device', function () {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart')
+            .resolves(Promise.resolve({
+                node: '1234abcd1234abcd1234abcd',
+                source: 'dmi',
+                data: smartCatalog
+            }));
+
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
+            source: 'dmi',
+            data: catalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+            '/Storage/0000_00_01_1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function () {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should return a valid Redfish storage device', function () {
+        waterline.catalogs.find.resolves(Promise.resolve(redfishCatalogArray));
+
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+            '/Storage/AHCI.Embedded.1-1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function () {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 an invalid  storage device', function () {
+        waterline.catalogs.find.resolves([]);
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+            '/Storage/bad')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
 
 });
 
