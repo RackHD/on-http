@@ -60,6 +60,9 @@
     "SimpleStorage": {
         "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/SimpleStorage"
     },
+    "Storage": {
+    "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/Storage"
+    },
     "LogServices": {
         "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/LogServices"
     },
