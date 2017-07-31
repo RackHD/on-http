@@ -1,0 +1,23 @@
+{
+    "@odata.id": "<%= url %>"
+    ,"@odata.context": "<%= basepath %>/$metadata#ManagerNetworkProtocol.ManagerNetworkProtocol"
+    ,"@odata.type": "#ManagerNetworkProtocol.v1_0_0.ManagerNetworkProtocol"
+    ,"Id": "ManagerNetworkProtocol"
+    ,"Name": "Manager Network Protocol"
+    ,"Description": "Manager Network Service"
+    ,"Oem": {}
+    <% if (typeof networkProtocol.hostname !== 'undefined') { %>
+    ,"HostName": "<%= networkProtocol.hostname %>"
+    <% } %>
+    <% if (typeof networkProtocol.fqdn !== 'undefined') { %>
+    ,"FQDN": "<%= networkProtocol.fqdn %>"
+    <% } %>
+    <% if (typeof networkProtocol.services !== 'undefined') { %>
+        <% networkProtocol.services.forEach(function(service, i, arr) { %>
+            ,"<%= service.name %>" : {
+                "ProtocolEnabled" : <%= service.enabled %>,
+                "Port": <%= service.port %>
+            }
+        <% }); %>
+    <% } %>
+}
