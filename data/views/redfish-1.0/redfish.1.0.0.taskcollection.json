@@ -8,31 +8,7 @@
     "Members": [
     <% graphs.forEach(function(graph, i, arr) { %>
         {
-            "@odata.type": "#Task.v1_0_0.Task",
-            "@odata.id": "<%= basepath %>/TaskService/Tasks/<%=graph.id%>",
-            "@odata.context": "<%= basepath %>/$metadata#TaskService/Tasks/$entity",
-            "Name": "<%= graph.name %>",
-            "TaskState": "<%= graph.state %>",
-            "Messages": [],
-            "TaskStatus": "<%= graph.status %>",
-            "StartTime": "<%= graph.startTime %>",
-            <% if(graph.endTime) { %>
-            "EndTime": "<%= graph.endTime %>",
-            <% } %>
-            "Id": "<%= graph.id %>",
-            "Oem" : {
-            <% if((graph.systemId) || (graph.node)) { %>
-                "RackHD": {
-                    <% if (graph.systemId) { %>
-                    "SystemId": "<%= graph.systemId %>"
-                    <% } %>
-                    <%= ((graph.systemId) && (graph.node)) ? ',' : '' %>
-                    <% if (graph.node) { %>
-                    "NodeId": "<%= graph.node %>"
-                    <% } %>
-                }
-                <% } %>
-            }
+            "@odata.id": "<%= basepath %>/TaskService/Tasks/<%=graph.id%>"
         }
         <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
     <% }); %>
