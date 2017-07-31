@@ -265,6 +265,44 @@ describe('Redfish Systems Root', function () {
                 version: 'test'
             }
         },
+        ohai: {
+            network: {
+                interfaces: {
+                    eth0: {
+                        addresses: {
+                            "2C:60:0C:6F:B4:AF": {
+                                family: "lladdr"
+                            }
+                        }
+                    },
+                    eth1: {
+                        addresses: {
+                            "172_31_128_19": {
+                                broadcast: "172.31.131.255",
+                                family: "inet",
+                                netmask: "255.255.252.0",
+                                scope: "Global"
+                            },
+                            "2C:60:0C:6F:B4:B0": {
+                                family: "lladdr"
+                            },
+                            "fe80::2e60:cff:fe6f:b4b0": {
+                                family: "inet6",
+                                scope: "Link"
+                            }
+                        },
+                        mtu: "1500",
+                        state: "up",
+                        type: "eth"
+                    },
+                    lo: {
+                        encapsulation: "Loopback",
+                        mtu: "65536",
+                        state: "down"
+                    }
+                }
+            }
+        },
         cpu: {
             real: "1",
             0: {
@@ -867,19 +905,21 @@ describe('Redfish Systems Root', function () {
             .expect(400);
     });
 
+    /*
+        **** EthernetInterface - General
+    */
+
     it('should 404 an invalid identifier for ethernet query', function() {
-        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/EthernetInterfaces')
+        return helper.request().get('/redfish/v1/Systems/' + 'bad' + node.id + '/EthernetInterfaces')
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
 
-    it('should 404 a non-Dell identifier for ethernet query', function() {
-        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces')
-            .expect('Content-Type', /^application\/json/)
-            .expect(404);
-    });
+    /*
+        **** EthernetInterface - DELL
+    */
 
-    it('should return a valid ethernet block for Dell-based catalog', function() {
+    it('should 200 a Dell identifier for ethernet query', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
             node: dellNode.id,
             source: 'nics',
@@ -892,33 +932,6 @@ describe('Redfish Systems Root', function () {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
-            });
-    });
-
-    it('should 404 an invalid identifier for ethernet index query with valid index', function() {
-        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/EthernetInterfaces/' + "NIC.Integrated.1-1-1")
-            .expect('Content-Type', /^application\/json/)
-            .expect(404)
-            .expect(function(res) {
-                expect(res.text).contains("Node not Found bad1234abcd1234abcd1234abcd");
-            });
-    });
-
-    it('should 404 a non-Dell identifier for ethernet index query with valid index', function() {
-        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + "NIC.Integrated.1-1-1")
-            .expect('Content-Type', /^application\/json/)
-            .expect(404)
-            .expect(function(res) {
-                expect(res.text).contains("No Ethernet found for node " + node.id);
-            });
-    });
-
-    it('should 404 a valid identifier for ethernet index query with invalid index', function() {
-        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces/' + "BADNIC.Integrated.1-1-1")
-            .expect('Content-Type', /^application\/json/)
-            .expect(404)
-            .expect(function(res) {
-                expect(res.text).contains("No Ethernet index found for node " + "BADNIC.Integrated.1-1-1");
             });
     });
 
@@ -937,6 +950,78 @@ describe('Redfish Systems Root', function () {
                 expect(redfish.render.called).to.be.true;
             });
     });
+
+    it('should 404 a DELL with valid index and invalid ethernet index', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'nics',
+            data: dellCatalogData.nics
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces/' + 'BAD' + 'NIC.Integrated.1-1-1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.false;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    /* 
+        **** EthernetInterface - Non-DELL
+    */
+
+    it('should 200 a non-Dell identifier for ethernet query', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
+            node: node.id,
+            source: 'ohai',
+            data: catalogData.ohai
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should return a valid ethernet index block for non-Dell catalog with valid index', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
+            node: node.id,
+            source: 'ohai',
+            data: catalogData.ohai
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth0')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should 404 a non-DELL with valid index and invalid ethernet index', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
+            node: node.id,
+            source: 'ohai',
+            data: catalogData.ohai
+        }));
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'BADi' + 'eth0')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.false;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    /* 
+        **** Processors
+    */
 
     it('should return a valid processor list', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
