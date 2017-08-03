@@ -74,7 +74,7 @@ describe("SKU Pack Service", function() {
         self.sandbox.reset();
     });
 
-    helper.after(function () {
+    after(function () {
         self.sandbox.restore();
     });
 

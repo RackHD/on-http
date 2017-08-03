@@ -10,48 +10,34 @@ describe('Redfish Metadata', function () {
     var accountService;
     var fromRoot = process.cwd();
 
-
-
     var userObj = {
         username: 'admin',
         password: 'admin123',
         role: 'Administrator'
     };
 
-    before('start HTTP server', function () {
-        var self = this;
-        this.timeout(5000);
-        this.sandbox = sinon.sandbox.create();
+    helper.httpServerBefore([], { authEnabled: true });
 
-        return helper.startServer([], { authEnabled: true })
-        .then(function() {
-            waterline = helper.injector.get('Services.Waterline');
-            Promise = helper.injector.get('Promise');
-            fs = Promise.promisifyAll( helper.injector.get('fs') );
-            accountService = helper.injector.get('Http.Services.Api.Account');
-            self.sandbox.stub(waterline.localusers, 'findOne');
-        })
-        .then(function() {
+    before(function () {
+        waterline = helper.injector.get('Services.Waterline');
+        Promise = helper.injector.get('Promise');
+        fs = Promise.promisifyAll( helper.injector.get('fs') );
+        accountService = helper.injector.get('Http.Services.Api.Account');
+    });
 
-            waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
-                username: userObj.username,
-                comparePassword: function(password) { return password === 'admin123'; },
-                role: userObj.role
-            });
-            return Promise.all([
-                accountService.aclMethod('addUserRoles', 'admin', 'Administrator')
-            ]);
+    beforeEach('set up mocks', function() {
+        this.sandbox.stub(waterline.localusers, 'findOne');
+        waterline.localusers.findOne.withArgs({username: 'admin'}).resolves({
+            username: userObj.username,
+            comparePassword: function(password) { return password === 'admin123'; },
+            role: userObj.role
         });
+        return Promise.all([
+            accountService.aclMethod('addUserRoles', 'admin', 'Administrator')
+        ]);
     });
 
-    afterEach('tear down mocks', function () {
-        this.sandbox.reset();
-    });
-
-    after('stop HTTP server', function () {
-        this.sandbox.restore();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     it('should return the correct metada', function () {
         return Promise.resolve()

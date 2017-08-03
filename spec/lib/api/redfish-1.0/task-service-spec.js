@@ -23,82 +23,42 @@ describe('Redfish TaskService', function () {
             });
     }
 
-    before('start HTTP server', function () {
-        this.timeout(5000);
-        return helper.startServer([]).then(function () {
-            Constants = helper.injector.get('Constants');
+    helper.httpServerBefore();
 
-            view = helper.injector.get('Views');
-            sinon.stub(view, "get", redirectGet);
+    before(function () {
+        Constants = helper.injector.get('Constants');
+        view = helper.injector.get('Views');
+        validator = helper.injector.get('Http.Api.Services.Schema');
+        redfish = helper.injector.get('Http.Api.Services.Redfish');
+        waterline = helper.injector.get('Services.Waterline');
 
-            validator = helper.injector.get('Http.Api.Services.Schema');
-            sinon.spy(validator, 'validate');
-            redfish = helper.injector.get('Http.Api.Services.Redfish');
-            sinon.spy(redfish, 'render');
+        Promise = helper.injector.get('Promise');
+        Errors = helper.injector.get('Errors');
 
-            waterline = helper.injector.get('Services.Waterline');
-            sinon.stub(waterline.graphobjects);
-            sinon.stub(waterline.nodes);
-
-            Promise = helper.injector.get('Promise');
-            Errors = helper.injector.get('Errors');
-
-            var nodeFs = helper.injector.get('fs');
-            fs = Promise.promisifyAll(nodeFs);
-        })
-        .then(function() {
-            graph = {
-                id: '566afe8a7e7b8f3751b951a5',
-                instanceId: '566afe8a7e7b8f3751b951a5',
-                _status: Constants.Task.States.Pending,
-                createdAt: '2016-01-21T17:51:23.395Z',
-                updatedAt: '2016-01-21T17:52:23.395Z',
-                name: 'isc-dhcp leases poller',
-                node: 'abcdefg'
-            };
-        });
+        var nodeFs = helper.injector.get('fs');
+        fs = Promise.promisifyAll(nodeFs);
+        tv4 = require('tv4');
+        graph = {
+            id: '566afe8a7e7b8f3751b951a5',
+            instanceId: '566afe8a7e7b8f3751b951a5',
+            _status: Constants.Task.States.Pending,
+            createdAt: '2016-01-21T17:51:23.395Z',
+            updatedAt: '2016-01-21T17:52:23.395Z',
+            name: 'isc-dhcp leases poller',
+            node: 'abcdefg'
+        };
     });
 
     beforeEach('set up mocks', function () {
-        tv4 = require('tv4');
-        sinon.spy(tv4, "validate");
-
-        validator.validate.reset();
-        redfish.render.reset();
-
-        function resetStubs(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (obj[method] && obj[method].reset) {
-                  obj[method].reset();
-                }
-            }).value();
-        }
-
-        resetStubs(waterline.graphobjects);
-        resetStubs(waterline.nodes);
+        this.sandbox.spy(tv4, "validate");
+        this.sandbox.stub(view, "get", redirectGet);
+        this.sandbox.spy(validator, 'validate');
+        this.sandbox.spy(redfish, 'render');
+        this.sandbox.stub(waterline.graphobjects);
+        this.sandbox.stub(waterline.nodes);
     });
 
-    afterEach('tear down mocks', function () {
-        tv4.validate.restore();
-    });
-
-    after('stop HTTP server', function () {
-        validator.validate.restore();
-        redfish.render.restore();
-        view.get.restore();
-
-        function restoreStubs(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (obj[method] && obj[method].restore) {
-                  obj[method].restore();
-                }
-            }).value();
-        }
-
-        restoreStubs(waterline.graphobjects);
-        restoreStubs(waterline.nodes);
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     it('should return a valid task service root', function () {
         waterline.graphobjects.find.resolves([graph]);

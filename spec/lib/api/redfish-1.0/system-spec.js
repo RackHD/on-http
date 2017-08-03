@@ -40,77 +40,43 @@ describe('Redfish Systems Root', function () {
             });
     }
 
-    before('start HTTP server', function () {
-        this.timeout(10000);
-        return helper.startServer([]).then(function () {
-            view = helper.injector.get('Views');
-            sinon.stub(view, "get", redirectGet);
+    helper.httpServerBefore();
 
-            redfish = helper.injector.get('Http.Api.Services.Redfish');
-            sinon.spy(redfish, 'render');
-            sinon.spy(redfish, 'validateSchema');
-
-            validator = helper.injector.get('Http.Api.Services.Schema');
-            sinon.spy(validator, 'validate');
-
-            waterline = helper.injector.get('Services.Waterline');
-            sinon.stub(waterline.nodes);
-            sinon.stub(waterline.catalogs);
-            sinon.stub(waterline.workitems);
-            sinon.stub(waterline.obms);
-
-            Promise = helper.injector.get('Promise');
-            Errors = helper.injector.get('Errors');
-
-            taskProtocol = helper.injector.get('Protocol.Task');
-            sinon.stub(taskProtocol);
-
-            nodeApi = helper.injector.get('Http.Services.Api.Nodes');
-            sinon.stub(nodeApi, "setNodeWorkflowById");
-            sinon.stub(nodeApi, "getAllNodes");
-
-            racadm = helper.injector.get('JobUtils.RacadmTool');
-            sinon.stub(racadm, "runCommand");
-
-            wsman = helper.injector.get('Http.Services.Wsman');
-            sinon.stub(wsman, "getLog");
-            sinon.stub(wsman, "isDellSystem");
-            configuration = helper.injector.get('Services.Configuration');
-
-            var nodeFs = helper.injector.get('fs');
-            fs = Promise.promisifyAll(nodeFs);
-
-            sinon.stub(mktemp, 'createFile');
-            sinon.stub(fs, 'writeFile');
-
-        });
-
+    before(function () {
+        view = helper.injector.get('Views');
+        redfish = helper.injector.get('Http.Api.Services.Redfish');
+        validator = helper.injector.get('Http.Api.Services.Schema');
+        waterline = helper.injector.get('Services.Waterline');
+        Promise = helper.injector.get('Promise');
+        Errors = helper.injector.get('Errors');
+        taskProtocol = helper.injector.get('Protocol.Task');
+        nodeApi = helper.injector.get('Http.Services.Api.Nodes');
+        racadm = helper.injector.get('JobUtils.RacadmTool');
+        wsman = helper.injector.get('Http.Services.Wsman');
+        configuration = helper.injector.get('Services.Configuration');
+        var nodeFs = helper.injector.get('fs');
+        fs = Promise.promisifyAll(nodeFs);
+        tv4 = require('tv4');
     });
 
     beforeEach('set up mocks', function () {
-        tv4 = require('tv4');
-        sinon.spy(tv4, "validate");
-
-        validator.validate.reset();
-        redfish.render.reset();
-        redfish.validateSchema.reset();
-        nodeApi.setNodeWorkflowById.reset();
-        racadm.runCommand.reset();
-
-        function resetStubs(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (obj[method] && obj[method].reset) {
-                  obj[method].reset();
-                }
-            }).value();
-        }
-
-        resetStubs(waterline.nodes);
-        resetStubs(waterline.catalogs);
-        resetStubs(waterline.workitems);
-        resetStubs(waterline.obms);
-        resetStubs(taskProtocol);
-        resetStubs(nodeApi);
+        this.sandbox.stub(view, "get", redirectGet);
+        this.sandbox.spy(redfish, 'render');
+        this.sandbox.spy(redfish, 'validateSchema');
+        this.sandbox.spy(validator, 'validate');
+        this.sandbox.stub(waterline.nodes);
+        this.sandbox.stub(waterline.catalogs);
+        this.sandbox.stub(waterline.workitems);
+        this.sandbox.stub(waterline.obms);
+        this.sandbox.stub(taskProtocol);
+        this.sandbox.stub(nodeApi, "setNodeWorkflowById");
+        this.sandbox.stub(nodeApi, "getAllNodes");
+        this.sandbox.stub(racadm, "runCommand");
+        this.sandbox.stub(wsman, "getLog");
+        this.sandbox.stub(wsman, "isDellSystem");
+        this.sandbox.spy(tv4, "validate");
+        this.sandbox.stub(mktemp, 'createFile');
+        this.sandbox.stub(fs, 'writeFile');
 
         waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd')
         .resolves(Promise.resolve({
@@ -140,6 +106,9 @@ describe('Redfish Systems Root', function () {
                 password: 'passw'
             }
         });
+        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
+            node: node, isDell: false, isRedfishCapable: false
+        });
         wsman.isDellSystem.rejects(new Errors.NotFoundError('Not Found'));
 
         waterline.nodes.getNodeById.withArgs('DELLabcd1234abcd1234abcd')
@@ -152,7 +121,7 @@ describe('Redfish Systems Root', function () {
         waterline.nodes.needByIdentifier.withArgs('DELLabcd1234abcd1234abcd')
         .resolves(Promise.resolve({
             id: 'DELLabcd1234abcd1234abcd',
-            name: 'DELLabcd1234abcd1234abcd' 
+            name: 'DELLabcd1234abcd1234abcd'
         }));
         mktemp.createFile.withArgs('/nfs/XXXXXX.xml')
         .resolves(Promise.resolve('/nfs/file.xml'));
@@ -160,31 +129,8 @@ describe('Redfish Systems Root', function () {
         .resolves(Promise.resolve(undefined));
     });
 
-    afterEach('tear down mocks', function () {
-        tv4.validate.restore();
-    });
+    helper.httpServerAfter();
 
-    after('stop HTTP server', function () {
-        validator.validate.restore();
-        redfish.render.restore();
-        redfish.validateSchema.restore();
-        view.get.restore();
-        nodeApi.setNodeWorkflowById.restore();
-
-        function restoreStubs(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (obj[method] && obj[method].restore) {
-                  obj[method].restore();
-                }
-            }).value();
-        }
-
-        restoreStubs(waterline.nodes);
-        restoreStubs(waterline.catalogs);
-        restoreStubs(waterline.workitems);
-        restoreStubs(taskProtocol);
-        return helper.stopServer();
-    });
    //OBM model's mock data
     var obm =[{
         id: "574dcd5794ab6e2506fd107a",
@@ -703,10 +649,6 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid system', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: false, isRedfishCapable: false
-        });
-
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
@@ -899,6 +841,11 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 400 an invalid password name for Bios.ChangePassword post', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'DeviceSummary').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'DeviceSummary',
+            data: dellCatalogData.DeviceSummary
+        }));
         return helper.request().post('/redfish/v1/Systems/' + dellNode.id + '/Bios.ChangePassword')
             .send({ PasswordName: "bogusname", OldPassword: "somepass", NewPassword: "newpass"})
             .expect('Content-Type', /^application\/json/)
@@ -1156,10 +1103,6 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid sel log service', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: false, isRedfishCapable: false
-        });
-
         waterline.workitems.findPollers.resolves([{
             config: { command: 'selInformation' }
         }]);
@@ -1349,10 +1292,6 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid sel log service entry despite no #', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: false, isRedfishCapable: false
-        });
-
         waterline.nodes.find.resolves([node]);
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
@@ -1400,9 +1339,21 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 404 an invalid sel log service entry', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: false, isRedfishCapable: false
-        });
+        waterline.workitems.findPollers.resolves([{
+            config: { command: 'sel' }
+        }]);
+
+        taskProtocol.requestPollerCache.resolves([{
+            sel: [{
+                logId: 'abcd',
+                value: 'Assert',
+                sensorType: 'Temperature',
+                event: 'Thermal Event',
+                sensorNumber: '1',
+                date: '01/01/1970',
+                time: '01:01:01'
+            }]
+        }]);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id +
                                     '/LogServices/sel/Entries/abcdefg')
@@ -1667,10 +1618,6 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 501 on lc service not supported', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: false, isRedfishCapable: false
-        });
-
         return helper.request().get('/redfish/v1/Systems/' + node.id +
                                     '/LogServices/lc')
             .expect('Content-Type', /^application\/json/)
@@ -1678,10 +1625,6 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 501 on lc entries not supported', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: false, isRedfishCapable: false
-        });
-
         return helper.request().get('/redfish/v1/Systems/' + node.id +
                                     '/LogServices/lc/Entries')
             .expect('Content-Type', /^application\/json/)
@@ -1689,10 +1632,6 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 501 on lc entry not supported', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: false, isRedfishCapable: false
-        });
-
         return helper.request().get('/redfish/v1/Systems/' + node.id +
                                     '/LogServices/lc/Entries/abcdefg')
             .expect('Content-Type', /^application\/json/)
@@ -1724,12 +1663,7 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid  Redfish storage list', function() {
-
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: '1234abcd1234abcd1234abcd',
-            source: 'Redfish',
-            data: redfishCatalog
-        }));
+        waterline.catalogs.find.resolves(Promise.resolve(redfishCatalogArray));
 
         return helper.request().get('/redfish/v1/Systems/' + node.id + '/Storage')
             .expect('Content-Type', /^application\/json/)

@@ -11,38 +11,23 @@ describe('Redfish Schemas', function () {
     var Promise;
     var fromRoot = process.cwd();
 
-    before('start HTTP server', function () {
-        this.timeout(5000);
-        return helper.startServer([]).then(function () {
-            redfish = helper.injector.get('Http.Api.Services.Redfish');
-            sinon.spy(redfish, 'render');
+    helper.httpServerBefore();
 
-            validator = helper.injector.get('Http.Api.Services.Schema');
-            Promise = helper.injector.get('Promise');
-            fs = Promise.promisifyAll( helper.injector.get('fs') );
-            sinon.spy(validator, 'validate');
-        });
+    before(function () {
+        redfish = helper.injector.get('Http.Api.Services.Redfish');
+        validator = helper.injector.get('Http.Api.Services.Schema');
+        Promise = helper.injector.get('Promise');
+        fs = Promise.promisifyAll( helper.injector.get('fs') );
+        tv4 = require('tv4');
     });
 
     beforeEach('set up mocks', function () {
-        tv4 = require('tv4');
-        sinon.spy(tv4, "validate");
-
-        validator.validate.reset();
-        redfish.render.reset();
-
+        this.sandbox.spy(tv4, "validate");
+        this.sandbox.spy(redfish, 'render');
+        this.sandbox.spy(validator, 'validate');
     });
 
-    afterEach('tear down mocks', function () {
-        tv4.validate.restore();
-    });
-
-    after('stop HTTP server', function () {
-        validator.validate.restore();
-        redfish.render.restore();
-        
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     it('should return valid schemas', function () {
 

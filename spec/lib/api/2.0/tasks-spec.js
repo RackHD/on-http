@@ -7,68 +7,45 @@ describe('Http.Api.Tasks', function () {
     var taskProtocol;
     var tasksApiService;
     var taskGraphApiService;
-    var sandbox;
     var lookupService;
     var templates;
 
-    before('start HTTP server', function () {
-        this.timeout(20000);
-        return helper.startServer();
+    helper.httpServerBefore();
+
+    before(function() {
+        taskProtocol = helper.injector.get('Protocol.Task');
+        tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
+        taskGraphApiService = helper.injector.get("Http.Services.Api.Taskgraph.Scheduler");
+        lookupService = helper.injector.get('Services.Lookup');
+        templates = helper.injector.get('Templates');
     });
 
     beforeEach('set up mocks', function () {
-        taskProtocol = helper.injector.get('Protocol.Task');
         // Defaults, you can tack on .resolves().rejects().resolves(), etc. like so
-        taskProtocol.activeTaskExists = sinon.stub().resolves();
-        taskProtocol.requestCommands = sinon.stub().resolves({
+        taskProtocol.activeTaskExists = this.sandbox.stub().resolves();
+        taskProtocol.requestCommands = this.sandbox.stub().resolves({
                                                             "identifier":"1234", 
                                                             "tasks": [ {"cmd": "testfoo"}
                                                              ]});
-        taskProtocol.respondCommands = sinon.stub();
+        taskProtocol.respondCommands = this.sandbox.stub();
+        tasksApiService.getNode = this.sandbox.stub();
+        lookupService.ipAddressToMacAddress = this.sandbox.stub().resolves('00:11:22:33:44:55');
 
-        tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
-        tasksApiService.getNode = sinon.stub();
-        taskGraphApiService = helper.injector.get("Http.Services.Api.Taskgraph.Scheduler");
-
-        lookupService = helper.injector.get('Services.Lookup');
-        lookupService.ipAddressToMacAddress = sinon.stub().resolves('00:11:22:33:44:55');
-
-        templates = helper.injector.get('Templates');
-
-        sandbox = sinon.sandbox.create();
         return helper.reset().then(function(){
-          return helper.injector.get('Views').load();
-          });
-    });
-
-    afterEach('restoring stubs', function() {
-        function resetStubs(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (obj[method] && obj[method].reset) {
-                    obj[method].reset();
-                }
-            }).value();
-        }
-
-        resetStubs(taskProtocol.activeTaskExists);
-        resetStubs(taskProtocol.requestCommands);
-        resetStubs(taskProtocol.respondCommands);
-        resetStubs(tasksApiService.getNode);
-        resetStubs(lookupService.ipAddressToMacAddress);
-
-        sandbox.restore();
-    });
-
-    after('stop HTTP server', function () {
-        return helper.reset().then(function(){
-            return helper.stopServer();
+            return helper.injector.get('Views').load();
         });
     });
 
+    after(function () {
+        return helper.reset();
+    });
+
+    helper.httpServerAfter();
+
     describe('GET /tasks/:id', function () {
         it("should send down tasks", function() {
-            sandbox.stub(taskGraphApiService, 'getTasksById').resolves({
-                "identifier":"1234", 
+            this.sandbox.stub(taskGraphApiService, 'getTasksById').resolves({
+                "identifier":"1234",
                 "tasks": [ {"cmd": "testfoo"}
             ]});
             return helper.request().get('/api/2.0/tasks/testnodeid')
@@ -82,7 +59,7 @@ describe('Http.Api.Tasks', function () {
         });
 
         it("should error if no task available", function() {
-            sandbox.stub(taskGraphApiService, 'getTasksById').rejects(new Error(''));
+            this.sandbox.stub(taskGraphApiService, 'getTasksById').rejects(new Error(''));
             return helper.request().get('/api/2.0/tasks/testnodeid')
             .expect(404);
         });
@@ -91,15 +68,11 @@ describe('Http.Api.Tasks', function () {
     describe("GET /tasks/bootstrap.js", function() {
         var stubTemplates;
 
-        before(function() {
-            stubTemplates = sinon.stub(templates, 'get');
+        beforeEach(function() {
+            stubTemplates = this.sandbox.stub(templates, 'get');
             stubTemplates.withArgs('bootstrap.js').resolves({
                 contents: 'test node id: <%= identifier %>'
             });
-        });
-
-        after(function() {
-            stubTemplates.restore();
         });
 
        it("should render a bootstrap for the node", function() {
@@ -131,7 +104,7 @@ describe('Http.Api.Tasks', function () {
         it("should accept a large entity response", function() {
             var data = { foo: new Array(200000).join('1') };
 
-            sandbox.stub(taskGraphApiService, 'postTaskById').resolves({});
+            this.sandbox.stub(taskGraphApiService, 'postTaskById').resolves({});
             return helper.request().post('/api/2.0/tasks/123')
             .send(data)
             .expect(201)

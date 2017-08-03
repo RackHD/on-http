@@ -20,43 +20,28 @@ describe('Redfish Endpoint', function () {
             });
     }
 
-    before('start HTTP server', function () {
-        this.timeout(5000);
-        return helper.startServer([]).then(function () {
-            redfish = helper.injector.get('Http.Api.Services.Redfish');
-            sinon.spy(redfish, 'render');
-            validator = helper.injector.get('Http.Api.Services.Schema');
-            sinon.spy(validator, 'validate');
-            view = helper.injector.get('Views');
-            sinon.stub(view, "get", redirectGet);
-            Promise = helper.injector.get('Promise');
-            var nodeFs = helper.injector.get('fs');
-            fs = Promise.promisifyAll(nodeFs);
-            systemUuid = helper.injector.get('SystemUuid');
-            sinon.stub(systemUuid, 'getUuid');
-        });
+    helper.httpServerBefore();
+
+    before(function() {
+        redfish = helper.injector.get('Http.Api.Services.Redfish');
+        validator = helper.injector.get('Http.Api.Services.Schema');
+        view = helper.injector.get('Views');
+        Promise = helper.injector.get('Promise');
+        var nodeFs = helper.injector.get('fs');
+        fs = Promise.promisifyAll(nodeFs);
+        systemUuid = helper.injector.get('SystemUuid');
+        tv4 = require('tv4');
     });
 
     beforeEach('set up mocks', function () {
-        tv4 = require('tv4');
-        sinon.spy(tv4, "validate");
-
-        validator.validate.reset();
-        redfish.render.reset();
-        systemUuid.getUuid.reset();
+        this.sandbox.spy(tv4, "validate");
+        this.sandbox.spy(redfish, 'render');
+        this.sandbox.spy(validator, 'validate');
+        this.sandbox.stub(view, "get", redirectGet);
+        this.sandbox.stub(systemUuid, 'getUuid');
     });
 
-    afterEach('tear down mocks', function () {
-        tv4.validate.restore();
-        systemUuid.getUuid.restore();
-    });
-
-    after('stop HTTP server', function () {
-        validator.validate.restore();
-        redfish.render.restore();
-        view.get.restore();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     it('should return a valid service root', function () {
         systemUuid.getUuid.resolves('66ddf9c7-a3a4-47fc-b603-60737d1f15a8');

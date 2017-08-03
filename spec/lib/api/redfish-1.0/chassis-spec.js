@@ -117,69 +117,47 @@ describe('Redfish Chassis Root', function () {
         oper_state: "on"
     };
 
-    before('start HTTP server', function () {
-        var self = this;
-        this.timeout(5000);
-        this.sandbox = sinon.sandbox.create();
+    helper.httpServerBefore();
 
-        return helper.startServer([]).then(function () {
-            redfish = helper.injector.get('Http.Api.Services.Redfish');
-            self.sandbox.spy(redfish, 'render');
-
-            validator = helper.injector.get('Http.Api.Services.Schema');
-            self.sandbox.spy(validator, 'validate');
-
-            waterline = helper.injector.get('Services.Waterline');
-            self.sandbox.stub(waterline.nodes);
-            waterline.nodes.findByIdentifier.withArgs('4567efgh4567efgh4567efgh').resolves(enclosure);
-            waterline.nodes.findByIdentifier.withArgs('1234abcd1234abcd1234abcd').resolves(system);
-            waterline.nodes.findByIdentifier.withArgs('aaaabbbbcccc111122223333').resolves(ucsEnclosure);
-            waterline.nodes.findByIdentifier.withArgs('ddddeeeeffff444455556666').resolves(ucsSystem);
-            waterline.nodes.findByIdentifier.resolves();
-
-            Promise = helper.injector.get('Promise');
-            Errors = helper.injector.get('Errors');
-
-            taskProtocol = helper.injector.get('Protocol.Task');
-            self.sandbox.stub(taskProtocol);
-
-            env = helper.injector.get('Services.Environment');
-            self.sandbox.stub(env, "get").resolves({});
-
-            var nodeFs = helper.injector.get('fs');
-            fs = Promise.promisifyAll(nodeFs);
-
-            nodeApi = helper.injector.get('Http.Services.Api.Nodes');
-            self.sandbox.stub(nodeApi, "getAllNodes");
-            self.sandbox.stub(nodeApi, "getNodeCatalogSourceById");
-            self.sandbox.stub(nodeApi, "getPollersByNodeId");
-            self.sandbox.stub(nodeApi, "getNodeById");
-            nodeApi.getNodeById.withArgs('4567efgh4567efgh4567efgh').resolves(enclosure);
-            nodeApi.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(system);
-            nodeApi.getNodeById.withArgs('aaaabbbbcccc111122223333').resolves(ucsEnclosure);
-            nodeApi.getNodeById.withArgs('ddddeeeeffff444455556666').resolves(ucsSystem);
-
-            nodeApi.getNodeById.rejects(new Errors.NotFoundError('Not Found'));
-        });
-
+    before(function () {
+        redfish = helper.injector.get('Http.Api.Services.Redfish');
+        validator = helper.injector.get('Http.Api.Services.Schema');
+        waterline = helper.injector.get('Services.Waterline');
+        Promise = helper.injector.get('Promise');
+        Errors = helper.injector.get('Errors');
+        taskProtocol = helper.injector.get('Protocol.Task');
+        env = helper.injector.get('Services.Environment');
+        var nodeFs = helper.injector.get('fs');
+        fs = Promise.promisifyAll(nodeFs);
+        nodeApi = helper.injector.get('Http.Services.Api.Nodes');
+        tv4 = require('tv4');
     });
 
     beforeEach('set up mocks', function () {
-        tv4 = require('tv4');
-        sinon.spy(tv4, "validate");
-
-        this.sandbox.reset();
+        this.sandbox.spy(tv4, "validate");
+        this.sandbox.spy(redfish, 'render');
+        this.sandbox.spy(validator, 'validate');
+        this.sandbox.stub(waterline.nodes);
+        waterline.nodes.findByIdentifier.withArgs('4567efgh4567efgh4567efgh').resolves(enclosure);
+        waterline.nodes.findByIdentifier.withArgs('1234abcd1234abcd1234abcd').resolves(system);
+        waterline.nodes.findByIdentifier.withArgs('aaaabbbbcccc111122223333').resolves(ucsEnclosure);
+        waterline.nodes.findByIdentifier.withArgs('ddddeeeeffff444455556666').resolves(ucsSystem);
+        waterline.nodes.findByIdentifier.resolves();
+        this.sandbox.stub(taskProtocol);
+        this.sandbox.stub(env, "get").resolves({});
+        this.sandbox.stub(nodeApi, "getAllNodes");
+        this.sandbox.stub(nodeApi, "getNodeCatalogSourceById");
+        this.sandbox.stub(nodeApi, "getPollersByNodeId");
+        this.sandbox.stub(nodeApi, "getNodeById");
+        nodeApi.getNodeById.withArgs('4567efgh4567efgh4567efgh').resolves(enclosure);
+        nodeApi.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(system);
+        nodeApi.getNodeById.withArgs('aaaabbbbcccc111122223333').resolves(ucsEnclosure);
+        nodeApi.getNodeById.withArgs('ddddeeeeffff444455556666').resolves(ucsSystem);
+        nodeApi.getNodeById.rejects(new Errors.NotFoundError('Not Found'));
         nodeApi.getAllNodes.resolves([enclosure]);
     });
 
-    afterEach('tear down mocks', function () {
-        tv4.validate.restore();
-    });
-
-    after('stop HTTP server', function () {
-        this.sandbox.restore();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     it('should return a valid chassis root', function () {
         nodeApi.getAllNodes.resolves([enclosure]);

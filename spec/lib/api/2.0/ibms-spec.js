@@ -65,26 +65,15 @@ describe('Http.Api.Ibms', function () {
         }
     };
 
-    before('start HTTP server', function () {
-        this.timeout(5000);
-        return helper.startServer().then(function() {
-            waterline = helper.injector.get('Services.Waterline');
-            Errors = helper.injector.get('Errors');helper.injector.get("Services.Configuration");
-            configuration = helper.injector.get("Services.Configuration");
-            //sinon.stub(configuration);
-        });
+    helper.httpServerBefore();
+
+    before(function () {
+        waterline = helper.injector.get('Services.Waterline');
+        Errors = helper.injector.get('Errors');
+        configuration = helper.injector.get("Services.Configuration");
     });
 
-    afterEach(function () {
-        if (stub) {
-            stub.restore();
-            stub = undefined;
-        }
-    });
-
-    after('stop HTTP server', function () {
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     describe('/api/2.0/ibms/definitions', function () {
         it('should return a list of IBM schemas', function () {
@@ -113,7 +102,7 @@ describe('Http.Api.Ibms', function () {
 
     describe('/api/2.0/ibms', function () {
         it('should return a list of IBM instances', function () {
-            stub = sinon.stub(waterline.ibms, 'find').resolves(goodData);
+            stub = this.sandbox.stub(waterline.ibms, 'find').resolves(goodData);
 
             return helper.request().get('/api/2.0/ibms')
                 .expect('Content-Type', /^application\/json/)
@@ -128,7 +117,7 @@ describe('Http.Api.Ibms', function () {
         });
 
         it('should put an IBM instance', function () {
-            stub = sinon.stub(waterline.ibms, 'upsertByNode').resolves(goodData[0]);
+            stub = this.sandbox.stub(waterline.ibms, 'upsertByNode').resolves(goodData[0]);
 
             return helper.request().put('/api/2.0/ibms')
                 .send(goodSendData)
@@ -140,8 +129,7 @@ describe('Http.Api.Ibms', function () {
         });
 
         it('should PUT an IBM instance with default credential', function () {
-            this.sandbox = sinon.sandbox.create();
-            stub = sinon.stub(waterline.ibms, 'upsertByNode').resolves(defaultCred);
+            stub = this.sandbox.stub(waterline.ibms, 'upsertByNode').resolves(defaultCred);
             configuration.set('defaultIbms', {
                 "user": "monorail",
                 "password": "monorail"
@@ -152,8 +140,7 @@ describe('Http.Api.Ibms', function () {
                 .expect(201);
         });
         it('should fail to PUT an IBM instance with default credential', function () {
-            this.sandbox.restore();
-            stub = sinon.stub(waterline.ibms, 'upsertByNode').resolves(defaultCred);
+            stub = this.sandbox.stub(waterline.ibms, 'upsertByNode').resolves(defaultCred);
             configuration.set('defaultIbms', undefined);
 
             return helper.request().put('/api/2.0/ibms')
@@ -163,7 +150,7 @@ describe('Http.Api.Ibms', function () {
         });
 
         it('should 400 when put with unloaded schema', function () {
-            stub = sinon.stub(waterline.ibms, 'upsertByNode');
+            stub = this.sandbox.stub(waterline.ibms, 'upsertByNode');
 
             return helper.request().put('/api/2.0/ibms')
                 .send(badData1)
@@ -175,7 +162,7 @@ describe('Http.Api.Ibms', function () {
         });
 
         it('should 400 when put with missing field', function () {
-            stub = sinon.stub(waterline.ibms, 'upsertByNode');
+            stub = this.sandbox.stub(waterline.ibms, 'upsertByNode');
 
             return helper.request().put('/api/2.0/ibms')
                 .send(badData2)
@@ -190,15 +177,9 @@ describe('Http.Api.Ibms', function () {
 
     describe('/api/2.0/ibms/:id', function () {
         beforeEach(function() {
-            sinon.stub(waterline.ibms, 'needByIdentifier');
-            sinon.stub(waterline.ibms, 'updateByIdentifier');
-            sinon.stub(waterline.ibms, 'destroyByIdentifier');
-        });
-
-        afterEach(function() {
-            waterline.ibms.needByIdentifier.restore();
-            waterline.ibms.updateByIdentifier.restore();
-            waterline.ibms.destroyByIdentifier.restore();
+            this.sandbox.stub(waterline.ibms, 'needByIdentifier');
+            this.sandbox.stub(waterline.ibms, 'updateByIdentifier');
+            this.sandbox.stub(waterline.ibms, 'destroyByIdentifier');
         });
 
         it('should get an IBM instance', function () {
@@ -223,7 +204,7 @@ describe('Http.Api.Ibms', function () {
         it('should patch an IBM instance', function () {
 
             waterline.ibms.needByIdentifier.resolves(goodData[0]);
-            stub = sinon.stub(waterline.nodes, 'getNodeById').resolves(goodData[0]);
+            stub = this.sandbox.stub(waterline.nodes, 'getNodeById').resolves(goodData[0]);
             waterline.ibms.updateByIdentifier.resolves(goodData[0]);
             return helper.request().patch('/api/2.0/ibms/123')
                 .send(goodSendData)
@@ -236,7 +217,7 @@ describe('Http.Api.Ibms', function () {
 
         it('should 400 when patching with bad data', function () {
             waterline.ibms.needByIdentifier.resolves([]);
-            stub = sinon.stub(waterline.nodes, 'getNodeById').resolves([]);
+            stub = this.sandbox.stub(waterline.nodes, 'getNodeById').resolves([]);
             waterline.ibms.updateByIdentifier.resolves([]);
 
             return helper.request().patch('/api/2.0/ibms/123')
@@ -250,7 +231,7 @@ describe('Http.Api.Ibms', function () {
 
         it('should delete an IBM instance', function () {
             waterline.ibms.needByIdentifier.resolves([]);
-            stub = sinon.stub(waterline.nodes, 'getNodeById');
+            stub = this.sandbox.stub(waterline.nodes, 'getNodeById');
             waterline.ibms.destroyByIdentifier.resolves([]);
 
             return helper.request().delete('/api/2.0/ibms/123')

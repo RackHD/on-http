@@ -9,32 +9,23 @@ describe('2.0 Http.Api.Catalogs', function () {
     var Errors;
     var stubNeedByIdentifier;
     var stubFind;
+    var waterline;
 
-    before('start HTTP server', function () {
-        this.timeout(5000);
-        return helper.startServer([]).then(function () {
-            Promise = helper.injector.get('Promise');
-            Errors = helper.injector.get('Errors');
-            var w = helper.injector.get('Services.Waterline');
-            stubNeedByIdentifier = sinon.stub(w.catalogs, "needByIdentifier");
-            stubFind = sinon.stub(w.catalogs, "find");
-        });
-    });
+    helper.httpServerBefore();
 
-    beforeEach('loading views', function(){
+    before(function () {
+        Promise = helper.injector.get('Promise');
+        Errors = helper.injector.get('Errors');
+        waterline = helper.injector.get('Services.Waterline');
         return helper.injector.get('Views').load();
     });
 
-    afterEach("reset stubs", function() {
-        stubFind.reset();
-        stubNeedByIdentifier.reset();
+    beforeEach('set up mocks', function() {
+        stubNeedByIdentifier = this.sandbox.stub(waterline.catalogs, "needByIdentifier");
+        stubFind = this.sandbox.stub(waterline.catalogs, "find");
     });
 
-    after('stop HTTP server', function () {
-        stubFind.restore();
-        stubNeedByIdentifier.restore();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     describe("GET /catalogs", function() {
 

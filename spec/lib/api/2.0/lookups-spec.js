@@ -54,36 +54,23 @@ describe('Http.Api.Lookup 2.0', function () {
         }
     ];
 
-    before('start HTTP server', function () {
-        this.timeout(5000);
-        return helper.startServer().then(function () {
-            Promise = helper.injector.get('Promise');
-            _ = helper.injector.get('_');
-            waterline = helper.injector.get('Services.Waterline');
-            findByTerm = sinon.stub(waterline.lookups, 'findByTerm').resolves(data);
-            create = sinon.stub(waterline.lookups, 'create').resolves(data[0]);
-            needOneById = sinon.stub(waterline.lookups, 'needOneById').resolves(data[0]);
-            updateOneById = sinon.stub(waterline.lookups, 'updateOneById').resolves(data[0]);
-            destroyOneById = sinon.stub(waterline.lookups, 'destroyOneById').resolves(data[0]);
-        });
+    helper.httpServerBefore();
+
+    before(function () {
+        Promise = helper.injector.get('Promise');
+        _ = helper.injector.get('_');
+        waterline = helper.injector.get('Services.Waterline');
     });
 
-    afterEach(function () {
-        findByTerm.reset();
-        create.reset();
-        needOneById.reset();
-        updateOneById.reset();
-        destroyOneById.reset();
+    beforeEach('set up mocks', function () {
+        findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(data);
+        create = this.sandbox.stub(waterline.lookups, 'create').resolves(data[0]);
+        needOneById = this.sandbox.stub(waterline.lookups, 'needOneById').resolves(data[0]);
+        updateOneById = this.sandbox.stub(waterline.lookups, 'updateOneById').resolves(data[0]);
+        destroyOneById = this.sandbox.stub(waterline.lookups, 'destroyOneById').resolves(data[0]);
     });
 
-    after('stop HTTP server', function () {
-        findByTerm.restore();
-        create.restore();
-        needOneById.restore();
-        updateOneById.restore();
-        destroyOneById.restore();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     describe('/api/2.0/lookups', function () {
         describe('GET', function () {

@@ -21,6 +21,27 @@ global.onHttpContext = index.onHttpContextFactory();
 // Legacy
 global.dihelper = onHttpContext.helper;
 
+helper.httpServerBefore = function(overrides, endpointOpt) {
+    before('helper.httpServer.before', function() {
+        this.timeout(10000);
+        return helper.startServer(overrides, endpointOpt);
+    });
+
+    beforeEach(function () {
+        this.sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(function () {
+        this.sandbox.restore();
+    });
+};
+
+helper.httpServerAfter = function() {
+    after('helper.httpServer.after', function() {
+        return helper.stopServer();
+    });
+};
+
 helper.startServer = function (overrides, endpointOpt) {
     overrides = (overrides || []).concat([
         onHttpContext.helper.simpleWrapper({
@@ -64,7 +85,9 @@ helper.startServer = function (overrides, endpointOpt) {
 };
 
 helper.stopServer = function () {
-    return helper.injector.get('app').stop();
+    if (helper.injector) {
+        return helper.injector.get('app').stop();
+    }
 };
 
 helper.request = function (url, options) {

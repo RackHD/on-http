@@ -45,7 +45,7 @@ describe("Schema API Service", function() {
         template.get.reset();
     });
 
-    helper.after(function () {
+    after(function () {
         template.get.restore();
     });
 

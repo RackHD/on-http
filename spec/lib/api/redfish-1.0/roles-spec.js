@@ -6,22 +6,17 @@
 describe('Redfish Roles', function () {
     var redfish;
 
-    before('start HTTP server', function () {
-        this.timeout(5000);
-        return helper.startServer([]).then(function () {
-            redfish = helper.injector.get('Http.Api.Services.Redfish');
-            sinon.spy(redfish, 'render');
-        });
+    helper.httpServerBefore();
+
+    before(function () {
+        redfish = helper.injector.get('Http.Api.Services.Redfish');
     });
 
     beforeEach('set up mocks', function () {
-         redfish.render.reset();    });
-
-
-    after('stop HTTP server', function () {
-        redfish.render.restore();
-        return helper.stopServer();
+        this.sandbox.spy(redfish, 'render');
     });
+
+    helper.httpServerAfter();
 
     it('should return valid roles', function () {
         return helper.request().get('/redfish/v1/AccountService/Roles')

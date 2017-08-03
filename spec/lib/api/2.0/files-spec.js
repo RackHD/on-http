@@ -8,11 +8,12 @@ describe('Http.Api.Internal.Files', function () {
     var badFilename = "RackHD_Rulez";
     var badUuid = "617";
 
-    before('start HTTP server and add file', function () {
-        this.timeout(10000);
+    helper.httpServerBefore();
 
-        return helper.startServer([]).then(function () {
-            Promise = helper.injector.get('Promise');
+    before('add file', function () {
+        var Promise = helper.injector.get('Promise');
+
+        return Promise.try(function () {
             return helper.request().get('/api/2.0/files');
         }).then(function (res) {
             return Promise.map(res.body, function (file) {
@@ -33,9 +34,7 @@ describe('Http.Api.Internal.Files', function () {
         });
     });
 
-    after('stop HTTP server', function () {
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     describe('GET /files/{fileidentifier}', function () {
         it('should get file by name', function () {
