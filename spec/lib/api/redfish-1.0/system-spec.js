@@ -28,6 +28,60 @@ describe('Redfish Systems Root', function () {
 
 </SystemConfiguration>`;
 
+    var nodeObm = {
+        id: "574dcd5794ab6e2506fd107a",
+        node: "1234abcd1234abcd1234abcd",
+        service: 'ipmi-obm-service',
+        config: {
+            host: '1.2.3.4',
+            user: 'myuser',
+            password: 'mypass'
+        }
+    };
+
+    var node = {
+        autoDiscover: false,
+        id: '1234abcd1234abcd1234abcd',
+        name: 'name',
+        identifiers: ['1234'],
+        tags: [],
+        obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a'}],
+        type: 'compute',
+        relations: [
+            {
+                relationType: 'enclosedBy',
+                targets: [ '4567efgh4567efgh4567efgh' ]
+            }
+        ]
+    };
+
+    // var dellNodeObm ={
+    //     id: "DELL574dcd5794ab6e2506fd107a",
+    //     node: "DELLabcd1234abcd1234abcd",
+    //     service: 'ipmi-obm-service',
+    //     config: {
+    //         host: '1.2.3.4',
+    //         user: 'myuser',
+    //         password: 'mypass'
+    //    }
+    // };
+
+    var dellNode = {
+        autoDiscover: false,
+        id: 'DELLabcd1234abcd1234abcd',
+        name: 'dell node',
+        identifiers: ['ABCDEFG'],
+        tags: [],
+        obms: [{ obm: '/api/2.0/obms/DELL574dcd5794ab6e2506fd107a'}],
+        type: 'compute',
+        relations: [
+            {
+                relationType: 'enclosedBy',
+                targets: [ '4567efgh4567efgh4567efgh' ]
+            }
+        ]
+    };
+
 
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
@@ -73,56 +127,24 @@ describe('Redfish Systems Root', function () {
         this.sandbox.stub(nodeApi, "getAllNodes");
         this.sandbox.stub(racadm, "runCommand");
         this.sandbox.stub(wsman, "getLog");
-        this.sandbox.stub(wsman, "isDellSystem");
         this.sandbox.spy(tv4, "validate");
         this.sandbox.stub(mktemp, 'createFile');
         this.sandbox.stub(fs, 'writeFile');
 
-        waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd')
-        .resolves(Promise.resolve({
-            id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd'
-        }));
-        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd')
-        .resolves(Promise.resolve({
-            id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd',
-            identifiers: ['1234']
-        }));
-        waterline.nodes.getNodeById.withArgs('bad' + '1234abcd1234abcd1234abcd').resolves();
-        waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('Not Found'));
-        waterline.nodes.getNodeById.resolves({
-	    identifiers: ['1234']
-        });
+        waterline.nodes.getNodeById.resolves();
+        waterline.nodes.needByIdentifier.resolves();
+
+        waterline.nodes.needByIdentifier.withArgs(node.id).resolves(Promise.resolve(node));
+        waterline.nodes.needByIdentifier.withArgs(dellNode.id).resolves(Promise.resolve(dellNode));
+
+        waterline.nodes.getNodeById.withArgs(node.id).resolves(Promise.resolve(node));
+        waterline.nodes.getNodeById.withArgs(dellNode.id).resolves(Promise.resolve(dellNode));
+
         waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
         nodeApi.setNodeWorkflowById.resolves({instanceId: 'abcdef'});
-        waterline.obms.findByNode.resolves({
-            id: '12341234',
-            node: '12345678',
-            service: 'ipmi-obm-service',
-            config: {
-                host: '1.1.1.1',
-                user: 'user',
-                password: 'passw'
-            }
-        });
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: false, isRedfishCapable: false
-        });
-        wsman.isDellSystem.rejects(new Errors.NotFoundError('Not Found'));
 
-        waterline.nodes.getNodeById.withArgs('DELLabcd1234abcd1234abcd')
-        .resolves(Promise.resolve({
-            id: 'DELLabcd1234abcd1234abcd',
-            name: 'DELLabcd1234abcd1234abcd',
-            identifiers: [ "ABCDEFG" ]
-        }));
+        waterline.obms.findByNode.withArgs(node.id, 'ipmi-obm-service', true).resolves(Promise.resolve(nodeObm));
 
-        waterline.nodes.needByIdentifier.withArgs('DELLabcd1234abcd1234abcd')
-        .resolves(Promise.resolve({
-            id: 'DELLabcd1234abcd1234abcd',
-            name: 'DELLabcd1234abcd1234abcd'
-        }));
         mktemp.createFile.withArgs('/nfs/XXXXXX.xml')
         .resolves(Promise.resolve('/nfs/file.xml'));
         fs.writeFile.withArgs('/nfs/file.xml',xmlData, function() {})
@@ -131,64 +153,6 @@ describe('Redfish Systems Root', function () {
 
     helper.httpServerAfter();
 
-   //OBM model's mock data
-    var obm =[{
-        id: "574dcd5794ab6e2506fd107a",
-        node: "1234abcd1234abcd1234abcd",
-        service: 'ipmi-obm-service',
-        config: {
-            host: '1.2.3.4',
-            user: 'myuser',
-            password: 'mypass'
-       }
-    }];
-    // Node new mock data with OBM model change
-    var node = {
-        autoDiscover: false,
-        id: '1234abcd1234abcd1234abcd',
-        name: 'name',
-        identifiers: [],
-        tags: [],
-        obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a'}],
-        type: 'compute',
-        relations: [
-            {
-                relationType: 'enclosedBy',
-                targets: [ '4567efgh4567efgh4567efgh' ]
-            }
-        ]
-    };
-    // Node new mock data with OBM model change
-    var dellNode = {
-        autoDiscover: false,
-        id: 'DELLabcd1234abcd1234abcd',
-        name: 'dell node',
-        identifiers: [],
-        tags: [],
-        obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a'}],
-        type: 'compute',
-        relations: [
-            {
-                relationType: 'enclosedBy',
-                targets: [ '4567efgh4567efgh4567efgh' ]
-            }
-        ]
-    };
-    var rawNode = {
-        autoDiscover: false,
-        id: '1234abcd1234abcd1234abcd',
-        name: 'name',
-        identifiers: ['1234'],
-        tags: [],
-        obms: obm,
-        type: 'compute',
-        relations: [
-            {
-                relationType: 'enclosedBy',
-                targets: [ '4567efgh4567efgh4567efgh' ]
-            }
-        ]
-    };
 
     var catalogData = {
         dmi: {
@@ -332,6 +296,8 @@ describe('Redfish Systems Root', function () {
         },
         DeviceSummary: {
             id: "1.2.3.4"
+        },
+        hardware: {
         },
         nics: [
             {
@@ -622,7 +588,7 @@ describe('Redfish Systems Root', function () {
             "sequenceNumber": 2173760
         }
     ];
-	    
+
     var httpEndpoints = [
         {
             "address": "172.31.128.1",
@@ -650,7 +616,7 @@ describe('Redfish Systems Root', function () {
 
     it('should return a valid system', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: '1234abcd1234abcd1234abcd',
+            node: node.id,
             source: 'dummysource',
             data: catalogData
         }));
@@ -662,7 +628,6 @@ describe('Redfish Systems Root', function () {
         taskProtocol.requestPollerCache.resolves([{
             chassis: { power: "Unknown", uid: "Reserved"}
         }]);
-        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(rawNode);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id)
             .expect('Content-Type', /^application\/json/)
@@ -675,15 +640,15 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid system with sku', function() {
-        waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd')
+        waterline.nodes.needByIdentifier.withArgs(node.id)
         .resolves(Promise.resolve({
-            id: '1234abcd1234abcd1234abcd',
-            name: '1234abcd1234abcd1234abcd',
+            id: node.id,
+            name: node.id,
             sku: 'sku-value'
         }));
 
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: '1234abcd1234abcd1234abcd',
+            node: node.id,
             source: 'dummysource',
             data: catalogData
         }));
@@ -695,8 +660,6 @@ describe('Redfish Systems Root', function () {
         taskProtocol.requestPollerCache.resolves([{
             chassis: { power: "Unknown", uid: "Reserved"}
         }]);
-
-        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(rawNode);
 
         return helper.request().get('/redfish/v1/Systems/' + node.id)
             .expect('Content-Type', /^application\/json/)
@@ -784,7 +747,7 @@ describe('Redfish Systems Root', function () {
             .expect(404);
     });
 
-    it('should return a 202 for a Dell-based bios settings patch', function() {
+    it('should 202 for a Dell-based bios settings patch', function() {
         // Force a southbound interface through httpEndpoints
         configuration.set('httpEndpoints', httpEndpoints);
         waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'DeviceSummary').resolves(Promise.resolve({
@@ -812,7 +775,7 @@ describe('Redfish Systems Root', function () {
             .expect(404);
     });
 
-    it('should return a 202 for a Dell-based bios change password SysPassword', function() {
+    it('should 202 for a Dell-based bios change password SysPassword', function() {
         // Force a southbound interface through httpEndpoints
         configuration.set('httpEndpoints', httpEndpoints);
         waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'DeviceSummary').resolves(Promise.resolve({
@@ -826,7 +789,7 @@ describe('Redfish Systems Root', function () {
             .expect(202);
     });
 
-    it('should return a 202 for a Dell-based bios change password SetupPassword', function() {
+    it('should 202 for a Dell-based bios change password SetupPassword', function() {
         // Force a southbound interface through httpEndpoints
         configuration.set('httpEndpoints', httpEndpoints);
         waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'DeviceSummary').resolves(Promise.resolve({
@@ -1123,13 +1086,8 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid iDRAC sel log service', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: true, isRedfishCapable: false
-        });
-
-        wsman.getLog.withArgs(node, 'SEL').resolves(wsmanSelLog);
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
+        wsman.getLog.withArgs(sinon.match.any, 'SEL').resolves(wsmanSelLog);
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
                                     '/LogServices/sel')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -1141,6 +1099,7 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 404 an invalid sel log service', function() {
+        wsman.getLog.withArgs(sinon.match.any, 'SEL').resolves(wsmanSelLog);
         return helper.request().get('/redfish/v1/Systems/bad' + node.id +
                                     '/LogServices/sel')
             .expect('Content-Type', /^application\/json/)
@@ -1148,7 +1107,7 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid sel log service entry collection', function() {
-        waterline.nodes.find.resolves([node]);
+        wsman.getLog.withArgs(sinon.match.any, 'SEL').resolves(wsmanSelLog);
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
         }]);
@@ -1177,13 +1136,8 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid iDRAC sel log service entry collection', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: true, isRedfishCapable: false
-        });
-
-        wsman.getLog.withArgs(node, 'SEL').resolves(wsmanSelLog);
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
+        wsman.getLog.withArgs(sinon.match.any, 'SEL').resolves(wsmanSelLog);
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
                                     '/LogServices/sel/Entries')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -1215,7 +1169,6 @@ describe('Redfish Systems Root', function () {
     });
 
 
-
     it('should 404 an invalid sel log service entry list', function() {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id +
                                     '/LogServices/sel/Entries')
@@ -1224,10 +1177,6 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid sel log service entry with Created keyword', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: false, isRedfishCapable: false
-        });
-
         waterline.nodes.find.resolves([node]);
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
@@ -1258,10 +1207,6 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid sel log service entry without Created keyword',function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: false, isRedfishCapable: false
-        });
-
         waterline.nodes.find.resolves([node]);
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
@@ -1321,13 +1266,8 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid iDrac sel log service entry', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: true, isRedfishCapable: false
-        });
-
-        wsman.getLog.withArgs(node, 'SEL').resolves(wsmanSelLog);
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
+        wsman.getLog.withArgs(dellNode, 'SEL').resolves(wsmanSelLog);
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
                                     '/LogServices/sel/Entries/23')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -1362,13 +1302,9 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 404 an invalid iDRAC sel log service entry', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: true, isRedfishCapable: false
-        });
+        wsman.getLog.withArgs(dellNode, 'SEL').resolves(wsmanSelLog);
 
-        wsman.getLog.withArgs(node, 'SEL').resolves(wsmanSelLog);
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
                                     '/LogServices/sel/Entries/abcdefg')
             .expect('Content-Type', /^application\/json/)
             .expect(404);
@@ -1385,7 +1321,6 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 404 a reset type list on an invalid node', function() {
-        waterline.nodes.getNodeById.resolves();
         return helper.request().get('/redfish/v1/Systems/' + node.id +
                                     'invalid/Actions/ComputerSystem.Reset')
             .expect(404);
@@ -1405,7 +1340,6 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 404 a reset on an invalid node', function() {
-        waterline.nodes.getNodeById.resolves();
         return helper.request().post('/redfish/v1/Systems/' + node.id +
                                     'invalid/Actions/ComputerSystem.Reset')
             .send({ reset_type: "ForceRestart"})
@@ -1494,9 +1428,8 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return valid SecureBoot status', function() {
-        racadm.runCommand.resolves( "test=SecureBoot=Disabled" );
-
-        return helper.request().get('/redfish/v1/Systems/12345678/SecureBoot')
+        racadm.runCommand.resolves("test=SecureBoot=Disabled");
+        return helper.request().get('/redfish/v1/Systems/'+ node.id +'/SecureBoot')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -1506,42 +1439,36 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    it('should 500 on bad command', function() {
+    it('should 500 on bad racadm command', function() {
         racadm.runCommand.rejects("ERROR");
-        return helper.request().get('/redfish/v1/Systems/12345678/SecureBoot')
+        return helper.request().get('/redfish/v1/Systems/'+ node.id +'/SecureBoot')
             .expect('Content-Type', /^application\/json/)
             .expect(500);
     });
 
     it('should return 202 after setting Secure Boot', function() {
         racadm.runCommand.resolves( "test=SecureBoot=Disabled" );
-        return helper.request().post('/redfish/v1/Systems/12345678/SecureBoot')
+        return helper.request().post('/redfish/v1/Systems/'+ node.id +'/SecureBoot')
             .send({"SecureBootEnable": true})
             .expect(202);
     });
 
     it('should 400 on bad request command', function() {
-        return helper.request().post('/redfish/v1/Systems/12345678/SecureBoot')
+        return helper.request().post('/redfish/v1/Systems/'+ node.id +'/SecureBoot')
             .send({"zzzSecureBootEnable": true})
             .expect(400);
     });
 
     it('should 500 on failure', function() {
         racadm.runCommand.rejects("ERROR");
-        return helper.request().post('/redfish/v1/Systems/12345678/SecureBoot')
+        return helper.request().post('/redfish/v1/Systems/'+ node.id +'/SecureBoot')
             .send({"SecureBootEnable": true})
             .expect(500);
     });
 
     it('should return a valid lc log service', function() {
-
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: true, isRedfishCapable: false
-        });
-
-        wsman.getLog.withArgs(node, 'LC').resolves(wsmanLcLog);
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
+        wsman.getLog.withArgs(sinon.match.any, 'LC').resolves(wsmanLcLog);
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
                                     '/LogServices/lc')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -1553,6 +1480,7 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 404 an invalid lc log service', function() {
+        wsman.getLog.withArgs(sinon.match.any, 'LC').resolves(wsmanLcLog);
         return helper.request().get('/redfish/v1/Systems/bad' + node.id +
                                     '/LogServices/lc')
             .expect('Content-Type', /^application\/json/)
@@ -1560,14 +1488,8 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid lc log service entry collection', function() {
-
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: true, isRedfishCapable: false
-        });
-
-        wsman.getLog.withArgs(node, 'LC').resolves(wsmanLcLog);
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
+        wsman.getLog.withArgs(sinon.match.any, 'LC').resolves(wsmanLcLog);
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
                                     '/LogServices/lc/Entries')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -1579,21 +1501,16 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 404 an invalid lc log service entry collection', function() {
-        return helper.request().get('/redfish/v1/Systems/bad' + node.id +
+        wsman.getLog.withArgs(sinon.match.any, 'LC').resolves(wsmanLcLog);
+        return helper.request().get('/redfish/v1/Systems/bad' + dellNode.id +
                                     '/LogServices/lc/Entries')
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
 
     it('should return a valid lc log service entry', function() {
-
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: true, isRedfishCapable: false
-        });
-
-        wsman.getLog.withArgs(node, 'LC').resolves(wsmanLcLog);
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
+        wsman.getLog.withArgs(sinon.match.any, 'LC').resolves(wsmanLcLog);
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
                                     '/LogServices/lc/Entries/1234567')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -1605,13 +1522,9 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 404 an invalid lc log service entry', function() {
-        wsman.isDellSystem.withArgs('1234abcd1234abcd1234abcd').resolves({
-            node: node, isDell: true, isRedfishCapable: false
-        });
+        wsman.getLog.withArgs(sinon.match.any, 'LC').resolves(wsmanLcLog);
 
-        wsman.getLog.withArgs(node, 'LC').resolves(wsmanLcLog);
-        
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
                                     '/LogServices/lc/Entries/abcdefg')
             .expect('Content-Type', /^application\/json/)
             .expect(404);
