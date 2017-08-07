@@ -1,5 +1,5 @@
 {
-    "autoDiscover": "<%=autoDiscover%>",
+    "autoDiscover": <%=autoDiscover%>,
     "catalogs": "<%=basepath %>/nodes/<%=id%>/catalogs",
     "id" : "<%=id%>",
     <% if (hasOwnProperty("identifiers")) { %>

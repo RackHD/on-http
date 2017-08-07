@@ -1,5 +1,5 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Registries",
+    "@odata.context" : "<%= basepath %>/$metadata#MessageRegistryFileCollection.MessageRegistryFileCollection",
     "@odata.id": "<%= url %>",
     "@odata.type": "#MessageRegistryFileCollection.MessageRegistryFileCollection",
     "Oem": {},

@@ -5,25 +5,19 @@
 
 describe('Http.Api.Config v2.0', function () {
     var configuration;
-    before('start HTTP server', function () {
-        this.timeout(10000);
-        return helper.startServer().then(function() {
-            configuration = helper.injector.get('Services.Configuration');
-            sinon.stub(configuration, 'set').returns(configuration);
-            sinon.stub(configuration, 'getAll').returns({});
-        });
+
+    helper.httpServerBefore();
+
+    before(function () {
+        configuration = helper.injector.get('Services.Configuration');
     });
 
-    afterEach('tear down mocks', function () {
-        configuration.set.reset();
-        configuration.getAll.reset();
+    beforeEach('set up mocks', function() {
+        this.sandbox.stub(configuration, 'set').returns(configuration);
+        this.sandbox.stub(configuration, 'getAll').returns({});
     });
 
-    after('stop HTTP server', function () {
-        configuration.set.restore();
-        configuration.getAll.restore();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     it('should return configuration', function () {
         return helper.request().get('/api/2.0/config')

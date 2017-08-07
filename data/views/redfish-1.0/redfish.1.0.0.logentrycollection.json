@@ -1,5 +1,5 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Systems/Links/Members/<%= identifier %>/LogServices/Members/<%=type%>/Entries",
+    "@odata.context" : "<%= basepath %>/$metadata#LogEntryCollection.LogEntryCollection",
     "@odata.id": "<%= url %>",
     "@odata.type": "#LogEntryCollection.LogEntryCollection",
     "Oem" : {},
@@ -9,7 +9,7 @@
         <% logEntries.forEach(function(entry, i, arr) { %>
             {
                 "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/LogServices/<%=type%>/Entries/<%= entry.logId %>",
-                "@odata.type": "#LogEntry.1.0.0.LogEntry",
+                "@odata.type": "#LogEntry.v1_0_0.LogEntry",
                 "Oem": {},
                 "Id": "<%= entry.logId %>",
                 "Name": "name",

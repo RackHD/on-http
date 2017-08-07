@@ -23,13 +23,6 @@
         </iconList>
         <serviceList>
             <service>
-                <serviceType>urn:schemas-upnp-org:service:api:1.1</serviceType>
-                <serviceId>urn:upnp-org:serviceId:api:1.1</serviceId>
-                <SCPDURL>/upnp/upnp-on-http-api1.1.xml</SCPDURL>
-                <controlURL></controlURL>
-                <eventSubURL></eventSubURL>
-            </service>
-            <service>
                 <serviceType>urn:schemas-upnp-org:service:api:2.0</serviceType>
                 <serviceId>urn:upnp-org:serviceId:api:2.0</serviceId>
                 <SCPDURL>/upnp/upnp-on-http-api2.0.xml</SCPDURL>

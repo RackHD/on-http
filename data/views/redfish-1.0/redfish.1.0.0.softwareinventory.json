@@ -1,0 +1,43 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#SoftwareInventory.SoftwareInventory",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#SoftwareInventory.SoftwareInventory",
+    "Oem" : {},
+    "Name": "Software Inventory Collection",
+    "RelatedItem": [
+        <% if (elementInfo.type === "entity") { %>
+            <% RelatedItems.forEach(function(RelatedItem, i, arr) { %>
+                <% if (elementInfo.enumerate === true) { %>
+                    {
+                        "@odata.id": "<%= basepath %><%=elementInfo.base%><%= RelatedItem.node%><%=elementInfo.end%><%=RelatedItem.FQDD %>"
+                    }
+                <% } else{ %>
+                    <% if (elementInfo.base === "/Managers/") { %>
+                        {
+                        "@odata.id": "<%= basepath %><%=elementInfo.base%><%= RelatedItem.node%>.0<%=elementInfo.end%>"
+                        }
+                    <% } else{ %>
+                       <% if (elementInfo.base === "/Systems/") { %>
+                           {
+                                "@odata.id": "<%= basepath %><%=elementInfo.base%><%= RelatedItem.node%><%=elementInfo.end%>"
+                           }
+                       <% } else{ %>
+                           {
+                                "@odata.id": "<%= basepath %><%=elementInfo.base%><%= RelatedItem.chassisId%><%=elementInfo.end%>"
+                           }
+                        <% } %>
+                    <% } %>
+                <% } %>
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+            <% }); %>
+        <% } else if (elementInfo.type === "complex") { %>
+            <% RelatedItems.forEach(function(RelatedItem, i, arr) { %>
+                {
+                    "@odata.id": "<%= basepath %><%=elementInfo.base%><%= RelatedItem.chassisId%><%=elementInfo.end%><%=i%>"
+                }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+            <% }); %>
+
+        <% } %>
+]
+}

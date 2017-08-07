@@ -1,0 +1,29 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#SimpleStorage.SimpleStorage",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#SimpleStorage.v1_0_0.SimpleStorage",
+    "Oem" : {},
+    "Name": "Simple Storage Controller",
+    "Id": "<%= index %>",
+    "Description": "<%= controller.productName %>",
+    "Devices": [
+        <% devices.forEach(function(device, i, arr) { %>
+            {
+                "Oem": {
+                    "Dell-EMC" : {
+                        "Revision": "<%= device.model || 'Unknown' %>",
+                        "Capacity": "<%= device.size || 'Unknown' %>",
+                        "SerialNumbers": "<%= device.serialNumber || 'Unknown' %>",
+                        "Type": "<%= device.mediaType || 'Unknown' %>"
+                    }
+                },
+                "Name": "<%= device.deviceDescription || 'Unknown' %>",
+                "Status": {},
+                "Manufacturer": "<%= device.manufacturer || 'Unknown' %>",
+                "Model": "<%= device.model || 'Unknown' %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ],
+    "Status": {}
+}

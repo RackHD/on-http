@@ -1,4 +1,4 @@
-// Copyright 2015, EMC, Inc.
+// Copyright © 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
 
 'use strict';
 
@@ -8,10 +8,39 @@ var util = require('util');
 
 var index = require('../index');
 
+var mockConsul = require('./mock-consul-server.js');
+var mockGrpc = require('./mock-grpc.js');
+var mockery = require('mockery');
+mockery.enable();
+mockery.warnOnUnregistered(false);
+mockery.registerMock('consul', mockConsul);
+mockery.registerMock('grpc', mockGrpc);
+
 global.onHttpContext = index.onHttpContextFactory();
 
 // Legacy
 global.dihelper = onHttpContext.helper;
+
+helper.httpServerBefore = function(overrides, endpointOpt) {
+    before('helper.httpServer.before', function() {
+        this.timeout(10000);
+        return helper.startServer(overrides, endpointOpt);
+    });
+
+    beforeEach(function () {
+        this.sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(function () {
+        this.sandbox.restore();
+    });
+};
+
+helper.httpServerAfter = function() {
+    after('helper.httpServer.after', function() {
+        return helper.stopServer();
+    });
+};
 
 helper.startServer = function (overrides, endpointOpt) {
     overrides = (overrides || []).concat([
@@ -34,12 +63,20 @@ helper.startServer = function (overrides, endpointOpt) {
     helper.injector.get('Services.Configuration')
         .set('enableUPnP', false)
         .set('skuPackRoot', 'spec/lib/services/sku-static')
-        .set('httpEndpoints', [ _.merge( {}, 
+        .set('httpEndpoints', [_.merge({},
             {
-                'port': 8089,
-                'httpsEnabled': false
+                'port': 8091,
+                'httpsEnabled': false,
+                "yamlName": ["monorail-2.0-sb.yaml"]
             },
-            endpointOpt )
+            endpointOpt),
+            _.merge({},
+                {
+                    'port': 8089,
+                    'httpsEnabled': false,
+                    "yamlName": ["monorail-2.0.yaml", "redfish.yaml", "redfish-root.yaml"]
+                },
+                endpointOpt)
         ]);
 
     index.injector = helper.injector;
@@ -48,7 +85,9 @@ helper.startServer = function (overrides, endpointOpt) {
 };
 
 helper.stopServer = function () {
-    return helper.injector.get('app').stop();
+    if (helper.injector) {
+        return helper.injector.get('app').stop();
+    }
 };
 
 helper.request = function (url, options) {

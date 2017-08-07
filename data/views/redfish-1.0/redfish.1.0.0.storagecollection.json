@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#StorageCollection.StorageCollection",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#StorageCollection.StorageCollection",
+    "Oem" : {},
+    "Name": "Simple Storage Collection",
+    "Members@odata.count": <%= controllers.length %>,
+    "Members": [
+        <% controllers.forEach(function(n, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/Storage/<%=n%>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}

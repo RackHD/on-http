@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#VolumeCollection.VolumeCollection",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#VolumeCollection.VolumeCollection",
+    "Oem" : {},
+    "Name": "Volume Collection",
+    "Members@odata.count": <%= virtualDisks.length %>,
+    "Members": [
+        <% virtualDisks.forEach(function(n, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/Storage/<%=index%>/Volumes/<%=i%>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}

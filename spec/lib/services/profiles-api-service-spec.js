@@ -1,4 +1,4 @@
-// Copyright 2015-2016, EMC, Inc.
+// Copyright © 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
 
 "use strict";
 
@@ -21,7 +21,8 @@ describe("Http.Services.Api.Profiles", function () {
             helper.require("/lib/services/profiles-api-service"),
             helper.require("/lib/services/swagger-api-service"),
             helper.require("/lib/api/view/view"),
-            helper.require("/lib/services/schema-api-service")
+            helper.require("/lib/services/schema-api-service"),
+            helper.require("/lib/services/taskgraph-api-service")
         ]);
         profileApiService = helper.injector.get("Http.Services.Api.Profiles");
         Errors = helper.injector.get("Errors");
@@ -233,6 +234,7 @@ describe("Http.Services.Api.Profiles", function () {
         this.sandbox.stub(profileApiService, 'waitForDiscoveryStart').resolves();
         this.sandbox.stub(configuration, 'get').withArgs('discoveryGraph')
             .returns('from.config.graph');
+        configuration.get.withArgs('skipResetPostDiscovery').returns('false');
         configuration.get.withArgs('autoCreateObm').returns('false');
         configuration.get.withArgs('skipPollersCreation').returns('false');
         return profileApiService.runDiscovery(node)
@@ -347,7 +349,8 @@ describe("Http.Services.Api.Profiles", function () {
 
             var promise = profileApiService.getProfileFromTaskOrNode(node);
 
-            return expect(promise).to.be.rejectedWith('Unable to retrieve workflow properties')
+            return expect(promise).to.be.rejectedWith(
+                'Unable to retrieve workflow properties or profiles')
             .then(function() {
                 expect(workflowApiService.findActiveGraphForTarget).to.have.been.calledOnce;
                 expect(taskProtocol.requestProfile).to.have.been.calledOnce;

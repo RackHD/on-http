@@ -1,5 +1,6 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Managers",
+    "@odata.context" : "<%= basepath %>/$metadata#ManagerCollection.ManagerCollection",
+    "@odata.id": "<%= basepath %>/Managers",
     "@odata.type": "#ManagerCollection.ManagerCollection",
     "Name": "Manager Collection",
     "Oem": {},

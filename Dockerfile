@@ -1,6 +1,6 @@
 # Copyright 2016, EMC, Inc.
 
-FROM rackhd/on-tasks
+FROM rackhd/on-tasks:devel
 
 COPY . /RackHD/on-http/
 WORKDIR /RackHD/on-http
@@ -10,9 +10,8 @@ RUN mkdir -p ./node_modules \
   && ln -s /RackHD/on-core ./node_modules/on-core \
   && ln -s /RackHD/on-core/node_modules/di ./node_modules/di \
   && apt-get install -y unzip curl \
-  && npm install --ignore-scripts \
+  && npm install \
   && npm install apidoc \
-  && npm run apidoc \
   && npm run taskdoc \
   && /RackHD/on-http/install-web-ui.sh \
   && /RackHD/on-http/install-swagger-ui.sh \

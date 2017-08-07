@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#AccountService",
+    "@odata.context" : "<%= basepath %>/$metadata#AccountService.AccountService",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#AccountService.1.0.0.AccountService",
+    "@odata.type": "#AccountService.v1_0_0.AccountService",
     "Oem": {},
     "Id": "AccountService",
     "Description": "Account Service",

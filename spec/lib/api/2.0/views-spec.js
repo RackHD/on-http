@@ -9,42 +9,28 @@ describe('Http.Api.Views', function () {
     var _;
     var ejs;
 
-    before('start HTTP server', function () {
-        this.timeout(10000);
-        return helper.startServer([
-        ]).then(function() {
-            _ = helper.injector.get('_');
-            viewsProtocol = helper.injector.get('Views');
-            ejs = helper.injector.get('ejs');
-            Promise = helper.injector.get('Promise');
-            sinon.stub(viewsProtocol, 'load');
-            sinon.stub(viewsProtocol, 'getAll');
-            sinon.stub(viewsProtocol, 'get');
-            sinon.stub(viewsProtocol, 'put');
-            sinon.stub(viewsProtocol, 'unlink');
-        });
+    helper.httpServerBefore();
+
+    before(function () {
+        _ = helper.injector.get('_');
+        viewsProtocol = helper.injector.get('Views');
+        ejs = helper.injector.get('ejs');
+        Promise = helper.injector.get('Promise');
     });
 
-    afterEach('reset stubs', function () {
-        _(viewsProtocol).methods().forEach(function (method) {
-            if (viewsProtocol[method].reset) {
-              viewsProtocol[method].reset();
-            }
-        }).value();
+    beforeEach('set up mocks', function() {
+        this.sandbox.stub(viewsProtocol, 'load');
+        this.sandbox.stub(viewsProtocol, 'getAll');
+        this.sandbox.stub(viewsProtocol, 'get');
+        this.sandbox.stub(viewsProtocol, 'put');
+        this.sandbox.stub(viewsProtocol, 'unlink');
     });
 
-    after('stop HTTP server', function () {
-        _(viewsProtocol).methods().forEach(function (method) {
-            if (viewsProtocol[method].restore) {
-              viewsProtocol[method].restore();
-            }
-        }).value();
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     describe('2.0 Views', function() {
-        before(function() {
-            sinon.stub(viewsProtocol, 'render', function(viewName, options) {
+        beforeEach(function() {
+            this.sandbox.stub(viewsProtocol, 'render', function(viewName, options) {
                 switch(viewName) {
                     case 'renderable.2.0.json':
                         return Promise.resolve(
@@ -58,19 +44,13 @@ describe('Http.Api.Views', function () {
                         });
                     default:
                         return Promise.resolve();
-                };
+                }
             });
-            sinon.stub(ejs, 'render', function(template, options) {
+            this.sandbox.stub(ejs, 'render', function(template, options) {
                 return Promise.resolve(
                     JSON.stringify(_.omit(options, '_', 'Constants', 'basepath'))
                 );
             });
-        });
-
-        after(function() {
-            viewsProtocol.render.restore();
-            viewsProtocol.get.reset();
-            ejs.render.restore();
         });
 
         it('should get all views', function() {
@@ -113,12 +93,8 @@ describe('Http.Api.Views', function () {
     });
 
     describe('2.0 Views', function() {
-        before(function() {
-            sinon.stub(viewsProtocol, 'render').resolves('{"message": "error"}');
-        });
-
-        after(function() {
-            viewsProtocol.render.restore();
+        beforeEach(function() {
+            this.sandbox.stub(viewsProtocol, 'render').resolves('{"message": "error"}');
         });
 
         it('should fail to get non-existant view', function() {

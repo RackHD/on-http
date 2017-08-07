@@ -1,0 +1,60 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#<%= baseprofile %>/Members/$entity"
+    ,"@odata.id": "<%= url %>"
+    ,"@odata.type": "#SerialInterface.1.2.0.SerialInterface"
+    <% if (typeof bitRate !== 'undefined') { %>
+        ,"BitRate" : [
+        <% bitRate.forEach(function(bitRate, i, arr) { %>
+            {
+                "Member": "<%= bitRate.member %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+        ]
+    <% } %>
+    <% if (typeof connectorType !== 'undefined') { %>
+        ,"ConnectorType" : "<%= connectorType %>"
+    <% } %>
+
+    <% if (typeof dataBits !== 'undefined') { %>
+        ,"DataBits" : [
+        <% dataBits.forEach(function(dataBits, i, arr) { %>
+            {
+                "Member": "<%= dataBits.member %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+        ]
+    <% } %>
+    <% if (typeof description !== 'undefined') { %>
+        ,"Description": "<%= description %>"
+    <% } %>
+    <% if (typeof flowcontrol !== 'undefined') { %>
+        ,"FlowControl": "<%= flowcontrol %>"
+    <% } %>
+    <% if (typeof Id !== 'undefined') { %>
+        ,"Id": "<%= Id %>"
+    <% } %>
+    , "InterfaceEnabled": <%= interfaceEnabled %>
+    ,"Name": "<%= name %>"
+    <% if (typeof parity !== 'undefined') { %>
+        ,"Parity": "<%= parity %>"
+    <% } %>
+    <% if (typeof pinout !== 'undefined') { %>
+        ,"PinOut": "<%= pinout %>"
+    <% } %>
+    <% if (typeof signaltype !== 'undefined') { %>
+        ,"SignalType": "<%= signaltype %>"
+    <% } %>
+    <% if (typeof stopBits !== 'undefined') { %>
+        ,"StopBits" : [
+        <% stopBits.forEach(function(stopBits, i, arr) { %>
+            {
+                "Member": "<%= stopBits.member %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+        ]
+    <% } %>
+}
+

@@ -1,0 +1,133 @@
+{
+  "@odata.context": "<%= basepath %>/$metadata#Drive.Drive",
+  "@odata.id": "<%= url %>",
+  "@odata.type": "#Drive.v1_1_1.Drive",
+  "Oem": {},
+  "Id": "<%= driveIndex %>",
+  "Description": "<%= drive.deviceDescription %>",
+  "Name": "Drive",
+  "Model": "<%= drive.model%>",
+  "Revision": "<%= drive.revision%>",
+  "Status": {
+    "Health": <%
+    switch(drive.primaryStatus){
+      case '1': %>
+        "OK"
+    <%  break;
+      case '2': %>
+        "Warning"
+    <%  break;
+      case '3': %>
+        "Critical"
+    <%  break;
+      default: %>
+        "OK"
+    <%} %>
+  },
+  "CapacityBytes": <%= drive.sizeInBytes %>,
+  "FailurePredicted": <%=drive.predictiveFailureState == 0 ? false:true%>,
+  "Protocol": <%
+  switch(drive.busProtocol){
+    case '1': %>
+      "iSCSI",
+    <% break;
+    case '3': %>
+      "FC",
+    <% break;
+    case '4': %>
+      "USB",
+    <% break;
+    case '5': %>
+      "SATA",
+    <% break;
+    case '6': %>
+      "SAS",
+    <% break;
+    default: %>
+      "SATA",
+  <%} %>
+  "MediaType": "<%= drive.mediaType == 0 ? 'HDD':'SSD'%>",
+  "Manufacturer": "<%= drive.manufacturer %>",
+  "SKU": "",
+  "SerialNumber": "<%= drive.serialNumber %>",
+  "PartNumber": "<%= drive.ppid %>",
+  "AssetTag": "",
+  "Identifiers" :[ {
+	"DurableName" : "<%= drive.sasaddress %>",
+	"DurableNameFormat" : "EUI"
+  }],
+  "Location":[{
+    "Info": "<%= drive.fqdd %>"
+  }],
+  "HotspareType": <%
+  switch(drive.hotSpareStatus){
+    case '0': %>
+      "None",
+    <% break;
+    case '1': %>
+      "Dedicated",
+    <% break;
+    case '2': %>
+      "Global",
+    <% break;
+    default: %>
+      "None",
+  <%} %>
+  "EncryptionAbility": "<%= drive.securityStatus == 0 ? 'None':'SelfEncryptingDrive'%>",
+  "EncryptionStatus": <%
+  switch(drive.securityStatus){
+    case '0': %>
+      "Unencrypted",
+    <% break;
+    case '1': %>
+      "Unlocked",
+    <% break;
+    case '2': %>
+      "Locked",
+    <% break;
+    case '5': %>
+      "Foreign",
+    <% break;
+    default: %>
+      "Unencrypted",
+  <%} %>
+  "BlockSizeBytes": <%= drive.blockSizeInBytes %>,
+  "CapableSpeedGbs":  <% 
+  switch(drive.maxCapableSpeed){
+    case '0': %>
+      0,
+    <% break;
+    case '1': %>
+      1.5,
+    <% break;
+    case '2': %>
+      3,
+    <% break;
+    case '3': %>
+      6,
+    <% break;
+    case '4': %>
+      12,
+    <% break;
+    default: %>
+      0,
+  <%} %>
+  "Links": {
+    "Volumes@odata.count": <%= volumeIds.length %>,
+    "Volumes": [
+        <% volumeIds.forEach(function(n, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/Storage/<%=index%>/Volumes/<%=n%>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+  },
+  "Operations": [
+    {"OperationName": "<%= drive.operationName %>",
+     "PercentageComplete": <%= drive.operationPercentComplete %>
+    }
+   ]
+
+
+}

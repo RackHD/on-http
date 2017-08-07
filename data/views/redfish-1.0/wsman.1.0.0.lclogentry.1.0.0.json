@@ -1,0 +1,32 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#LogEntry.LogEntry",
+    "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/LogServices/<%=type%>/Entries/<%= entry.recordId %>",
+    "@odata.type": "#LogEntry.v1_0_0.LogEntry",
+    "Oem": {
+        "Dell":{
+            "Log Name": "<%= entry.logName %>",
+            "Category": "<%= entry.category %>",
+			"Entry Id": "<%= entry.instanceId %>",
+            "Severity": "<%= entry.severity %>",
+            "Comment": "<%= entry.comment %>",
+            "Agent": "<%= entry.agentId %>",
+            "fqdd": "<%= entry.fqdd %>",
+            "Raw Event Data": "<%= entry.rawEventData %>",
+            "Sequence Number": "<%= entry.sequenceNumber %>"
+        }
+    },
+    "Id": "<%= entry.recordId %>",
+    "Name": "<%= entry.elementName %>",
+    "EntryType": "Oem",
+    "Created": "<%= entry.creationTimeStamp %>",
+    "OemRecordFormat": "",
+    "Message": "<%= entry.message %>",
+    "MessageId": "<%= entry.messageId %>",
+    "MessageArgs": ["<%= entry.messageArguments %>"],
+    "Links": {
+        "Oem": {},
+        "OriginOfCondition": {
+            "@odata.id": "<%= entry.origin || 'null' %>"
+        }
+    }
+}

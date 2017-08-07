@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#ServiceRoot",
+    "@odata.context" : "<%= basepath %>/$metadata#ServiceRoot.ServiceRoot",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#ServiceRoot.1.0.0.ServiceRoot",
+    "@odata.type": "#ServiceRoot.v1_0_0.ServiceRoot",
     "Oem" : {},
     "Id": "<%= identifier %>",
     "Description": "",
@@ -10,7 +10,9 @@
     "UUID": "<%=uuid%>",
     "Links": {
         "Oem": {},
-        "Sessions": {}
+        "Sessions": {
+            "@odata.id": "/redfish/v1/SessionService/Sessions"
+        }
     },
     "Systems": {
         "@odata.id": "<%=basepath%>/Systems"
@@ -20,6 +22,9 @@
     },
     "Managers": {
         "@odata.id": "<%=basepath%>/Managers"
+    },
+    "UpdateService": {
+        "@odata.id": "<%=basepath%>/UpdateService"
     },
     "Tasks": {
         "@odata.id": "<%=basepath%>/TaskService"

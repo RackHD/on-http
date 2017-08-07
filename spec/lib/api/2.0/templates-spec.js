@@ -1,5 +1,4 @@
-// Copyright 2015-2016, EMC, Inc.
-
+// Copyright © 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
 'use strict';
 
 describe('Http.Api.Templates', function () {
@@ -14,73 +13,45 @@ describe('Http.Api.Templates', function () {
     var findActiveGraphForTarget;
     var nodeApiService;
 
-    before('start HTTP server', function () {
-        this.timeout(5000);
+    helper.httpServerBefore();
 
-        return helper.startServer([
-        ]);
-    });
-
-    beforeEach('set up mocks', function () {
+    before(function() {
         taskProtocol = helper.injector.get('Protocol.Task');
         lookupService = helper.injector.get('Services.Lookup');
         Errors = helper.injector.get('Errors');
         waterline = helper.injector.get('Services.Waterline');
         swagger = helper.injector.get('Http.Services.Swagger');
-        sinon.stub(swagger, 'makeRenderableOptions').resolves({});
-        this.sandbox = sinon.sandbox.create();
-
         tasksApiService = helper.injector.get('Http.Services.Api.Tasks');
-        tasksApiService.getNode = sinon.stub().resolves({ id: '1234abcd5678effe9012dcba' });
-
         nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
-        nodeApiService.getNodeByIdentifier = sinon.stub()
-            .resolves({ id: '1234abcd5678effe9012dcba' });
-
-        lookupService.ipAddressToMacAddress = sinon.stub().resolves('00:11:22:33:44:55');
-        lookupService.reqIpAddressToMacAddress = sinon.stub().resolves();
-
-        sinon.stub(taskProtocol, 'activeTaskExists').resolves({});
-        sinon.stub(taskProtocol, 'requestCommands').resolves({ testcommands: 'cmd' });
-        sinon.stub(taskProtocol, 'requestProfile').resolves();
-        sinon.stub(taskProtocol, 'requestProperties').resolves();
-
         workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
-        findActiveGraphForTarget = this.sandbox.stub(
-            workflowApiService, 'findActiveGraphForTarget');
-
-
-        sinon.stub(workflowApiService, 'createActiveGraph').resolves({ instanceId: 'test' });
-
         templates = helper.injector.get('Templates');
-        sinon.stub(templates, 'getAll').resolves();
-        sinon.stub(templates, 'getName').resolves();
-        sinon.stub(templates, 'get').resolves();
-        sinon.stub(templates, 'put').resolves();
-        sinon.stub(templates, 'unlink').resolves();
-        sinon.stub(templates, 'render').resolves();
-
         return helper.injector.get('Views').load();
     });
 
-    afterEach('teardown mocks', function () {
-        function resetMocks(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (typeof obj[method].restore === 'function') {
-                    obj[method].restore();
-                }
-            }).value();
-        }
-        resetMocks(lookupService);
-        resetMocks(taskProtocol);
-        resetMocks(workflowApiService);
-        resetMocks(templates);
-        resetMocks(swagger);
+    beforeEach('set up mocks', function () {
+        this.sandbox.stub(swagger, 'makeRenderableOptions').resolves({});
+        tasksApiService.getNode = this.sandbox.stub().resolves({ id: '1234abcd5678effe9012dcba' });
+        nodeApiService.getNodeByIdentifier = this.sandbox.stub()
+            .resolves({ id: '1234abcd5678effe9012dcba' });
+        lookupService.ipAddressToMacAddress = this.sandbox.stub().resolves('00:11:22:33:44:55');
+        lookupService.reqIpAddressToMacAddress = this.sandbox.stub().resolves();
+        this.sandbox.stub(taskProtocol, 'activeTaskExists').resolves({});
+        this.sandbox.stub(taskProtocol, 'requestCommands').resolves({ testcommands: 'cmd' });
+        this.sandbox.stub(taskProtocol, 'requestProfile').resolves();
+        this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
+
+        findActiveGraphForTarget = this.sandbox.stub(
+            workflowApiService, 'findActiveGraphForTarget');
+
+        this.sandbox.stub(templates, 'getAll').resolves();
+        this.sandbox.stub(templates, 'getName').resolves();
+        this.sandbox.stub(templates, 'get').resolves();
+        this.sandbox.stub(templates, 'put').resolves();
+        this.sandbox.stub(templates, 'unlink').resolves();
+        this.sandbox.stub(templates, 'render').resolves();
     });
 
-    after('stop HTTP server', function () {
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     var template = {
         id: '1234abcd5678effe9012dcba',
@@ -186,7 +157,7 @@ describe('Http.Api.Templates', function () {
             };
             findActiveGraphForTarget.resolves(graph);
             taskProtocol.requestProperties.resolves({});
-            return helper.request()
+            return helper.request('http://localhost:8091')
                 .get('/api/2.0/templates/123?nodeId=583ae29c68896e275779e2ff')
                 .expect(200)
                 .then(function () {
@@ -201,7 +172,7 @@ describe('Http.Api.Templates', function () {
             };
             findActiveGraphForTarget.resolves(graph);
             taskProtocol.requestProperties.resolves({});
-            return helper.request()
+            return helper.request('http://localhost:8091')
                 .get('/api/2.0/templates/123?macs=00:50:56:aa:7d:85')
                 .expect(200)
                 .then(function () {
@@ -211,7 +182,8 @@ describe('Http.Api.Templates', function () {
         });
 
         it('should return 400 when nodeId is not provided', function () {
-            return helper.request().get('/api/2.0/templates/123')
+            return helper.request('http://localhost:8091')
+                .get('/api/2.0/templates/123')
                 .expect('Content-Type', /^application\/json/)
                 .expect(400)
                 .expect(function (req) {

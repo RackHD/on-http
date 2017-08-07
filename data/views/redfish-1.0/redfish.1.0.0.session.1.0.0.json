@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#SessionService/Sessions/Members/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#Session.Session",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#Session.1.0.0.Session",
+    "@odata.type": "#Session.v1_0_0.Session",
     "Oem": {},
     "Id": "<%= entry.id %>",
     "Description": "User Session",

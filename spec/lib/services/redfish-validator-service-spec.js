@@ -44,7 +44,7 @@ describe("Redfish Validator Service", function() {
         view.get.reset();
     });
 
-    helper.after(function () {
+    after(function () {
         view.get.restore();
         env.get.restore();
     });

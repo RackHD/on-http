@@ -71,7 +71,7 @@ else:
     PATH = os.getcwd()
 
 
-class Progress:
+class Progress(object):
     """
     Secure erase job progress class.
     """
@@ -109,9 +109,10 @@ class Progress:
         log = open(self.path + drive + '.log', 'r')
         MAX_DOT_COUNT = 50
         # Scrub pass counts for different scrub methods, default pass count is 1
+        pass_count_key = self.parameters["option"] or "nnsa"
         pass_counts = {"nnsa": 4, "dod": 4, "gutmann": 35, "schneier":7, "pfitzner7":7,
                        "pfitzner33": 33, "usarmy": 3, "random2": 2, "old": 6, "fastold": 5}
-        pass_count = pass_counts[self.parameters["option"]]
+        pass_count = pass_counts.get(pass_count_key, 1)
         line_count = 0
         dot_count = 0
         patterna = re.compile("^scrub: \w{4,6}\s*\|\.+\|$")
@@ -151,6 +152,7 @@ class Progress:
         :param drive: drive name
         :return: a float digital of percentage
         """
+        self.parameters["option"] = self.parameters["option"] or "security-erase"
         log = open(self.path + drive + '.log', 'r')
         percent = 0.0
         if not self.duration.has_key(drive) or self.duration[drive] == 0:
@@ -218,15 +220,14 @@ class Progress:
         erase_start_flags = [False]*disk_count
         payload = {
             "taskId": self.parameters["taskId"],
-            "progress": {
-                "value": 0,
-                "maximum": 100
-            }
+            "value": 0,
+            "maximum": 100
         }
         counter = 0
         total_percent = 0.00
         if not self.parameters["address"]:
-            self.parameters["address"] = "http://172.31.128.1:9080/api/current/notification"
+            self.parameters["address"] = \
+                "http://172.31.128.1:9080/api/current/notification/progress"
         while True:
             for (index, value) in enumerate(self.disk_list):
                 value = value.split("/")[-1]
@@ -244,12 +245,12 @@ class Progress:
                     erase_start_flags[index] = os.path.exists(self.path + value + '.log')
             total_percent = sum(percentage_list)/disk_count
             if total_percent == float('+inf'):
-                payload["progress"]["percentage"] = "Not Available"
+                payload["percentage"] = "Not Available"
             else:
-                payload["progress"]["percentage"] = str("%.2f" % total_percent) + "%"
-                payload["progress"]["value"] = int(total_percent)
+                payload["percentage"] = str("%.2f" % total_percent) + "%"
+                payload["value"] = int(total_percent)
             counter += 1
-            payload["progress"]["description"] = "This is the {}th polling with {}s interval" \
+            payload["description"] = "This is the {}th polling with {}s interval" \
                 .format(str(counter), str(self.interval))
             cmd = 'curl -X POST -H "Content-Type:application/json" ' \
                 '-d \'{}\' {}'.format(json.dumps(payload), self.parameters["address"])
@@ -340,6 +341,8 @@ def convert_raid_to_jbod():
     """
 
     disk_argument_list = []
+    raid_controller_vendor = ""
+    disk_list_without_raid = []
     # ARG_LIST.d should include at least following items as a string
     #   {
     #   "diskName": "/dev/sdx"
@@ -352,20 +355,20 @@ def convert_raid_to_jbod():
         disk_argument_list.append(json.loads(arg))
     assert disk_argument_list != [], "no disk arguments includes"
 
-    # Idenfity tools used for raid operation
-    raid_controller_vendor = ARG_LIST.v
-    assert raid_controller_vendor in RAID_VENDOR_LIST.keys(), \
-        "RAID controller vendor info is invalid"
-    raid_tool = RAID_VENDOR_LIST[raid_controller_vendor]
-    assert os.path.exists(raid_tool), "Overlay doesn't include tool path: " + raid_tool
-
-    disk_list_without_raid = []
     for disk_argument in disk_argument_list:
         # if virtualDisk doesn't exit, push disk directly into disk list
         if not disk_argument["virtualDisk"]:
             # disk_list_without_raid.append("/dev/" + disk_argument["diskName"])
             disk_list_without_raid.append(disk_argument["diskName"])
         else:
+            # Idenfity tools used for raid operation
+            # Tool will be validated once and only when RAID exists
+            if not raid_controller_vendor:
+                raid_controller_vendor = ARG_LIST.v or "lsi"
+                assert raid_controller_vendor in RAID_VENDOR_LIST.keys(), \
+                    "RAID controller vendor info is invalid"
+                raid_tool = RAID_VENDOR_LIST[raid_controller_vendor]
+                assert os.path.exists(raid_tool), "Overlay doesn't include tool path: " + raid_tool
             command = [raid_tool, "/c0", "set", "jbod=on"]
             subprocess.check_output(command, shell=False)
             command = [raid_tool, disk_argument["virtualDisk"], "del", "force"]
@@ -755,7 +758,7 @@ if __name__ == '__main__':
     pool.join()
 
     if progress_result["exitcode"]:
-        print progress_result["Message"]
+        print progress_result["message"]
 
     print erase_result_list
     for erase_result in erase_result_list:

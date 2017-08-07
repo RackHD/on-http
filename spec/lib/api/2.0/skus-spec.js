@@ -11,63 +11,40 @@ describe('Http.Api.Skus.2.0', function() {
     var Errors;
     var skuApiService;
 
-    before('start HTTP server', function () {
-        this.timeout(5000);
-        return helper.startServer([
-        ]).then(function() {
-            waterline = helper.injector.get('Services.Waterline');
-            sinon.stub(waterline.skus);
-            workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
+    helper.httpServerBefore();
 
-            skuApiService = helper.injector.get('Http.Services.SkuPack');
-            Promise = helper.injector.get('Promise');
-            Constants = helper.injector.get('Constants');
-            Errors = helper.injector.get('Errors');
+    before(function () {
+        waterline = helper.injector.get('Services.Waterline');
+        workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
 
-            sinon.stub(skuApiService, 'getSkus');
-            sinon.stub(skuApiService, 'postSku');
-            sinon.stub(skuApiService, 'getSkusById');
-            sinon.stub(skuApiService, 'upsertSku');
-            sinon.stub(skuApiService, 'patchSku');
-            sinon.stub(skuApiService, 'getNodesSkusById');
-            sinon.stub(skuApiService, 'regenerateSkus');
-            sinon.stub(skuApiService, 'deleteSkuById');
-
-            sinon.stub(workflowApiService, 'createAndRunGraph');
-        });
+        skuApiService = helper.injector.get('Http.Services.SkuPack');
+        Promise = helper.injector.get('Promise');
+        Constants = helper.injector.get('Constants');
+        Errors = helper.injector.get('Errors');
     });
 
-    afterEach('reset stubs', function () {
-        function resetStubs(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (obj[method] && obj[method].reset) {
-                    obj[method].reset();
-                }
-            }).value();
-        }
-        resetStubs(waterline.skus);
-        resetStubs(workflowApiService);
+    beforeEach('set up mocks', function() {
+        this.sandbox.stub(waterline.skus);
+
+        this.sandbox.stub(skuApiService, 'getSkus');
+        this.sandbox.stub(skuApiService, 'postSku');
+        this.sandbox.stub(skuApiService, 'getSkusById');
+        this.sandbox.stub(skuApiService, 'upsertSku');
+        this.sandbox.stub(skuApiService, 'patchSku');
+        this.sandbox.stub(skuApiService, 'getNodesSkusById');
+        this.sandbox.stub(skuApiService, 'regenerateSkus');
+        this.sandbox.stub(skuApiService, 'deleteSkuById');
+
+        this.sandbox.stub(workflowApiService, 'createAndRunGraph');
     });
 
-    after('stop HTTP server', function () {
-        skuApiService.getSkus.restore();
-        skuApiService.postSku.restore();
-        skuApiService.getSkusById.restore();
-        skuApiService.upsertSku.restore();
-        skuApiService.patchSku.restore();
-        skuApiService.regenerateSkus.restore();
-        skuApiService.getNodesSkusById.restore();
-        skuApiService.deleteSkuById.restore();
-        workflowApiService.createAndRunGraph.restore();
-
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     var node = {
         id: '1234abcd1234abcd1234abcd',
         name: 'sku test node',
         type: 'compute',
-        obmSettings: [
+        obms: [
             {
                 service: 'ipmi-obm-service',
                 config: {
@@ -77,11 +54,13 @@ describe('Http.Api.Skus.2.0', function() {
                 }
             }
         ],
-        autoDiscover: "false",
+        ibms: [],
+        autoDiscover: false,
         identifiers: [],
         createdAt: '010101',
         updatedAt: '010101',
         tags: [],
+        relations: [],
         sku: '0987'
     };
 
@@ -139,7 +118,6 @@ describe('Http.Api.Skus.2.0', function() {
                 .expect(200)
                 .then(function (res) {
                     expect(skuApiService.getSkus).to.have.been.called;
-                    var checkSku = res.body;
                     expect(res.body).to.have.lengthOf(1);
                     expect(res.body[0]).to.have.property('name').that.equals(record.name);
                     expect(res.body[0]).to.have.property('rules').that.deep.equals(record.rules);
@@ -261,19 +239,14 @@ describe('Http.Api.Skus.2.0', function() {
 
             beforeEach('setup', function () {
                 skuService = helper.injector.get('Http.Services.SkuPack');
-                sinon.stub(skuService, 'installPack');
-                sinon.stub(skuService, 'registerPack');
+                this.sandbox.stub(skuService, 'installPack');
+                this.sandbox.stub(skuService, 'registerPack');
                 skuService.installPack.resolves(['filename', 'contents']);
                 skuService.registerPack.resolves();
             });
 
             beforeEach('reset createAndRunGraph stub', function () {
                 workflowApiService.createAndRunGraph.resolves();
-            });
-
-            afterEach('teardown', function () {
-                skuService.installPack.restore();
-                skuService.registerPack.restore();
             });
 
             it('should process a .tar.gz file', function (done) {
@@ -295,12 +268,10 @@ describe('Http.Api.Skus.2.0', function() {
 
         describe('POST sku pack', function () {
             beforeEach('setup', function () {
-                sinon.stub(skuApiService, 'skuPackHandler');
+                this.sandbox.stub(skuApiService, 'skuPackHandler');
                 skuApiService.skuPackHandler.resolves();
             });
-            afterEach('teardown', function () {
-                skuApiService.skuPackHandler.restore();
-            });
+
             it('should post a sku pack', function (done) {
                 var fs = helper.injector.get('fs');
                 var skuPack = {id: 'sku name test'};
@@ -324,12 +295,10 @@ describe('Http.Api.Skus.2.0', function() {
 
         describe('PUT sku pack', function () {
             beforeEach('setup', function () {
-                sinon.stub(skuApiService, 'putPackBySkuId');
+                this.sandbox.stub(skuApiService, 'putPackBySkuId');
                 skuApiService.putPackBySkuId.resolves();
             });
-            afterEach('teardown', function () {
-                skuApiService.putPackBySkuId.restore();
-            });
+
             it('should put a sku pack', function (done) {
                 var fs = helper.injector.get('fs');
                 var skuPack = {id : 'sku name test'};

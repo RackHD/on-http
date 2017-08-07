@@ -1,9 +1,10 @@
 {
     "title": "redfish-obm-service",
     "definitions": {
-        "Obm": {
+        "ObmBase": {
             "description": "Redfish OBM settings",
             "type": "object",
+            "additionalProperties": false,
             "properties": {
                 "nodeId": {
                     "type": "string"
@@ -50,8 +51,20 @@
                     },
                     "required": ["host", "user", "password", "root", "uri", "protocol"]
                 }
-            },
-            "required": ["service", "config"]
+            }
+        },
+        "ObmPatch": {
+            "type": "object",
+            "allOf": [
+                {"$ref": "#/definitions/ObmBase"}
+            ]
+        },
+        "Obm": {
+            "type": "object",
+            "allOf": [
+                {"$ref": "#/definitions/ObmBase"},
+                {"required": ["nodeId", "service", "config"]}
+            ]
         }
     }
 }

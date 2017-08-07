@@ -1,6 +1,6 @@
 info:
   title: rackhd api 
-  version: "2.1.0" 
+  version: "5.0.0"
 basePath: /api/2.0
 consumes:
 - application/json
@@ -63,6 +63,12 @@ definitions:
         type: string
       username:
         type: string
+  patch_user_obj:
+    properties:
+      role:
+        type: string
+      password:
+        type: string
   hooks.2.0_HookBase:
     description: Hook base schema
     type: object
@@ -115,11 +121,20 @@ definitions:
     - service
     - config
     type: object
-  node.2.0_PartialNode:
-    description: Post a node into RackHD
+  node.2.0_GetNode:
+    description: Get a node from RackHD
     properties:
-      autoDiscover:
+      identifier:
         type: string
+      autoDiscover:
+        type: boolean
+      bootSettings:
+        type: object
+      identifiers:
+        items:
+          type: string
+          uniqueItems: true
+        type: array
       name:
         description: Name of the node
         type: string
@@ -128,6 +143,54 @@ definitions:
         type: array
         items:
             $ref: "#/definitions/nodes_post_obm_by_id"
+      relations:
+        type: array
+        items:
+          $ref: "#/definitions/relations_obj"
+      tags:
+        type: string
+      type:
+        description: Type of node
+        enum:
+        - compute
+        - compute-container
+        - switch
+        - dae
+        - pdu
+        - mgmt
+        - enclosure
+        - rack
+        type: string
+    type: object
+  node.2.0_PartialNode:
+    description: Post a node into RackHD
+    properties:
+      autoDiscover:
+        type: boolean
+      bootSettings:
+        type: object
+      identifiers:
+        items:
+          type: string
+          uniqueItems: true
+        type: array
+      name:
+        description: Name of the node
+        type: string
+      obms:
+        description: The list of obm settings
+        type: array
+        items:
+            $ref: "#/definitions/nodes_post_obm_by_id"
+      relations:
+        type: array
+        items:
+          $ref: "#/definitions/relations_obj"
+      tags:
+        items:
+          type: string
+          uniqueItems: true
+        type: array
       type:
         description: Type of node
         enum:
@@ -148,9 +211,12 @@ definitions:
         type: object
       service:
         type: string
+      nodeId:
+        type: string
     required:
     - service
     - config
+    - nodeId
     type: object
   obm_led:
     properties:
@@ -158,6 +224,17 @@ definitions:
         type: string
       value:
         type: boolean
+  obm:
+    type: object
+    properties:
+      id:
+        type: string
+      node:
+        type: string
+      config:
+        type: object  
+      service:
+        type: string
   poller.2.0_PartialPoller:
     description: A poller for periodic collection of telemetry data
     properties:
@@ -176,6 +253,7 @@ definitions:
         - ipmi
         - snmp
         - redfish
+        - wsman
         type: string
     type: object
   post_node_workflow:
@@ -191,6 +269,7 @@ definitions:
   post_tags:
     properties:
       name:
+        minLength: 1
         type: string
       rules:
         items:
@@ -220,6 +299,20 @@ definitions:
                 type: string
             type: object
         type: object
+    type: object
+  relations_obj:
+    description: A key value set of node relations.
+    properties:
+      relationType:
+        description: Relation Type with the node.
+        type: string
+      info:
+        type: string
+      targets:
+        description: Array of targets.
+        items:
+          type: string
+        type: array
     type: object
   role_obj:
     properties:
@@ -262,6 +355,8 @@ definitions:
             type: string
         type: object
       service:
+        type: string
+      nodeId:
         type: string
     required:
     - service
@@ -308,6 +403,7 @@ definitions:
         type: string
       username:
         type: string
+        pattern: ^[A-Za-z][0-9A-Za-z._-]+$
   workflow_graph:
     properties:
       friendlyName:
@@ -410,6 +506,35 @@ paths:
       - catalogsRead
       x-view: catalogs.2.0.json
     x-swagger-router-controller: catalogs
+  /catalogs/{identifier}/firmware:
+    get:
+      description: Get a catalog based on its node identifier.
+      operationId: firmwareCatalogsIdGet
+      parameters:
+      - description: node identifier
+        in: path
+        name: identifier
+        required: true
+        type: string
+      responses:
+        200:
+          description: Successfully retrieved the catalog
+          schema:
+            type: object
+                       
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Get a firmware catalog
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Read
+      - catalogsRead
+    x-swagger-router-controller: catalogs
   /config:
     get:
       description: Get the RackHD server configuration properties.
@@ -436,6 +561,35 @@ paths:
       - application/json
       description: Modify the RackHD server configuration.
       operationId: configPatch
+      parameters:
+      - description: The configuration properties to be modified
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/generic_obj'
+      responses:
+        200:
+          description: Successfully modified the configuration
+          schema:
+            type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Patch server configuration
+      tags:
+      - /api/2.0
+      x-authentication-type:
+      - jwt
+      x-privileges:
+      - Write
+      - configModify
+    put:
+      consumes:
+      - application/json
+      description: Modify the RackHD server configuration.
+      operationId: configPut
       parameters:
       - description: The configuration properties to be modified
         in: body
@@ -1067,7 +1221,7 @@ paths:
           description: Successfully retrieved the list of lookups
           schema:
             items:
-              type: object
+              $ref: '#/definitions/Lookups.2.0_LookupBase'
             type: array
         default:
           description: Unexpected error
@@ -1095,7 +1249,7 @@ paths:
         201:
           description: Successfully created new lookup
           schema:
-            type: object
+            $ref: '#/definitions/Lookups.2.0_LookupBase'
         default:
           description: Unexpected error
           schema:
@@ -1153,7 +1307,7 @@ paths:
           description: Successfully retrieved the lookup
           schema:
             items:
-              type: object
+              $ref: '#/definitions/Lookups.2.0_LookupBase'
             type: array
         default:
           description: Unexpected error
@@ -1186,7 +1340,7 @@ paths:
         200:
           description: Successfully modified the lookup
           schema:
-            type: object
+            $ref: '#/definitions/Lookups.2.0_LookupBase'
         404:
           description: The specified lookup was not found
           schema:
@@ -1231,7 +1385,7 @@ paths:
           description: Successfully retrieved the list of nodes
           schema:
             items:
-              type: object
+              $ref: '#/definitions/node.2.0_GetNode'
             type: array
         400:
           description: Bad Request
@@ -1277,7 +1431,6 @@ paths:
       x-privileges:
       - Write
       - nodesWrite
-      x-swagger-deserializer: nodes
       x-swagger-schema: node.2.0.json#/definitions/Node
     x-swagger-router-controller: nodes
   /nodes/tags/{tagName}:
@@ -1347,7 +1500,7 @@ paths:
           description: Successfully retrieved the specified node
           schema:
             items:
-              type: object
+              $ref: '#/definitions/node.2.0_GetNode'
             type: array
         404:
           description: The specified node was not found
@@ -1385,7 +1538,7 @@ paths:
         200:
           description: Successfully modified the specified node
           schema:
-            type: object
+            $ref: '#/definitions/node.2.0_PartialNode'
         404:
           description: The specified node was not found
           schema:
@@ -1402,7 +1555,6 @@ paths:
       x-privileges:
       - Write
       - nodesModify
-      x-swagger-deserializer: nodes
     x-swagger-router-controller: nodes
   /nodes/{identifier}/catalogs:
     get:
@@ -1489,7 +1641,9 @@ paths:
         200:
           description: Successfully retrieved the specified OBM service
           schema:
-            type: object
+            type: array
+            items:
+              $ref: '#/definitions/obm'
         default:
           description: Unexpected error
           schema:
@@ -1556,7 +1710,9 @@ paths:
         200:
           description: Successfully retrieved the pollers of specified node
           schema:
-            type: object
+            type: array
+            items:
+              type: object
         404:
           description: The specified node was not found
           schema:
@@ -1626,7 +1782,7 @@ paths:
           description: Successfully retrieved the nodes relations
           schema:
             items:
-              type: object
+              $ref: '#/definitions/relations_obj'
             type: array
         404:
           description: The specified node was not found.
@@ -1752,7 +1908,6 @@ paths:
       - Write
       - nodesWrite
       x-swagger-schema: ibm
-      x-swagger-deserializer: nodes
     x-swagger-router-controller: nodes
   /nodes/{identifier}/tags:
     get:
@@ -1992,7 +2147,9 @@ paths:
         200:
           description: Successfully retrieved the list of OBM service instances
           schema:
-            type: object
+            type: array
+            items:
+              $ref: '#/definitions/obm'
         default:
           description: Unexpected error
           schema:
@@ -2199,7 +2356,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/ipmi-obm-service_Obm'
+          $ref: '#/definitions/generic_obj'
       responses:
         200:
           description: Successfully patched the specified OBM settings
@@ -2248,7 +2405,9 @@ paths:
         200:
           description: Successful retrieval of the list of pollers
           schema:
-            type: object
+            type: array
+            items:
+              type: object
         default:
           description: Unexpected error
           schema:
@@ -3001,20 +3160,11 @@ paths:
       description: Get the specified task schema.
       operationId: taskSchemasIdGet
       parameters:
-      - description: The filename of the task schema
+      - description: The name of task schema
         in: path
         name: identifier
         required: true
         type: string
-      - description: >
-          The reference resolve flag.
-          false - a simple schema with any internal reference only in the response.
-          true - all the internal references will be resolved and fully defined in
-          the response.
-        in: query
-        name: resolveRef
-        required: false
-        type: boolean
       responses:
         200:
           description: Successfully retrieved the task schema
@@ -3078,7 +3228,9 @@ paths:
         200:
           description: Successfully retrieved the list of SKUs
           schema:
-            type: object
+            type: array
+            items:
+              $ref: '#/definitions/skus.2.0_SkusUpsert'
         default:
           description: Unexpected error
           schema:
@@ -3301,7 +3453,9 @@ paths:
         200:
           description: Successfully retrieved the nodes associated with the specified SKU
           schema:
-            type: object
+            type: array
+            items:
+              $ref: '#/definitions/node.2.0_GetNode'
         404:
           description: The SKU with the specified identifier was not found
           schema:
@@ -3318,6 +3472,7 @@ paths:
       x-privileges:
       - Read
       - skusRead
+      x-view: node.2.0.json
     x-swagger-router-controller: skus
   /skus/{identifier}/pack:
     delete:
@@ -4019,6 +4174,10 @@ paths:
           description: Forbidden
           schema:
             type: object
+        409:
+          description: Conflict
+          schema:
+            type: object
         default:
           description: Unexpected error
           schema:
@@ -4117,7 +4276,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/get_user_obj'
+          $ref: '#/definitions/patch_user_obj'
       responses:
         200:
           description: Successfully modified the specified user.
@@ -4679,6 +4838,34 @@ paths:
       - Write
       - workflowsModify
     x-swagger-router-controller: workflows
+  /notification/alerts:
+      post:
+        operationId: notificationAlertsPost
+        consumes:
+          - application/x-www-form-urlencoded
+          - application/json
+        summary: |
+          Publishes alerts(redfish) received to rackHD
+        description: |
+          Publishes alerts(redfish) received to rackHD
+        responses:
+          201:
+            description: |
+              Specifics of the alert
+            schema:
+              type: object
+          400:
+            description: |
+              bad request parameter passed
+            schema:
+              $ref: '#/definitions/Error'
+          default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+        tags:
+        - /api/2.0
+      x-swagger-router-controller: notification
 produces:
 - application/json
 schemes:

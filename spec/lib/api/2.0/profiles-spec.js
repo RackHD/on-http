@@ -1,4 +1,4 @@
-// Copyright 2015-2016, EMC, Inc.
+// Copyright © 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
 
 'use strict';
 
@@ -7,75 +7,57 @@ describe('Http.Api.Profiles', function () {
     var taskProtocol;
     var lookupService;
     var profiles;
-    var presenter;
     var profileApiService;
+    var taskgraphApiService;
     var Errors;
     var waterline;
 
-    before('start HTTP server', function () {
-        this.timeout(10000);
-        return helper.startServer([]);
-    });
+    helper.httpServerBefore();
 
-    beforeEach('set up mocks', function () {
+    before(function() {
         taskProtocol = helper.injector.get('Protocol.Task');
         lookupService = helper.injector.get('Services.Lookup');
         Errors = helper.injector.get('Errors');
-
-        sinon.stub(lookupService, 'ipAddressToMacAddress').resolves('00:00:00:00:00:00');
-        sinon.stub(taskProtocol, 'activeTaskExists').resolves({});
-        sinon.stub(taskProtocol, 'requestCommands').resolves({ testcommands: 'cmd' });
-        sinon.stub(taskProtocol, 'requestProfile').resolves();
-        sinon.stub(taskProtocol, 'requestProperties').resolves();
-
         workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
-        sinon.stub(workflowApiService, 'findActiveGraphForTarget').resolves({});
-        sinon.stub(workflowApiService, 'createActiveGraph').resolves({ instanceId: 'test' });
-
-        presenter = helper.injector.get('common-api-presenter');
-
+        taskgraphApiService = helper.injector.get('Http.Services.Api.Taskgraph.Scheduler');
         profiles = helper.injector.get('Profiles');
-        sinon.stub(profiles, 'getAll').resolves();
-        sinon.stub(profiles, 'getName').resolves();
-        sinon.stub(profiles, 'get').resolves();
-        sinon.stub(profiles, 'put').resolves();
-
         profileApiService = helper.injector.get('Http.Services.Api.Profiles');
-        sinon.stub(profileApiService, 'getNode').resolves({});
-        sinon.stub(profileApiService, 'createNodeAndRunDiscovery').resolves({});
-        sinon.stub(profileApiService, 'runDiscovery').resolves({});
-        sinon.stub(profileApiService, 'setLookup').resolves();
-
         waterline = helper.injector.get('Services.Waterline');
-        sinon.stub(waterline.lookups, "findOneByTerm").resolves();
+    });
+
+    beforeEach('set up mocks', function () {
+        this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves('00:00:00:00:00:00');
+        this.sandbox.stub(taskProtocol, 'activeTaskExists').resolves({});
+        this.sandbox.stub(taskProtocol, 'requestCommands').resolves({ testcommands: 'cmd' });
+        this.sandbox.stub(taskProtocol, 'requestProfile').resolves();
+        this.sandbox.stub(taskProtocol, 'requestProperties').resolves();
+
+        this.sandbox.stub(workflowApiService, 'findActiveGraphForTarget').resolves({});
+
+        this.sandbox.stub(taskgraphApiService, 'workflowsPost').resolves({ instanceId: 'test' });
+
+        this.sandbox.stub(profiles, 'getAll').resolves();
+        this.sandbox.stub(profiles, 'getName').resolves();
+        this.sandbox.stub(profiles, 'get').resolves();
+        this.sandbox.stub(profiles, 'put').resolves();
+
+        this.sandbox.stub(profileApiService, 'getNode').resolves({});
+        this.sandbox.stub(profileApiService, 'createNodeAndRunDiscovery').resolves({});
+        this.sandbox.stub(profileApiService, 'runDiscovery').resolves({});
+        this.sandbox.stub(profileApiService, 'setLookup').resolves();
+
+        this.sandbox.stub(waterline.lookups, "findOneByTerm").resolves();
 
         return helper.reset().then(function() {
             return helper.injector.get('Views').load();
         });
     });
 
-    afterEach('teardown mocks', function () {
-        function resetMocks(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (typeof obj[method].restore === 'function') {
-                    obj[method].restore();
-                }
-            }).value();
-        }
-        resetMocks(lookupService);
-        resetMocks(taskProtocol);
-        resetMocks(workflowApiService);
-        resetMocks(presenter.CommonApiPresenter.prototype);
-        resetMocks(profiles);
-        resetMocks(profileApiService);
-        resetMocks(waterline.lookups);
+    after(function () {
+        return helper.reset();
     });
 
-    after('stop HTTP server', function () {
-        return helper.reset().then(function() {
-            return helper.stopServer();
-        });
-    });
+    helper.httpServerAfter();
 
     var profile = [{
         id: '1234abcd5678effe9012dcba',
@@ -254,7 +236,8 @@ describe('Http.Api.Profiles', function () {
                 .query({ macs: '00:00:de:ad:be:ef', ips: '172.31.128.5' })
                 .expect(503)
                 .then(function(resp) {
-                    expect(resp.body.message).to.equal('Error: Unable to retrieve workflow properties');
+                    expect(resp.body.message).to.equal(
+                        'Error: Unable to retrieve workflow properties or profiles');
                 });
         });
 
@@ -275,10 +258,27 @@ describe('Http.Api.Profiles', function () {
     });
 
     describe("2.0 GET /profiles/switch/:vendor", function() {
-        it("should get switch profile", function() {
-            sinon.stub(profileApiService, 'getProfilesSwitchVendor').resolves(
+        it("should get switch profile via proxy", function() {
+            this.sandbox.stub(profileApiService, 'getProfilesSwitchVendor').resolves(
                 'switch_node_profile');
-            sinon.stub(profileApiService, 'renderProfile').resolves('#!ipxe\n');
+            this.sandbox.stub(profileApiService, 'renderProfile').resolves('#!ipxe\n');
+
+            return helper.request()
+                .get('/api/2.0/profiles/switch/testswitchvendor')
+                .set("X-Real-IP", "188.1.1.1")
+                .set("X-RackHD-API-proxy-ip", "127.0.0.1")
+                .set("X-RackHD-API-proxy-port", "7180")
+                .expect(200)
+                .then(function() {
+                    expect(profileApiService.getProfilesSwitchVendor).to.have.been.calledWith(
+                        "188.1.1.1", "testswitchvendor");
+                });
+        });
+
+        it("should get switch profile", function() {
+            this.sandbox.stub(profileApiService, 'getProfilesSwitchVendor').resolves(
+                'switch_node_profile');
+            this.sandbox.stub(profileApiService, 'renderProfile').resolves('#!ipxe\n');
             waterline.lookups.findOneByTerm.resolves({macAddress: '11:11:11:11:11:11'});
             profileApiService.getProfilesSwitchVendor.resolves('switch_node_profile');
             profileApiService.renderProfile.resolves('#!ipxe\n');
@@ -302,8 +302,8 @@ describe('Http.Api.Profiles', function () {
         });
 
         it("should return 404 for invalid switch vendor name", function() {
-            sinon.stub(profileApiService, 'getProfilesSwitchVendor').resolves();
-            sinon.stub(profileApiService, 'renderProfile').resolves();
+            this.sandbox.stub(profileApiService, 'getProfilesSwitchVendor').resolves();
+            this.sandbox.stub(profileApiService, 'renderProfile').resolves();
             waterline.lookups.findOneByTerm.resolves({macAddress: '11:11:11:11:11:11'});
             profileApiService.getProfilesSwitchVendor.rejects(new Errors.NotFoundError(
                 'invalid switch name'));
@@ -334,7 +334,8 @@ describe('Http.Api.Profiles', function () {
             return helper.request().get('/api/2.0/profiles/switch/testswitchvendor')
                 .expect(503)
                 .then(function(resp) {
-                    expect(resp.body.message).to.equal('Error: Unable to retrieve workflow properties');
+                    expect(resp.body.message).to.equal(
+                        'Error: Unable to retrieve workflow properties or profiles');
                 });
         });
 

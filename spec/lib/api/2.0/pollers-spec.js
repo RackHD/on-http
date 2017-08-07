@@ -4,26 +4,24 @@
 'use strict';
 
 describe('Http.Api.Pollers', function () {
-    var taskProtocol;
-    before('start HTTP server', function () {
-        this.timeout(10000);
-        taskProtocol = {
-            requestPollerCache: sinon.stub()
-        };
-        return helper.startServer([
-            dihelper.simpleWrapper(taskProtocol, 'Protocol.Task')
-        ]);
-    });
+    var taskProtocol = {};
 
-    beforeEach('reset test DB', function () {
+    helper.httpServerBefore([
+        dihelper.simpleWrapper(taskProtocol, 'Protocol.Task')
+    ]);
+
+    beforeEach('set up mocks', function () {
+        taskProtocol.requestPollerCache = this.sandbox.stub();
         return helper.reset().then(function() {
             return helper.injector.get('Views').load();
         });
     });
 
-    after('stop HTTP server', function () {
-        return helper.stopServer();
+    after(function() {
+        return helper.reset();
     });
+
+    helper.httpServerAfter();
 
     it('should return an empty array from GET /pollers', function () {
         return helper.request().get('/api/2.0/pollers')
@@ -181,6 +179,26 @@ describe('Http.Api.Pollers', function () {
             type: 'string',
             defaultsTo: 'admin'
         }
+        ]
+    },
+    {
+        name: 'wsman',
+        config: [
+            {
+                key: 'host',
+                type: 'string',
+                required: true
+            },
+            {
+                key: 'user',
+                type: 'string',
+                defaultsTo: 'root'
+            },
+            {
+                key: 'password',
+                type: 'string',
+                defaultsTo: 'calvin'
+            }
         ]
     }
     ];

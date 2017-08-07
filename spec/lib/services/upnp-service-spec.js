@@ -90,7 +90,7 @@ describe("UPnP Service", function() {
         uPnPService.cache.removeAllListeners('expired');
     });
 
-    helper.after(function () {
+    after(function () {
         sandbox.restore();
     });
 

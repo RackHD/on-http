@@ -212,6 +212,23 @@ describe("Http.Services.Api.Obms", function () {
             }
         },
         "service": "vmrun-obm-service"
+    },
+    {
+        "service": 'dell-wsman-obm-service',
+        "config": {
+            "host": {
+                "default": 'localhost',
+                "type": 'string'
+            },
+            "user": {
+                "default": 'root',
+                "type": 'string'
+            },
+            "password": {
+                "default": 'calvin',
+                "type": 'string'
+            }
+        }
     }
     ];
     describe("getObmLib", function() {

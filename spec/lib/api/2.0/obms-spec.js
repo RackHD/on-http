@@ -73,26 +73,16 @@ describe('Http.Api.Obms', function () {
     };
     var badLedData = {};
 
-    before('start HTTP server', function () {
-        this.timeout(5000);
-        return helper.startServer().then(function() {
-            waterline = helper.injector.get('Services.Waterline');
-            Errors = helper.injector.get('Errors');
-            nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
-            obmsApiService = helper.injector.get('Http.Services.Api.Obms');
-        });
+    helper.httpServerBefore();
+
+    before(function () {
+        waterline = helper.injector.get('Services.Waterline');
+        Errors = helper.injector.get('Errors');
+        nodeApiService = helper.injector.get('Http.Services.Api.Nodes');
+        obmsApiService = helper.injector.get('Http.Services.Api.Obms');
     });
 
-    afterEach(function () {
-        if (stub) {
-            stub.restore();
-            stub = undefined;
-        }
-    });
-
-    after('stop HTTP server', function () {
-        return helper.stopServer();
-    });
+    helper.httpServerAfter();
 
     describe('/api/2.0/obms/definitions', function () {
         it('should return a list of OBM schemas', function () {
@@ -111,9 +101,13 @@ describe('Http.Api.Obms', function () {
                 .expect(function (res) {
                     expect(res.body).to.have.property('title', 'ipmi-obm-service');
                     expect(res.body).to.have.deep.property(
-                        'definitions.Obm.properties.service').that.is.an('object');
+                        'definitions.ObmBase.properties.service').that.is.an('object');
                     expect(res.body).to.have.deep.property(
-                        'definitions.Obm.properties.config').that.is.an('object');
+                        'definitions.ObmBase.properties.config').that.is.an('object');
+                    expect(res.body).to.have.deep.property(
+                        'definitions.ObmPatch').that.is.an('object');
+                    expect(res.body).to.have.deep.property(
+                        'definitions.Obm').that.is.an('object');
                 });
         });
 
@@ -124,9 +118,13 @@ describe('Http.Api.Obms', function () {
                 .expect(function (res) {
                     expect(res.body).to.have.property('title', 'panduit-obm-service');
                     expect(res.body).to.have.deep.property(
-                        'definitions.Obm.properties.service').that.is.an('object');
+                        'definitions.ObmBase.properties.service').that.is.an('object');
                     expect(res.body).to.have.deep.property(
-                        'definitions.Obm.properties.config').that.is.an('object');
+                        'definitions.ObmBase.properties.config').that.is.an('object');
+                    expect(res.body).to.have.deep.property(
+                        'definitions.ObmPatch').that.is.an('object');
+                    expect(res.body).to.have.deep.property(
+                        'definitions.Obm').that.is.an('object');
                 });
 
         });
@@ -134,7 +132,7 @@ describe('Http.Api.Obms', function () {
 
     describe('/api/2.0/obms', function () {
         it('should return a list of OBM instances', function () {
-            stub = sinon.stub(waterline.obms, 'find').resolves(goodData);
+            stub = this.sandbox.stub(waterline.obms, 'find').resolves(goodData);
 
             return helper.request().get('/api/2.0/obms')
                 .expect('Content-Type', /^application\/json/)
@@ -149,7 +147,7 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should put an OBM instance', function () {
-            stub = sinon.stub(waterline.obms, 'upsertByNode').resolves(goodData[0]);
+            stub = this.sandbox.stub(waterline.obms, 'upsertByNode').resolves(goodData[0]);
 
             return helper.request().put('/api/2.0/obms')
                 .send(goodSendData[0])
@@ -161,7 +159,7 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should 400 when put with unloaded schema', function () {
-            stub = sinon.stub(waterline.obms, 'upsertByNode');
+            stub = this.sandbox.stub(waterline.obms, 'upsertByNode');
 
             return helper.request().put('/api/2.0/obms')
                 .send(badData1)
@@ -173,7 +171,7 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should 400 when put with missing field', function () {
-            stub = sinon.stub(waterline.obms, 'upsertByNode');
+            stub = this.sandbox.stub(waterline.obms, 'upsertByNode');
 
             return helper.request().put('/api/2.0/obms')
                 .send(badData2)
@@ -188,7 +186,7 @@ describe('Http.Api.Obms', function () {
 
     describe('/api/2.0/obms/:id', function () {
         it('should get an OBM instance', function () {
-            stub = sinon.stub(waterline.obms, 'needByIdentifier').resolves(goodData[0]);
+            stub = this.sandbox.stub(waterline.obms, 'needByIdentifier').resolves(goodData[0]);
 
             return helper.request().get('/api/2.0/obms/123')
                 .expect('Content-Type', /^application\/json/)
@@ -201,7 +199,7 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should 404 if OBM instance is not found', function () {
-            stub = sinon.stub(waterline.obms, 'needByIdentifier').rejects(
+            stub = this.sandbox.stub(waterline.obms, 'needByIdentifier').rejects(
                 new Errors.NotFoundError('not found'));
 
             return helper.request().get('/api/2.0/obms/123')
@@ -209,7 +207,7 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should patch an OBM instance', function () {
-            stub = sinon.stub(obmsApiService, 'updateObmById').resolves(goodData[0]);
+            stub = this.sandbox.stub(obmsApiService, 'updateObmById').resolves(goodData[0]);
 
             return helper.request().patch('/api/2.0/obms/123')
                 .send(goodSendData[0])
@@ -221,7 +219,7 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should 400 when patching with bad data', function () {
-            stub = sinon.stub(obmsApiService, 'updateObmById');
+            stub = this.sandbox.stub(obmsApiService, 'updateObmById');
 
             return helper.request().patch('/api/2.0/obms/123')
                 .send(badData1)
@@ -233,7 +231,7 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should delete an OBM instance', function () {
-            stub = sinon.stub(obmsApiService, 'removeObmById');
+            stub = this.sandbox.stub(obmsApiService, 'removeObmById');
 
             return helper.request().delete('/api/2.0/obms/123')
                 .expect(204)
@@ -245,7 +243,7 @@ describe('Http.Api.Obms', function () {
 
     describe('/api/2.0/obms/led', function () {
         it('should post a body', function () {
-            stub = sinon.stub(nodeApiService, 'postNodeObmIdById');
+            stub = this.sandbox.stub(nodeApiService, 'postNodeObmIdById');
 
             return helper.request().post('/api/2.0/obms/led')
                 .send(goodLedData)
@@ -256,7 +254,7 @@ describe('Http.Api.Obms', function () {
         });
 
         it('should 400 if node is not specified in body', function () {
-            stub = sinon.stub(nodeApiService, 'postNodeObmIdById');
+            stub = this.sandbox.stub(nodeApiService, 'postNodeObmIdById');
 
             return helper.request().post('/api/2.0/obms/led')
                 .send(badLedData)

@@ -9,9 +9,11 @@ accepteula
 rootpw <%=rootPlainPassword%>
 
 # Search the networkDevices and set the first device (if defined) up.
+# Use kargs if set to override the default kickstart network device
 # If no device is specified in the networkDevices, then we fallback
 # to setting 'vmnic0' up as DHCP. The device can be specified with a
 # MAC address or device name ('vmnic0' for example)
+<% if(Object.keys(kargs).length === 0) { %>
 <% if( typeof networkDevices !== 'undefined' ) { %>
   <% need_default = networkDevices.every(function(n) { %>
     <% if(typeof n.ipv4 !== 'undefined') { %>
@@ -29,6 +31,8 @@ rootpw <%=rootPlainPassword%>
     network --bootproto=dhcp --device=vmnic0
   <% } %>
 <% } %>
+<% } %>
+
 reboot
 
 %firstboot --interpreter=busybox
@@ -50,6 +54,12 @@ esxcli system settings advanced set -o /UserVars/SuppressShellWarning -i 1
 
 #Set the ESXi Shell Interactive idle time logout
 esxcli system settings advanced set -o /UserVars/ESXiShellInteractiveTimeout -i 3600
+
+#Set Console port redirect
+esxcli system settings kernel set -s="gdbPort" -v=<%=gdbPort%>
+esxcli system settings kernel set -s="logPort" -v=<%=logPort%>
+esxcli system settings kernel set -s="tty2Port" -v=<%=comport%>
+esxcli system settings kernel set -s="debugLogToSerial" -v=<%=debugLogToSerial%>
 
 # disable firewall
 esxcli network firewall set --default-action false --enabled no
@@ -116,6 +126,9 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
 <% if ( typeof switchDevices !== 'undefined' ) { %>
   <% switchDevices.forEach(function(n) { %>
     esxcli network vswitch standard add -v "<%=n.switchName%>"
+    <% if( typeof n.failoverPolicy !== 'undefined' ) { %>
+        esxcli network vswitch standard policy failover set -l "<%=n.failoverPolicy%>" -v "<%=n.switchName%>"
+    <% } %>
     <% if( undefined !== n.uplinks ) { %>
       <% n.uplinks.forEach(function(s) { %>
         currdev=<%=s%>
@@ -132,10 +145,24 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
   <% }); %>
 <% } %>
 
+#parameters:vmkName, portgroup, switchName
+createVmk () {
+    vmkMac=`esxcli network ip interface list | sed -ne '/^.*\Name: $1.*$/{N;s/.*MAC Address: //;p}'`
+    esxcli network vswitch standard portgroup add -p $2 -v $3
+    esxcli network ip interface remove -i $1
+    if [ -z $vmkMac ]
+    then
+      esxcli network ip interface add -i $1 -p $2
+    else
+      esxcli network ip interface add -i $1 -p $2 -M $vmkMac
+    fi
+}
+
 <% vmkid = 0 %>
 <% if( typeof networkDevices !== 'undefined' ) { %>
   <% networkDevices.forEach(function(n) { %>
     currdev=<%=n.device%>
+    esxSwitchName=<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
     <% if (n.device.substring(0,5) != 'vmnic') { %>
        currdev=`esxcli network nic list | grep <%=n.device%> | cut -d ' ' -f 1`
     <% } %>
@@ -143,18 +170,14 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
       <% if( undefined !== n.ipv4.vlanIds ) { %>
         <% n.ipv4.vlanIds.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
-          esxcli network vswitch standard portgroup add -p $currdev.<%=vid%> -v "<%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>"
-          esxcli network ip interface remove -i <%=vmkname%>
-          esxcli network ip interface add -i <%=vmkname%> -p $currdev.<%=vid%>
+          createVmk <%=vmkname%> $currdev.<%=vid%> $esxSwitchName
           esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
           esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
           esxcli network vswitch standard portgroup set -p $currdev.<%=vid%> -v <%=vid %>
         <% }); %>
       <% } else { %>
         <% vmkname = 'vmk' + vmkid++ %>
-        esxcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-        esxcli network ip interface remove -i <%=vmkname%>
-        esxcli network ip interface add -i <%=vmkname%> -p $currdev
+        createVmk <%=vmkname%> $currdev $esxSwitchName
         esxcli network ip interface ipv4 set -i <%=vmkname%> -I <%=n.ipv4.ipAddr%> -N <%=n.ipv4.netmask%> -t static
         esxcli network ip route ipv4 add -n default -g <%=n.ipv4.gateway%>
       <% } %>
@@ -163,25 +186,19 @@ cp /var/log/esxi_install.log "/vmfs/volumes/datastore1/firstboot-esxi_install.lo
       <% if( undefined !== n.ipv6.vlanIds ) { %>
         <% n.ipv6.vlanIds.forEach(function(vid) { %>
           <% vmkname = 'vmk' + vmkid++ %>
-          esxcli network vswitch standard portgroup add -p $currdev.<%=vid%> -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-          esxcli network ip interface remove -i <%=vmkname%>
-          esxcli network ip interface add -i <%=vmkname%> -p $currdev.<%=vid%>
+          createVmk <%=vmkname%> $currdev.<%=vid%> $esxSwitchName
           esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
           esxcli network vswitch standard portgroup set -p $currdev.<%=vid%> -v <%=vid %>
         <% }); %>
       <% } else { %>
         <% vmkname = 'vmk' + vmkid++ %>
-        esxcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-        esxcli network ip interface remove -i <%=vmkname%>
-        esxcli network ip interface add -i <%=vmkname%> -p $currdev
+        createVmk <%=vmkname%> $currdev $esxSwitchName
         esxcli network ip interface ipv6 address add -i <%=vmkname%> -I <%=n.ipv6.ipAddr%>
       <% } %>
     <% } %>
     <% if( (undefined === n.ipv6) && (undefined === n.ipv4) ) { %>
       <% vmkname = 'vmk' + vmkid++ %>
-      esxcli network vswitch standard portgroup add -p $currdev -v <%= typeof n.esxSwitchName!='undefined' ? n.esxSwitchName : 'vSwitch0' %>
-      esxcli network ip interface remove -i <%=vmkname%>
-      esxcli network ip interface add -i <%=vmkname%> -p $currdev
+      createVmk <%=vmkname%> $currdev $esxSwitchName
       esxcli network ip interface ipv4 set -i <%=vmkname%> -t dhcp
     <% } %>
   <% }); %>

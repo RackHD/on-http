@@ -1,0 +1,85 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Storage.Storage",
+    "@odata.id" : "<%= url %>",
+    "@odata.type" : "#Storage.v1_1_1.Storage",
+    "Id" : "<%= index %>",
+    "Description" : "",
+    "Name" : "",
+    "Links" : { },
+    "Status": {
+      "HealthRollup": <%
+      switch(hardware.data.system.storageRollupStatus){
+        case '1': %>
+          "OK"
+      <%  break;
+        case '2': %>
+          "Warning"
+      <%  break;
+        case '3': %>
+          "Critical"
+      <%  break;
+        default: %>
+          "OK"
+      <%} %>
+    },
+
+    "StorageControllers@odata.count" : <%= controllers.length %>,
+    "StorageControllers" : [
+        <% controllers.forEach(function(controller, i, arr) { %>
+            {
+                "MemberId" : "<%= controller.fqdd %>",
+                "Status" : {
+                    "Health" : <%
+                    switch(controller.primaryStatus){
+                      case 1: %>
+                        "OK"
+                    <%  break;
+                      case 2: %>
+                        "Warning"
+                    <%  break;
+                      case 3: %>
+                        "Critical"
+                    <%  break;
+                      default: %>
+                        "OK"
+                    <%} %>,
+                    "HealthRollup" : <%
+                    switch(controller.rollupStatus){
+                      case 1: %>
+                        "OK"
+                    <%  break;
+                      case 2: %>
+                        "Warning"
+                    <%  break;
+                      case 3: %>
+                        "Critical"
+                    <%  break;
+                      default: %>
+                        "OK"
+                    <%} %>
+		},
+		"SpeedGbps" : <%= controller.possibleSpeed %>,
+                "FirmwareVersion" : "<%= controller.controllerFirmwareVersion %>",
+                "Manufacturer" : "<%= controller.deviceCardManufacturer %>",
+                "Model" : "<%= controller.productName %>",
+                "Identifiers" : [ {
+			"DurableName" : "<%= controller.sasaddress %>",
+			"DurableNameFormat" : "EUI"
+		}]
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+       <% }); %>
+    ],
+    "Drives@odata.count" : <%= drives.length %>,
+    "Drives" : [
+        <% drives.forEach(function(drive, i, arr) { %>
+            {
+                "@odata.id" : "<%= basepath %>/Systems/<%= identifier %>/Storage/<%= index %>/Drives/<%= i %>"
+            }
+        <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ],
+    "Volumes" : {
+        "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/Storage/<%= index %>/Volumes"
+    }
+}

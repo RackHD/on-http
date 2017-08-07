@@ -1,0 +1,25 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#LogEntry.LogEntry",
+    "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/LogServices/<%=type%>/Entries/<%= entry.logId %>",
+    "@odata.type": "#LogEntry.v1_0_0.LogEntry",
+    "Oem": {
+        "Dell":{
+            "instanceID": "<%= entry.instanceID %>",
+            "perceivedSeverity": "<%= entry.perceivedSeverity %>"
+        }
+    },
+    "Id": "<%= entry.recordID %>",
+    "Name": "<%= entry.elementName %>",
+    "EntryType": "<%= type %>",
+    "Created": "<%= entry.creationTimeStamp %>",
+    "OemRecordFormat": "",
+    "Message": "<%= entry.recordData %>",
+    "MessageId": "",
+    "MessageArgs": [],
+    "Links": {
+        "Oem": {},
+        "OriginOfCondition": {
+            "@odata.id": "<%= entry.origin || 'null' %>"
+        }
+    }
+}

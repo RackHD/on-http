@@ -1,17 +1,17 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Chassis/Members/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#Chassis.Chassis",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#Chassis.1.0.0.Chassis",
+    "@odata.type": "#Chassis.v1_0_0.Chassis",
     "Oem": {},
     "Id": "<%= identifier %>",
     "Description": "",
     "Name": "Chassis",
     "ChassisType": "<%= chassisType %>",
-    "AssetTag" : "<%= ohai.data.dmi.chassis.asset_tag %>",
-    "Manufacturer": "<%= ohai.data.dmi.chassis.manufacturer %>",
-    "Model": "<%= ohai.data.dmi.system.product_name %>",
-    "SKU": "<%= ohai.data.dmi.chassis.sku_number %>",
-    "SerialNumber": "<%= ohai.data.dmi.chassis.serial_number %>",
+    "AssetTag" : "<%= catData.chassis.asset_tag %>",
+    "Manufacturer": "<%= catData.chassis.manufacturer %>",
+    "Model": "<%= catData.system.product_name %>",
+    "SKU": "<%= catData.chassis.sku_number %>",
+    "SerialNumber": "<%= catData.chassis.serial_number %>",
     "Actions": {
         "Oem": {},
         "#Chassis.Reset": {}
@@ -23,7 +23,6 @@
     "Power": {
         "@odata.id": "<%= basepath %>/Chassis/<%= identifier %>/Power"
     },
-    "LogServices": {},
     "IndicatorLED": "<%= chassisData.uid %>",
     "Links": {
         "Oem": {},

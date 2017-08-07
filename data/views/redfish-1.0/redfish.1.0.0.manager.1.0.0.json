@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#Managers/Members/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#Manager.Manager",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#Manager.1.0.0.Manager",
+    "@odata.type": "#Manager.v1_0_0.Manager",
     "Oem": {},
     "Id": "<%= identifier %>",
     "Name": "Manager",
@@ -31,11 +31,15 @@
     "FirmwareVersion": "<%= mcInfo['Firmware Revision'] %>",
     <% } %>
     "Status" : {},
+    "SerialInterfaces" : {
+        "@odata.id": "<%= url %>/SerialInterfaces"
+    },
     "EthernetInterfaces" : {
         "@odata.id": "<%= url %>/EthernetInterfaces"
     }
     <% if( typeof networkProtocol !== 'undefined') { %>
     , "NetworkProtocol" : {
+        "@odata.id": "<%= url %>",
         <% if (typeof networkProtocol.hostname !== 'undefined') { %>
         "HostName": "<%= networkProtocol.hostname %>",
         "FQDN": "<%= networkProtocol.fqdn %>",

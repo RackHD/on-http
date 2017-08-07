@@ -10,7 +10,6 @@ rm -rf node_modules/
 rm -rf coverage/
 rm -rf test/
 rm commitstring.txt
-rm -rf on-http-api1.1/
 rm -rf on-http-api2.0/
 rm -rf on-http-redfish-1.0/
 rm -rf on-http*.tar.gz*

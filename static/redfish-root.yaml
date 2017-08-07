@@ -1,0 +1,71 @@
+swagger: "2.0"
+info:
+  version: "1.2.0"
+  title: rackhd redfish root
+# during dev, should point to your local machine
+#host: localhost:8080
+# basePath prefixes all resource paths
+basePath: /redfish
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+tags:
+  - name: "/redfish"
+    description: redfish version info
+paths:
+  /:
+    x-swagger-router-controller: redfish-root
+    get:
+      #x-privileges: [ 'Login' ]
+      #x-authentication-type: [ 'redfish', 'basic', 'anonymous' ]
+      summary: return redfish running version v1 
+      description: >
+        This object represents the Redfish protocol version.  All values for resources described
+        by this schema shall comply to the requirements as described in the Redfish specification.
+        This object represents the root Redfish service.
+      operationId: getRedfishProtocolVersion
+      tags: [ "/redfish" ]
+      responses:
+        200:
+          description: Success
+          $ref: "#/responses/status_200"
+        400:
+          $ref: "#/responses/status_400"
+        501:
+          $ref: "#/responses/status_501"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+definitions:
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+
+responses:
+  status_200:
+    description: >
+      The request was processed successfully and response returned.
+  status_400:
+    description: >
+      The request could not be processed because it contains missing or invalid information
+      (such as validation error on an input field, a missing required value, and so on).
+      An extended error shall be returned in the response body, as defined in section Extended
+      Error Handling.
+  status_501:
+    description: >
+      The server does not (currently) support the functionality required to fulfill the request.
+      This is the appropriate response when the server does not recognize the request method
+      and is not capable of supporting the method for any resource.

@@ -1,0 +1,84 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#ComputerSystem.ComputerSystem",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#ComputerSystem.v1_3_0.ComputerSystem",
+    "Oem" : {},
+    "Id": "<%= identifier %>",
+    "Description": "<%= hardware.data.system.systemGeneration %>",
+    "Name": "Computer System",
+    "SystemType": "<%= systemType %>",
+    "AssetTag": "<%= hardware.data.system.assetTag || 'Not Specified' %>",
+    "Manufacturer": "<%= hardware.data.system.manufacturer %>",
+    "Model": "<%= hardware.data.system.model %>",
+    "SKU": "<%= hardware.data.system.boardSerialNumber %>",
+    "SerialNumber": "<%= hardware.data.system.serviceTag %>",
+    "PartNumber": "",
+    "UUID": "<%= hardware.data.system.uuid.toLowerCase() %>",
+    "HostName": "<% hardware.data.system.hostName %>",
+    "IndicatorLED": "<%= hardware.data.leds[0] || 'Unknown' %>",
+    "PowerState": "<%= hardware.data.system.powerState == 2 ? 'On' : 'Off' %>",
+    "Boot": {},
+    "BiosVersion": "<%= hardware.data.system.biosVersionString.trim() %> <%= hardware.data.system.biosReleaseDate.trim() %> ",
+    "ProcessorSummary": {
+        "Count": <%= hardware.data.system.populatedCpuSockets %>,
+        "Model": "<%= hardware.data.cpus[0].model %>",
+        "Status": {}
+    },
+    "MemorySummary": {
+        "TotalSystemMemoryGiB": <%= hardware.data.system.sysMemTotalSize %>,
+        "Status": {}
+    },
+    "Actions": {
+        "Oem": {
+            "RackHD": {
+                "#RackHD.BootImage": {
+                    "target": "<%=basepath%>/Systems/<%=identifier%>/Actions/RackHD.BootImage"
+                }
+            }
+        },
+        "#ComputerSystem.Reset": {
+            "target": "<%=basepath%>/Systems/<%=identifier%>/Actions/ComputerSystem.Reset"
+        }
+    },
+    "Status": {},    
+    "Processors": {
+        "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/Processors"
+    },
+    "EthernetInterfaces": {
+        "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/EthernetInterfaces"
+    },
+    "SimpleStorage": {
+        "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/SimpleStorage"
+    },
+    "LogServices": {
+        "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/LogServices"
+    },
+    "Links": {
+        "Oem": {},
+        "ManagedBy@odata.count": <%= obm.length %>,
+        "ManagedBy": [
+            <% obm.forEach(function(obm, i, arr) { %>
+                {
+                    "@odata.id": "<%= basepath %>/Managers/<%= obm %>"
+                }
+                <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+            <% }); %>
+        ],
+        "PoweredBy@odata.count": 0,
+        "PoweredBy": [],
+        "CooledBy@odata.count": 0,
+        "CooledBy": [],
+        "Chassis@odata.count": <%= chassis.length %>,
+        "Chassis": [
+            <% chassis.forEach(function(chassis, i, arr) { %>
+                {
+                    "@odata.id": "<%= basepath %>/Chassis/<%= chassis %>"
+                }
+                <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+            <% }); %>
+        ]
+    },
+    "Storage":{
+        "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/Storage"
+    }
+}

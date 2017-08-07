@@ -1,4 +1,4 @@
-// Copyright 2015, EMC, Inc.
+// Copyright © 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
 
 'use strict';
 
@@ -22,6 +22,7 @@ describe("SKU Pack Service", function() {
             dihelper.simpleWrapper({}, 'TaskGraph.TaskGraph'),
             helper.require("/lib/services/workflow-api-service"),
             helper.require("/lib/services/sku-pack-service"),
+            helper.require('/lib/services/taskgraph-api-service'),
             dihelper.requireWrapper('os-tmpdir', 'osTmpdir', undefined, __dirname),
             dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf'),
             dihelper.requireWrapper('fs-extra', 'fs', undefined, __dirname)
@@ -73,7 +74,7 @@ describe("SKU Pack Service", function() {
         self.sandbox.reset();
     });
 
-    helper.after(function () {
+    after(function () {
         self.sandbox.restore();
     });
 
@@ -149,7 +150,13 @@ describe("SKU Pack Service", function() {
 
     it('should get the nodes with a certain sku id ', function() {
         waterline.skus.needByIdentifier.resolves({id: 'abc', sku: 'sku'});
-        waterline.nodes.find.resolves('123');
+        waterline.nodes.find.returns({
+            populate: function() {
+                return {
+                    populate: sinon.stub().resolves('123')
+                };
+            }
+        });
         return skuService.getNodesSkusById('456').then(function(val){
             expect(waterline.skus.needByIdentifier).to.have.been.called;
             expect(val).equal('123');

@@ -14,36 +14,28 @@ describe('Http.Api.Notification', function () {
         data: 'test data'
     };
 
-    before('start HTTP server', function () {
-        helper.setupInjector([
-             helper.require("/lib/services/notification-api-service.js"),
+    helper.httpServerBefore([
+        helper.require("/lib/services/notification-api-service.js")
+    ]);
 
-        ]);
-        this.timeout(5000);
-        return helper.startServer([]).then(function () {
-            notificationApiService = helper.injector.get('Http.Services.Api.Notification');
-            sinon.stub(notificationApiService, 'postNodeNotification')
-                .resolves(nodeNotificationMessage);
-            sinon.stub(notificationApiService, 'postBroadcastNotification')
-                .resolves(broadcastNotificationMessage);
-        });
+    before(function () {
+        notificationApiService = helper.injector.get('Http.Services.Api.Notification');
+    });
 
+    beforeEach('set up mocks', function() {
+        this.sandbox.stub(notificationApiService, 'postNodeNotification')
+            .resolves(nodeNotificationMessage);
+        this.sandbox.stub(notificationApiService, 'postBroadcastNotification')
+            .resolves(broadcastNotificationMessage);
     });
-    after('stop HTTP server', function () {
-        function resetMocks(obj) {
-            _(obj).methods().forEach(function (method) {
-                if (typeof obj[method].restore === 'function') {
-                    obj[method].restore();
-                }
-            }).value();
-        }
-        resetMocks(notificationApiService);
-        return helper.stopServer();
-    });
+
+    helper.httpServerAfter();
 
     describe('POST /notification', function () {
         it('should return node notification detail', function () {
-            return helper.request()
+            var _nodeNotificationMessage = _.cloneDeep(nodeNotificationMessage);
+            _nodeNotificationMessage.nodeIp = '127.0.0.1';
+            return helper.request('http://localhost:8091')
             .post('/api/2.0/notification?nodeId=' +
                   nodeNotificationMessage.nodeId +
                   '&randomData=' +
@@ -54,11 +46,13 @@ describe('Http.Api.Notification', function () {
             .then(function () {
                 expect(notificationApiService.postNodeNotification).to.have.been.calledOnce;
                 expect(notificationApiService.postNodeNotification)
-                    .to.have.been.calledWith(nodeNotificationMessage);
+                    .to.have.been.calledWith(_nodeNotificationMessage);
             });
         });
         it('should return broadcast notification detail', function () {
-            return helper.request()
+            var _broadcastNotificationMessage = _.cloneDeep(broadcastNotificationMessage);
+            _broadcastNotificationMessage.nodeIp = '127.0.0.1';
+            return helper.request('http://localhost:8091')
             .post('/api/2.0/notification')
             .send(broadcastNotificationMessage)
             .set('Content-Type', 'application/json')
@@ -67,11 +61,11 @@ describe('Http.Api.Notification', function () {
             .then(function () {
                 expect(notificationApiService.postBroadcastNotification).to.have.been.calledOnce;
                 expect(notificationApiService.postBroadcastNotification)
-                    .to.have.been.calledWith(broadcastNotificationMessage);
+                    .to.have.been.calledWith(_broadcastNotificationMessage);
             });
         });
         it('should pass with nodeId in query body', function () {
-            return helper.request()
+            return helper.request('http://localhost:8091')
             .post('/api/2.0/notification')
             .send({ nodeId: nodeNotificationMessage.nodeId })
             .expect('Content-Type', /^application\/json/)
@@ -79,7 +73,7 @@ describe('Http.Api.Notification', function () {
         });
 
         it('should pass with nodeId in query body', function () {
-            return helper.request()
+            return helper.request('http://localhost:8091')
             .post('/api/2.0/notification')
             .send(nodeNotificationMessage)
             .expect('Content-Type', /^application\/json/)
@@ -88,187 +82,245 @@ describe('Http.Api.Notification', function () {
     });
 
     describe('POST /notification/progress', function () {
-        beforeEach(function() {
-            sinon.stub(notificationApiService, 'postNotification').resolves();
-        });
-
-        afterEach(function() {
-            notificationApiService.postNotification.restore();
-        });
-
-        it('should post progress notification via body', function () {
-            return helper.request()
-            .post('/api/2.0/notification/progress')
-            .set('Content-Type', 'application/json')
-            .send({
-                taskId: 'test',
-                maximum: 5,
-                value: 2,
-                description: 'foo bar'
-            })
-            .expect(200)
-            .expect(function(res){
-                expect(res.text).to.equal('Notification response, no file will be sent');
-            })
-            .then(function() {
-                expect(notificationApiService.postNotification).to.be.calledWith({
-                    taskId: 'test',
-                    progress: {
-                        maximum: 5,
-                        value: 2,
-                        description: 'foo bar'
-                    }
-                });
-            });
-        });
-
-        it('should post progress notification via query', function () {
-            return helper.request()
-            .post('/api/2.0/notification/progress?taskId=testid&maximum=5&value=2&description=foo%20bar%20%202') //jshint ignore: line
-            .set('Content-Type', 'application/json')
-            .expect(200)
-            .expect(function(res){
-                expect(res.text).to.equal('Notification response, no file will be sent');
-            })
-            .then(function() {
-                expect(notificationApiService.postNotification).to.be.calledWith({
+        describe('stub publishTaskProgress', function() {
+            var body;
+            beforeEach(function() {
+                body = {
                     taskId: 'testid',
-                    progress: {
-                        maximum: 5,
-                        value: 2,
-                        description: 'foo bar  2'
-                    }
+                    maximum: 5,
+                    value: 2,
+                    description: 'foo bar'
+                };
+                this.sandbox.stub(notificationApiService, 'publishTaskProgress').resolves();
+            });
+
+            it('should post progress notification via body', function () {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress')
+                .set('Content-Type', 'application/json')
+                .send(body)
+                .expect(200)
+                .expect(function(res){
+                    expect(res.text).to.equal('Notification response, no file will be sent');
+                })
+                .then(function() {
+                    expect(notificationApiService.publishTaskProgress).to.be.calledWith(body);
                 });
+            });
+
+            it('should be success if description is missing in body', function() {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress')
+                .send(body)
+                .set('Content-Type', 'application/json')
+                .expect(200);
+            });
+
+            it('should be success if value is 0 in body', function() {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress')
+                .send({
+                    taskId: 'test',
+                    value: 0,
+                    maximum: '100',
+                    description: 'foo bar'
+                })
+                .send(body)
+                .set('Content-Type', 'application/json')
+                .expect(200);
+            });
+
+            it('should post progress notification via query', function () {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress?taskId=testid&maximum=5&value=2&description=foo%20bar%20%202') //jshint ignore: line
+                .set('Content-Type', 'application/json')
+                .expect(200)
+                .expect(function(res){
+                    expect(res.text).to.equal('Notification response, no file will be sent');
+                })
+                .then(function() {
+                    expect(notificationApiService.publishTaskProgress).to.be.calledWith({
+                        taskId: 'testid',
+                        maximum: '5',
+                        value: '2',
+                        description: 'foo bar  2'
+                    });
+                });
+            });
+
+            it('should be success if description is missing in query', function() {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress?taskId=testid&maximum=4&value=2')
+                .set('Content-Type', 'application/json')
+                .expect(200);
             });
         });
 
-        it('should return 400 if taskId is missing in query', function() {
-            return helper.request()
-            .post('/api/2.0/notification/progress?maximum=5&value=2&description=foo')
-            .set('Content-Type', 'application/json')
-            .expect(400);
-        });
+        describe('not stub publishTaskProgress', function() {
+            it('should return 400 if taskid is missing in query', function() {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress?maximum=5&value=2&description=foo')
+                .set('content-type', 'application/json')
+                .expect(400);
+            });
 
-        it('should return 400 if maximum is missing in query', function() {
-            return helper.request()
-            .post('/api/2.0/notification/progress?taskId=testid&value=2&description=foo')
-            .set('Content-Type', 'application/json')
-            .expect(400);
-        });
+            it('should return 400 if maximum is missing in query', function() {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress?taskid=testid&value=2&description=foo')
+                .set('content-type', 'application/json')
+                .expect(400);
+            });
 
-        it('should return 400 if value is missing in query', function() {
-            return helper.request()
-            .post('/api/2.0/notification/progress?taskId=testid&maximum=4&description=foo')
-            .set('Content-Type', 'application/json')
-            .expect(400);
-        });
+            it('should return 400 if value is missing in query', function() {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress?taskid=testid&maximum=4&description=foo')
+                .set('content-type', 'application/json')
+                .expect(400);
+            });
+            it('should return 400 if taskId is missing in body', function() {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress')
+                .send({
+                    maximum: 5,
+                    value: 2,
+                    description: 'foo bar'
+                })
+                .set('Content-Type', 'application/json')
+                .expect(400);
+            });
 
-        it('should be success if description is missing in query', function() {
-            return helper.request()
-            .post('/api/2.0/notification/progress?taskId=testid&maximum=4&value=2')
-            .set('Content-Type', 'application/json')
-            .expect(200);
-        });
+            it('should return 400 if maximum is missing in body', function() {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress')
+                .send({
+                    taskId: 'test',
+                    value: 2,
+                    description: 'foo bar'
+                })
+                .set('Content-Type', 'application/json')
+                .expect(400);
+            });
 
-        it('should return 400 if taskId is missing in body', function() {
-            return helper.request()
-            .post('/api/2.0/notification/progress')
-            .send({
-                maximum: 5,
-                value: 2,
-                description: 'foo bar'
-            })
-            .set('Content-Type', 'application/json')
-            .expect(400);
-        });
+            it('should return 400 if maximum is invalid in body', function() {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress')
+                .send({
+                    taskId: 'test',
+                    value: 2,
+                    maximum: 'abc',
+                    description: 'foo bar'
+                })
+                .set('Content-Type', 'application/json')
+                .expect(400);
+            });
 
-        it('should return 400 if maximum is missing in body', function() {
-            return helper.request()
-            .post('/api/2.0/notification/progress')
-            .send({
-                taskId: 'test',
-                value: 2,
-                description: 'foo bar'
-            })
-            .set('Content-Type', 'application/json')
-            .expect(400);
-        });
+            it('should return 400 if value is missing in body', function() {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress')
+                .send({
+                    taskId: 'test',
+                    maximum: 5,
+                    description: 'foo bar'
+                })
+                .set('Content-Type', 'application/json')
+                .expect(400);
+            });
 
-        it('should return 400 if value is missing in body', function() {
-            return helper.request()
-            .post('/api/2.0/notification/progress')
-            .send({
-                taskId: 'test',
-                maximum: 5,
-                description: 'foo bar'
-            })
-            .set('Content-Type', 'application/json')
-            .expect(400);
-        });
-
-        it('should be success if description is missing in body', function() {
-            return helper.request()
-            .post('/api/2.0/notification/progress')
-            .send({
-                taskId: 'test',
-                maximum: 5,
-                value: 2
-            })
-            .set('Content-Type', 'application/json')
-            .expect(200);
+            it('should return 400 if value is invalid in body', function() {
+                return helper.request('http://localhost:8091')
+                .post('/api/2.0/notification/progress')
+                .send({
+                    taskId: 'test',
+                    value: 'a2',
+                    maximum: 5,
+                    description: 'foo bar'
+                })
+                .set('Content-Type', 'application/json')
+                .expect(400);
+            });
         });
     });
 
     describe('GET /notification/progress', function () {
-        beforeEach(function() {
-            sinon.stub(notificationApiService, 'postNotification').resolves();
-        });
+        describe('stub publishTaskProgress', function() {
+            beforeEach(function() {
+                this.sandbox.stub(notificationApiService, 'publishTaskProgress').resolves();
+            });
 
-        afterEach(function() {
-            notificationApiService.postNotification.restore();
-        });
-
-        it('should update progress notification via query', function () {
-            return helper.request()
-            .get('/api/2.0/notification/progress?taskId=testid&maximum=5&value=2&description=foo%20bar%20%202') //jshint ignore: line
-            .expect(200)
-            .expect(function(res){
-                expect(res.text).to.equal('Notification response, no file will be sent');
-            })
-            .then(function() {
-                expect(notificationApiService.postNotification).to.be.calledWith({
-                    taskId: 'testid',
-                    progress: {
-                        maximum: 5,
-                        value: 2,
+            it('should update progress notification via query', function () {
+                return helper.request('http://localhost:8091')
+                .get('/api/2.0/notification/progress?taskId=testid&maximum=5&value=2&description=foo%20bar%20%202') //jshint ignore: line
+                .expect(200)
+                .expect(function(res){
+                    expect(res.text).to.equal('Notification response, no file will be sent');
+                })
+                .then(function() {
+                    expect(notificationApiService.publishTaskProgress).to.be.calledWith({
+                        taskId: 'testid',
+                        maximum: '5',
+                        value: '2',
                         description: 'foo bar  2'
-                    }
+                    });
                 });
+            });
+
+            it('should be success if description is missing', function() {
+                return helper.request('http://localhost:8091')
+                .get('/api/2.0/notification/progress?taskId=testid&maximum=4&value=2')
+                .expect(200);
             });
         });
 
-        it('should return 400 if taskId is missing', function() {
-            return helper.request()
-            .get('/api/2.0/notification/progress?maximum=5&value=2&description=foo')
-            .expect(400);
-        });
+        describe('not stub publishTaskProgress', function() {
+            it('should return 400 if taskId is missing', function() {
+                return helper.request('http://localhost:8091')
+                .get('/api/2.0/notification/progress?maximum=5&value=2&description=foo')
+                .expect(400);
+            });
 
-        it('should return 400 if maximum is missing', function() {
-            return helper.request()
-            .get('/api/2.0/notification/progress?taskId=testid&value=2&description=foo')
-            .expect(400);
-        });
+            it('should return 400 if maximum is missing', function() {
+                return helper.request('http://localhost:8091')
+                .get('/api/2.0/notification/progress?taskId=testid&value=2&description=foo')
+                .expect(400);
+            });
 
-        it('should return 400 if value is missing', function() {
-            return helper.request()
-            .get('/api/2.0/notification/progress?taskId=testid&maximum=4&description=foo')
-            .expect(400);
-        });
-
-        it('should be success if description is missing', function() {
-            return helper.request()
-            .get('/api/2.0/notification/progress?taskId=testid&maximum=4&value=2')
-            .expect(200);
+            it('should return 400 if value is missing', function() {
+                return helper.request('http://localhost:8091')
+                .get('/api/2.0/notification/progress?taskId=testid&maximum=4&description=foo')
+                .expect(400);
+            });
         });
     });
+
+    describe('POST /notification/alerts', function () {
+        var alert = {
+            "Severity":"Critical"
+        };
+        beforeEach(function(){
+            this.sandbox.stub(notificationApiService, 'redfishAlertProcessing').resolves();
+        });
+
+        it('should post alert notification successfully(json) ', function () {
+            return helper.request()
+                .post('/api/2.0/notification/alerts')
+                .set('Content-Type', 'application/json')
+                .send(alert)
+                .expect(201)
+                .then(function () {
+                    expect(notificationApiService.redfishAlertProcessing).to.have.been.calledOnce;// jshint ignore:line
+                });
+        });
+
+        it('should post alert notification successfully(x-www-form-urlencoded)', function () {
+            return helper.request()
+                .post('/api/2.0/notification/alerts')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                .send({})
+                .expect(201)  
+                .then(function () {
+                    expect(notificationApiService.redfishAlertProcessing).to.have.been.calledOnce;// jshint ignore:line
+                });
+        });
+    });
+
 });

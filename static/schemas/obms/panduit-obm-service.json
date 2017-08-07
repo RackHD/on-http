@@ -1,9 +1,10 @@
 {
     "title": "panduit-obm-service",
     "definitions": {
-        "Obm": {
+        "ObmBase": {
             "description": "Panduit OBM settings",
             "type": "object",
+            "additionalProperties": false,
             "properties": {
                 "nodeId": {
                     "type": "string"
@@ -50,8 +51,20 @@
                     },
                     "required": ["host", "community", "cyclePassword", "pduOutlets"]
                 }
-            },
-            "required": ["service", "config"]
+            }
+        },
+        "ObmPatch": {
+            "type": "object",
+            "allOf": [
+                {"$ref": "#/definitions/ObmBase"}
+            ]
+        },
+        "Obm": {
+            "type": "object",
+            "allOf": [
+                {"$ref": "#/definitions/ObmBase"},
+                {"required": ["nodeId", "service", "config"]}
+            ]
         }
     }
 }
