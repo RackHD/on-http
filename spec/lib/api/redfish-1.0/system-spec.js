@@ -16,6 +16,7 @@ describe('Redfish Systems Root', function () {
     var Errors;
     var racadm;
     var wsman;
+    var lookup;
     var configuration;
     var mktemp = require('mktemp');
 
@@ -108,6 +109,7 @@ describe('Redfish Systems Root', function () {
         racadm = helper.injector.get('JobUtils.RacadmTool');
         wsman = helper.injector.get('Http.Services.Wsman');
         configuration = helper.injector.get('Services.Configuration');
+        lookup = helper.injector.get('Services.Lookup');
         var nodeFs = helper.injector.get('fs');
         fs = Promise.promisifyAll(nodeFs);
         tv4 = require('tv4');
@@ -121,6 +123,7 @@ describe('Redfish Systems Root', function () {
         this.sandbox.stub(waterline.nodes);
         this.sandbox.stub(waterline.catalogs);
         this.sandbox.stub(waterline.workitems);
+        this.sandbox.stub(lookup, 'macAddressToIp');
         this.sandbox.stub(waterline.obms);
         this.sandbox.stub(taskProtocol);
         this.sandbox.stub(nodeApi, "setNodeWorkflowById");
@@ -153,6 +156,10 @@ describe('Redfish Systems Root', function () {
 
     helper.httpServerAfter();
 
+
+    // Lookup table mocks. With and without ip address
+    var lookup_ip = '123.1.1.1';
+    var lookup_no_ip = 'undefined'
 
     var catalogData = {
         dmi: {
@@ -845,21 +852,49 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    it('should return a valid ethernet index block for Dell-based catalog with valid index', function() {
+    it('should return ip given catalog with no ip and ip from lookup (DELL catalogs)', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
             node: dellNode.id,
             source: 'nics',
             data: dellCatalogData.nics
         }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(lookup_ip));
+
         return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces/' + 'NIC.Integrated.1-1-1')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function() {
+            .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv4Addresses).to.exist;
+                expect(res.body.IPv6Addresses).to.not.exist;
+                expect(res.body.IPv4Addresses[0].Address).to.equal('123.1.1.1');
             });
     });
+
+    it('should return no ip given catalog with no ip and no ip from lookup (DELL catalogs)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'nics',
+            data: dellCatalogData.nics
+        }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(undefined));
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces/' + 'NIC.Integrated.1-1-1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv4Addresses).to.not.exist;
+                expect(res.body.IPv6Addresses).to.not.exist;
+            });
+    });
+
 
     it('should 404 a DELL with valid index and invalid ethernet index', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
@@ -903,6 +938,9 @@ describe('Redfish Systems Root', function () {
             source: 'ohai',
             data: catalogData.ohai
         }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(lookup_ip));
+
         return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth0')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -913,19 +951,90 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    it('should 404 a non-DELL with valid index and invalid ethernet index', function() {
+
+    it('should return ip given catalog with ip an ip from lookup (non-DELL catalogs)', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
             node: node.id,
             source: 'ohai',
             data: catalogData.ohai
         }));
-        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'BADi' + 'eth0')
+
+        lookup.macAddressToIp.resolves(Promise.resolve(lookup_ip));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth1')
             .expect('Content-Type', /^application\/json/)
-            .expect(404)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.false;
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv4Addresses).to.exist;
+                expect(res.body.IPv6Addresses).to.exist;
+                expect(res.body.IPv4Addresses[0].Address).to.equal('123.1.1.1');
+            });
+    });
+
+    it('should return no ip given catalog with ip and no ip from lookup (non-DELL catalogs)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
+            node: node.id,
+            source: 'ohai',
+            data: catalogData.ohai
+        }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(undefined));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv6Addresses).to.not.exist;
+                expect(res.body.IPv4Addresses).to.not.exist;
+            });
+    });
+
+    it('should return ip given catalog with no ip and ip from lookup (non-DELL catalogs)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
+            node: node.id,
+            source: 'ohai',
+            data: catalogData.ohai
+        }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(lookup_ip));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth0')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv4Addresses).to.exist;
+                expect(res.body.IPv6Addresses).to.not.exist;
+                expect(res.body.IPv4Addresses[0].Address).to.equal('123.1.1.1');
+            });
+    });
+
+    it('should return no ip given catalog with no ip and no ip from lookupi (non-DELL catalogs)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
+            node: node.id,
+            source: 'ohai',
+            data: catalogData.ohai
+        }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(undefined));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth0')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv4Addresses).to.not.exist;
+                expect(res.body.IPv6Addresses).to.not.exist;
             });
     });
 
