@@ -159,7 +159,6 @@ describe('Redfish Systems Root', function () {
 
     // Lookup table mocks. With and without ip address
     var lookup_ip = '123.1.1.1';
-    var lookup_no_ip = 'undefined'
 
     var catalogData = {
         dmi: {
