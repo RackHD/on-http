@@ -39,18 +39,7 @@
     }
     <% if( typeof networkProtocol !== 'undefined') { %>
     , "NetworkProtocol" : {
-        "@odata.id": "<%= url %>",
-        <% if (typeof networkProtocol.hostname !== 'undefined') { %>
-        "HostName": "<%= networkProtocol.hostname %>",
-        "FQDN": "<%= networkProtocol.fqdn %>",
-        <% } %>
-        <% networkProtocol.services.forEach(function(service, i, arr) { %>
-            "<%= service.name %>" : {
-                "ProtocolEnabled" : <%= service.enabled %>,
-                "Port": <%= service.port %>
-            }
-            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
-        <% }); %>
+        "@odata.id": "<%= url %>/NetworkProtocol"
     }
     <% } %>
 }
