@@ -14,7 +14,7 @@ sudo coreos-install -d <%=installDisk%> -c $CLOUD_CONFIG_FILE -b <%=repo%>
 mkdir /mnt/coreos
 OEM_PARTITION_NUM=6 # https://coreos.com/os/docs/latest/sdk-disk-partitions.html
 mount <%=installDisk%>${OEM_PARTITION_NUM} /mnt/coreos/
-echo "set linux_append=\"net.ifnames=0 biosdevname=0 coreos.first_boot=1 coreos.config.url=<%=ignitionScriptUri%>\"" > /mnt/coreos/grub.cfg
+echo "set linux_append=\"coreos.first_boot=1 coreos.config.url=<%=ignitionScriptUri%>\"" > /mnt/coreos/grub.cfg
 <%} %>
 
 curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
