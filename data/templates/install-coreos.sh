@@ -21,5 +21,17 @@ IGNITION_SCRIPT_FILE=ignition.json
   sudo coreos-install -d <%=installDisk%> -c ${CLOUD_CONFIG_FILE} -b <%=repo%>
 <% } %>
 
+<% if (typeof grubLinuxAppend !== 'undefined') { %>
+  mkdir /mnt/coreos
+  OEM_PARTITION_NUM=6 # https://coreos.com/os/docs/latest/sdk-disk-partitions.html
+  mount <%=installDisk%>${OEM_PARTITION_NUM} /mnt/coreos/
+  if [ -f /mnt/coreos/grub.cfg ]; then  # Running 'coreos-install -i' will create the grub.cfg, don't clobber it
+      sed -i 's/\(linux_append="[^"]*\)/\1 <%=grubLinuxAppend%>/' /mnt/coreos/grub.cfg
+  else
+      echo "set linux_append=\"<%=grubLinuxAppend%>\"" > /mnt/coreos/grub.cfg
+  fi
+  umount /mnt/coreos/
+<%} %>
+
 curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
 sudo reboot
