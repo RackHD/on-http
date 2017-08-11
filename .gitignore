@@ -43,7 +43,8 @@ node_modules
 
 # static images
 static/ansible/
-static/files/
+static/files/*
+!static/files/.gitkeep
 static/http/
 static/smb/
 static/tftp/

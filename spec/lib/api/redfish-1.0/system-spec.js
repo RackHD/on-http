@@ -16,6 +16,7 @@ describe('Redfish Systems Root', function () {
     var Errors;
     var racadm;
     var wsman;
+    var lookup;
     var configuration;
     var mktemp = require('mktemp');
 
@@ -108,6 +109,7 @@ describe('Redfish Systems Root', function () {
         racadm = helper.injector.get('JobUtils.RacadmTool');
         wsman = helper.injector.get('Http.Services.Wsman');
         configuration = helper.injector.get('Services.Configuration');
+        lookup = helper.injector.get('Services.Lookup');
         var nodeFs = helper.injector.get('fs');
         fs = Promise.promisifyAll(nodeFs);
         tv4 = require('tv4');
@@ -121,6 +123,7 @@ describe('Redfish Systems Root', function () {
         this.sandbox.stub(waterline.nodes);
         this.sandbox.stub(waterline.catalogs);
         this.sandbox.stub(waterline.workitems);
+        this.sandbox.stub(lookup, 'macAddressToIp');
         this.sandbox.stub(waterline.obms);
         this.sandbox.stub(taskProtocol);
         this.sandbox.stub(nodeApi, "setNodeWorkflowById");
@@ -153,6 +156,9 @@ describe('Redfish Systems Root', function () {
 
     helper.httpServerAfter();
 
+
+    // Lookup table mocks. With and without ip address
+    var lookup_ip = '123.1.1.1';
 
     var catalogData = {
         dmi: {
@@ -294,10 +300,160 @@ describe('Redfish Systems Root', function () {
                 }
             ]
         },
+        "boot": {
+            "bootSequenceRetry": {
+                "currentValue": "Enabled",
+                "possibleValues": [
+                    "Enabled",
+                    "Disabled"
+                ]
+            },
+            "bootSourcesByBootModes": {
+                "bootSourcesByBootMode": [
+                    {
+                        "bootMode": "BIOS",
+                        "bootSources": {
+                            "bootSource": [
+                                {
+                                    "currentSequence": "0",
+                                    "enabled": false,
+                                    "instanceId": "IPL:BIOS.Setup.1-1#BootSeq#NIC.Integrated.1-1-1#3af7bdf4ca33fa61a730ab808b217b76",
+                                    "name": "Integrated NIC 1 Port 1 Partition 1: IBA XE Slot 0100 v2334 BootSeq",
+                                    "type": "IPL"
+                                },
+                                {
+                                    "currentSequence": "1",
+                                    "enabled": true,
+                                    "instanceId": "IPL:BIOS.Setup.1-1#BootSeq#NIC.Integrated.1-3-1#b2401d51f8600b7a76c243bea93fbc17",
+                                    "name": "Integrated NIC 1 Port 3 Partition 1: IBA GE Slot 0600 v1562 BootSeq",
+                                    "type": "IPL"
+                                },
+                                {
+                                    "currentSequence": "2",
+                                    "enabled": true,
+                                    "instanceId": "IPL:BIOS.Setup.1-1#BootSeq#HardDisk.List.1-1#c9203080df84781e2ca3d512883dee6f",
+                                    "name": "Hard drive C: BootSeq",
+                                    "type": "IPL"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "currentBootMode": "BIOS",
+            "hardDrives": {
+                "hardDrive": [
+                    {
+                        "currentSequence": "0",
+                        "enabled": true,
+                        "instanceId": "BCV:BIOS.Setup.1-1#HddSeq#RAID.Integrated.1-1#64ecb602db2eafbac9e34b9e83f405ae",
+                        "name": "Integrated RAID Controller 1: PERC H730P Mini(bus 02 dev 00) HddSeq",
+                        "type": "BCV"
+                    }
+                ]
+            },
+            "includeBootOrderInProfile": true
+        },
         DeviceSummary: {
             id: "1.2.3.4"
         },
-        hardware: {
+        "leds": [],
+        "cpus": [
+            {
+                "cpuFamily": "B3",
+                "cpuStatus": "1",
+                "currentClockSpeed": "2500",
+                "deviceDescription": "CPU 1",
+                "fqdd": "CPU.Socket.1",
+                "hyperThreadingCapable": "1",
+                "hyperThreadingEnabled": "1",
+                "id": 0,
+                "manufacturer": "Intel",
+                "maxClockSpeed": "4000",
+                "model": "Intel(R) Xeon(R) CPU E5-2680 v3 @ 2.50GHz",
+                "numberOfEnabledCores": "12",
+                "numberOfProcessorCores": "12",
+                "primaryStatus": "1",
+                "turboModeCapable": "1",
+                "turboModeEnabled": "1",
+                "virtualizationTechnologyCapable": "1",
+                "virtualizationTechnologyEnabled": "1",
+                "voltage": "1.3"
+            }
+        ],
+        "system": {
+            "activePowerPolicy": null,
+            "assetTag": "",
+            "baseBoardChassisSlot": "NA",
+            "batteryRollupStatus": "1",
+            "biosReleaseDate": "2015-01-09T00:03:00Z",
+            "biosVersionString": "1.2.10",
+            "bladeGeometry": "255",
+            "boardPartNumber": "04N3DFA07",
+            "boardSerialNumber": "CN7792159B000W",
+            "caption": null,
+            "chassisModel": "",
+            "chassisName": "Main System Chassis",
+            "chassisServiceTag": "BPM0182",
+            "chassisSystemHeight": "2",
+            "cmcip": null,
+            "cpldVersion": "1.0.1",
+            "cpuRollupStatus": "1",
+            "currentRollupStatus": null,
+            "deviceDescription": "System",
+            "elementName": null,
+            "estimatedExhaustTemperature": "41",
+            "estimatedSystemAirflow": "29",
+            "expressServiceCode": "25493213234",
+            "fanRollupStatus": "1",
+            "fqdd": "System.Embedded.1",
+            "generation": null,
+            "hostName": "ESXi55.hwimo.lab.emc.com",
+            "id": null,
+            "idsdmRollupStatus": "1",
+            "instanceID": "System.Embedded.1",
+            "intrusionRollupStatus": null,
+            "lastSystemInventoryTime": "20170726165951.000000+000",
+            "lastUpdateTime": "20151124163216.000000+000",
+            "licensingRollupStatus": "1",
+            "lifecycleControllerVersion": "2.21.21.21",
+            "manufacturer": " ",
+            "maxCpuSockets": "2",
+            "maxDimmSlots": "24",
+            "maxPcieSlots": "6",
+            "memoryOperationMode": "OptimizerMode",
+            "memoryRollupStatus": null,
+            "model": " ",
+            "nodeId": "BPM0182",
+            "platformGuid": "3238314f-c0c2-3080-4d10-00504c4c4544",
+            "populatedCpuSockets": "2",
+            "populatedDimmSlots": "24",
+            "populatedPcieSlots": "1",
+            "powerCap": "646",
+            "powerCapEnabledState": "3",
+            "powerState": "2",
+            "primaryStatus": "1",
+            "psRollupStatus": "1",
+            "rollupStatus": "1",
+            "sdCardRollupStatus": null,
+            "serverAllocation": null,
+            "serviceTag": "BPM0182",
+            "smbiosGUID": "44454c4c-5000-104d-8030-c2c04f313832",
+            "storageRollupStatus": "1",
+            "sysMemErrorInfo": null,
+            "sysMemErrorMethodology": "6",
+            "sysMemFailOverState": "NotInUse",
+            "sysMemLocation": "3",
+            "sysMemMaxCapacitySize": "786432",
+            "sysMemPrimaryStatus": "1",
+            "sysMemTotalSize": 384,
+            "systemGeneration": "13G Monolithic",
+            "systemID": "1575",
+            "systemRevision": "0",
+            "tempRollupStatus": "1",
+            "tempStatisticsRollupStatus": null,
+            "uuid": "4c4c4544-0050-4d10-8030-c2c04f313832",
+            "voltRollupStatus": "1"
         },
         nics: [
             {
@@ -639,6 +795,31 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid system for device with DELL catalogs', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        waterline.workitems.findPollers.resolves([{
+            config: { command: 'chassis' }
+        }]);
+
+        taskProtocol.requestPollerCache.resolves([{
+            chassis: { power: "Unknown", uid: "Reserved"}
+        }]);
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id)
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
     it('should return a valid system with sku', function() {
         waterline.nodes.needByIdentifier.withArgs(node.id)
         .resolves(Promise.resolve({
@@ -845,21 +1026,49 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    it('should return a valid ethernet index block for Dell-based catalog with valid index', function() {
+    it('should return ip given catalog with no ip and ip from lookup (DELL catalogs)', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
             node: dellNode.id,
             source: 'nics',
             data: dellCatalogData.nics
         }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(lookup_ip));
+
         return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces/' + 'NIC.Integrated.1-1-1')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function() {
+            .expect(function(res) {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv4Addresses).to.exist;
+                expect(res.body.IPv6Addresses).to.not.exist;
+                expect(res.body.IPv4Addresses[0].Address).to.equal('123.1.1.1');
             });
     });
+
+    it('should return no ip given catalog with no ip and no ip from lookup (DELL catalogs)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'nics',
+            data: dellCatalogData.nics
+        }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(undefined));
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces/' + 'NIC.Integrated.1-1-1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv4Addresses).to.not.exist;
+                expect(res.body.IPv6Addresses).to.not.exist;
+            });
+    });
+
 
     it('should 404 a DELL with valid index and invalid ethernet index', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
@@ -877,7 +1086,7 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    /* 
+    /*
         **** EthernetInterface - Non-DELL
     */
 
@@ -903,6 +1112,9 @@ describe('Redfish Systems Root', function () {
             source: 'ohai',
             data: catalogData.ohai
         }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(lookup_ip));
+
         return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth0')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -913,27 +1125,115 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    it('should 404 a non-DELL with valid index and invalid ethernet index', function() {
+
+    it('should return ip given catalog with ip an ip from lookup (non-DELL catalogs)', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
             node: node.id,
             source: 'ohai',
             data: catalogData.ohai
         }));
-        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'BADi' + 'eth0')
+
+        lookup.macAddressToIp.resolves(Promise.resolve(lookup_ip));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth1')
             .expect('Content-Type', /^application\/json/)
-            .expect(404)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv4Addresses).to.exist;
+                expect(res.body.IPv6Addresses).to.exist;
+                expect(res.body.IPv4Addresses[0].Address).to.equal('123.1.1.1');
+            });
+    });
+
+    it('should return no ip given catalog with ip and no ip from lookup (non-DELL catalogs)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
+            node: node.id,
+            source: 'ohai',
+            data: catalogData.ohai
+        }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(undefined));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv6Addresses).to.not.exist;
+                expect(res.body.IPv4Addresses).to.not.exist;
+            });
+    });
+
+    it('should return ip given catalog with no ip and ip from lookup (non-DELL catalogs)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
+            node: node.id,
+            source: 'ohai',
+            data: catalogData.ohai
+        }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(lookup_ip));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth0')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv4Addresses).to.exist;
+                expect(res.body.IPv6Addresses).to.not.exist;
+                expect(res.body.IPv4Addresses[0].Address).to.equal('123.1.1.1');
+            });
+    });
+
+    it('should return no ip given catalog with no ip and no ip from lookupi (non-DELL catalogs)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'ohai').resolves(Promise.resolve({
+            node: node.id,
+            source: 'ohai',
+            data: catalogData.ohai
+        }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(undefined));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id + '/EthernetInterfaces/' + 'eth0')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv4Addresses).to.not.exist;
+                expect(res.body.IPv6Addresses).to.not.exist;
+            });
+    });
+
+    /*
+        **** Processors
+    */
+
+    it('should return a valid processor list for DELL nodet', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
+            source: 'hardware',
+            data: dellCatalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Processors')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
             .expect(function() {
-                expect(tv4.validate.called).to.be.false;
+                expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
             });
     });
 
-    /* 
-        **** Processors
-    */
-
-    it('should return a valid processor list', function() {
+    it('should return a valid processor list for non-DELL nodes', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
@@ -949,6 +1249,7 @@ describe('Redfish Systems Root', function () {
                 expect(redfish.render.called).to.be.true;
             });
     });
+
 
     it('should 404 an invalid processor list', function() {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Processors')
@@ -968,7 +1269,25 @@ describe('Redfish Systems Root', function () {
             .expect(404);
     });
 
-    it('should return a valid processor', function() {
+    it('should return a valid processor for a DELL node', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Processors/0')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+
+    it('should return a valid processori for a non-DELL node', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
@@ -991,6 +1310,9 @@ describe('Redfish Systems Root', function () {
             .expect(404);
     });
 
+    /*
+        **** simple storage
+    */
 
     it('should return a valid simple storage list', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
@@ -1052,6 +1374,10 @@ describe('Redfish Systems Root', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
+
+    /*
+        **** log services
+    */
 
     it('should return a valid log service', function() {
         return helper.request().get('/redfish/v1/Systems/' + node.id +

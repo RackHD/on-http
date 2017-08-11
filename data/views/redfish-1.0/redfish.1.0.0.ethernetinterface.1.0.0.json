@@ -39,8 +39,25 @@
     <% if (typeof ipv6addresspolicytable !== 'undefined') { %>
         ,"IPv6AddressPolicyTable": []
     <% } %>
-    <% if (typeof ipv6addresses !== 'undefined') { %>
-        ,"IPv6Addresses": []
+    <% if (typeof ipv6 !== 'undefined') { %>
+        ,"IPv6Addresses" : [
+        <% ipv6.forEach(function(ipv6, i, arr) { %>
+            {
+                "Address": "<%= ipv6.ipaddr %>"
+                <% if(typeof ipv6.prefixlength !== 'undefined') { %>
+                ,"PrefixLength": "<%= ipv6.prefixlength %>"
+                <% } %>
+                <% if(typeof ipv6.ipsrc !== 'undefined') { %>
+                ,"AddressOrigin": "<%= ipv6.ipsrc %>"
+                <% } %>
+                <% if(typeof ipv6.addressstate !== 'undefined') { %>
+                ,"AddressState": "<%= ipv6.addressstate %>"
+                <% } %>
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+        ]
+
     <% } %>
     <% if (typeof ipv6defaultgateway !== 'undefined') { %>
         ,"IPv6DefaultGateway": null
