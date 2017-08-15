@@ -36,7 +36,8 @@ java -jar ./swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-c
 
 ##### Peter remove on-http.deb building & upload to bintray ,since Jenkins takes over this work
 #./build-package.bash on-http "${BRANCH}"
-#
+# But Qiang add on-http.deb building only.(2017.8.3)
+./build-package.bash on-http "${BRANCH}"
 
 if [ -d deb ]; then rm -rf deb/; fi
 mkdir deb && cp -a *.deb deb/
