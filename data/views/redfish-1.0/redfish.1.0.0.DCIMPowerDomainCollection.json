@@ -4,11 +4,11 @@
     "@odata.type": "#PowerCollection.PowerCollection",
     "Oem" : {},
     "Name": "DCIMPower Collection",
-    "Members@odata.count": <%= nodes.length %>,
+    "Members@odata.count": <%= domains.length %>,
     "Members": [
-        <% nodes.forEach(function(node, i, arr) { %>
+        <% domains.forEach(function(domain, i, arr) { %>
             {
-                "@odata.id": "<%= basepath %>/DCIMPower/<%=node.identifiers[2]%>/<%=node.identifiers[0]%>-<%= node.id %>"
+                "@odata.id": "<%= basepath %>/DCIMPower/<%=domain %>"
             }
             <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
         <% }); %>

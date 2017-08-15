@@ -1,0 +1,21 @@
+{
+  "@odata.type": "#<%=type%>Collection.<%=type%>Collection",
+  "Name": "<%=type%> Collection",
+  "Members@odata.count": <%= nodes.length %>,
+
+  "Members": [
+    <% nodes.forEach(function(node, i, arr) { %>
+
+      {
+        "@odata.id": "<%= basepath %>/DCIMPower/<%=node.identifiers[2]%>/<%=node.identifiers[3]%>/<%=node.identifiers[0]%>-<%= node.id %>"
+      }
+    <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+    <% }); %>
+
+  ],
+  "@odata.context": "/redfish/v1/$metadata#<%=type%>Collection",
+  "@odata.id": "/redfish/v1/DCIMPower/default/<%=type%>"
+}
+
+
+
