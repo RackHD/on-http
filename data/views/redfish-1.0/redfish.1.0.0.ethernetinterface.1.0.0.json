@@ -72,8 +72,6 @@
     <% if(typeof linkstatus !== 'undefined') { %>
         <% if(typeof linkstatus === 'string') { %>
             ,"LinkStatus": "<%= linkstatus %>"
-        <% } else { %>
-            ,"LinkStatus": null
         <% } %>
     <% } %>
     <% if(typeof links !== 'undefined') { %>

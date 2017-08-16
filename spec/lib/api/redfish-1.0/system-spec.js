@@ -535,8 +535,8 @@ describe('Redfish Systems Root', function () {
                 "iscsiOffloadMode": "3",
                 "iscsiOffloadSupport": null,
                 "legacyBootProtocol": null,
-                "linkDuplex": "1",
-                "linkSpeed": "3",
+                "linkDuplex": "0",
+                "linkSpeed": "0",
                 "linkStatus": null,
                 "macAddress": null,
                 "maxBandwidth": "0",
@@ -1048,7 +1048,7 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    it('should return no ip given catalog with no ip and no ip from lookup (DELL catalogs)', function() {
+    it('should return no ip given catalog with no ip and no ip from lookup (1-1-1) (DELL catalogs)', function() {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
             node: dellNode.id,
             source: 'nics',
@@ -1064,6 +1064,31 @@ describe('Redfish Systems Root', function () {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
+                expect(res.body.IPv4Addresses).to.not.exist;
+                expect(res.body.IPv6Addresses).to.not.exist;
+            });
+    });
+
+    it('should return no ip given catalog with no ip and no ip from lookup (1-2-1) (DELL catalogs)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'nics').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'nics',
+            data: dellCatalogData.nics
+        }));
+
+        lookup.macAddressToIp.resolves(Promise.resolve(undefined));
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/EthernetInterfaces/' + 'NIC.Integrated.1-2-1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+                expect(res.body.SpeedMbps).to.not.exist;
+                expect(res.body.FullDuplex).to.not.exist;
+                expect(res.body.LinkStatus).to.not.exist;
+                expect(res.body.LinkStatus).to.not.equal(null);
                 expect(res.body.IPv4Addresses).to.not.exist;
                 expect(res.body.IPv6Addresses).to.not.exist;
             });
