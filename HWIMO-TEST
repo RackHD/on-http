@@ -1,19 +1,69 @@
-#!/bin/bash
-
+#!/bin/bash -e
 # Copyright 2015, EMC, Inc.
 
-set -e
-set -x
+checkDependencies(){
+    mongo_path=$( which mongod )
+    if [ -z "$mongo_path" ]; then
+        echo "[ERROR]: the unit test requires mongodb service installed"
+        exit 1
+    fi
+    rabbitmq_path=$( which rabbitmq-server )
+    if [ -z "$rabbitmq_path" ]; then
+        echo "[ERROR]: the unit test requires rabbitmq service installed"
+        exit 1
+    fi
+    export mongo_status=$(service mongodb status |grep running)
+    export rabbitmq_status=$(sudo service rabbitmq-server status|grep pid)
 
-rm -rf node_modules
-npm install
+}
 
-# Checks the code against the jshint options
-./node_modules/.bin/jshint -c .jshintrc --reporter=checkstyle lib index.js > checkstyle-result.xml || true
-./node_modules/.bin/jshint -c .jshintrc lib index.js || true
+cleanDatabase(){
+    mongo pxe --eval "db.dropDatabase()"
+    mongo monorail-test --eval "db.dropDatabase()"
+}
 
+handleDependServices(){
+    action=$1
+    if [ -z "$mongo_status" ]; then
+        echo "[INFO]: $action mongodb service"
+        sudo service mongodb $action
+    fi
 
-# Runs the mocha tests and reports the code coerage.
-./node_modules/.bin/istanbul cover -x "**/spec/**" ./node_modules/.bin/_mocha -- $(find spec -name '*-spec.js') --timeout 10000 -R xunit-file --require spec/helper.js 
-./node_modules/.bin/istanbul report cobertura
+    if [ -z "$rabbitmq_status" ]; then
+        echo "[INFO]: $action rabbitmq service"
+        sudo service rabbitmq-server $action
+    fi
+}
 
+prepareDependencies(){
+    handleDependServices start
+    sleep 2
+    cleanDatabase
+}
+
+restoreDependencies(){
+    cleanDatabase
+    handleDependServices stop
+}
+
+build(){
+    rm -rf node_modules
+    npm install
+}
+
+unitTest(){
+    # Checks the code against the jshint options
+    ./node_modules/.bin/jshint -c .jshintrc --reporter=checkstyle lib index.js > checkstyle-result.xml || true
+    ./node_modules/.bin/jshint -c .jshintrc lib index.js || true
+
+    # Runs the mocha tests and reports the code coverage.
+    ./node_modules/.bin/istanbul cover -x "**/spec/**" ./node_modules/.bin/_mocha -- $(find spec -name '*-spec.js') --timeout 10000 -R xunit-file --require spec/helper.js
+    ./node_modules/.bin/istanbul report cobertura
+    sudo chown $USER:$USER xunit.xml
+}
+
+checkDependencies
+prepareDependencies
+build
+unitTest
+restoreDependencies
