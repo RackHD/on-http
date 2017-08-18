@@ -15,17 +15,17 @@ set -e
 set -x
 
 rm -rf packagebuild
-git clone . packagebuild
+rsync -L -r . packagebuild
 pushd packagebuild
 cp ../package.json .
 rsync -ar ../debianstatic/on-http/ debian
 
-rm -rf node_modules
 npm install --cache=`pwd`
+./install-web-ui.sh
+./install-swagger-ui.sh
 npm run apidoc
 npm run taskdoc
 npm prune --production
-
 git log -n 1 --pretty=format:%h.%ai.%s > commitstring.txt
 
 export DEBEMAIL="hwimo robots <hwimo@hwimo.lab.emc.com>"
