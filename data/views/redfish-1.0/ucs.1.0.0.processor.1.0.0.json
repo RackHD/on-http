@@ -1,0 +1,26 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Processor.Processor",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Processor.v1_0_0.Processor",
+    "Oem" : {},
+    "Id": "<%=socketId%>",
+    "Name": "",
+    "Socket": "",
+    "ProcessorType": "CPU",
+    "ProcessorArchitecture": "x86",
+    "InstructionSet": "x86-64",
+    "Manufacturer": "<%= ucsData.data.vendor %>",
+    "Model": "<%= ucsData.data.model %>",
+    "MaxSpeedMHz": null,
+    "TotalCores": <%= ucsData.data.num_of_cores %>,
+    "TotalThreads": <%= ucsData.data.num_of_threads %>,
+    "Status": {},
+    "ProcessorId" : {
+        "VendorId": "<%= ucsData.data.vendor %>",
+        "IdentificationRegisters": "",
+        "EffectiveFamily": "",
+        "EffectiveModel": "<%= ucsData.data.model %>",
+        "Step": "",
+        "MicrocodeInfo": ""
+    }
+}
