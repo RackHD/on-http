@@ -1260,24 +1260,6 @@ describe('Redfish Systems Root', function () {
 
         it('should return a valid UCS processor list', function() {
             waterline.catalogs.findLatestCatalogOfSource
-                .withArgs(ucsNodeId, 'UCS:rack-unit-2').resolves(ucsCatalog);
-            waterline.nodes.needByIdentifier.withArgs(ucsNodeId).resolves(ucsNode);
-            waterline.nodes.getNodeById.withArgs(ucsNodeId).resolves(ucsNode);
-
-            return helper.request().get('/redfish/v1/Systems/' + ucsNodeId + '/Processors')
-                .expect('Content-Type', /^application\/json/)
-                .expect(200)
-                .expect(function() {
-                    expect(tv4.validate.called).to.be.true;
-                    expect(validator.validate.called).to.be.true;
-                    expect(redfish.render.called).to.be.true;
-                });
-        });
-
-        it('should retry get catalog if the source UCS failed.', function() {
-            waterline.catalogs.findLatestCatalogOfSource
-                .withArgs(ucsNodeId, 'UCS:rack-unit-2').resolves({});
-            waterline.catalogs.findLatestCatalogOfSource
                 .withArgs(ucsNodeId, 'UCS').resolves(ucsCatalog);
             waterline.nodes.needByIdentifier.withArgs(ucsNodeId).resolves(ucsNode);
             waterline.nodes.getNodeById.withArgs(ucsNodeId).resolves(ucsNode);
@@ -1289,29 +1271,10 @@ describe('Redfish Systems Root', function () {
                     expect(tv4.validate.called).to.be.true;
                     expect(validator.validate.called).to.be.true;
                     expect(redfish.render.called).to.be.true;
-                    expect(waterline.catalogs.findLatestCatalogOfSource).to.be.calledTwice;
-                    expect(waterline.catalogs.findLatestCatalogOfSource.getCall(0).args[1])
-                        .to.equal('UCS:rack-unit-2');
-                    expect(waterline.catalogs.findLatestCatalogOfSource.getCall(1).args[1])
-                        .to.equal('UCS');
-                });
-        });
-
-        it('should throw a error which is not NotFoundError.', function() {
-            waterline.catalogs.findLatestCatalogOfSource
-                .withArgs(ucsNodeId, 'UCS:rack-unit-2').rejects("this is a ucs error.");
-            waterline.nodes.needByIdentifier.withArgs(ucsNodeId).resolves(ucsNode);
-            waterline.nodes.getNodeById.withArgs(ucsNodeId).resolves(ucsNode);
-
-            return helper.request().get('/redfish/v1/Systems/' + ucsNodeId + '/Processors')
-                .expect('Content-Type', /^application\/json/)
-                .expect(500)
-                .expect(function(res) {
-                    expect(res.text.indexOf('this is a ucs error.') === -1).to.be.false;
                 });
         });
         
-        it('should return a valid normal processor list for Dell node', function() {
+        it('should return a valid processor list for Dell node', function() {
             waterline.catalogs.findLatestCatalogOfSource.resolves({
                 node: 'DELLabcd1234abcd1234abcd',
                 source: 'dummysource',
@@ -1328,7 +1291,7 @@ describe('Redfish Systems Root', function () {
                 });
         });
     
-        it('should return a valid processor list for non-DELL nodes', function() {
+        it('should return a valid processor list for non-DELL/Ucs nodes', function() {
             waterline.catalogs.findLatestCatalogOfSource.resolves({
                 node: '1234abcd1234abcd1234abcd',
                 source: 'dummysource',
@@ -1345,13 +1308,13 @@ describe('Redfish Systems Root', function () {
                 });
         });
 
-        it('should 404 an invalid processor list', function() {
+        it('should 404 an invalid processor list with invalid nodeId', function() {
             return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Processors')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
 
-        it('should 404 an invalid processor list', function() {
+        it('should 404 an invalid processor list with incorrect catalog', function() {
             waterline.catalogs.findLatestCatalogOfSource.resolves({
                 node: '1234abcd1234abcd1234abcd',
                 source: 'dummysource',
