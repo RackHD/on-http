@@ -98,7 +98,6 @@ describe('Redfish Systems Root', function () {
         ]
     };
 
-
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
         if( entry !== 'error.2.0.json') {
@@ -134,6 +133,8 @@ describe('Redfish Systems Root', function () {
         this.sandbox.stub(view, "get", redirectGet);
         this.sandbox.spy(redfish, 'render');
         this.sandbox.spy(redfish, 'validateSchema');
+        this.sandbox.spy(redfish, 'handleError');
+        this.sandbox.stub(redfish, 'getVendorNameById');
         this.sandbox.spy(validator, 'validate');
         this.sandbox.stub(waterline.nodes);
         this.sandbox.stub(waterline.catalogs);
@@ -1465,7 +1466,7 @@ describe('Redfish Systems Root', function () {
                     expect(redfish.render.called).to.be.true;
                 });
         });
-        
+
         it('should return a valid processor list for Dell node', function() {
             waterline.catalogs.findLatestCatalogOfSource.resolves({
                 node: 'DELLabcd1234abcd1234abcd',
@@ -1482,7 +1483,7 @@ describe('Redfish Systems Root', function () {
                     expect(redfish.render.called).to.be.true;
                 });
         });
-    
+
         it('should return a valid processor list for non-DELL/Ucs nodes', function() {
             waterline.catalogs.findLatestCatalogOfSource.resolves({
                 node: '1234abcd1234abcd1234abcd',
@@ -1518,45 +1519,263 @@ describe('Redfish Systems Root', function () {
         });
     });
 
-    it('should return a valid processor for a DELL node', function() {
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: '1234abcd1234abcd1234abcd',
-            source: 'dummysource',
-            data: dellCatalogData
-        }));
-
-        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Processors/0')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
-            });
-    });
 
 
-    it('should return a valid processori for a non-DELL node', function() {
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: '1234abcd1234abcd1234abcd',
-            source: 'dummysource',
-            data: catalogData
-        }));
 
-        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/0')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
-            });
-    });
+    describe('/redfish/v1/Systems/<identifier>/Processors/{socketId}', function(){
+        var ucsNode;
+        var ucsCatalog;
+        var ucsProcessorInfo;
+        var dellProcessorInfo;
+        var redfishProcessorInfo;
 
-    it('should 404 an invalid processor', function() {
-        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/bad')
-            .expect('Content-Type', /^application\/json/)
-            .expect(404);
+        before('/redfish/v1/Systems/<identifier>/Processors/{socketId} before', function(){
+            ucsNode = {
+                id : "599444b0303bbe8c07ef004c",
+                autoDiscover : false,
+                identifiers : [
+                    "10.240.19.70:sys/chassis-1"
+                ],
+                name : "sys/cisconode",
+                relations : [
+                    {
+                        relationType : "encloses",
+                        targets : [ "599444b0303bbe8c07ef004e" ]
+                    }
+                ],
+                tags : [ ],
+                type : "enclosure"
+            };
+
+            ucsCatalog = {
+                node : "599444b0303bbe8c07ef004c",
+                source : "UCS:blade-2",
+                data : {
+                    model : "UCSB-B200-M4",
+                    num_of_cores : 20,
+                    num_of_cpus : 2,
+                    num_of_threads : 40,
+                    vendor : "Cisco Systems Inc"
+                }
+            };
+
+            ucsProcessorInfo = {
+                "@odata.context": "/redfish/v1/$metadata#Processor.Processor",
+                "@odata.id": "/redfish/v1/Systems/599444b0303bbe8c07ef004c/Processors/0",
+                "@odata.type": "#Processor.v1_0_0.Processor",
+                "Oem": {},
+                "Id": "0",
+                "Name": "",
+                "Socket": "",
+                "ProcessorType": "CPU",
+                "ProcessorArchitecture": "x86",
+                "InstructionSet": "x86-64",
+                "Manufacturer": "Cisco Systems Inc",
+                "Model": "UCSB-B200-M4",
+                "MaxSpeedMHz": null,
+                "TotalCores": 20,
+                "TotalThreads": 40,
+                "Status": {},
+                "ProcessorId": {
+                  "VendorId": "Cisco Systems Inc",
+                  "IdentificationRegisters": "",
+                  "EffectiveFamily": "",
+                  "EffectiveModel": "UCSB-B200-M4",
+                  "Step": "",
+                  "MicrocodeInfo": ""
+                }
+            };
+
+            dellProcessorInfo = {
+                '@odata.context': '/redfish/v1/$metadata#Processor.Processor',
+                '@odata.id': '/redfish/v1/Systems/DELLabcd1234abcd1234abcd/Processors/0',
+                '@odata.type': '#Processor.v1_0_0.Processor',
+                Oem: {},
+                Id: '0',
+                Name: '',
+                Socket: 'CPU 1',
+                ProcessorType: 'CPU',
+                ProcessorArchitecture: 'x86',
+                InstructionSet: 'x86-64',
+                Manufacturer: 'Intel',
+                Model: 'Intel(R) Xeon(R) CPU E5-2680 v3 @ 2.50GHz',
+                MaxSpeedMHz: 4000,
+                TotalCores: 12,
+                TotalThreads: 24,
+                Status: {},
+                ProcessorId: {
+                    VendorId: 'Intel',
+                    IdentificationRegisters: '',
+                    EffectiveFamily: 'B3',
+                    EffectiveModel: 'Intel(R) Xeon(R) CPU E5-2680 v3 @ 2.50GHz',
+                    Step: '',
+                    MicrocodeInfo: ''
+                }
+            };
+
+            redfishProcessorInfo = {
+                '@odata.context': '/redfish/v1/$metadata#Processor.Processor',
+                '@odata.id': '/redfish/v1/Systems/1234abcd1234abcd1234abcd/Processors/0',
+                '@odata.type': '#Processor.v1_0_0.Processor',
+                Oem: {},
+                Id: '0',
+                Name: '',
+                Socket: 'test',
+                ProcessorType: 'CPU',
+                ProcessorArchitecture: 'x86',
+                InstructionSet: 'x86-64',
+                Manufacturer: 'test',
+                Model: 'Intel(R) Xeon(R) CPU E5-2650 v3 @ 2.30GHz',
+                MaxSpeedMHz: 2300,
+                TotalCores: 10,
+                TotalThreads: 20,
+                Status: {},
+                ProcessorId: {
+                    VendorId: 'test',
+                    IdentificationRegisters: 'test',
+                    EffectiveFamily: 'test',
+                    EffectiveModel: 'Intel(R) Xeon(R) CPU E5-2650 v3 @ 2.30GHz',
+                    Step: '',
+                    MicrocodeInfo: ''
+                }
+            };
+
+        });
+
+        it('should return an error when get system vendor fails', function() {
+            redfish.getVendorNameById.rejects();
+
+            return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Processors/0')
+                .expect('Content-Type', /^application\/json/)
+                .expect(500)
+                .expect(function() {
+                    expect(redfish.handleError.called).to.be.true;
+                });
+        });
+
+        it('should return a valid processor for a DELL node', function() {
+            waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+                node: 'Dell1234abcd1234abcd1234abcd',
+                source: 'dummysource',
+                data: dellCatalogData
+            }));
+            redfish.getVendorNameById.resolves(Promise.resolve({vendor: 'Dell'}));
+
+            return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Processors/0')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function(data) {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+                    expect(data.body).to.be.deep.equal(dellProcessorInfo);
+                });
+        });
+
+        it('should throw an invalid socketId for a DELL node', function() {
+            waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+                node: '1234abcd1234abcd1234abcd',
+                source: 'dummysource',
+                data: dellCatalogData
+            }));
+            redfish.getVendorNameById.resolves(Promise.resolve({vendor: 'Dell'}));
+
+            return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Processors/100')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404)
+                .expect(function(err) {
+                    expect(err.body.error['@Message.ExtendedInfo'][1].Message).to.be.equal('invalid socketId');
+                });
+        });
+
+        it('should return a valid processor for a Cisco node', function() {
+            waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve(ucsCatalog));
+            waterline.nodes.needByIdentifier.withArgs(ucsNode.id).resolves(Promise.resolve(ucsNode));
+            redfish.getVendorNameById.resolves(Promise.resolve({vendor: 'Cisco'}));
+
+            return helper.request().get('/redfish/v1/Systems/' + ucsNode.id + '/Processors/0')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function(data) {
+                    expect(data.body).to.be.deep.equal(ucsProcessorInfo);
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+                });
+        });
+
+        it('should throw an invalid socketId error for Cisco Node', function() {
+            waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve(ucsCatalog));
+            waterline.nodes.needByIdentifier.withArgs(ucsNode.id).resolves(Promise.resolve(ucsNode));
+            redfish.getVendorNameById.resolves(Promise.resolve({vendor: 'Cisco'}));
+
+            return helper.request().get('/redfish/v1/Systems/' + ucsNode.id + '/Processors/3')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404)
+                .expect(function(err) {
+                    expect(err.body.error["@Message.ExtendedInfo"][1].Message).to.be.equal('invalid socketId');
+                });
+        });
+
+
+        it('should return a valid processor for a non-DELL&non-Cisco node', function() {
+            waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+                node: '1234abcd1234abcd1234abcd',
+                source: 'dummysource',
+                data: catalogData
+            }));
+            waterline.nodes.needByIdentifier.withArgs(node.id).resolves(Promise.resolve(node));
+            redfish.getVendorNameById.resolves(Promise.resolve({vendor: 'other'}));
+
+            return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/0')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function(data) {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+                    expect(data.body).to.be.deep.equal(redfishProcessorInfo);
+                });
+        });
+
+        it('should return an invalid socketId for a non-DELL&non-Cisco node', function() {
+            waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+                node: '1234abcd1234abcd1234abcd',
+                source: 'dummysource',
+                data: catalogData
+            }));
+            waterline.nodes.needByIdentifier.withArgs(node.id).resolves(Promise.resolve(node));
+            redfish.getVendorNameById.resolves(Promise.resolve({vendor: 'other'}));
+
+            return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/100')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404)
+                .expect(function(err) {
+                    expect(err.body.error["@Message.ExtendedInfo"][1].Message).to.be.equal('invalid socketId');
+                });
+        });
+
+        it('should 404 an invalid processor', function() {
+            redfish.getVendorNameById.resolves(Promise.resolve({vendor: 'Dell'}));
+            return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/bad')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+
+        it('should 404 an invalid processor', function() {
+            redfish.getVendorNameById.resolves(Promise.resolve({vendor: 'Cisco'}));
+            return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/bad')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+
+        it('should 404 an invalid processor', function() {
+            redfish.getVendorNameById.resolves(Promise.resolve({vendor: 'Other'}));
+            return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/bad')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
+
     });
 
     /*
