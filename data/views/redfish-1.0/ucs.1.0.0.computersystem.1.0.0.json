@@ -1,0 +1,74 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#ComputerSystem.ComputerSystem",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#ComputerSystem.v1_3_0.ComputerSystem",
+    "Oem" : {},
+    "Id": "<%= identifier %>",
+    "Description": "<%= data.descr %>",
+    "Name": "Computer System",
+    "SystemType": "<%= systemType %>",
+    "AssetTag": "",
+    "Manufacturer": "<%= data.vendor %>",
+    "Model": "<%= data.model %>",
+    "SKU": "<%= skuInfo %>",
+    "SerialNumber": "<%= data.serial %>",
+    "PartNumber": "<%= data.part_number %>",
+    "UUID": "<%= data.uuid %>",
+    "HostName": "",
+    "IndicatorLED": null,
+    "PowerState": null,
+    "Boot": {},
+    "BiosVersion": "",
+    "ProcessorSummary": {
+        "Count": <%= data.num_of_cpus %>,
+        "Model": "",
+        "Status": {}
+    },
+    "MemorySummary": {
+        "TotalSystemMemoryGiB": <%= data.total_memory %>,
+        "Status": {}
+    },
+    "Actions": {
+        "Oem": {
+            "RackHD": {
+                "#RackHD.BootImage": {
+                    "target": "<%=basepath%>/Systems/<%=identifier%>/Actions/RackHD.BootImage"
+                }
+            }
+        },
+        "#ComputerSystem.Reset": {
+            "target": "<%=basepath%>/Systems/<%=identifier%>/Actions/ComputerSystem.Reset"
+        }
+    },
+    "Status": {},    
+    "Processors": {
+        "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/Processors"
+    },
+    "EthernetInterfaces": {
+        "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/EthernetInterfaces"
+    },
+    "SimpleStorage": {
+        "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/SimpleStorage"
+    },
+    "LogServices": {
+        "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/LogServices"
+    },
+    "Links": {
+        "Oem": {},
+        "ManagedBy@odata.count": 0,
+        "ManagedBy": [
+            {}
+        ],
+        "PoweredBy@odata.count": 0,
+        "PoweredBy": [],
+        "CooledBy@odata.count": 0,
+        "CooledBy": [],
+        "Chassis@odata.count": 0,
+        "Chassis": [
+            {}
+        ]
+    },
+    "Storage":{
+        "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/Storage"
+    }
+}
