@@ -56,6 +56,17 @@ describe('Redfish Systems Root', function () {
         ]
     };
 
+    var ucsNode = {
+        autoDiscover: false,
+        id: '5994f712d0e1e80257af9ff3',
+        name: 'name',
+        identifiers: ['10.240.19.70:sys/rack-unit-2'],
+        tags: [],
+        obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a'}],
+        type: 'compute',
+        relations: []
+    };
+
     // var dellNodeObm ={
     //     id: "DELL574dcd5794ab6e2506fd107a",
     //     node: "DELLabcd1234abcd1234abcd",
@@ -133,6 +144,7 @@ describe('Redfish Systems Root', function () {
         this.sandbox.spy(tv4, "validate");
         this.sandbox.stub(mktemp, 'createFile');
         this.sandbox.stub(fs, 'writeFile');
+        this.sandbox.stub(redfish, 'getVendorNameById');
 
         waterline.nodes.getNodeById.resolves();
         waterline.nodes.needByIdentifier.resolves();
@@ -771,6 +783,10 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid system', function() {
+        redfish.getVendorNameById.resolves({
+            node: node,
+            vendor: 'notDellAndCisco'
+        });
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: node.id,
             source: 'dummysource',
@@ -796,6 +812,10 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid system for device with DELL catalogs', function() {
+        redfish.getVendorNameById.resolves({
+            node: dellNode,
+            vendor: 'Dell'
+	});
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: dellNode.id,
             source: 'dummysource',
@@ -821,6 +841,10 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return a valid system with sku', function() {
+        redfish.getVendorNameById.resolves({
+            node: node,
+            vendor: 'notDellAndCisco'
+	});
         waterline.nodes.needByIdentifier.withArgs(node.id)
         .resolves(Promise.resolve({
             id: node.id,
@@ -852,7 +876,43 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid  Cisco system', function() {
+	redfish.getVendorNameById.resolves({
+	    node: ucsNode,
+	    vendor: 'Cisco'
+	});
+
+	this.sandbox.stub(nodeApi, "getNodeCatalogSourceById");
+	nodeApi.getNodeCatalogSourceById.resolves({
+	    node: ucsNode.id,
+	    source: 'UCS',
+	    data: {
+		"desrc": "description",
+		"model": "UCSC-C220-M3S",
+		"serial": "FCH1948V1NG",
+		"vendor": "Cisco Systems Inc",
+		"part_number": "74-9932-02",
+		"uuid": "c3bef8a5-96a8-45d2-9a4d-f4c7da71942e",
+		"num_of_cpus": 1,
+		"total_memory": 200
+	    }
+	});
+	return helper.request().get('/redfish/v1/Systems/' + ucsNode.id)
+	    .expect('Content-Type', /^application\/json/)
+	    .expect(200)
+	    .expect(function() {
+		expect(tv4.validate.called).to.be.true;
+		expect(validator.validate.called).to.be.true;
+		expect(redfish.render.called).to.be.true;
+	    });
+
+    });
+
     it('should 404 an invalid system', function() {
+        redfish.getVendorNameById.resolves({
+            node: node,
+            vendor: 'Dell'
+        });
         return helper.request().get('/redfish/v1/Systems/bad' + node.id)
             .expect('Content-Type', /^application\/json/)
             .expect(404);
