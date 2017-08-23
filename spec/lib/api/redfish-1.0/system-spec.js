@@ -1237,61 +1237,93 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    /*
-        **** Processors
-    */
+    describe('/redfish/v1/Systems/<identifier>/Processors', function() {
+        var ucsNode;
+        var ucsCatalog;
+        var ucsNodeId;
 
-    it('should return a valid processor list for DELL nodet', function() {
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: '1234abcd1234abcd1234abcd',
-            source: 'hardware',
-            data: dellCatalogData
-        }));
+        before('/redfish/v1/Systems/<identifier>/Processors before', function(){
+            ucsNodeId = "599337d6ff99ed24305bc58a";
+            ucsNode =  {
+                "id": ucsNodeId,
+                "identifiers": [
+                   "10.240.19.70:sys/rack-unit-2"
+                ],
+                "name": "sys/rack-unit-2"
+            };
+            ucsCatalog = {
+                node: ucsNodeId,
+                source: 'UCS',
+                data: {num_of_cpus: 2}
+            };
+        });
 
-        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Processors')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
+        it('should return a valid UCS processor list', function() {
+            waterline.catalogs.findLatestCatalogOfSource
+                .withArgs(ucsNodeId, 'UCS').resolves(ucsCatalog);
+            waterline.nodes.needByIdentifier.withArgs(ucsNodeId).resolves(ucsNode);
+            waterline.nodes.getNodeById.withArgs(ucsNodeId).resolves(ucsNode);
+
+            return helper.request().get('/redfish/v1/Systems/' + ucsNodeId + '/Processors')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+                });
+        });
+        
+        it('should return a valid processor list for Dell node', function() {
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: 'DELLabcd1234abcd1234abcd',
+                source: 'dummysource',
+                data: dellCatalogData
             });
-    });
 
-    it('should return a valid processor list for non-DELL nodes', function() {
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: '1234abcd1234abcd1234abcd',
-            source: 'dummysource',
-            data: catalogData
-        }));
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
+            return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Processors')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+                });
+        });
+    
+        it('should return a valid processor list for non-DELL/Ucs nodes', function() {
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: '1234abcd1234abcd1234abcd',
+                source: 'dummysource',
+                data: catalogData
             });
-    });
 
+            return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+                });
+        });
 
-    it('should 404 an invalid processor list', function() {
-        return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Processors')
-            .expect('Content-Type', /^application\/json/)
-            .expect(404);
-    });
+        it('should 404 an invalid processor list with invalid nodeId', function() {
+            return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/Processors')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
 
-    it('should 404 an invalid processor list', function() {
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: '1234abcd1234abcd1234abcd',
-            source: 'dummysource',
-            data: catalogDataWithBadProcessor
-        }));
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors')
-            .expect('Content-Type', /^application\/json/)
-            .expect(404);
+        it('should 404 an invalid processor list with incorrect catalog', function() {
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: '1234abcd1234abcd1234abcd',
+                source: 'dummysource',
+                data: catalogDataWithBadProcessor
+            });
+            return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
     });
 
     it('should return a valid processor for a DELL node', function() {
