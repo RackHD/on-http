@@ -14,7 +14,7 @@
     "SerialNumber": "<%= hardware.data.system.serviceTag %>",
     "PartNumber": "",
     "UUID": "<%= hardware.data.system.uuid.toLowerCase() %>",
-    "HostName": "<% hardware.data.system.hostName %>",
+    "HostName": "<%= hardware.data.system.hostName %>",
     "IndicatorLED": "<%= hardware.data.leds[0] || 'Unknown' %>",
     "PowerState": "<%= hardware.data.system.powerState == 2 ? 'On' : 'Off' %>",
     "Boot": {},
@@ -40,7 +40,7 @@
             "target": "<%=basepath%>/Systems/<%=identifier%>/Actions/ComputerSystem.Reset"
         }
     },
-    "Status": {},    
+    "Status": {},
     "Processors": {
         "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/Processors"
     },
