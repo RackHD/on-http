@@ -4,7 +4,7 @@
     "@odata.type" : "#Storage.v1_1_1.Storage",
     "Id" : "<%= index %>",
     "Description" : "",
-    "Name" : "",
+    "Name": "Local Storage Controller",
     "Links" : { },
     "Status": {
       "HealthRollup": <%

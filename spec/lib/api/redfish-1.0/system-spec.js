@@ -382,78 +382,137 @@ describe('Redfish Systems Root', function () {
             }
         ],
         "system": {
-            "activePowerPolicy": null,
             "assetTag": "",
-            "baseBoardChassisSlot": "NA",
-            "batteryRollupStatus": "1",
+            "boardSerialNumber": "CN7792159B000W",
             "biosReleaseDate": "2015-01-09T00:03:00Z",
             "biosVersionString": "1.2.10",
-            "bladeGeometry": "255",
-            "boardPartNumber": "04N3DFA07",
-            "boardSerialNumber": "CN7792159B000W",
-            "caption": null,
-            "chassisModel": "",
-            "chassisName": "Main System Chassis",
-            "chassisServiceTag": "BPM0182",
-            "chassisSystemHeight": "2",
-            "cmcip": null,
-            "cpldVersion": "1.0.1",
-            "cpuRollupStatus": "1",
-            "currentRollupStatus": null,
-            "deviceDescription": "System",
-            "elementName": null,
-            "estimatedExhaustTemperature": "41",
-            "estimatedSystemAirflow": "29",
-            "expressServiceCode": "25493213234",
-            "fanRollupStatus": "1",
-            "fqdd": "System.Embedded.1",
-            "generation": null,
+            "fQDD": "RAID.Integrated.1-1",
             "hostName": "ESXi55.hwimo.lab.emc.com",
-            "id": null,
-            "idsdmRollupStatus": "1",
-            "instanceID": "System.Embedded.1",
-            "intrusionRollupStatus": null,
-            "lastSystemInventoryTime": "20170726165951.000000+000",
-            "lastUpdateTime": "20151124163216.000000+000",
-            "licensingRollupStatus": "1",
-            "lifecycleControllerVersion": "2.21.21.21",
             "manufacturer": " ",
-            "maxCpuSockets": "2",
-            "maxDimmSlots": "24",
-            "maxPcieSlots": "6",
-            "memoryOperationMode": "OptimizerMode",
-            "memoryRollupStatus": null,
             "model": " ",
-            "nodeId": "BPM0182",
-            "platformGuid": "3238314f-c0c2-3080-4d10-00504c4c4544",
             "populatedCpuSockets": "2",
-            "populatedDimmSlots": "24",
-            "populatedPcieSlots": "1",
-            "powerCap": "646",
-            "powerCapEnabledState": "3",
             "powerState": "2",
-            "primaryStatus": "1",
-            "psRollupStatus": "1",
-            "rollupStatus": "1",
-            "sdCardRollupStatus": null,
-            "serverAllocation": null,
             "serviceTag": "BPM0182",
-            "smbiosGUID": "44454c4c-5000-104d-8030-c2c04f313832",
             "storageRollupStatus": "1",
-            "sysMemErrorInfo": null,
-            "sysMemErrorMethodology": "6",
-            "sysMemFailOverState": "NotInUse",
-            "sysMemLocation": "3",
-            "sysMemMaxCapacitySize": "786432",
-            "sysMemPrimaryStatus": "1",
-            "sysMemTotalSize": 384,
             "systemGeneration": "13G Monolithic",
-            "systemID": "1575",
-            "systemRevision": "0",
-            "tempRollupStatus": "1",
-            "tempStatisticsRollupStatus": null,
-            "uuid": "4c4c4544-0050-4d10-8030-c2c04f313832",
-            "voltRollupStatus": "1"
+            "sysMemTotalSize": 384,
+            "uuid": "4c4c4544-0050-4d10-8030-c2c04f313832"
+        },
+        "storage": {
+            "controllers": [
+                {
+                    "controllerFirmwareVersion": "25.3.0.0016",
+                    "deviceCardManufacturer": "DELL",
+                    "fQDD": "RAID.Integrated.1-1",
+                    "primaryStatus": "1",
+                    "productName": "PERC H730P Mini",
+                    "possibleSpeed": "1_5_GBS",
+                    "sasaddress": "514187704AD4F700"
+                }
+            ],
+            "physicalDisks": [
+                {
+                    "blockSizeInBytes": "512",
+                    "busProtocol": "6",
+                    "deviceDescription": "Disk 0 in Backplane 1 of Integrated RAID Controller 1",
+                    "fqdd": "Disk.Bay.0:Enclosure.Internal.0-1:RAID.Integrated.1-1",
+                    "hotSpareStatus": "0",
+                    "manufacturer": "TOSHIBA",
+                    "maxCapableSpeed": "4",
+                    "mediaType": "1",
+                    "model": "PX02SMF040",
+                    "operationName": "None",
+                    "operationPercentComplete": "0",
+                    "ppid": "PH0HKK8C264025AV0JK2A03",
+                    "primaryStatus": "1",
+                    "revision": "A3AF",
+                    "sasaddress": "500003969C8A6E8E",
+                    "securityState": "0",
+                    "serialNumber": "X5V0A02TT0QB",
+                    "sizeInBytes": "399431958528"
+                },
+                {
+                    "blockSizeInBytes": "512",
+                    "busProtocol": "6",
+                    "deviceDescription": "Disk 1 in Backplane 1 of Integrated RAID Controller 1",
+                    "fqdd": "Disk.Bay.1:Enclosure.Internal.0-1:RAID.Integrated.1-1",
+                    "hotSpareStatus": "0",
+                    "manufacturer": "TOSHIBA",
+                    "maxCapableSpeed": "4",
+                    "mediaType": "1",
+                    "model": "PX02SMF040",
+                    "operationName": "None",
+                    "operationPercentComplete": "0",
+                    "ppid": "PH0HKK8C264025AV0JK2A03",
+                    "primaryStatus": "1",
+                    "revision": "A3AF",
+                    "sasaddress": "500003969C8A6E11",
+                    "securityState": "0",
+                    "serialNumber": "X5V0A03DT0QB",
+                    "sizeInBytes": "399431958528"
+                },
+                {
+                    "blockSizeInBytes": "512",
+                    "busProtocol": "6",
+                    "deviceDescription": "Disk 2 in Backplane 1 of Integrated RAID Controller 1",
+                    "fqdd": "Disk.Bay.2:Enclosure.Internal.0-1:RAID.Integrated.1-1",
+                    "hotSpareStatus": "0",
+                    "manufacturer": "SEAGATE",
+                    "maxCapableSpeed": "4",
+                    "mediaType": "0",
+                    "model": "ST1200MM0088",
+                    "operationName": "None",
+                    "operationPercentComplete": "0",
+                    "ppid": "PH0HKK8C264025AV0JK2A03",
+                    "primaryStatus": "1",
+                    "revision": "A3AF",
+                    "sasaddress": "500003969C8A6Eff",
+                    "securityState": "0",
+                    "serialNumber": "S400QAPL",
+                    "sizeInBytes": "399431958528"
+
+                }
+            ],
+            "virtualDisks": [
+                {
+                    "blockSizeInBytes": "512",
+                    "busProtocol": "6",
+                    "cacheCade": "0",
+                    "deviceDescription": "Virtual Disk 1 on Integrated RAID Controller 1",
+                    "diskCachePolicy": "256",
+                    "fqdd": "Disk.Virtual.1:RAID.Integrated.1-1",
+                    "id": 0,
+                    "instanceId": "Disk.Virtual.1:RAID.Integrated.1-1",
+                    "lastSystemInventoryTime": "20170726165951.000000+000",
+                    "lastUpdateTime": "20170726175943.000000+000",
+                    "lockStatus": "0",
+                    "mediaType": "1",
+                    "name": "Virtual Disk 1",
+                    "objectStatus": "0",
+                    "operationName": "None",
+                    "operationPercentComplete": "0",
+                    "pendingOperations": "0",
+                    "physicalDiskIds": [
+                        "Disk.Bay.0:Enclosure.Internal.0-1:RAID.Integrated.1-1",
+                        "Disk.Bay.1:Enclosure.Internal.0-1:RAID.Integrated.1-1",
+                        "Disk.Bay.2:Enclosure.Internal.0-1:RAID.Integrated.1-1"
+                    ],
+                    "primaryStatus": "1",
+                    "raidStatus": "2",
+                    "raidTypes": "4",
+                    "readCachePolicy": "32",
+                    "remainingRedundancy": "1",
+                    "rollupStatus": "1",
+                    "sizeInBytes": "1199638052864",
+                    "spanDepth": "1",
+                    "spanLength": null,
+                    "startingLbaInBlocks": "0",
+                    "stripeSize": "128",
+                    "t10piStatus": "0",
+                    "virtualDiskTargetId": "1",
+                    "writeCachePolicy": "2"
+                }
+            ]
         },
         nics: [
             {
@@ -694,6 +753,31 @@ describe('Redfish Systems Root', function () {
             }
         }
     ];
+
+    var redfishVolumeCreate = {
+        "username": "someuser",
+        "password": "somepassword",
+        "volume": {
+            "Id": "AnId",
+            "Name": "volumeToCreate",
+            "CapacityBytes": 1234567,
+            "VolumeType": "NonRedundant",
+            "Links": {
+                "Drives@odata.count": 3,
+                "Drives": [
+                    {
+                        "@odata.id": "/redfish/v1/Systems/SomeNodeId/Storage/RAID.Integrated.1-1/Drives/0"
+                    },
+                    {
+                        "@odata.id": "/redfish/v1/Systems/SomeNodeId/Storage/RAID.Integrated.1-1/Drives/1"
+                    },
+                    {
+                        "@odata.id": "/redfish/v1/Systems/SomeNodeId/Storage/RAID.Integrated.1-1/Drives/2"
+                    }
+                ]
+            }
+        }
+    };
 
 
     var smartCatalog = [
@@ -1394,6 +1478,24 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid simple storage list for devices with DELL catalogs', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/SimpleStorage')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+
+            });
+    });
+
     it('should 404 an invalid simple storage', function() {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id + '/SimpleStorage')
             .expect('Content-Type', /^application\/json/)
@@ -1416,6 +1518,24 @@ describe('Redfish Systems Root', function () {
 
         return helper.request().get('/redfish/v1/Systems/' + node.id +
                                     '/SimpleStorage/0000_00_01_1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should return a valid simple storage device for devices with DELL catalogs', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
+                                    '/SimpleStorage/RAID_Integrated_1-1')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -1934,6 +2054,10 @@ describe('Redfish Systems Root', function () {
             .expect(501);
     });
 
+    /*
+        **** Storage
+    */
+
     it('should return a valid  storage list', function() {
 
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
@@ -1957,6 +2081,26 @@ describe('Redfish Systems Root', function () {
                 expect(redfish.render.called).to.be.true;
             });
     });
+
+
+    it('should return a valid storage list for device with DELL catalogs', function() {
+
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Storage')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
 
     it('should return a valid  Redfish storage list', function() {
         waterline.catalogs.find.resolves(Promise.resolve(redfishCatalogArray));
@@ -2002,6 +2146,25 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid storage device with DELL catalogs', function () {
+
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
+            '/Storage/RAID_Integrated_1-1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function () {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
     it('should return a valid Redfish storage device', function () {
         waterline.catalogs.find.resolves(Promise.resolve(redfishCatalogArray));
 
@@ -2017,7 +2180,7 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    it('should 404 an invalid  storage device', function () {
+    it('should 404 an invalid storage device', function () {
         waterline.catalogs.find.resolves([]);
         return helper.request().get('/redfish/v1/Systems/' + node.id +
             '/Storage/bad')
@@ -2025,6 +2188,211 @@ describe('Redfish Systems Root', function () {
             .expect(404);
     });
 
+   it('should return a valid storage drive with DELL catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
+            '/Storage/RAID_Integrated_1-1/Drives/1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function () {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should return a valid volume list for devices with DELL catalogs', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should return a valid volume for devices with DELL catalogs', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes/0')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should return a valid remove volume for devices with DELL catalogs', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        return helper.request().delete('/redfish/v1/Systems/' + dellNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes/0')
+            .send({ username: "bogusname", password: "somepassword"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(202)
+            .expect(function(res) {
+                expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
+            });
+    });
+
+    it('should return a valid create volume for devices with DELL catalogs (raid type NonRedundant (default))', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes')
+            .send(redfishVolumeCreate)
+            .expect('Content-Type', /^application\/json/)
+            .expect(202)
+            .expect(function(res) {
+                expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
+            });
+    });
+
+    it('should return a valid create volume for devices with DELL catalogs (raid type Mirrored)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        var newCat = redfishVolumeCreate;
+        newCat.volume.VolumeType = "Mirrored";
+
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes')
+            .send(newCat)
+            .expect('Content-Type', /^application\/json/)
+            .expect(202)
+            .expect(function(res) {
+                expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
+            });
+    });
+
+    it('should return a valid create volume for devices with DELL catalogs (raid type StripedWithParity)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        var newCat = redfishVolumeCreate;
+        newCat.volume.VolumeType = "StripedWithParity";
+
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes')
+            .send(newCat)
+            .expect('Content-Type', /^application\/json/)
+            .expect(202)
+            .expect(function(res) {
+                expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
+            });
+    });
+
+    it('should return a valid create volume for devices with DELL catalogs (raid type SpannedMirrors)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        var newCat = redfishVolumeCreate;
+        newCat.volume.VolumeType = "SpannedMirrors";
+
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes')
+            .send(newCat)
+            .expect('Content-Type', /^application\/json/)
+            .expect(202)
+            .expect(function(res) {
+                expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
+            });
+    });
+
+    it('should return a valid create volume for devices with DELL catalogs (raid type SpannedStripesWithParity)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        var newCat = redfishVolumeCreate;
+        newCat.volume.VolumeType = "SpannedStripesWithParity";
+
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes')
+            .send(newCat)
+            .expect('Content-Type', /^application\/json/)
+            .expect(202)
+            .expect(function(res) {
+                expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
+            });
+    });
+
+    it('should return a 400 for an invalid create volume for devices with DELL catalogs (raid type invalid)', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        var newCat = redfishVolumeCreate;
+        newCat.volume.VolumeType = "invalid";
+
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes')
+            .send(newCat)
+            .expect('Content-Type', /^application\/json/)
+            .expect(400);
+    });
+
+    it('should return a valid add hot spare for devices with DELL catalogs', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Drives/0')
+            .send({
+                "username": "someuser",
+                "password": "somepassword",
+                "hotspareType": "dhs",
+                "volumeId": "0"
+            })
+            .expect('Content-Type', /^application\/json/)
+            .expect(202)
+            .expect(function(res) {
+                expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
+            });
+    });
 
 });
-
