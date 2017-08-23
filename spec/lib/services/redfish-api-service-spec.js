@@ -4,7 +4,7 @@
 
 require('../../helper');
 
-describe("Redfish Validator Service", function() {
+describe("Redfish Api Service", function() {
     var redfish;
     var view;
     var _;
@@ -27,7 +27,7 @@ describe("Redfish Validator Service", function() {
     before(function() {
         helper.setupInjector([
             helper.require("/lib/services/schema-api-service"),
-            helper.require("/lib/services/redfish-validator-service"),
+            helper.require("/lib/services/redfish-api-service"),
             helper.require("/lib/api/view/view"),
             dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf'),
             dihelper.simpleWrapper({}, 'Services.Waterline')
