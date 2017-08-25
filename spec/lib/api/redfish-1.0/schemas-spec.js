@@ -65,7 +65,7 @@ describe('Redfish Schemas', function () {
             })
             .then(function(fileContent){
                 return helper.request().get('/redfish/v1/Schemas/Bios_v1.xml')
-                    .expect('Content-Type', "text/plain; charset=utf-8")
+                    .expect('Content-Type', "application/xml; charset=utf-8")
                     .expect(200)
                     .expect(function(res) {
                         expect(res.text).to.equal(fileContent);
