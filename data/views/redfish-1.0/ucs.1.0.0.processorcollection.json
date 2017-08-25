@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#ProcessorCollection.ProcessorCollection",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#ProcessorCollection.ProcessorCollection",
+    "Oem" : {},
+    "Name": "Processors Collection",
+    "Members@odata.count": <%= processors.data.num_of_cpus %>,
+    "Members": [
+        <% for(var i = 0; i < processors.data.num_of_cpus; i += 1) { %>
+            {
+                "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/Processors/<%=i%>"
+            }
+        <%= ( i + 1 < processors.data.num_of_cpus ) ? ',': '' %>
+        <% }; %>
+    ]
+}

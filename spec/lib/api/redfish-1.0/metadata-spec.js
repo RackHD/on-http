@@ -47,7 +47,7 @@ describe('Redfish Metadata', function () {
             .then(function(fileContent){
                 return helper.request().get('/redfish/v1/$metadata')
                     .auth('admin', 'admin123')
-                    .expect('Content-Type', "text/plain; charset=utf-8")
+                    .expect('Content-Type', "application/xml; charset=utf-8")
                     .expect(200)
                     .expect(function(res) {
                         expect(res.text).to.equal(fileContent);

@@ -4,28 +4,28 @@
     "@odata.type": "#ComputerSystem.v1_3_0.ComputerSystem",
     "Oem" : {},
     "Id": "<%= identifier %>",
-    "Description": "<%= data.descr %>",
+    "Description": "<%= hardware.data.descr %>",
     "Name": "Computer System",
     "SystemType": "<%= systemType %>",
     "AssetTag": "",
-    "Manufacturer": "<%= data.vendor %>",
-    "Model": "<%= data.model %>",
+    "Manufacturer": "<%= hardware.data.vendor %>",
+    "Model": "<%= hardware.data.model %>",
     "SKU": "<%= skuInfo %>",
-    "SerialNumber": "<%= data.serial %>",
-    "PartNumber": "<%= data.part_number %>",
-    "UUID": "<%= data.uuid %>",
+    "SerialNumber": "<%= hardware.data.serial %>",
+    "PartNumber": "<%= hardware.data.part_number %>",
+    "UUID": "<%= hardware.data.uuid %>",
     "HostName": "",
-    "IndicatorLED": null,
-    "PowerState": null,
+    "IndicatorLED": "<%= led.data.oper_state.charAt(0).toUpperCase() +  led.data.oper_state.slice(1) %>",
+    "PowerState": "<%= hardware.data.oper_power.charAt(0).toUpperCase() + hardware.data.oper_power.slice(1) %>",
     "Boot": {},
-    "BiosVersion": "",
+    "BiosVersion": "<%= bios.data.revision %>",
     "ProcessorSummary": {
-        "Count": <%= data.num_of_cpus %>,
+        "Count": <%= hardware.data.num_of_cpus %>,
         "Model": "",
         "Status": {}
     },
     "MemorySummary": {
-        "TotalSystemMemoryGiB": <%= data.total_memory %>,
+        "TotalSystemMemoryGiB": <%= hardware.data.total_memory/1024 %>,
         "Status": {}
     },
     "Actions": {
@@ -55,17 +55,27 @@
     },
     "Links": {
         "Oem": {},
-        "ManagedBy@odata.count": 0,
+        "ManagedBy@odata.count": <%= obm.length %>,
         "ManagedBy": [
-            {}
+            <% obm.forEach(function(obm, i, arr) { %>
+                {
+                    "@odata.id": "<%= basepath %>/Managers/<%= obm %>"
+                }
+                <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+            <%  }); %>
         ],
         "PoweredBy@odata.count": 0,
         "PoweredBy": [],
         "CooledBy@odata.count": 0,
         "CooledBy": [],
-        "Chassis@odata.count": 0,
+        "Chassis@odata.count": <%= chassis.length %>,
         "Chassis": [
-            {}
+            <% chassis.forEach(function(chassis, i, arr) { %>
+                {
+                    "@odata.id": "<%= basepath %>/Chassis/<%= chassis %>"
+                }
+                <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>    
+            <% }); %>
         ]
     },
     "Storage":{

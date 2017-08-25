@@ -45,7 +45,7 @@
             {
                 "Address": "<%= ipv6.ipaddr %>"
                 <% if(typeof ipv6.prefixlength !== 'undefined') { %>
-                ,"PrefixLength": "<%= ipv6.prefixlength %>"
+                ,"PrefixLength": <%= ipv6.prefixlength %>
                 <% } %>
                 <% if(typeof ipv6.ipsrc !== 'undefined') { %>
                 ,"AddressOrigin": "<%= ipv6.ipsrc %>"
@@ -72,8 +72,6 @@
     <% if(typeof linkstatus !== 'undefined') { %>
         <% if(typeof linkstatus === 'string') { %>
             ,"LinkStatus": "<%= linkstatus %>"
-        <% } else { %>
-            ,"LinkStatus": null
         <% } %>
     <% } %>
     <% if(typeof links !== 'undefined') { %>

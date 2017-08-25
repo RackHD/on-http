@@ -1,0 +1,15 @@
+---
+resources:
+- name: on-http
+  type: git
+  source:
+    uri: https://github.com/geoff-reid/on-http.git
+
+jobs:
+- name: job-unittest-on-http
+  public: true
+  plan:
+  - get: on-http
+    trigger: true
+  - task: run-unittest 
+    file: on-http/alpha/unittest.yml
