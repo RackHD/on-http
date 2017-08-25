@@ -7,4 +7,3 @@ cd $SCRIPT_DIR/..
 npm install
 npm run apidoc
 npm run taskdoc
-npm run swaggerdoc
