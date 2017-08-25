@@ -15,7 +15,7 @@
     "PartNumber": "<%= hardware.data.part_number %>",
     "UUID": "<%= hardware.data.uuid %>",
     "HostName": "",
-    "IndicatorLED": "<%= led.data.oper_state.charAt(0).toUpperCase() +  led.data.oper_state.slice(1) %>",
+    "IndicatorLED": "<%= led.data.oper_state === 'on'?'On':'Off' %>",
     "PowerState": "<%= hardware.data.oper_power.charAt(0).toUpperCase() + hardware.data.oper_power.slice(1) %>",
     "Boot": {},
     "BiosVersion": "<%= bios.data.revision %>",
@@ -25,7 +25,7 @@
         "Status": {}
     },
     "MemorySummary": {
-        "TotalSystemMemoryGiB": <%= hardware.data.total_memory/1024 %>,
+        "TotalSystemMemoryGiB": <%= hardware.data.total_memory>>10 %>,
         "Status": {}
     },
     "Actions": {
