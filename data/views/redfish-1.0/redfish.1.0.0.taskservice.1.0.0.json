@@ -25,29 +25,6 @@
     "ServiceEnabled": true,
     "Status": {},
     "Tasks": {
-        "@odata.type": "#TaskCollection.TaskCollection",
-        "Name": "Task Collection",
-        "Members": [
-        <% graphs.forEach(function(graph, i, arr) { %>
-            {
-                "@odata.type": "#Task.1.0.0.Task",
-                "@odata.id": "<%= basepath %>/TaskService/Tasks/<%=graph.id%>",
-                "@odata.context": "<%= basepath %>/$metadata#TaskService/Tasks/$entity",
-                "Name": "<%= graph.name %>",
-                "TaskState": "<%= graph.state %>",
-                "Messages": [],
-                "TaskStatus": "<%= graph.status %>",
-                "StartTime": "<%= graph.startTime %>",
-                "EndTime": "<%= graph.endTime %>",
-                "Id": "<%= graph.id %>",
-                "Oem" : {
-                    "RackHD": {
-                        "SystemId": "<%= graph.node %>"
-                    }
-                }
-            }
-            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
-        <% }); %>
-        ]
+        "@odata.id": "<%= basepath %>/TaskService/Tasks%>"
     }
 }
