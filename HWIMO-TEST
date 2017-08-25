@@ -59,11 +59,10 @@ unitTest(){
     # Runs the mocha tests and reports the code coverage.
     ./node_modules/.bin/istanbul cover -x "**/spec/**" ./node_modules/.bin/_mocha -- $(find spec -name '*-spec.js') --timeout 10000 -R xunit-file --require spec/helper.js
     ./node_modules/.bin/istanbul report cobertura
-    sudo chown $USER:$USER xunit.xml
 }
 
 checkDependencies
 prepareDependencies
+trap restoreDependencies SIGINT SIGTERM SIGKILL EXIT
 build
 unitTest
-restoreDependencies
