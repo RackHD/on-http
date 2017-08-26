@@ -17,9 +17,11 @@
     "MessageId": "",
     "MessageArgs": [],
     "Links": {
-        "Oem": {},
+        <% if (entry.origin) { %>
         "OriginOfCondition": {
-            "@odata.id": "<%= entry.origin || 'null' %>"
-        }
+            "@odata.id": "<%= entry.origin %>"
+        },
+        <% } %>
+        "Oem": {}
     }
 }
