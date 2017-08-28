@@ -1033,9 +1033,22 @@ describe('Redfish Systems Root', function () {
             .expect(404);
     });
 
+    it('should 404 an invalid system for Bios.ResetBios', function() {
+        return helper.request().post('/redfish/v1/Systems/bad' + node.id + '/Bios.ResetBios')
+            .send({"target": {},"title": {}})
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
     it('should 404 an non-Dell system for Bios.ChangePassword post', function() {
         return helper.request().post('/redfish/v1/Systems/' + node.id + '/Bios.ChangePassword')
             .send({ PasswordName: "bogusname", OldPassword: "somepass", NewPassword: "newpass"})
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+    it('should 404 non-Dell identifier for Bios.ResetBios', function() {
+        return helper.request().post('/redfish/v1/Systems/' + node.id + '/Bios.ResetBios')
+            .send({"Bios": {"Oem": {}},"target": {},"title": {}})
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
@@ -1054,7 +1067,20 @@ describe('Redfish Systems Root', function () {
             .expect(202);
     });
 
-    it('should 202 for a Dell-based bios change password SetupPassword', function() {
+    it('should return a 202 for valid Dell identifier for Bios.ResetBios', function() {
+        configuration.set('httpEndpoints', httpEndpoints);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'DeviceSummary').resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'DeviceSummary',
+            data: dellCatalogData.DeviceSummary
+        }));
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id + '/Bios.ResetBios')
+            .send({"target": {},"title": {}})
+            .expect('Content-Type', /^application\/json/)
+            .expect(202);
+    });
+
+    it('should return a 202 for a Dell-based bios change password SetupPassword', function() {
         // Force a southbound interface through httpEndpoints
         configuration.set('httpEndpoints', httpEndpoints);
         waterline.catalogs.findLatestCatalogOfSource.withArgs(dellNode.id, 'DeviceSummary').resolves(Promise.resolve({
