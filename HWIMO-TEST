@@ -48,6 +48,7 @@ restoreDependencies(){
 
 build(){
     rm -rf node_modules
+    ./install-swagger-ui.sh
     npm install
 }
 
