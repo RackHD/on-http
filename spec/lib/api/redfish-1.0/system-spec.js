@@ -56,6 +56,21 @@ describe('Redfish Systems Root', function () {
         ]
     };
 
+    var ucsNode = {
+        autoDiscover: false,
+        id: '5994f712d0e1e80257af9ff3',
+        name: 'name',
+        identifiers: ['10.240.19.70:sys/rack-unit-2'],
+        tags: [],
+        obms: [{ obm: '/api/2.0/obms/574dcd5794ab6e2506fd107a'}],
+        type: 'compute',
+        relations: [
+            {
+                "relationType":"enclosedBy",
+                "targets":["5994f71bd0e1e80257af9ff7"]
+            }
+        ]
+    };
     // var dellNodeObm ={
     //     id: "DELL574dcd5794ab6e2506fd107a",
     //     node: "DELLabcd1234abcd1234abcd",
@@ -854,92 +869,159 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    it('should return a valid system', function() {
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: node.id,
-            source: 'dummysource',
-            data: catalogData
-        }));
-
-        waterline.workitems.findPollers.resolves([{
-            config: { command: 'chassis' }
-        }]);
-
-        taskProtocol.requestPollerCache.resolves([{
-            chassis: { power: "Unknown", uid: "Reserved"}
-        }]);
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id)
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
+    describe('Get Systems By Indentifier', function () {
+        beforeEach('set up mocks', function(){
+            this.sandbox.stub(redfish, 'getVendorNameById');
+        });
+        it('should return a valid system', function() {
+            redfish.getVendorNameById.resolves({
+                node: node,
+                vendor: 'undefined'
             });
-    });
+            waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+                node: node.id,
+                source: 'dummysource',
+                data: catalogData
+            }));
 
-    it('should return a valid system for device with DELL catalogs', function() {
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: dellNode.id,
-            source: 'dummysource',
-            data: dellCatalogData
-        }));
+            waterline.workitems.findPollers.resolves([{
+                config: { command: 'chassis' }
+            }]);
 
-        waterline.workitems.findPollers.resolves([{
-            config: { command: 'chassis' }
-        }]);
+            taskProtocol.requestPollerCache.resolves([{
+                chassis: { power: "Unknown", uid: "Reserved"}
+            }]);
 
-        taskProtocol.requestPollerCache.resolves([{
-            chassis: { power: "Unknown", uid: "Reserved"}
-        }]);
+            return helper.request().get('/redfish/v1/Systems/' + node.id)
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+                });
+        });
 
-        return helper.request().get('/redfish/v1/Systems/' + dellNode.id)
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
+        it('should return a valid system for device with DELL catalogs', function() {
+            redfish.getVendorNameById.resolves({
+                node: dellNode,
+                vendor: 'Dell'
             });
-    });
+            waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+                node: dellNode.id,
+                source: 'dummysource',
+                data: dellCatalogData
+            }));
 
-    it('should return a valid system with sku', function() {
-        waterline.nodes.needByIdentifier.withArgs(node.id)
-        .resolves(Promise.resolve({
-            id: node.id,
-            name: node.id,
-            sku: 'sku-value'
-        }));
+            waterline.workitems.findPollers.resolves([{
+                config: { command: 'chassis' }
+            }]);
 
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: node.id,
-            source: 'dummysource',
-            data: catalogData
-        }));
+            taskProtocol.requestPollerCache.resolves([{
+                chassis: { power: "Unknown", uid: "Reserved"}
+            }]);
 
-        waterline.workitems.findPollers.resolves([{
-            config: { command: 'chassis' }
-        }]);
+            return helper.request().get('/redfish/v1/Systems/' + dellNode.id)
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+                });
+        });
 
-        taskProtocol.requestPollerCache.resolves([{
-            chassis: { power: "Unknown", uid: "Reserved"}
-        }]);
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id)
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
+        it('should return a valid system with sku', function() {
+            redfish.getVendorNameById.resolves({
+                node: node,
+                vendor: 'notDellAndCisco'
             });
-    });
+            waterline.nodes.needByIdentifier.withArgs(node.id)
+            .resolves(Promise.resolve({
+                id: node.id,
+                name: node.id,
+                sku: 'sku-value'
+            }));
 
-    it('should 404 an invalid system', function() {
-        return helper.request().get('/redfish/v1/Systems/bad' + node.id)
-            .expect('Content-Type', /^application\/json/)
-            .expect(404);
+            waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+                node: node.id,
+                source: 'dummysource',
+                data: catalogData
+            }));
+
+            waterline.workitems.findPollers.resolves([{
+                config: { command: 'chassis' }
+            }]);
+
+            taskProtocol.requestPollerCache.resolves([{
+                chassis: { power: "Unknown", uid: "Reserved"}
+            }]);
+
+            return helper.request().get('/redfish/v1/Systems/' + node.id)
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+                });
+        });
+
+       it('should return a valid  Cisco system', function() {
+            redfish.getVendorNameById.resolves({
+                node: ucsNode,
+                vendor: 'Cisco'
+            });
+
+            this.sandbox.stub(nodeApi, "getNodeCatalogSourceById");
+            nodeApi.getNodeCatalogSourceById.withArgs(ucsNode.id, 'UCS').resolves({
+                node: ucsNode.id,
+                source: 'UCS',
+                data: {
+                    "descr": "",
+                    "model": "UCSC-C220-M3S",
+                    "serial": "FCH1948V1NG",
+                    "vendor": "Cisco Systems Inc",
+                    "part_number": "74-9932-02",
+                    "uuid": "c3bef8a5-96a8-45d2-9a4d-f4c7da71942e",
+                    "num_of_cpus": 1,
+                    "total_memory": 256,
+                    "oper_power": "off"
+                }
+            });
+
+            nodeApi.getNodeCatalogSourceById.withArgs(ucsNode.id, "UCS:bios").resolves({
+                node: ucsNode.id,
+                source: 'UCS:bios',
+                data: {
+                    "revison":"0"
+                }
+            });
+            nodeApi.getNodeCatalogSourceById.withArgs(ucsNode.id, "UCS:locator-led").resolves({
+                node: ucsNode.id,
+                source: 'UCS:locator-led',
+                data: {
+                    "oper_state":"off"
+                }
+            });
+            return helper.request().get('/redfish/v1/Systems/' + ucsNode.id)
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+                });
+        });
+        it('should 404 an invalid system', function(){
+            redfish.getVendorNameById.resolves({
+                node: node,
+                vendor: 'Dell'
+            });
+            return helper.request().get('/redfish/v1/Systems/bad' + node.id)
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
     });
 
     it('should 404 an invalid identifier for bios query', function() {
