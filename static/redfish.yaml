@@ -1930,7 +1930,7 @@ paths:
           $ref: "#/responses/status_404"
         501:
           $ref: "#/responses/status_501"
-  /Managers/RackHD/SerialInterfaces:
+  /Managers/{identifier}/SerialInterfaces:
     x-swagger-router-controller: managers
     get:
       x-privileges: [ 'Login' ]
@@ -1938,11 +1938,16 @@ paths:
       summary: retrieve information about the ethernet interfaces
       operationId: listManagerSerialInterfaces
       tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
       responses:
         200:
           description: Success
           schema:
-            $ref: "#/definitions/EthernetInterfaceCollection.EthernetInterfaceCollection"
+            $ref: "#/definitions/SerialInterfaceCollection_SerialInterfaceCollection"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -1955,7 +1960,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /Managers/RackHD/SerialInterfaces/{index}:
+  /Managers/{identifier}/SerialInterfaces/{index}:
     x-swagger-router-controller: managers
     get:
       x-privileges: [ 'Login' ]
@@ -1964,6 +1969,10 @@ paths:
       operationId: getManagerSerialInterface
       tags: [ "/redfish/v1" ]
       parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
         - name: index
           in: path
           required: true
@@ -1972,7 +1981,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: "#/definitions/SerialInterface.1.0.0_SerialInterface"
+            $ref: "#/definitions/SerialInterface.v1_0_3.SerialInterface"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -6005,7 +6014,7 @@ definitions:
         description: This is the manufacturer/provider specific extension moniker
           used to divide the Oem object into sections.
     type: object
-  SerialInterface.1.0.0_SerialInterface:
+  SerialInterface.v1_0_3.SerialInterface:
     description: This schema defines an asynchronous serial interface resource.
     properties:
       '@odata.context':

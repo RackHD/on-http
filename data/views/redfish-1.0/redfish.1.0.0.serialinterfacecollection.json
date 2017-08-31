@@ -1,5 +1,5 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#<%= baseprofile %>/Links/Members/<%= identifier %>/SerialInterfaceCollection/$entity",
+    "@odata.context" : "<%= basepath %>/$metadata#SerialInterfaceCollection.SerialInterfaceCollection",
     "@odata.id": "<%= url %>",
     "@odata.type": "#SerialInterfaceCollection.SerialInterfaceCollection",
     "Name": "<%= name %>",

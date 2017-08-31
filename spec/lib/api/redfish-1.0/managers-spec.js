@@ -132,14 +132,12 @@ describe('Redfish Managers', function () {
         '802_1q VLAN ID' : 'Disabled',
         'Firmware Revision' : '9.08',
         'Manufacturer Name' : 'Unknown (0x1291)',
-        'Product Name' : 'Unknown (0xF02)'
-    };
+        'Product Name' : 'Unknown (0xF02) ',
+        'Port Type': 'Serial'
+        };
 
 
     var dmiCatalogData = {
-        source: 'dmi',
-        data: {
-
             'Port Connector Information': [{
                 'Internal Reference Designator': 'J26-B2B_CONN_0',
                 'Internal Connector Type': 'Other',
@@ -161,9 +159,9 @@ describe('Redfish Managers', function () {
                     'External Connector Type': 'RJ-45',
                     'Port Type': 'Network Port'
                 }]
-        }
+        };
 
-    };
+
 
     it('should return a valid manager root', function () {
         waterline.nodes.find.resolves([node]);
@@ -187,7 +185,7 @@ describe('Redfish Managers', function () {
             data: catalogData
         }));
 
-        return helper.request().get('/redfish/v1/Managers/' + node.id + '.0')
+        return helper.request().get('/redfish/v1/Managers/' + node.id)
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -206,7 +204,7 @@ describe('Redfish Managers', function () {
             source: 'dummysource',
             data: catalogData
         }));
-        return helper.request().get('/redfish/v1/Managers/' + dellNode.id + '.0')
+        return helper.request().get('/redfish/v1/Managers/' + dellNode.id)
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -216,12 +214,12 @@ describe('Redfish Managers', function () {
             });
     });
 
-    it('should return a valid idrac manager', function() {
+    it('should return a valid network protocol for idrac manager', function() {
         waterline.nodes.needByIdentifier.withArgs('DELLabcd1234abcd1234abcd').resolves(dellNode);
         waterline.nodes.getNodeById.withArgs('DELLabcd1234abcd1234abcd').resolves(dellNode);
         waterline.nodes.find.resolves([dellNode]);
 
-        return helper.request().get('/redfish/v1/Managers/' + dellNode.id + '.0/NetworkProtocol')
+        return helper.request().get('/redfish/v1/Managers/' + dellNode.id + '/NetworkProtocol')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -247,7 +245,7 @@ describe('Redfish Managers', function () {
             data: catalogData
         }));
 
-        return helper.request().get('/redfish/v1/Managers/' + node.id + '.0/EthernetInterfaces')
+        return helper.request().get('/redfish/v1/Managers/' + node.id + '/EthernetInterfaces')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -261,7 +259,7 @@ describe('Redfish Managers', function () {
         waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd').resolves(node);
         waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(node);
 
-        return helper.request().get('/redfish/v1/Managers/' + node.id + '.0/NetworkProtocol')
+        return helper.request().get('/redfish/v1/Managers/' + node.id + '/NetworkProtocol')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -286,7 +284,7 @@ describe('Redfish Managers', function () {
             data: catalogData
         }));
 
-        return helper.request().get('/redfish/v1/Managers/' + node.id + '.0/EthernetInterfaces/0')
+        return helper.request().get('/redfish/v1/Managers/' + node.id + '/EthernetInterfaces/0')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -361,12 +359,32 @@ describe('Redfish Managers', function () {
         });
     });
 
-    it('should return the RackHD manager serial interface collection', function () {
-        waterline.catalogs.find.resolves(Promise.resolve({
+    it('should return 200 for non-DELL manager serial interface', function () {
+        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(node);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: catalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Managers/' + node.id + '/SerialInterfaces')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function () {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+ 
+    it('should return 200 for non-DELL manager serial interface with index', function () {
+        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(node);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: '1234abcd1234abcd1234abcd',
             data: dmiCatalogData
         }));
 
-        return helper.request().get('/redfish/v1/Managers/RackHD/SerialInterfaces')
+        return helper.request().get('/redfish/v1/Managers/' + node.id + '/SerialInterfaces/J21-COMA')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function () {
@@ -376,19 +394,51 @@ describe('Redfish Managers', function () {
             });
     });
 
-    it('should return the RackHD manager serial interface', function () {
+    it('should retrun 404 for Dell manager serial interface', function() {
+        waterline.nodes.getNodeById.withArgs('DELLabcd1234abcd1234abcd').resolves(dellNode);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: 'DELLabcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: catalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Managers/' + dellNode.id + '/SerialInterfaces')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return 404 for Dell node manager serial interface with index', function() {
+        waterline.nodes.getNodeById.withArgs('DELLabcd1234abcd1234abcd').resolves(dellNode);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: 'DELLabcd1234abcd1234abcd',
+            source: 'dummysource',
+            data: catalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Managers/' + dellNode.id + '/SerialInterfaces/J21-COMA')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return 404 for RackHD manager serial interface', function() {
         waterline.catalogs.find.resolves(Promise.resolve({
             data: dmiCatalogData
         }));
 
         return helper.request().get('/redfish/v1/Managers/RackHD/SerialInterfaces')
-            .then(function (res) {
-                return Promise.map(res.body.Members, function (member) {
-                    return helper.request().get(member['@odata.id'])
-                        .expect('Content-Type', /^application\/json/)
-                        .expect(200);
-                });
-            });
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
     });
+
+    it('should return 404 for RackHD manager serial interface with index', function() {
+        waterline.catalogs.find.resolves(Promise.resolve({
+            data: dmiCatalogData
+        }));
+
+        return helper.request().get('/redfish/v1/Managers/RackHD/SerialInterfaces/J21-COMA')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
 });
 

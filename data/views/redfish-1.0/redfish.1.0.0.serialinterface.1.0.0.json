@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "<%= basepath %>/$metadata#<%= baseprofile %>/Members/$entity"
+    "@odata.context" : "<%= basepath %>/$metadata#SerialInterface.SerialInterface"
     ,"@odata.id": "<%= url %>"
-    ,"@odata.type": "#SerialInterface.1.2.0.SerialInterface"
+    ,"@odata.type": "#SerialInterface.v1_0_2.SerialInterface"
     <% if (typeof bitRate !== 'undefined') { %>
         ,"BitRate" : [
         <% bitRate.forEach(function(bitRate, i, arr) { %>
