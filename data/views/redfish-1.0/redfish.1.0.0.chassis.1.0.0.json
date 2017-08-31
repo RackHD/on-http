@@ -1,7 +1,7 @@
 {
     "@odata.context" : "<%= basepath %>/$metadata#Chassis.Chassis",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#Chassis.v1_0_0.Chassis",
+    "@odata.type": "#Chassis.v1_4_0.Chassis",
     "Oem": {},
     "Id": "<%= identifier %>",
     "Description": "",
