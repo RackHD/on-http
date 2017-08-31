@@ -31,9 +31,11 @@
     "FirmwareVersion": "<%= mcInfo['Firmware Revision'] %>",
     <% } %>
     "Status" : {},
+    <% if(!noSerial) { %>
     "SerialInterfaces" : {
         "@odata.id": "<%= url %>/SerialInterfaces"
     },
+    <% } %>
     "EthernetInterfaces" : {
         "@odata.id": "<%= url %>/EthernetInterfaces"
     }
