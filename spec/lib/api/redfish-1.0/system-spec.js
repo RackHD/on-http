@@ -71,16 +71,16 @@ describe('Redfish Systems Root', function () {
             }
         ]
     };
-    // var dellNodeObm ={
-    //     id: "DELL574dcd5794ab6e2506fd107a",
-    //     node: "DELLabcd1234abcd1234abcd",
-    //     service: 'ipmi-obm-service',
-    //     config: {
-    //         host: '1.2.3.4',
-    //         user: 'myuser',
-    //         password: 'mypass'
-    //    }
-    // };
+    var dellNodeObm ={
+        id: "DELL574dcd5794ab6e2506fd107a",
+        node: "DELLabcd1234abcd1234abcd",
+        service: 'dell-wsman-obm-service',
+        config: {
+            host: '1.2.3.4',
+            user: 'myuser',
+            password: 'mypass'
+       }
+    };
 
     var dellNode = {
         autoDiscover: false,
@@ -161,7 +161,9 @@ describe('Redfish Systems Root', function () {
         waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
         nodeApi.setNodeWorkflowById.resolves({instanceId: 'abcdef'});
 
+        waterline.obms.findByNode.resolves(undefined);
         waterline.obms.findByNode.withArgs(node.id, 'ipmi-obm-service', true).resolves(Promise.resolve(nodeObm));
+        waterline.obms.findByNode.withArgs(dellNode.id, 'dell-wsman-obm-service', true).resolves(Promise.resolve(dellNodeObm));
 
         mktemp.createFile.withArgs('/nfs/XXXXXX.xml')
         .resolves(Promise.resolve('/nfs/file.xml'));
@@ -2040,7 +2042,7 @@ describe('Redfish Systems Root', function () {
 
     it('should return valid SecureBoot status', function() {
         racadm.runCommand.resolves("test=SecureBoot=Disabled");
-        return helper.request().get('/redfish/v1/Systems/'+ node.id +'/SecureBoot')
+        return helper.request().get('/redfish/v1/Systems/'+ dellNode.id +'/SecureBoot')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function() {
@@ -2050,11 +2052,11 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    it('should 500 on bad racadm command', function() {
+    it('should 501 on unsupported URI command', function() {
         racadm.runCommand.rejects("ERROR");
         return helper.request().get('/redfish/v1/Systems/'+ node.id +'/SecureBoot')
             .expect('Content-Type', /^application\/json/)
-            .expect(500);
+            .expect(501);
     });
 
     it('should return 202 after setting Secure Boot', function() {
