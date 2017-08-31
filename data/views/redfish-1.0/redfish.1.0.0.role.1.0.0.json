@@ -1,6 +1,6 @@
 {
   "@odata.context" : "<%= basepath %>/$metadata#Role.Role",
-  "@odata.type": "#Role.Role",
+  "@odata.type": "#Role.v1_0_2.Role",
   "Description": "Display the privileges of <%= identifier  %>",
   "Name": "<%= identifier  %>",
   "OemPrivileges": [],
