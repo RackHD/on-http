@@ -1584,54 +1584,124 @@ describe('Redfish Systems Root', function () {
             .expect(404);
     });
 
-    it('should return a valid simple storage device', function() {
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart')
-        .resolves(Promise.resolve({
-            node: '1234abcd1234abcd1234abcd',
-            source: 'dummysource',
-            data: smartCatalog
-        }));
-
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: '1234abcd1234abcd1234abcd',
-            source: 'dummysource',
-            data: catalogData
-        }));
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
-                                    '/SimpleStorage/0000_00_01_1')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
+    describe('Get simple storage device', function(){
+        it('should return a valid simple storage device', function() {
+            waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart')
+            .resolves({
+                node: '1234abcd1234abcd1234abcd',
+                source: 'dummysource',
+                data: smartCatalog
             });
-    });
 
-    it('should return a valid simple storage device for devices with DELL catalogs', function() {
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
-            node: dellNode.id,
-            source: 'dummysource',
-            data: dellCatalogData
-        }));
-
-        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
-                                    '/SimpleStorage/RAID_Integrated_1-1')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: '1234abcd1234abcd1234abcd',
+                source: 'dummysource',
+                data: catalogData
             });
-    });
 
-    it('should 404 an invalid simple storage device', function() {
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
-                                    '/SimpleStorage/bad')
-            .expect('Content-Type', /^application\/json/)
-            .expect(404);
+            return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                        '/SimpleStorage/0000_00_01_1')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+                });
+        });
+
+        it('should return a valid simple storage device for devices with DELL catalogs', function() {
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: dellNode.id,
+                source: 'dummysource',
+                data: dellCatalogData
+            });
+
+            return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
+                                        '/SimpleStorage/RAID_Integrated_1-1')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+                });
+        });
+
+        describe('Get Cisco valid simple storage device', function(){
+            beforeEach('set up mocks', function(){
+                this.sandbox.stub(redfish, 'getVendorNameById');
+                this.sandbox.stub(nodeApi, "getNodeCatalogSourceById");
+            });
+            afterEach('restore sanbox', function(){
+                this.sandbox.restore();
+            });
+
+            it('should return a valid simple storage device with valid contoller', function(){
+                redfish.getVendorNameById.resolves({
+                    node: node,
+                    vendor: 'Cisco'
+                });
+                nodeApi.getNodeCatalogSourceById.withArgs(ucsNode.id, 'UCS:board').resolves({
+                    node: ucsNode.id,
+                    source: 'UCS:board',
+                    data:{
+                        'children' : {
+                            'storage-SAS-collection' : [{
+                                'id': '1',
+                                'model': 'LSI 6G MegaRAID 9265-8i',
+                                'pci_addr': '01:00.0',
+                                'children': {
+                                    'disk-collection': [{
+                                        'revision': '0',
+                                        'size': '381941995283',
+                                        'serial': 'SRVDISK183',
+                                        'device_type': '',
+                                        'rn': 'disk-2',
+                                        'vendor': 'TOSHIBA',
+                                        'model': 'PX02SMU040'
+                                    }]
+                                }
+                            }]
+                        }
+                    }
+                });
+                return helper.request().get('/redfish/v1/Systems/'+ucsNode.id+
+
+                                            '/SimpleStorage/SAS_01_00_0_1')
+                    .expect('Content-Type', /^application\/json/)
+                    .expect(200)
+                    .expect(function() {
+                        expect(tv4.validate.called).to.be.true;
+                        expect(validator.validate.called).to.be.true;
+                        expect(redfish.render.called).to.be.true;
+                    });
+            });
+            it('should return a invalid simple storage device with undefined controller', function(){
+                redfish.getVendorNameById.resolves({
+                    node: node,
+                    vendor: 'Cisco'
+                });
+                nodeApi.getNodeCatalogSourceById.withArgs(ucsNode.id, 'UCS:board').resolves({
+                    node: ucsNode.id,
+                    source: 'UCS:board',
+                    data: {
+                        children: {}
+                    }
+                });
+                return helper.request().get('/redfish/v1/Systems/'+ucsNode.id+
+                                            '/SimpleStorage/sas111_01_00_0_1')
+                    .expect('Content-Type', /^application\/json/)
+                    .expect(404);
+            });
+        });
+
+        it('should 404 an invalid simple storage device', function() {
+            return helper.request().get('/redfish/v1/Systems/' + ucsNode.id +
+                                        '/SimpleStorage/bad')
+                .expect('Content-Type', /^application\/json/)
+                .expect(404);
+        });
     });
 
     /*
