@@ -85,7 +85,7 @@ function parseDriveWwid(idList) {
 
     //According to SCSI-3 spec, vendor specified logic unit name string is 60
 	//Only IDE and SCSI disk will be retrieved
-    var scsiLines = [], sataLines = [], wwnLines = [], usbLines = [];
+    var scsiLines = [], sataLines = [], usbLines = [];
     lines.forEach(function(line){
         if ( line && !(line.match('part')) && line.match(/[sh]d[a-z]?[a-z]$/i)){
             var nameIndex = line.lastIndexOf('/'), idIndex = line.lastIndexOf('->');
@@ -95,21 +95,10 @@ function parseDriveWwid(idList) {
             else if (line.indexOf('ata') === 0) {
                 sataLines.push([line.slice(nameIndex + 1), line.slice(0, idIndex)]);
             }
-            else if (line.indexOf('wwn') === 0) {
-                wwnLines.push([line.slice(nameIndex + 1), line.slice(0, idIndex)]);
-            }
             else if (line.indexOf('usb') === 0) {
                 usbLines.push([line.slice(nameIndex + 1), line.slice(0, idIndex)]);
             }
         }
-    });
-
-    //wwnLine example: wwn-0x5000cca23de9e287 -> ../../sdb
-    //esxiWwn example: ["sdb", "naa.5000cca23de9e287"]
-    var esxiWwn = wwnLines.map(function(wwnLine) {
-        var line = wwnLine[1];
-        var split = line.split(/-/);
-        return [wwnLine[0], 'naa.' + split[1].slice(2)];
     });
 
     //ESXi SATA WWID should be ('t10.ATA_____' + logic unit name)
@@ -138,14 +127,7 @@ function parseDriveWwid(idList) {
         return [esxiLine[0], strLine];
     });
 
-    //If one device Name is mapped to both WWN and SATA array, use WWN element instead
-    esxiWwn.forEach(function(line) {
-        esxiSata.forEach(function(subline){
-            if (line[0] === subline[0]){
-                subline [1] = line[1];
-            }
-        });
-    });
+    //If drive have both WWN and SATA ID, ESXi will use SATA name only
 
     //esxiLine example: ["sda", "scsi-35000c500725f45d7"]
     //esxiScsi example: ["sda", "naa.5000c500725f45d7"]

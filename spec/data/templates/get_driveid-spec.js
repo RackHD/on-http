@@ -11,6 +11,15 @@ describe('get_driveid script', function() {
     var mockScsiDvd =
         '[0:0:0:0]    disk    ATA      QEMU HARDDISK    2.2.  /dev/sda\n' +
         '[1:0:0:0]    cd/dvd  QEMU     QEMU DVD-ROM     2.2.  /dev/sr0';
+    var mockScsiEmpty ='';
+    var mockVdInfoStdEmpty = 
+        'total 0\n' +
+        'drwxr-xr-x 2 root root 360 Dec 22 10:02 ./\n' +
+        'drwxr-xr-x 5 root root 100 Dec 22 10:02 ../';
+    var mockWwidStdEmpty = 
+        'total 0\n' +
+        'drwxr-xr-x 2 root root 360 Dec 22 10:02 ./\n' +
+        'drwxr-xr-x 5 root root 100 Dec 22 10:02 ../';
     var mockVdInfoDvd = '';
     var mockWwidDvd =
         'total 0\n' +
@@ -113,7 +122,7 @@ describe('get_driveid script', function() {
                     {
                         "scsiId":"5:0:0:0",
                         "virtualDisk":"",
-                        "esxiWwid":"naa.5000cca23de98340",
+                        "esxiWwid":"t10.ATA_____QEMU_HARDDISK___________________________QM00001_____________",
                         "devName":"sda",
                         "identifier":1,
                         "linuxWwid":"/dev/disk/by-id/ata-HUS724040ALA640_PBJY9ZJX"
@@ -146,6 +155,20 @@ describe('get_driveid script', function() {
                 //jshint ignore: end
             ));
         });
+
+        it('should parser empty lsscsi response', function() {
+            var mockExec = function() {
+                return mockScsiEmpty;
+            };
+            getDriveId.__set__('execSync', mockExec);
+            var result = buildDriveMap(mockWwidStdEmpty, mockVdInfoStdEmpty, mockScsiEmpty);
+            expect(result).to.deep.equal(JSON.stringify(
+                //jshint ignore: start
+                []
+                //jshint ignore: end
+            ));
+        });
+
 
         it('should parser raw SATA data with ASCII code 0x00', function() {
             var mockExec = function() {
