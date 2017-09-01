@@ -1,0 +1,27 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#Processor.Processor",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Processor.v1_0_0.Processor",
+    "Oem" : {},
+    "Id": "<%=socketId%>",
+    "Name": "",
+    "Socket": "<%= ucsData.data.children["cpu-collection"][socketId].socket_designation %>",
+    "ProcessorType": "CPU",
+    "ProcessorArchitecture": "x86",
+    "InstructionSet": "x86-64",
+    "Manufacturer": "<%= ucsData.data.children["cpu-collection"][socketId].vendor %>",
+    "Model": "<%= ucsData.data.children["cpu-collection"][socketId].model %>",
+    "MaxSpeedMHz":
+        <%=_.trim(_.last(ucsData.data.children["cpu-collection"][socketId].model.split(' ')), 'GHz') * 1000 %>,
+    "TotalCores": <%= ucsData.data.children["cpu-collection"][socketId].cores %>,
+    "TotalThreads": <%= ucsData.data.children["cpu-collection"][socketId].threads %>,
+    "Status": {},
+    "ProcessorId" : {
+        "VendorId": "<%= ucsData.data.children["cpu-collection"][socketId].vendor %>",
+        "IdentificationRegisters": "",
+        "EffectiveFamily": "<%= ucsData.data.children["cpu-collection"][socketId].arch %>",
+        "EffectiveModel": "<%= ucsData.data.children["cpu-collection"][socketId].model %>",
+        "Step": "<%= ucsData.data.children["cpu-collection"][socketId].stepping %>",
+        "MicrocodeInfo": ""
+    }
+}
