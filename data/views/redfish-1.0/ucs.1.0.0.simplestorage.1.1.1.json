@@ -1,0 +1,29 @@
+{
+    "@odata.context" : "<%= basepath %>/$metadata#SimpleStorage.SimpleStorage",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#SimpleStorage.v1_1_1.SimpleStorage",
+    "Oem" : {},
+    "Name": "Simple Storage Controller",
+    "Id": "<%= index %>",
+    "Description": "<%= description %>",
+    "Devices": [
+        <% devices.forEach(function(device, i, arr) { %>
+            {
+                "Oem": {
+                    "Cisco" : {
+                        "Revision": "<%= device.revision || 'Unknown' %>",
+                        "Capacity": "<%= device.size || 'Unknown' %>",
+                        "SerialNumbers": "<%= device.serial || 'Unknown' %>",
+                        "Type": "<%= device.device_type || 'Unknown' %>"
+                    }
+                },
+                "Name": "<%= device.rn || 'Unknown' %>",
+                "Status": {},
+                "Manufacturer": "<%= device.vendor || 'Unknown' %>",
+                "Model": "<%= device.model || 'Unknown' %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ],
+    "Status": {}
+}
