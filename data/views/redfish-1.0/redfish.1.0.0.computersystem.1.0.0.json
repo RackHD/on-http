@@ -17,7 +17,6 @@
     "HostName": "",
     "IndicatorLED": "<%= chassisData.uid %>",
     "PowerState": "<%= chassisData.power==='Unknown' ? 'On' : chassisData.power %>",
-    "Bios": {},
     "Boot": {},
     "BiosVersion": "<%= catData.dmi.bios.version.trim() %> <%= catData.dmi.bios.bios_revision.trim() %> <%= catData.dmi.bios.release_date.trim() %>",
     "ProcessorSummary": {
@@ -59,9 +58,6 @@
     },
     "SimpleStorage": {
         "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/SimpleStorage"
-    },
-    "Storage": {
-    "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/Storage"
     },
     "LogServices": {
         "@odata.id": "<%= basepath %>/Systems/<%= identifier %>/LogServices"
