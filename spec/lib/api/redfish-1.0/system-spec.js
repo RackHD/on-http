@@ -284,6 +284,66 @@ describe('Redfish Systems Root', function () {
                 Version: "Not Specified",
                 "Voltage": "Unknown"
             }
+        ],
+        "smart": [
+            {
+                "Controller": {
+                    "controller_PCI_BDF": "0000:03:00.0",
+                    "controller_name": "LSI Logic / Symbios Logic MegaRAID SAS-3 3108 [Invader] (rev 02)",
+                    "host_ID": "0"
+                },
+                "SMART": {
+                    "Identity": {
+                        "Device type": "disk",
+                        "Logical block size": "512 bytes",
+                        "Product": "MR9361-8i",
+                        "Revision": "4.20",
+                        "SMART support is": "Unavailable - device lacks SMART capability.",
+                        "Serial number": "0036acee028fd5fc1de09df708b00506",
+                        "User Capacity": "1,198,597,865,472 bytes [1.19 TB]",
+                        "Vendor": "LSI"
+                    }
+                }
+            },
+            {
+                "Controller": {
+                    "controller_PCI_BDF": "0000:03:00.0",
+                    "controller_name": "LSI Logic / Symbios Logic MegaRAID SAS-3 3108 [Invader] (rev 02)",
+                    "host_ID": "0"
+                },
+                "SMART": {
+                    "Identity": {
+                        "Logical block size": "512 bytes",
+                        "Physical block size": "4096 bytes",
+                        "Product": "HUSMM1640ASS200",
+                        "Revision": "A204",
+                        "Rotation Rate": "Solid State Device",
+                        "Serial number": "0QV6E90A",
+                        "Transport protocol": "SAS",
+                        "User Capacity": "400,088,457,216 bytes [400 GB]",
+                        "Vendor": "HGST"
+                    }
+                }
+            },
+            {
+                "Controller": {
+                    "controller_PCI_BDF": "0000:03:00.0",
+                    "controller_name": "LSI Logic / Symbios Logic MegaRAID SAS-3 3108 [Invader] (rev 02)",
+                    "host_ID": "0"
+                },
+                "SMART": {
+                    "Identity": {
+                        "Logical block size": "512 bytes",
+                        "Product": "HUC109090CSS600",
+                        "Revision": "A5B0",
+                        "Rotation Rate": "10020 rpm",
+                        "Serial number": "W8G3MUUX",
+                        "Transport protocol": "SAS",
+                        "User Capacity": "900,185,481,216 bytes [900 GB]",
+                        "Vendor": "HITACHI"
+                    }
+                }
+            }
         ]
     };
 
@@ -794,18 +854,67 @@ describe('Redfish Systems Root', function () {
         }
     };
 
-
     var smartCatalog = [
         {
+            Controller: {
+                controller_PCI_BDF: "0000:00:01.1",
+                controller_name: "LSI Logic / Symbios Logic MegaRAID SAS-3 3108 [Invader] (rev 02)",
+                host_ID: 0
+            },
             SMART: {
                 Identity: {
+                    "Device type": "disk",
+                    "Logical block size": "512 bytes",
+                    "Product": "MR9361-8i",
+                    "Revision": "4.20",
+                    "SMART support is": "Unavailable - device lacks SMART capability.",
+                    "Serial number": "0036acee028fd5fc1de09df708b00506",
+                    "User Capacity": "1,198,597,865,472 bytes [1.19 TB]",
+                    "Vendor": "LSI"
                 }
-            },
+            }
+        },
+        {
             Controller: {
-                controller_PCI_BDF : "0000:00:01.1"
+                controller_PCI_BDF: "0000:00:01.1",
+                controller_name: "LSI Logic / Symbios Logic MegaRAID SAS-3 3108 [Invader] (rev 02)",
+                 host_ID: 0
+            },
+            SMART: {
+                Identity: {
+                    "Logical block size": "512 bytes",
+                    "Physical block size": "4096 bytes",
+                    "Product": "HUSMM1640ASS200",
+                    "Revision": "A204",
+                    "Rotation Rate": "Solid State Device",
+                    "Serial number": "0QV6E90A",
+                    "Transport protocol": "SAS",
+                    "User Capacity": "400,088,457,216 bytes [400 GB]",
+                    "Vendor": "HGST"
+                }
+            }
+        },
+        {
+            Controller: {
+                controller_PCI_BDF: "0000:00:01.1",
+                controller_name: "LSI Logic / Symbios Logic MegaRAID SAS-3 3108 [Invader] (rev 02)",
+                host_ID: 0
+            },
+            SMART: {
+                Identity: {
+                    "Logical block size": "512 bytes",
+                    "Product": "HUC109090CSS600",
+                    "Revision": "A5B0",
+                    "Rotation Rate": "10020 rpm",
+                    "Serial number": "W8G3MUUX",
+                    "Transport protocol": "SAS",
+                    "User Capacity": "900,185,481,216 bytes [900 GB]",
+                    "Vendor": "HITACHI"
+                }
             }
         }
     ];
+
 
     var wsmanSelLog = [
         {
@@ -2305,6 +2414,25 @@ describe('Redfish Systems Root', function () {
 
         return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
             '/Storage/RAID_Integrated_1-1/Drives/1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function () {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+
+   it('should return a valid storage drive with non-DELL catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
+            node: node.id,
+            source: 'dummysource',
+            data: smartCatalog
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+            '/Storage/0000_00_01_1/Drives/W8G3MUUX')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function () {

@@ -1,0 +1,82 @@
+{
+    "@odata.context": "<%= basepath %>/$metadata#Drive.Drive",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#Drive.v1_1_1.Drive",
+    "Oem": {},
+    "Id": "<%= driveIndex %>",
+    "Name": "Drive"
+    <% if(typeof deviceDescription !== "undefined") { %>
+    ,"Description": "<%= deviceDescription %>"
+    <%}%>
+    <% if(typeof model !== "undefined") { %>
+    ,"Model": "<%= model %>"
+    <%}%>
+    <% if(typeof revision !== "undefined") { %>
+    ,"Revision": "<%= revision%>"
+    <%}%>
+    <% if(typeof status !== "undefined") { %>
+    ,"Status": "<%= status %>"
+    <%}%>
+    <% if(typeof protocol !== "undefined") { %>
+    ,"Protocol": "<%= protocol %>"
+    <%}%>
+    <% if(typeof capacityBytes !== "undefined") { %>
+    ,"CapacityBytes": <%= capacityBytes %>
+    <%} %>
+    <% if(typeof predictiveFailureState !== "undefined") { %>
+    ,"FailurePredicted": <%= predictiveFailureState %>
+    <%} %>
+    <% if(typeof mediaType !== "undefined") { %>
+    ,"MediaType": "<%= mediaType %>"
+    <%} %>
+    <% if(typeof manufacturer !== 'undefined') { %>
+    ,"Manufacturer": "<%= manufacturer %>"
+    <%} %>
+    <% if(typeof serialNumber !== 'undefined') { %>
+    ,"SerialNumber": "<%= serialNumber %>"
+    <%} %>
+    <% if(typeof partNumber !== 'undefined') { %>
+    ,"PartNumber": "<%= partNumber %>"
+    <%} %>
+    <% if(typeof locationInfo !== 'undefined') { %>
+    ,"Location":[{
+        "Info": "<%= locationInfo %>"
+    }]
+    <%} %>
+    <% if(typeof hotSpareType !== 'undefined') { %>
+    ,"HotspareType": "<%= hotSpareType %>"
+    <%} %>
+    <% if(typeof encryptionAbility !== 'undefined') { %>
+    ,"EncryptionAbility": "<%= encryptionAbility %>"
+    <%} %>
+    <% if(typeof encryptionStatus !== 'undefined') { %>
+    ,"EncryptionStatus": "<%= encryptionStatus %>"
+    <%} %>
+    <% if(typeof blockSizeInBytes !== 'undefined') { %>
+    ,"BlockSizeBytes": <%= blockSizeInBytes %>
+    <%} %>
+    <% if(typeof capableSpeed !== 'undefined') { %>
+    ,"CapableSpeedGbs":  <%= capableSpeed %>
+    <%} %>
+    ,"Links": {
+        <% if(typeof volumes !== 'undefined') { %>
+        "Volumes@odata.count": <%= volumes.length %>,
+        "Volumes": [
+            <% volumes.forEach(function(n, i, arr) { %>
+                {
+                    "@odata.id": "<%= basepath %>/Systems/<%=identifier%>/Storage/<%=index%>/Volumes/<%=n%>"
+                }
+                <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+            <% }); %>
+        ]
+        <%} %>
+    }
+    <% if(typeof operations !== 'undefined') { %>
+    ,"Operations": [
+        {
+            "OperationName": "<%= operations.operationName %>",
+            "PercentageComplete": <%= operations.operationPercentComplete %>
+        }
+   ]
+   <%} %>
+}
