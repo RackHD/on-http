@@ -932,6 +932,12 @@ describe('Redfish Systems Root', function () {
                     "User Capacity": "32,017,047,552 bytes [32.0 GB]"
                 }
             }
+        },
+        {
+            Controller: {},
+            SMART: {
+                Identity: {}
+            }
         }
     ];
 
