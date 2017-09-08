@@ -10,6 +10,12 @@
         "State":"Enabled"
     },
     "ServiceEnabled": true,
+    "Actions": {
+        "Oem": {},
+        "#UpdateService.SimpleUpdate": {
+            "target": "<%=basepath%>/UpdateService/Actions/UpdateService.SimpleUpdate"
+        }
+    },
     "FirmwareInventory" : {
         "@odata.id": "<%= basepath %>/UpdateService/FirmwareInventory"
     }
