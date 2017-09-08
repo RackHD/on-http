@@ -912,6 +912,24 @@ describe('Redfish Systems Root', function () {
                     "Vendor": "HITACHI"
                 }
             }
+        },
+        {
+            Controller: {
+                controller_PCI_BDF: "0000:00:1f.2",
+                controller_name: "Intel Corporation C610/X99 series chipset 6-Port SATA Controller [AHCI mode] (rev 05)",
+                host_ID: 5
+            },
+            SMART: {
+                Identity: {
+                    "Device Model": "SATADOM-SH TYPE C 3SE",
+                    "Firmware Version": "S130710",
+                    "Rotation Rate": "Solid State Device",
+                    "SATA Version is": "SATA 3.0, 6.0 Gb/s (current: 6.0 Gb/s)",
+                    "Sector Size": "512 bytes logical/physical",
+                    "Serial Number": "20151007AA851172502C",
+                    "User Capacity": "32,017,047,552 bytes [32.0 GB]"
+                }
+            }
         }
     ];
 
@@ -2442,6 +2460,25 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+
+   it('should return a valid storage drive with non-DELL catalogs (SATADOM)', function () {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
+            node: node.id,
+            source: 'dummysource',
+            data: smartCatalog
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+            '/Storage/0000_00_1f_2/Drives/20151007AA851172502C')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function () {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
     it('should return a valid volume list for devices with DELL catalogs', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: dellNode.id,
@@ -2459,6 +2496,35 @@ describe('Redfish Systems Root', function () {
                 expect(redfish.render.called).to.be.true;
             });
     });
+
+   it('should 404 requests for volumes from devices with non-DELL (wsman) catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
+            node: node.id,
+            source: 'dummysource',
+            data: smartCatalog
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+            '/Storage/0000_00_01_1/Volumes')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+   it('should 404 requests for specific volumes from devices with non-DELL (wsman) catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
+            node: node.id,
+            source: 'dummysource',
+            data: smartCatalog
+        }));
+
+        return helper.request().get('/redfish/v1/Systems/' + node.id +
+            '/Storage/0000_00_01_1/Volumes/0036acee028fd5fc1de09df708b00506')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+
+
 
     it('should return a valid volume for devices with DELL catalogs', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
