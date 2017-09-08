@@ -1,9 +1,10 @@
 {
     "@odata.context" : "<%= basepath %>/$metadata#SoftwareInventory.SoftwareInventory",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#SoftwareInventory.SoftwareInventory",
+    "@odata.type": "#SoftwareInventory.v1_1_0.SoftwareInventory",
     "Oem" : {},
     "Name": "Software Inventory Collection",
+    "Id": "<%= identifier %>",
     "RelatedItem": [
         <% if (elementInfo.type === "entity") { %>
             <% RelatedItems.forEach(function(RelatedItem, i, arr) { %>
@@ -14,7 +15,7 @@
                 <% } else{ %>
                     <% if (elementInfo.base === "/Managers/") { %>
                         {
-                        "@odata.id": "<%= basepath %><%=elementInfo.base%><%= RelatedItem.node%>.0<%=elementInfo.end%>"
+                        "@odata.id": "<%= basepath %><%=elementInfo.base%><%= RelatedItem.node%><%=elementInfo.end%>"
                         }
                     <% } else{ %>
                        <% if (elementInfo.base === "/Systems/") { %>

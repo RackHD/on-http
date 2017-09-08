@@ -37,7 +37,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: "#/definitions/ServiceRoot.1.0.0_ServiceRoot"
+            $ref: "#/definitions/ServiceRoot.1.1.1_ServiceRoot"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -2456,7 +2456,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: "#/definitions/UpdateService.1.0.0_UpdateService"
+            $ref: "#/definitions/UpdateService.v1_1_0.UpdateService"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -2482,7 +2482,7 @@ paths:
           in: body
           required: true
           schema:
-            $ref: "#/definitions/UpdateService.1.0.0_UpdateService.post"
+            $ref: "#/definitions/UpdateService.v1_1_0.UpdateService.post"
       responses:
         201:
           description: Success
@@ -2507,16 +2507,11 @@ paths:
       summary: get a list of firmware installed on all nodes managed by this instance of RackHD
       operationId: getInventoryList
       tags: [ "/redfish/v1" ]
-      parameters:
-        - name: payload
-          in: body
-          required: true
-          schema:
-            $ref: "#/definitions/UpdateService.1.0.0_UpdateService"
       responses:
-        201:
+        200:
           description: Success
-          $ref: "#/responses/status_201"
+          schema:
+            $ref: "#/definitions/SoftwareInventoryCollection.SoftwareInventoryCollection"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -2542,71 +2537,11 @@ paths:
           in: path
           required: true
           type: string
-          description: node identifier
       responses:
-        201:
+        200:
           description: Success
-          $ref: "#/responses/status_201"
-        400:
-          $ref: "#/responses/status_400"
-        401:
-          $ref: "#/responses/status_401"
-        403:
-          $ref: "#/responses/status_403"
-        404:
-          $ref: "#/responses/status_404"
-        500:
-          description: Error
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  /UpdateService/SoftwareInventory:
-    x-swagger-router-controller: update-service
-    get:
-      x-privileges: [ 'Login' ]
-      x-authentication-type: [ 'redfish', 'basic' ]
-      summary: get a list of firmware installed on all nodes managed by this instance of RackHD
-      operationId: getInventoryList
-      tags: [ "/redfish/v1" ]
-      parameters:
-        - name: payload
-          in: body
-          required: true
-          schema:
-            $ref: "#/definitions/UpdateService.1.0.0_UpdateService"
-      responses:
-        201:
-          description: Success
-          $ref: "#/responses/status_201"
-        400:
-          $ref: "#/responses/status_400"
-        401:
-          $ref: "#/responses/status_401"
-        403:
-          $ref: "#/responses/status_403"
-        404:
-          $ref: "#/responses/status_404"
-        500:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /UpdateService/SoftwareInventory/{identifier}:
-    x-swagger-router-controller: update-service
-    get:
-      x-privileges: [ 'Login' ]
-      x-authentication-type: [ 'redfish', 'basic' ]
-      summary: retrieve information about a specific firmware
-      operationId: getInventoryById
-      tags: [ "/redfish/v1" ]
-      parameters:
-        - name: identifier
-          in: path
-          required: true
-          type: string
-          description: node identifier
-      responses:
-        201:
-          description: Success
-          $ref: "#/responses/status_201"
+            $ref: "#/definitions/SoftwareInventory.v1_1_0.SoftwareInventory"
         400:
           $ref: "#/responses/status_400"
         401:
@@ -6165,7 +6100,7 @@ definitions:
         description: This is the manufacturer/provider specific extension moniker
           used to divide the Oem object into sections.
     type: object
-  ServiceRoot.1.0.0_ServiceRoot:
+  ServiceRoot.1.1.1_ServiceRoot:
     description: This object represents the root Redfish service.
     properties:
       '@odata.context':
@@ -6196,6 +6131,11 @@ definitions:
         $ref: '#/definitions/odata.4.0.0_idRef'
         description: This is a link to the EventService.
         readOnly: true
+      # TODO: need to add
+      #Fabrics:
+      #  $ref: '#/definitions/FabricCollection.FabricCollection'
+      #  description: A link to a collection of all fabric entities.
+      #  readOnly: true
       Id:
         description: Uniquely identifies the resource within the collection of like
           resources.
@@ -6251,6 +6191,19 @@ definitions:
         $ref: '#/definitions/odata.4.0.0_idRef'
         description: This is a link to the Task Service.
         readOnly: true
+      # TODO: need to add
+      #StorageServices:
+      #  $ref: '#/definitions/StorageServiceCollection.StorageServiceCollection'
+      #  description: A link to a collection of all storage service entities.
+      #  readOnly: true
+      #StorageSystems:
+      #  $ref: '#/definitions/StorageSystemCollection.StorageSystemCollection'
+      #  description: This is a link to a collection of storage systems.
+      #  readOnly: true
+      UpdateService:
+        $ref: '#/definitions/odata.4.0.0_idRef'
+        description: This is a link to the UpdateService.
+        readOnly: true
       UUID:
         description: 'Unique identifier for a service instance. When SSDP is used,
           this value should be an exact match of the UUID value returned in a 200OK
@@ -6261,6 +6214,7 @@ definitions:
     required:
     - Links
     type: object
+
   Session.1.0.0_Session:
     description: This is the base type for resources and referenceable members.
     properties:
@@ -7200,7 +7154,7 @@ definitions:
     type: object
   Volume.1.0.2_Volume: #TODO
     type: object
-    properties: 
+    properties:
       '@odata.context':
         format: uri
         readOnly: true
@@ -7230,11 +7184,11 @@ definitions:
         type: string
       Status:
         $ref: '#/definitions/Resource_Status'
-      CapacityBytes: 
+      CapacityBytes:
         type: number
         readOnly: true
         description: The size in bytes of this Volume.
-      VolumeType: 
+      VolumeType:
         enum:
         - RawDevice
         - NonRedundant
@@ -7262,7 +7216,7 @@ definitions:
         type: number
         readOnly: true
         description: The size of the smallest addressible unit (Block) of this volume in bytes.
-      Operations: 
+      Operations:
         type: array
         items:
           properties:
@@ -7299,7 +7253,7 @@ definitions:
             items:
               $ref: '#/definitions/odata.4.0.0_idRef'
             readOnly: true
-            type: array  
+            type: array
         description: Contains references to other resources that are related to this resource.
       Actions:
         type: object
@@ -7313,7 +7267,7 @@ definitions:
               title:
                 type: string
                 description: Friendly action name
-              target: 
+              target:
                 type: string
                 format: uri
                 description: Link to invoke action
@@ -7372,13 +7326,69 @@ definitions:
         type: string
   testEvent:
     type: object
-  UpdateService.1.0.0_UpdateService:
+
+  UpdateService.v1_1_0.UpdateService:
+    description: This is the schema definition for the Update Service. It represents
+      the properties for the service itself and has links to collections of firmware
+      and software inventory.
     properties:
-      FirmwareInventory:
-        description: The value of this property shall be a link to a resource of type SoftwareInventoryCollection.
+      '@odata.context':
+        format: uri
+        readOnly: true
         type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+     # TODO: need to add actions
+     # Actions:
+     #  $ref: '#/definitions/UpdateService.v1_0_0.Actions'
+     #  description: The Actions object contains the available custom actions on this
+     #    resource.
+      Description:
+        description: Provides a description of this resource and is used for commonality in the schema definitions.
+        readOnly: true
+        type: string
+      FirmwareInventory:
+        $ref: '#/definitions/SoftwareInventoryCollection.SoftwareInventoryCollection'
+        description: An inventory of firmware.
+        readOnly: true
+      HttpPushUri:
+        description: The URI used to perform an HTTP or HTTPS push update to the Update
+          Service.
+        readOnly: true
+        type: string
+      Id:
+        description: Uniquely identifies the resource within the collection of like resources.
+        readOnly: true
+        type: string
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker used
+         to divide the Oem object into sections.
+      ServiceEnabled:
+        description: This indicates whether this service is enabled.
+        readOnly: false
+        type: boolean
+      SoftwareInventory:
+        $ref: '#/definitions/SoftwareInventoryCollection.SoftwareInventoryCollection'
+        description: An inventory of software.
+        readOnly: true
+      Status:
+        $ref: '#/definitions/Resource_Status'
+    required:
+    - Id
+    - Name
     type: object
-  UpdateService.1.0.0_UpdateService.post:
+
+  UpdateService.v1_1_0.UpdateService.post:
     properties:
       ImageURI:
         description: The URI of the firmware update package.
@@ -7419,4 +7429,119 @@ definitions:
              type: string
           description: Service entries
         type: array
- 
+
+  SoftwareInventoryCollection.SoftwareInventoryCollection:
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Description:
+        description: Provides a description of this resource and is used for commonality in the schema definitions.
+        readOnly: true
+        type: string
+      Members:
+        description: Contains the members of this collection.
+        items:
+          $ref: '#/definitions/odata.4.0.0_idRef'
+        readOnly: true
+        type: array
+      Members@odata.count:
+        readOnly: true
+        type: number
+      Members@odata.navigationLink:
+        $ref: '#/definitions/odata.4.0.0_idRef'
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker used
+          to divide the Oem object into sections.
+    type: object
+
+  SoftwareInventory.v1_1_0.SoftwareInventory:
+    description: This schema defines an inventory of software components.
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      # TODO: Actions need to be added
+      # Actions:
+      #  $ref: '#/definitions/SoftwareInventory.v1_0_0.Actions'
+      #  description: The Actions object contains the available custom actions on this
+      #    resource.
+      Description:
+        description: Provides a description of this resource and is used for commonality in the schema definitions.
+        readOnly: true
+        type: string
+      Id:
+        description: Uniquely identifies the resource within the collection of like resources.
+        readOnly: true
+        type: string
+      LowestSupportedVersion:
+        description: A string representing the lowest supported version of this software.
+        readOnly: true
+        type: string
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker used
+          to divide the Oem object into sections.
+      RelatedItem:
+        description: The ID(s) of the resources associated with this software inventory
+        items:
+          $ref: '#/definitions/odata.4.0.0_idRef'
+        readOnly: true
+        type: array
+      RelatedItem@odata.count:
+        readOnly: true
+        type: number
+      RelatedItem@odata.navigationLink:
+        $ref: '#/definitions/odata.4.0.0_idRef'
+      SoftwareId:
+        description: A string representing the implementation-specific ID for identifying
+          this software.
+        readOnly: true
+        type: string
+      Status:
+        $ref: '#/definitions/Resource_Status'
+      UefiDevicePaths:
+        description: A list of strings representing the UEFI Device Path(s) of the component(s)
+          associated with this software inventory item.
+        items:
+          type: string
+        readOnly: true
+        type: array
+      Updateable:
+        description: Indicates whether this software can be updated by the update service.
+        readOnly: true
+        type: boolean
+      Version:
+        description: A string representing the version of this software.
+        readOnly: true
+        type: string
+    required:
+    - Name
+    - Id
+    type: object
+

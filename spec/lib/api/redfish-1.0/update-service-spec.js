@@ -273,7 +273,7 @@ describe('Redfish Update Service', function () {
         waterline.nodes.findByIdentifier.resolves(node1);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory')
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(200)
             .expect(function(res) {
                 expect(res.body['Members@odata.count']).to.equal(2);
                 expect(res.body.Members[0]['@odata.id'])
@@ -289,7 +289,7 @@ describe('Redfish Update Service', function () {
         waterline.nodes.findByIdentifier.resolves(node2);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory')
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(200)
             .expect(function(res) {
                 expect(res.body['Members@odata.count']).to.equal(1);
                 expect(res.body.Members[0]['@odata.id'])
@@ -303,7 +303,7 @@ describe('Redfish Update Service', function () {
         waterline.nodes.findByIdentifier.resolves(node2);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory')
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(200)
             .expect(function(res) {
                 expect(res.body['Members@odata.count']).to.equal(1);
                 expect(res.body.Members[0]['@odata.id'])
@@ -317,7 +317,7 @@ describe('Redfish Update Service', function () {
         waterline.nodes.findByIdentifier.resolves(node2);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory')
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(200)
             .expect(function(res) {
                 expect(res.body['Members@odata.count']).to.equal(1);
                 expect(res.body.Members[0]['@odata.id'])
@@ -331,7 +331,7 @@ describe('Redfish Update Service', function () {
         waterline.nodes.findByIdentifier.resolves(node1);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/PSU-00.24.7A')
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(200)
             .expect(function(res) {
                 expect(res.body.RelatedItem.length).to.equal(2);
                 expect(res.body.RelatedItem[0]['@odata.id'])
@@ -346,11 +346,11 @@ describe('Redfish Update Service', function () {
         waterline.nodes.findByIdentifier.resolves(node1);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/iDRAC-2.40.40.40')
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(200)
             .expect(function(res) {
                 expect(res.body.RelatedItem.length).to.equal(1);
                 expect(res.body.RelatedItem[0]['@odata.id'])
-                    .to.equal("/redfish/v1/Managers/593acc7e5aa5beed6f1f3082.0");
+                    .to.equal("/redfish/v1/Managers/593acc7e5aa5beed6f1f3082");
             });
     });
 
@@ -360,11 +360,11 @@ describe('Redfish Update Service', function () {
         waterline.nodes.findByIdentifier.resolves(node2);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/BMC-9.08')
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(200)
             .expect(function(res) {
                 expect(res.body.RelatedItem.length).to.equal(1);
                 expect(res.body.RelatedItem[0]['@odata.id'])
-                    .to.equal("/redfish/v1/Managers/5947d2cfe6b9b3e113d81984.0");
+                    .to.equal("/redfish/v1/Managers/5947d2cfe6b9b3e113d81984");
             });
     });
 
@@ -374,7 +374,7 @@ describe('Redfish Update Service', function () {
         waterline.nodes.findByIdentifier.resolves(node2);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/BIOS-S2S_3A14')
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(200)
             .expect(function(res) {
                 expect(res.body.RelatedItem.length).to.equal(1);
                 expect(res.body.RelatedItem[0]['@odata.id'])
@@ -388,7 +388,7 @@ describe('Redfish Update Service', function () {
         waterline.nodes.findByIdentifier.resolves(node2);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/Disk-2.2.1')
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(200)
             .expect(function(res) {
                 expect(res.body.RelatedItem.length).to.equal(1);
                 expect(res.body.RelatedItem[0]['@odata.id'])
@@ -396,13 +396,15 @@ describe('Redfish Update Service', function () {
             });
     });
 
-    it('should return a valid list of Software Inventory from RACADM catalog', function () {
+   // Unsupported at the moment
+   /* 
+   it('should return a valid list of Software Inventory from RACADM catalog', function () {
         waterline.catalogs.find.resolves([mockCatalogRACADM]);
         waterline.catalogs.findMostRecent.resolves(mockCatalogRACADM);
         waterline.nodes.findByIdentifier.resolves(node1);
         return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory')
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(200)
             .expect(function(res) {
                 expect(res.body['Members@odata.count']).to.equal(1);
                 expect(res.body.Members[0]['@odata.id'])
@@ -417,7 +419,7 @@ describe('Redfish Update Service', function () {
         waterline.nodes.findByIdentifier.resolves(node2);
         return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory')
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(200)
             .expect(function(res) {
                 expect(res.body['Members@odata.count']).to.equal(1);
                 expect(res.body.Members[0]['@odata.id'])
@@ -431,12 +433,12 @@ describe('Redfish Update Service', function () {
         waterline.nodes.findByIdentifier.resolves(node1);
         return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory/NIC-21.1')
             .expect('Content-Type', /^application\/json/)
-            .expect(201)
+            .expect(200)
             .expect(function(res) {
                 expect(res.body.RelatedItem.length).to.equal(2);
                 expect(res.body.RelatedItem[0]['@odata.id'])
                     .to.equal("/redfish/v1/Systems/593acc7e5aa5beed6f1f3082/EthernetInterfaces/NIC.Integrated.1-4-1");
             });
-    });
+    });*/
 
 });
