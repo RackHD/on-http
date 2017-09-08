@@ -23,7 +23,7 @@
     "Drives" : [
         <% devices.forEach(function(device, i, arr) { %>
             {
-                "@odata.id" : "<%= url %>/Drives/<%= device.Identity["Serial number"] %>"
+                "@odata.id" : "<%= url %>/Drives/<%= device.Identity["Serial number"] ? device.Identity["Serial number"] : device.Identity["Serial Number"] %>"
             }
         <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
         <% }); %>
