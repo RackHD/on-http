@@ -7343,11 +7343,17 @@ definitions:
       '@odata.type':
         readOnly: true
         type: string
-     # TODO: need to add actions
-     # Actions:
-     #  $ref: '#/definitions/UpdateService.v1_0_0.Actions'
-     #  description: The Actions object contains the available custom actions on this
-     #    resource.
+      Actions:
+        description: The Actions object contains the available custom actions on this
+          resource.
+        properties:
+          '#UpdateService.SimpleUpdate':
+            $ref: '#/definitions/UpdateService.1.1.0_SimpleUpdate'
+          Oem:
+            properties: {}
+            type: object
+        readOnly: true
+        type: object
       Description:
         description: Provides a description of this resource and is used for commonality in the schema definitions.
         readOnly: true
@@ -7387,7 +7393,16 @@ definitions:
     - Id
     - Name
     type: object
-
+  UpdateService.1.1.0_SimpleUpdate:
+    properties:
+      target:
+        description: Link to invoke action
+        format: uri
+        type: string
+      title:
+        description: Friendly action name
+        type: string
+    type: object
   UpdateService.v1_1_0.UpdateService.post:
     properties:
       ImageURI:
