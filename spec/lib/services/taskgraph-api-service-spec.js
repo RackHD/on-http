@@ -30,10 +30,91 @@ describe("Http.Services.Taskgraph", function () {
         mockConsul.agent.service.serviceList.length = 0;
     });
 
-    describe("empty service list", function() {
+   describe("empty service list", function() {
         it("should reject with no registered services", function() {
             return tgApi.getTasksById(123).should.be.rejectedWith(/No registered service found/);
         });
+
+       it("should reject with no registered services", function() {
+           return tgApi.templatesLibGet(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.templatesLibPut(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.templatesMetaGet(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.templatesMetaGetByName(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.profilesGetMetadata(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.profilesGetLibByName(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.profilesPutLibByName(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.profilesGetMetadata(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+
+
+       it("should reject with no registered services", function() {
+           return tgApi.workflowsGetGraphs(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.workflowsGetGraphsByName(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.workflowsPutGraphs(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.workflowsDeleteGraphsByName(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.workflowsGetByInstanceId(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.workflowsAction(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.workflowsDeleteByInstanceId(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.workflowsPutTask(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.workflowsGetAllTasks(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.workflowsGetTasksByName(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+       it("should reject with no registered services", function() {
+           return tgApi.workflowsDeleteTasksByName(123).should.be.rejectedWith(/No registered service found/);
+       });
+
+
+
     });
 
     describe("invalid service", function() {

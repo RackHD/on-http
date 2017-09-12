@@ -12,6 +12,7 @@ describe("Http.Services.Api.Profiles", function () {
     var waterline;
     var lookupService;
     var configuration;
+    var taskGraphService;
 
     before("Http.Services.Api.Profiles before", function() {
         helper.setupInjector([
@@ -39,10 +40,14 @@ describe("Http.Services.Api.Profiles", function () {
         workflowApiService = helper.injector.get("Http.Services.Api.Workflows");
         eventsProtocol = helper.injector.get("Protocol.Events");
         lookupService = helper.injector.get("Services.Lookup");
+        taskGraphService = helper.injector.get('Http.Services.Api.Taskgraph.Scheduler');
     });
 
     beforeEach("Http.Services.Api.Profiles beforeEach", function() {
         this.sandbox = sinon.sandbox.create();
+        this.sandbox.stub(taskGraphService, 'profilesPutLibByName');
+        this.sandbox.stub(taskGraphService, 'profilesMetaGetByName');
+        this.sandbox.stub(taskGraphService, 'profilesGetLibByName');
     });
 
     afterEach("Http.Services.Api.Profiles afterEach", function() {
@@ -359,6 +364,40 @@ describe("Http.Services.Api.Profiles", function () {
                 expect(taskProtocol.requestProperties).to.have.been.calledOnce;
                 expect(promise.reason().status).to.equal(503);
             });
+        });
+
+        it('should create a new thing in the specified scope', function() {
+            var EventEmitter = require('events').EventEmitter;
+            var stream = new EventEmitter();
+            var promise;
+
+            promise =  profileApiService.profilesPutLibByName('test thing', stream, 'sku');
+            taskGraphService.profilesPutLibByName.resolves("test thing", "body", "scope");
+            stream.emit('data', new Buffer('test '));
+            stream.emit('data', new Buffer('thing'));
+            stream.emit('end');
+            return promise.then(function(thing) {
+                expect(thing).to.equal('test thing');
+
+            });
+        });
+
+        it('should GET profilesMetaGetByName', function() {
+            taskGraphService.profilesMetaGetByName.resolves("test thing");
+
+            return profileApiService.profilesMetaGetByName("name", "scope")
+                .then(function(result) {
+                    expect(result).to.equal('test thing');
+                });
+        });
+
+        it('should GET profilesGetLibByName', function() {
+            taskGraphService.profilesGetLibByName.resolves("test thing");
+
+            return profileApiService.profilesGetLibByName("name", "scope")
+                .then(function(result) {
+                    expect(result).to.equal('test thing');
+                });
         });
 
     });

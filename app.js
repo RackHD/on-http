@@ -42,7 +42,7 @@ function Runner(
     function start() {
         return core.start()
             .then(function() {
-                return Promise.all([profiles.load(), templates.load(), views.load()]);
+                return Promise.all([views.load()]);
             })
             .then(function() {
                 return fileService.start({

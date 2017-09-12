@@ -1,4 +1,0 @@
-#!ipxe
-
-chain <%=repo%>/<%=uefitool%> <%=args%>
-

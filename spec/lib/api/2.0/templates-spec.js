@@ -12,8 +12,12 @@ describe('Http.Api.Templates', function () {
     var tasksApiService;
     var findActiveGraphForTarget;
     var nodeApiService;
+    var templatesApiService = {};
 
-    helper.httpServerBefore();
+
+    helper.httpServerBefore([
+        dihelper.simpleWrapper(templatesApiService, 'Http.Services.Api.Templates')
+    ]);
 
     before(function() {
         taskProtocol = helper.injector.get('Protocol.Task');
@@ -26,6 +30,13 @@ describe('Http.Api.Templates', function () {
         workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
         templates = helper.injector.get('Templates');
         return helper.injector.get('Views').load();
+    });
+    beforeEach(function() {
+        this.sandbox.reset();
+    });
+
+    after(function () {
+        this.sandbox.restore();
     });
 
     beforeEach('set up mocks', function () {
@@ -43,6 +54,11 @@ describe('Http.Api.Templates', function () {
         findActiveGraphForTarget = this.sandbox.stub(
             workflowApiService, 'findActiveGraphForTarget');
 
+        templatesApiService.templatesLibPut = this.sandbox.stub();  
+        templatesApiService.templatesLibGet = this.sandbox.stub();
+        templatesApiService.templatesMetaGet = this.sandbox.stub();
+        templatesApiService.templatesMetaGetByName = this.sandbox.stub();
+
         this.sandbox.stub(templates, 'getAll').resolves();
         this.sandbox.stub(templates, 'getName').resolves();
         this.sandbox.stub(templates, 'get').resolves();
@@ -53,55 +69,60 @@ describe('Http.Api.Templates', function () {
 
     helper.httpServerAfter();
 
-    var template = {
-        id: '1234abcd5678effe9012dcba',
-        name: '123',
-        scope: 'global',
-        hash: '1234',
-        contents: 'reboot'
-    };
-
     describe('GET /templates/metadata', function () {
-        it('should return a list of templates', function () {
-            templates.getAll.resolves([template]);
+        it('should return a list of templates metadata', function () {
+            var templateMetadata =
+            {
+                    "id": "e33202fc-f77c-40cc-8bab-037115c1de9a",
+                    "hash": "2Hmi/YDYFG9CezRfd4xVOA==",
+                    "name": "renasar-ansible.pub",
+                    "scope": "global"
+            };
+            templatesApiService.templatesMetaGet.resolves([templateMetadata]);
             return helper.request().get('/api/2.0/templates/metadata')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .then(function (res) {
-                    expect(templates.getAll).to.have.been.calledOnce;
                     res.body.forEach(function(item) {
-                        expect(item.id).to.equal(template.id);
-                        expect(item.name).to.equal(template.name);
-                        expect(item.scope).to.equal(template.scope);
-                        expect(item.hash).to.equal(template.hash);
+                        expect(item.id).to.equal(templateMetadata.id);
+                        expect(item.name).to.equal(templateMetadata.name);
+                        expect(item.scope).to.equal(templateMetadata.scope);
+                        expect(item.hash).to.equal(templateMetadata.hash);
                     });
                 });
         });
     });
 
     describe('GET /templates/metadata/:name', function () {
-        it('should return a single template', function () {
-            templates.getName.resolves(template);
+        it('should return a single template metadata', function () {
+            var templateMetadataByName=
+                {
+                    "id": "e33202fc-f77c-40cc-8bab-037115c1de9a",
+                    "hash": "2Hmi/YDYFG9CezRfd4xVOA==",
+                    "name": "renasar-ansible.pub",
+                    "scope": "global"
+                };
+            templatesApiService.templatesMetaGetByName.resolves([templateMetadataByName]);
             return helper.request().get('/api/2.0/templates/metadata/123')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .then(function(res) {
-                    expect(templates.getName).to.have.been.calledWith('123');
-                    expect(res.body.id).to.equal(template.id);
-                    expect(res.body.name).to.equal(template.name);
-                    expect(res.body.scope).to.equal(template.scope);
-                    expect(res.body.hash).to.equal(template.hash);
+                    expect(templatesApiService.templatesMetaGetByName).to.have.been.calledWith('123');
+                    expect(res.body[0].id).to.equal(templateMetadataByName.id);
+                    expect(res.body[0].name).to.equal(templateMetadataByName.name);
+                    expect(res.body[0].scope).to.equal(templateMetadataByName.scope);
+                    expect(res.body[0].hash).to.equal(templateMetadataByName.hash);
                 });
         });
 
         it('should return 404 for invalid templates name', function() {
-            templates.getName.rejects(new Errors.NotFoundError('bad_template'));
+            templatesApiService.templatesMetaGetByName.rejects(new Errors.NotFoundError('bad_template'));
             return helper.request().get('/api/2.0/templates/metadata/test')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404)
                 .then(function() {
-                    expect(templates.getName).to.have.been.calledOnce;
-                    expect(templates.getName).to.have.been.calledWith('test');
+                    expect(templatesApiService.templatesMetaGetByName).to.have.been.calledOnce;
+                    expect(templatesApiService.templatesMetaGetByName).to.have.been.calledWith('test');
                 });
         });
 
@@ -109,22 +130,21 @@ describe('Http.Api.Templates', function () {
 
     describe('GET /templates/library/:name', function () {
         it('should return a single template', function () {
-            templates.get.resolves(template);
+            var templateLib = "SWI=flash:/<%=bootfile%>";
+            templatesApiService.templatesLibGet.resolves(templateLib);
             return helper.request().get('/api/2.0/templates/library/test')
-                //.expect('Content-Type', /^application\/json/)
-                .expect(200, template.contents)
+                .expect(200, templateLib)
                 .then(function() {
-                    expect(templates.get).to.have.been.calledWith('test');
+                    expect(templatesApiService.templatesLibGet).to.have.been.calledWith('test');
                 });
         });
 
         it('should return 404 for invalid templates name', function() {
-            templates.get.rejects(new Errors.NotFoundError('bad_template'));
+            templatesApiService.templatesLibGet.rejects(new Errors.NotFoundError('bad_template'));
             return helper.request().get('/api/2.0/templates/library/test')
-                .expect(404)
                 .then(function() {
-                    expect(templates.get).to.have.been.calledOnce;
-                    expect(templates.get).to.have.been.calledWith('test');
+                    expect(templatesApiService.templatesLibGet).to.have.been.calledOnce;
+                    expect(templatesApiService.templatesLibGet).to.have.been.calledWith('test');
                 });
         });
 
@@ -132,64 +152,31 @@ describe('Http.Api.Templates', function () {
 
     describe('2.0 PUT /templates/library/:name', function () {
         it('should PUT new mockfile', function () {
+            var returnedPutValue ={
+                "createdAt": "2017-09-14T18:18:38.489Z",
+                "hash": "w9F3Ve/dOcnhcJBgkGUDZg==",
+                "name": "ansible-external-inventory.js",
+                "path": "/home/rackhd/git/2rackhd/rackhd/on-taskgraph/data/templates/ansible-external-inventory.js",
+                "scope": "global",
+                "updatedAt": "2017-09-18T13:19:10.990Z",
+                "id": "2d138ac3-0e70-4dee-ae30-b242658bd2a4"
+            };
+            templatesApiService.templatesLibPut.resolves(returnedPutValue);
             return helper.request().put('/api/2.0/templates/library/testTemplate')
                 .send('test\n')
                 .expect(201)
                 .expect(function(){
-                    expect(templates.put).to.have.been.calledOnce;
-                    expect(templates.put).to.have.been.calledWith('testTemplate');
+                    expect(templatesApiService.templatesLibPut).to.have.been.calledOnce;
+                    expect(templatesApiService.templatesLibPut).to.have.been.calledWith('testTemplate');
                 });
         });
 
         it('should 400 error when templates.put() fails', function () {
-            templates.put.rejects(new Error('dummy'));
+            templatesApiService.templatesLibPut.rejects(new Error('dummy'));
             return helper.request().put('/api/2.0/templates/library/123')
                 .send('test_template_foo\n')
                 .expect('Content-Type', /^application\/json/)
                 .expect(400);
-        });
-    });
-
-    describe('GET SB /templates/:name', function () {
-        it('should return a template with query nodeId', function () {
-            var graph = {
-                instanceId: '0123'
-            };
-            findActiveGraphForTarget.resolves(graph);
-            taskProtocol.requestProperties.resolves({});
-            return helper.request('http://localhost:8091')
-                .get('/api/2.0/templates/123?nodeId=583ae29c68896e275779e2ff')
-                .expect(200)
-                .then(function () {
-                    expect(templates.render).to.have.been.calledOnce;
-                    expect(templates.render).to.have.been.calledWith('123');
-                });
-        });
-
-        it('should return a template with query macs', function () {
-            var graph = {
-                instanceId: '0123'
-            };
-            findActiveGraphForTarget.resolves(graph);
-            taskProtocol.requestProperties.resolves({});
-            return helper.request('http://localhost:8091')
-                .get('/api/2.0/templates/123?macs=00:50:56:aa:7d:85')
-                .expect(200)
-                .then(function () {
-                    expect(templates.render).to.have.been.calledOnce;
-                    expect(templates.render).to.have.been.calledWith('123');
-                });
-        });
-
-        it('should return 400 when nodeId is not provided', function () {
-            return helper.request('http://localhost:8091')
-                .get('/api/2.0/templates/123')
-                .expect('Content-Type', /^application\/json/)
-                .expect(400)
-                .expect(function (req) {
-                    expect(req.body).to.have.property('message')
-                        .to.equal('Neither query nodeId nor macs is provided.');
-                });
         });
     });
 
