@@ -14,7 +14,7 @@
 
   ],
   "@odata.context": "/redfish/v1/$metadata#<%=type%>Collection",
-  "@odata.id": "/redfish/v1/DCIMCooling/default/<%=type%>"
+  "@odata.id": "/redfish/v1/DCIMCooling/<%=domain%>/<%=type%>"
 }
 
 

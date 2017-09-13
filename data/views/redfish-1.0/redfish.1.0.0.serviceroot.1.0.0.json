@@ -20,15 +20,6 @@
     "Chassis": {
         "@odata.id": "<%=basepath%>/Chassis"
     },
-    "NetworkDevices": {
-        "@odata.id": "<%=basepath%>/NetworkDevices"
-    },
-    "DCIMCooling": {
-        "@odata.id": "<%=basepath%>/DCIMCooling"
-    },
-    "DCIMPower": {
-        "@odata.id": "<%=basepath%>/DCIMPower"
-    },
     "Managers": {
         "@odata.id": "<%=basepath%>/Managers"
     },

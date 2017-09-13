@@ -314,7 +314,6 @@ paths:
             $ref: "#/definitions/Bios.v1_0_1.Bios"
       responses:
         202:
-          description: Success
           $ref: "#/responses/status_202"
         400:
           $ref: "#/responses/status_400"
@@ -351,7 +350,6 @@ paths:
             $ref: "#/definitions/Bios.ChangePassword"
       responses:
         202:
-          description: Success
           $ref: "#/responses/status_202"
         400:
           $ref: "#/responses/status_400"
@@ -388,7 +386,6 @@ paths:
             $ref: "#/definitions/Bios.ResetBios"
       responses:
         202:
-          description: Success
           $ref: "#/responses/status_202"
         400:
           $ref: "#/responses/status_400"
@@ -1163,7 +1160,6 @@ paths:
             $ref: "#/definitions/RackHD.ResetAction_ResetAction"
       responses:
         202:
-          description: Success
           $ref: "#/responses/status_202"
         400:
           $ref: "#/responses/status_400"
@@ -1473,7 +1469,6 @@ paths:
             $ref: "#/definitions/ManagerAccount.1.0.0_ManagerAccount.post"
       responses:
         201:
-          description: Success
           $ref: "#/responses/status_201"
         400:
           $ref: "#/responses/status_400"
@@ -1602,7 +1597,6 @@ paths:
             $ref: "#/definitions/testEvent"
       responses:
         202:
-          description: Success
           $ref: "#/responses/status_202"
         401:
           $ref: "#/responses/status_401"
@@ -1674,7 +1668,6 @@ paths:
             $ref: "#/definitions/ManagerAccount.1.0.0_ManagerAccount"
       responses:
         202:
-          description: Success
           $ref: "#/responses/status_202"
         400:
           $ref: "#/responses/status_400"
@@ -2484,7 +2477,6 @@ paths:
             $ref: "#/definitions/UpdateService.v1_1_0.UpdateService.post"
       responses:
         201:
-          description: Success
           $ref: "#/responses/status_201"
         400:
           $ref: "#/responses/status_400"
@@ -2592,8 +2584,6 @@ paths:
           in: path
           required: true
           type: string
-          description: node identifier
-          x-param-handler: sku
       responses:
         200:
           description: Success
@@ -2622,7 +2612,6 @@ paths:
       tags: [ "/redfish/v1" ]
       responses:
         201:
-          description: Success
           $ref: "#/responses/status_201"
         400:
           $ref: "#/responses/status_400"
@@ -2637,7 +2626,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /DCIMCooling:
-    x-swagger-router-controller: dcimcooling-service
+    x-swagger-router-controller: dcimcooling
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
@@ -2662,7 +2651,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /DCIMCooling/{domain}:
-    x-swagger-router-controller: dcimcooling-service
+    x-swagger-router-controller: dcimcooling
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
@@ -2693,7 +2682,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /DCIMCooling/{domain}/{type}:
-    x-swagger-router-controller: dcimcooling-service
+    x-swagger-router-controller: dcimcooling
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
@@ -2729,7 +2718,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /DCIMCooling/{domain}/{type}/{identifier}:
-    x-swagger-router-controller: dcimcooling-service
+    x-swagger-router-controller: dcimcooling
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
@@ -2771,7 +2760,7 @@ paths:
             $ref: "#/definitions/ErrorResponse"
 
   /DCIMPower:
-    x-swagger-router-controller: dcimpower-service
+    x-swagger-router-controller: dcimpower
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
@@ -2797,7 +2786,7 @@ paths:
             $ref: "#/definitions/ErrorResponse"
 
   /DCIMPower/{domain}:
-    x-swagger-router-controller: dcimpower-service
+    x-swagger-router-controller: dcimpower
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
@@ -2828,7 +2817,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /DCIMPower/{domain}/{type}:
-    x-swagger-router-controller: dcimpower-service
+    x-swagger-router-controller: dcimpower
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
@@ -2864,7 +2853,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /DCIMPower/{domain}/{type}/{identifier}:
-    x-swagger-router-controller: dcimpower-service
+    x-swagger-router-controller: dcimpower
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
