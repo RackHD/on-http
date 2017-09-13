@@ -44,7 +44,7 @@ describe('Http.Api.Profiles', function () {
         this.sandbox.stub(profileApiService, 'getNode').resolves({});
         this.sandbox.stub(profileApiService, 'createNodeAndRunDiscovery').resolves({});
         this.sandbox.stub(profileApiService, 'runDiscovery').resolves({});
-        this.sandbox.stub(profileApiService, 'setLookup').resolves();
+        this.sandbox.stub(profileApiService, 'getMacAddressInRequest').resolves();
 
         this.sandbox.stub(waterline.lookups, "findOneByTerm").resolves();
 
@@ -162,12 +162,12 @@ describe('Http.Api.Profiles', function () {
             return helper.request().get('/api/2.0/profiles?mac=00:01:02:03:04:05&&ip=1.1.1.1')
                 .expect(200)
                 .expect(function() {
-                    expect(profileApiService.setLookup).to.have.been.calledOnce;
+                    expect(profileApiService.getMacAddressInRequest).to.have.been.calledOnce;
                 });
         });
 
         it("should send 500 set mac and ip fails", function() {
-            profileApiService.setLookup.rejects(new Error('error'));
+            profileApiService.getMacAddressInRequest.rejects(new Error('error'));
 
             return helper.request().get('/api/2.0/profiles?mac=00:01:02:03:04:05&&ip=1.1.1.1')
                 .expect(500);
