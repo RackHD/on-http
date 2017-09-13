@@ -14,7 +14,7 @@ var options = {
 };
 
 /**
- * Get SATA drive's logic unit name 
+ * Get SATA drive's logic unit name
  * @param {String} sataDrive SATA drive's name, eg. 'sda'
  * @return {String} SATA drive's logic unit name with 60 characters like:
  *  'SATADOM2-ML_3SE_________________________20160623AA106710169E'
@@ -259,6 +259,9 @@ function buildDriveMap(wwidData, vdData, scsiData) {
         driveIds[k].identifier = k;
         driveIds[k].linuxWwid = linuxWwid[1];
     });
+    if (driveIds.length===0) {
+      driveIds=[{}];
+    }
     return JSON.stringify(driveIds);
 }
 
