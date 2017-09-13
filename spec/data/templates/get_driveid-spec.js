@@ -164,7 +164,7 @@ describe('get_driveid script', function() {
             var result = buildDriveMap(mockWwidStdEmpty, mockVdInfoStdEmpty, mockScsiEmpty);
             expect(result).to.deep.equal(JSON.stringify(
                 //jshint ignore: start
-                {[]}
+                [{}]
                 //jshint ignore: end
             ));
         });

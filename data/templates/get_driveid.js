@@ -259,7 +259,9 @@ function buildDriveMap(wwidData, vdData, scsiData) {
         driveIds[k].identifier = k;
         driveIds[k].linuxWwid = linuxWwid[1];
     });
-    if (driveIds.length===0) driveIds=[{}];
+    if (driveIds.length===0) {
+      driveIds=[{}];
+    }
     return JSON.stringify(driveIds);
 }
 
