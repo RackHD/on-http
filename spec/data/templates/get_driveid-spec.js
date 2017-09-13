@@ -12,11 +12,11 @@ describe('get_driveid script', function() {
         '[0:0:0:0]    disk    ATA      QEMU HARDDISK    2.2.  /dev/sda\n' +
         '[1:0:0:0]    cd/dvd  QEMU     QEMU DVD-ROM     2.2.  /dev/sr0';
     var mockScsiEmpty ='';
-    var mockVdInfoStdEmpty = 
+    var mockVdInfoStdEmpty =
         'total 0\n' +
         'drwxr-xr-x 2 root root 360 Dec 22 10:02 ./\n' +
         'drwxr-xr-x 5 root root 100 Dec 22 10:02 ../';
-    var mockWwidStdEmpty = 
+    var mockWwidStdEmpty =
         'total 0\n' +
         'drwxr-xr-x 2 root root 360 Dec 22 10:02 ./\n' +
         'drwxr-xr-x 5 root root 100 Dec 22 10:02 ../';
@@ -35,9 +35,9 @@ describe('get_driveid script', function() {
         '[7:2:0:0]    disk    LSI      MRROMB           4.26  /dev/sdc\n' +
         '[7:0:1:0]    disk    LSI      MRROMB           4.26  /dev/sdg\n' +
         '[8:0:0:0]   disk    SMART    eUSB             0298  /dev/sdd';
-    
+
     var mockVdInfoStd, mockWwidStd, mockSataRawInfoStd, mockSataRawInfoWithEmpty;
-    
+
     //jshint ignore: start
     mockVdInfoStd =
         'total 0\n' +
@@ -59,7 +59,7 @@ describe('get_driveid script', function() {
         'lrwxrwxrwx 1 root root   9 Dec 22 10:03 wwn-0x5000cca23de98340 -> ../../sda\n' +
         'lrwxrwxrwx 1 root root   9 Dec 24 11:05 wwn-0x600163600196c0401e0c0e6511cec3c0 -> ../../sdc\n' +//
         'lrwxrwxrwx 1 root root  9 May 15 08:45 usb-SMART_eUSB_SPG143500HQ-0:0 -> ../../sdd';
-    
+
     mockSataRawInfoStd =
         'dev/sda:\n' +
         '0040 3fff 0000 0010 7e00 0200 003f 0000\n' +
@@ -68,7 +68,7 @@ describe('get_driveid script', function() {
         '322e 3120 2020 5145 4d55 2048 4152 4444\n' +
         '4953 4b20 2020 2020 2020 2020 2020 2020\n' +
         '2020 2020 2020 2020 2020 2020 2020 8010\n'
-    
+
     mockSataRawInfoWithEmpty =
         'dev/sda:\n' +
         '0040 3fff 0000 0010 7e00 0200 003f 0000\n' +
@@ -164,7 +164,7 @@ describe('get_driveid script', function() {
             var result = buildDriveMap(mockWwidStdEmpty, mockVdInfoStdEmpty, mockScsiEmpty);
             expect(result).to.deep.equal(JSON.stringify(
                 //jshint ignore: start
-                []
+                {[]}
                 //jshint ignore: end
             ));
         });
