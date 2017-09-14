@@ -1,7 +1,7 @@
 {
     "@odata.context" : "<%= basepath %>/$metadata#UpdateService.UpdateService",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#UpdateService.v1_0_1.UpdateService",
+    "@odata.type": "#UpdateService.v1_1_0.UpdateService",
     "Oem": {},
     "Id": "UpdateService",
     "Description": "Update Service",

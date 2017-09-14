@@ -111,6 +111,7 @@
         <Singleton Name="Registries" Type="MessageRegistryFileCollection.MessageRegistryFileCollection"/>
         <Singleton Name="JsonSchemas" Type="JsonSchemaFileCollection.JsonSchemaFileCollection"/>
         <Singleton Name="Sessions" Type="SessionCollection.SessionCollection"/>
+        <Singleton Name="UpdateService" Type="UpdateService.UpdateService"/>
       </EntityContainer>
 
       <EntityType Name="ServiceRoot" BaseType="ServiceRoot.ServiceRoot">
@@ -246,7 +247,6 @@
         <Singleton Name="StorageSystems" Type="StorageSystemCollection.StorageSystemCollection"/>
         <Singleton Name="StorageServices" Type="StorageServiceCollection.StorageServiceCollection"/>
         <Singleton Name="Fabrics" Type="FabricCollection.FabricCollection"/>
-        <Singleton Name="UpdateService" Type="UpdateService.UpdateService"/>
       </EntityContainer>
 
       <EntityType Name="ServiceRoot" BaseType="ServiceRoot.v1_1_0.ServiceRoot"/>
