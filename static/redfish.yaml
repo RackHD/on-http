@@ -2120,7 +2120,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /Schemas:
+  /JsonSchemas:
     x-swagger-router-controller: schemas
     get:
       x-privileges: [ 'Login' ]
@@ -2141,7 +2141,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /Schemas/{identifier}:
+  /JsonSchemas/{identifier}:
     x-swagger-router-controller: schemas
     get:
       x-privileges: [ 'Login' ]
