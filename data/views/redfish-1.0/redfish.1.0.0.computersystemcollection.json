@@ -8,7 +8,11 @@
     "Members": [
         <% nodes.forEach(function(node, i, arr) { %>
             {
+            <% if (node.identifiers[1] !== undefined && node.identifiers[1].includes('redfish'))  { %>
                 "@odata.id": "<%= basepath %>/Systems/<%=node.identifiers[0] %>-<%= node.id %>"
+            <% } else {%>
+                "@odata.id": "<%= basepath %>/Systems/<%= node.id %>"
+            <% } %>
             }
             <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
         <% }); %>

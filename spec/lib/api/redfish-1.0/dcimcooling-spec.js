@@ -208,7 +208,6 @@ describe('Redfish Cooling', function () {
         waterline.nodes.needByIdentifier.resolves([coolingNode]);
         var domain = coolingNode.identifiers[2];
         var type = coolingNode.identifiers[3];
-        var identifier = coolingNode.id;
         redfish.getRedfishCatalog.resolves(airHandlingUnit0Catalog);
 
         return helper.request().get('/redfish/v1/DCIMCooling/' + domain + '/' +

@@ -217,7 +217,6 @@ describe('Redfish Power', function () {
         waterline.nodes.needByIdentifier.resolves([powerNode]);
         var domain = powerNode.identifiers[2];
         var type = powerNode.identifiers[3];
-        var identifier = powerNode.id;
         redfish.getRedfishCatalog.resolves(PduCatalog);
 
         return helper.request().get('/redfish/v1/DCIMPower/' + domain + '/' +

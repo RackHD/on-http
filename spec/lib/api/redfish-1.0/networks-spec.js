@@ -12,17 +12,6 @@ describe('Redfish Networks', function () {
     var wsman;
     var systems;
 
-    var dellNodeObm ={
-        id: "DELL574dcd5794ab6e2506fd107a",
-        node: "DELLabcd1234abcd1234abcd",
-        service: 'dell-wsman-obm-service',
-        config: {
-            host: '1.2.3.4',
-            user: 'myuser',
-            password: 'mypass'
-        }
-    };
-
     var dellNode = {
         autoDiscover: false,
         id: 'DELLabcd1234abcd1234abcd',
@@ -89,7 +78,7 @@ describe('Redfish Networks', function () {
         //this.sandbox.spy(redfish, 'render');
         this.sandbox.spy(redfish, 'validateSchema');
         this.sandbox.spy(redfish, 'handleError');
-        this.sandbox.stub(redfish, 'getRedfishNetworkCatalog');
+        this.sandbox.stub(redfish, 'getRedfishCatalog');
         this.sandbox.stub(waterline.nodes);
         this.sandbox.stub(waterline.catalogs);
         this.sandbox.stub(wsman, 'isDellSystem');
@@ -180,13 +169,13 @@ describe('Redfish Networks', function () {
     it('/NetworkDevices/{identifier} should return a valid network device id for Redfish endpoints', function () {
         waterline.nodes.find.resolves([NetworksNode]);
         this.sandbox.spy(redfish, 'render');
-        redfish.getRedfishNetworkCatalog.resolves(networkSwitchCatalog);
+        redfish.getRedfishCatalog.resolves(networkSwitchCatalog);
         wsman.isDellSystem.resolves({node: NetworksNode, isDell: false, isRedfishCapable: false});
         return helper.request().get('/redfish/v1/NetworkDevices/' +
             NetworksNode.identifiers[0] + '-' + NetworksNode.id)
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(redfish.render.called).to.be.false;
 
             });
@@ -195,12 +184,12 @@ describe('Redfish Networks', function () {
     it('/NetworkDevices/{identifier} should return a valid network device id for Dell endpoints', function () {
         this.sandbox.stub(redfish, 'render');
         waterline.nodes.find.resolves([NetworksNode]);
-        redfish.getRedfishNetworkCatalog.resolves(networkSwitchCatalog);
+        redfish.getRedfishCatalog.resolves(networkSwitchCatalog);
         wsman.isDellSystem.resolves({node: dellNode, isDell: true, isRedfishCapable: false});
         return helper.request().get('/redfish/v1/NetworkDevices/' +
             NetworksNode.identifiers[0] + '-' + NetworksNode.id)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(systems.dataFactory).to.be.called.once;
                 expect(redfish.render.called).to.be.true;
 
@@ -210,11 +199,11 @@ describe('Redfish Networks', function () {
     it('/NetworkDevices/{identifier} should return a valid network device id for Quanta endpoints', function () {
         waterline.nodes.find.resolves([NetworksNode]);
         this.sandbox.stub(redfish, 'render');
-        redfish.getRedfishNetworkCatalog.resolves(networkSwitchCatalog);
+        redfish.getRedfishCatalog.resolves(networkSwitchCatalog);
         wsman.isDellSystem.resolves({node: NetworksNode, isDell: false, isRedfishCapable: false});
         return helper.request().get('/redfish/v1/NetworkDevices/' + NetworksNode.id)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(systems.dataFactory).to.be.called.once;
                 expect(redfish.render.called).to.be.true;
             });
