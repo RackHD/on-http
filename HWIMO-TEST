@@ -12,7 +12,10 @@ checkDependencies(){
         echo "[ERROR]: the unit test requires rabbitmq service installed"
         exit 1
     fi
-    export mongo_status=$(service mongodb status |grep running)
+    # mongod works for version after 2.6
+    # mongodb works for version before 2.6
+    mongo_status=$(service mongodb status || service mongod status)
+    export is_mongo_running=$(echo $mongo_status | grep running)
     export rabbitmq_status=$(sudo service rabbitmq-server status|grep pid)
 
 }
@@ -24,9 +27,9 @@ cleanDatabase(){
 
 handleDependServices(){
     action=$1
-    if [ -z "$mongo_status" ]; then
+    if [ -z "$is_mongo_running" ]; then
         echo "[INFO]: $action mongodb service"
-        sudo service mongodb $action
+        sudo service mongodb $action || sudo service mongod $action
     fi
 
     if [ -z "$rabbitmq_status" ]; then
