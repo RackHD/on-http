@@ -27,7 +27,6 @@ describe('Redfish Chassis Root', function () {
             }
         ]
     };
-
     var system = {
         id: '1234abcd1234abcd1234abcd',
         name: 'name',
@@ -208,11 +207,20 @@ describe('Redfish Chassis Root', function () {
         return helper.request().get('/redfish/v1/Chassis/' + enclosure.id)
             .expect('Content-Type', /^application\/json/)
             .expect(200)
-            .expect(function(res) {
+            .expect(function() {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
             });
+    });
+
+    it('should 404 an invalid chassis object', function() {
+        return helper.request().get('/redfish/v1/Chassis/ABCDEFG')
+        .expect('Content-Type', /^application\/json/)
+        .expect(404)
+        .expect(function() {
+             expect(redfish.render.called).to.be.true;
+        });
     });
 
 
@@ -444,15 +452,6 @@ describe('Redfish Chassis Root', function () {
                 });
         });
 
-        it('should 404 an invalid chassis object', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Other'});
-            return helper.request().get('/redfish/v1/Chassis/ABCDEFG')
-                .expect('Content-Type', /^application\/json/)
-                .expect(404)
-                .expect(function() {
-                    expect(redfish.render.called).to.be.true;
-                });
-        });
 
         it('should 404 an invalid chassis thermal object', function() {
             redfish.getVendorNameById.resolves({vendor: 'Other'});
@@ -460,6 +459,154 @@ describe('Redfish Chassis Root', function () {
                 .expect('Content-Type', /^application\/json/)
                 .expect(404)
                 .expect(function() {
+                    expect(redfish.render.called).to.be.true;
+                });
+        });
+    });
+
+    describe('/redfish/v1/Chassis/<identifier>/Power', function () {
+        var ucsPowerThermalPoller;
+        var ucsPsuPoller;
+
+        beforeEach('set up mock', function() {
+            this.sandbox.stub(redfish, 'getVendorNameById');
+        });
+
+        before('/redfish/v1/Chassis/<identifier>/Power/', function() {
+            ucsPowerThermalPoller = {
+                "config": {
+                    "command": "ucs.powerthermal"
+                },
+                "failureCount": 18,
+                "id": "59bafde8dbbbc7a37814054c",
+                "node": "/api/2.0/nodes/59bafdcadbbbc7a378140542",
+                "type": "ucs"
+            };
+
+            ucsPsuPoller = {
+                "config": {
+                    "command": "ucs.psu"
+                },
+                "failureCount": 18,
+                "id": "59bafde8dbbbc7a37811111c",
+                "node": "/api/2.0/nodes/59bafde8dbbbc7a37811111c",
+                "type": "ucs"
+            };
+        });
+
+        it('should return an error when get system vendor faild', function() {
+            redfish.getVendorNameById.rejects('ERROR');
+            return helper.request().get('/redfish/v1/Chassis/' + ucsSystem.id + '/Power')
+                .expect('Content-Type', /^application\/json/)
+                .expect(500)
+                .expect(function() {
+                    expect(redfish.handleError.called).to.be.true;
+                });
+        });
+
+        it('should return a valid UCS power object', function() {
+            nodeApi.getPollersByNodeId.resolves([ucsPowerThermalPoller, ucsPsuPoller]);
+            redfish.getVendorNameById.resolves({vendor: 'Cisco'});
+            taskProtocol.requestPollerCache.withArgs('59bafde8dbbbc7a37814054c', {latestOnly: true})
+            .resolves([
+                {
+                    "config": {
+                        "command": 'ucs.powerthermal'
+                    },
+                    "node": "59bafde8dbbbc7a37814054c",
+                    "result": {
+                        "computeMbPowerStats": [
+                            {
+                                "dn": "sys/chassis-3/blade-1/board/power-stats",
+                                "input_voltage": "110.000000"
+                            }
+                        ]
+                    }
+                }
+            ]);
+            taskProtocol.requestPollerCache.withArgs('59bafde8dbbbc7a37811111c', { latestOnly: true })
+            .resolves([
+               {
+                   "config": {
+                       "command": "ucs.psu"
+                   },
+                   "node": "59bafde8dbbbc7a37811111c",
+                   "result": {
+                       "equipmentPsuStats": [
+                           {
+                               "dn" : "sys/chassis-5/psu-3",
+                               "psu_wattage" : "110"
+                           }
+                       ]
+                   }
+               }
+            ]);
+
+            return helper.request().get('/redfish/v1/Chassis/' + ucsSystem.id + '/Power')
+               .expect('Content-Type', /^application\/json/)
+               .expect(200)
+               .expect(function() {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(redfish.render.called).to.be.true;
+               });
+
+        });
+
+        it('should 404 an invalid UCS power object', function() {
+            redfish.getVendorNameById.resolves({vendor: 'Cisco'});
+            nodeApi.getPollersByNodeId.rejects('ERROR');
+            return helper.request().get('/redfish/v1/Chassis/' + ucsSystem.id + '/Power')
+                .expect('Content-Type', /^application\/json/)
+                .expect(500)
+                .expect(function() {
+                    expect(redfish.handleError.called).to.be.true;
+                });
+        });
+
+        it('should return a valid non-ucs power object', function () {
+            redfish.getVendorNameById.resolves({vendor: 'Other'});
+            nodeApi.getPollersByNodeId.resolves([{
+                config: { command: 'sdr', inCondition: {} }
+            }]);
+
+            taskProtocol.requestPollerCache.resolves([{
+                sdr: [{
+                    "Lower critical": "10.00",
+                    "Lower non-critical": "",
+                    "Nominal Reading": "",
+                    "Normal Maximum": "",
+                    "Normal Minimum": "",
+                    "Sensor Id": "Volt12V",
+                    "Sensor Reading": "12",
+                    "Sensor Reading Units": "% Volts",
+                    "Sensor Type": "Voltage",
+                    "Upper critical": "12.600",
+                    "Upper non-critical": "",
+                    "entityId": "6.2"
+                },
+                {
+                    "Lower critical": "0.000",
+                    "Lower non-critical": "",
+                    "Nominal Reading": "",
+                    "Normal Maximum": "",
+                    "Normal Minimum": "",
+                    "Sensor Id": "Input",
+                    "Sensor Reading": "27",
+                    "Sensor Reading Units": "Watts",
+                    "Sensor Type": "Current",
+                    "Upper critical": "",
+                    "Upper non-critical": "",
+                    "entityId": "6.2"
+                }]
+            }]);
+
+            return helper.request().get('/redfish/v1/Chassis/' + enclosure.id + '/Power')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
                     expect(redfish.render.called).to.be.true;
                 });
         });
@@ -473,6 +620,6 @@ describe('Redfish Chassis Root', function () {
                     expect(redfish.render.called).to.be.true;
                 });
         });
-    });
 
+    });
 });
