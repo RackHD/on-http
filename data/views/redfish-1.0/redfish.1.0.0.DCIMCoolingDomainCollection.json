@@ -1,0 +1,16 @@
+{
+    "@odata.context" : "/redfish/v1/$metadata#CoolingCollection",
+    "@odata.id": "<%= url %>",
+    "@odata.type": "#CoolingCollection.CoolingCollection",
+    "Oem" : {},
+    "Name": "DCIMCooling Collection",
+    "Members@odata.count": <%= domains.length %>,
+    "Members": [
+        <% domains.forEach(function(domain, i, arr) { %>
+            {
+                "@odata.id": "<%= basepath %>/DCIMCooling/<%=domain %>"
+            }
+            <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+        <% }); %>
+    ]
+}

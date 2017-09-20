@@ -1,0 +1,16 @@
+{
+  "@odata.context" : "<%= basepath %>/$metadata#Systems",
+  "@odata.id": "<%= url %>",
+  "@odata.type": "#ComputerSystemCollection.ComputerSystemCollection",
+  "Oem" : {},
+  "Name": "Network Device Collection",
+  "Members@odata.count": <%= nodes.length %>,
+  "Members": [
+    <% nodes.forEach(function(node, i, arr) { %>
+    {
+      "@odata.id": "<%= basepath %>/NetworkDevices/<%=node.identifiers[0] %>-<%= node.id %>"
+    }
+    <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
+    <% }); %>
+  ]
+}

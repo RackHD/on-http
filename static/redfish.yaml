@@ -314,7 +314,6 @@ paths:
             $ref: "#/definitions/Bios.v1_0_1.Bios"
       responses:
         202:
-          description: Success
           $ref: "#/responses/status_202"
         400:
           $ref: "#/responses/status_400"
@@ -328,7 +327,6 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-
   /Systems/{identifier}/Bios.ChangePassword:
     x-swagger-router-controller: systems
     post:
@@ -352,7 +350,6 @@ paths:
             $ref: "#/definitions/Bios.ChangePassword"
       responses:
         202:
-          description: Success
           $ref: "#/responses/status_202"
         400:
           $ref: "#/responses/status_400"
@@ -389,7 +386,6 @@ paths:
             $ref: "#/definitions/Bios.ResetBios"
       responses:
         202:
-          description: Success
           $ref: "#/responses/status_202"
         400:
           $ref: "#/responses/status_400"
@@ -1164,7 +1160,6 @@ paths:
             $ref: "#/definitions/RackHD.ResetAction_ResetAction"
       responses:
         202:
-          description: Success
           $ref: "#/responses/status_202"
         400:
           $ref: "#/responses/status_400"
@@ -1474,7 +1469,6 @@ paths:
             $ref: "#/definitions/ManagerAccount.1.0.0_ManagerAccount.post"
       responses:
         201:
-          description: Success
           $ref: "#/responses/status_201"
         400:
           $ref: "#/responses/status_400"
@@ -1603,7 +1597,6 @@ paths:
             $ref: "#/definitions/testEvent"
       responses:
         202:
-          description: Success
           $ref: "#/responses/status_202"
         401:
           $ref: "#/responses/status_401"
@@ -1675,7 +1668,6 @@ paths:
             $ref: "#/definitions/ManagerAccount.1.0.0_ManagerAccount"
       responses:
         202:
-          description: Success
           $ref: "#/responses/status_202"
         400:
           $ref: "#/responses/status_400"
@@ -2485,7 +2477,6 @@ paths:
             $ref: "#/definitions/UpdateService.v1_1_0.UpdateService.post"
       responses:
         201:
-          description: Success
           $ref: "#/responses/status_201"
         400:
           $ref: "#/responses/status_400"
@@ -2554,6 +2545,62 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /NetworkDevices:
+    x-swagger-router-controller: networks
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of network devices
+      description: retrieve list of network devices
+      operationId: listNetworks
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/NetworkDeviceCollection_NetworkDeviceCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /NetworkDevices/{identifier}:
+    x-swagger-router-controller: networks
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve information for a specific network device
+      description: >
+        defines a network device and its respective properties.
+      operationId: getNetwork
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/ComputerSystem.1.0.0_ComputerSystem"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /$metadata:
     x-swagger-router-controller: metadata
     get:
@@ -2565,7 +2612,6 @@ paths:
       tags: [ "/redfish/v1" ]
       responses:
         201:
-          description: Success
           $ref: "#/responses/status_201"
         400:
           $ref: "#/responses/status_400"
@@ -2575,6 +2621,274 @@ paths:
           $ref: "#/responses/status_403"
         404:
           $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMCooling:
+    x-swagger-router-controller: dcimcooling
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMCooling components
+      description: >
+        Defines a collection of DCIMCooling components managed by the service
+      operationId: listDCIMCoolingDomainCollection
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMCooling/{domain}:
+    x-swagger-router-controller: dcimcooling
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMCooling components
+      description: >
+        Defines a collection of DCIMCooling components managed by the service
+      operationId: listDCIMCoolingDomain
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          type: string
+          description: domain
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMCooling/{domain}/{type}:
+    x-swagger-router-controller: dcimcooling
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMCooling components
+      description: >
+        Defines a collection of DCIMCooling components managed by the service
+      operationId: listDCIMCoolingTypeCollection
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          type: string
+          description: domain
+        - name: type
+          in: path
+          required: true
+          type: string
+          description: device type
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMCooling/{domain}/{type}/{identifier}:
+    x-swagger-router-controller: dcimcooling
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMCooling components in spcified domain with specified type
+      description: >
+        Defines a collection of DCIMCooling components managed by the service
+      operationId: listDCIMCoolingDefault
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          type: string
+          description: domain
+        - name: type
+          in: path
+          required: true
+          type: string
+          description: domain
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          description: device type
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /DCIMPower:
+    x-swagger-router-controller: dcimpower
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMPower components
+      description: >
+        Defines a collection of DCIMPower components managed by the service
+      operationId: listDCIMPowerDomainCollection
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /DCIMPower/{domain}:
+    x-swagger-router-controller: dcimpower
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMPower components
+      description: >
+        Defines a collection of DCIMPower components managed by the service
+      operationId: listDCIMPowerDomain
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          type: string
+          description: domain
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMPower/{domain}/{type}:
+    x-swagger-router-controller: dcimpower
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMPower components in spcified domain with specified type
+      description: >
+        Defines a collection of DCIMPower components managed by the service
+      operationId: listDCIMPowerTypeCollection
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          type: string
+          description: domain
+        - name: type
+          in: path
+          required: true
+          type: string
+          description: device type
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /DCIMPower/{domain}/{type}/{identifier}:
+    x-swagger-router-controller: dcimpower
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve list of DCIMPower components in spcified domain with specified type
+      description: >
+        Defines a collection of DCIMPower components managed by the service
+      operationId: listDCIMPowerDefault
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          type: string
+          description: domain
+        - name: type
+          in: path
+          required: true
+          type: string
+          description: domain
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          description: device type
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/DCIMCoolingCollection_DCIMCoolingCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
         500:
           description: Error
           schema:
@@ -2604,6 +2918,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+
   /swagger:
     x-swagger-pipe: swagger_raw
 
@@ -3331,6 +3646,44 @@ definitions:
         type: string
     type: object
   ComputerSystemCollection_ComputerSystemCollection:
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Description:
+        description: Provides a description of this resource and is used for commonality  in
+          the schema definitions.
+        readOnly: true
+        type: string
+      Members:
+        description: Contains the members of this collection.
+        items:
+          $ref: '#/definitions/odata.4.0.0_idRef'
+        readOnly: true
+        type: array
+      Members@odata.count:
+        readOnly: true
+        type: number
+      Members@odata.navigationLink:
+        $ref: '#/definitions/odata.4.0.0_idRef'
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+    type: object
+  NetworkDeviceCollection_NetworkDeviceCollection:
     properties:
       '@odata.context':
         format: uri
@@ -6214,7 +6567,6 @@ definitions:
     required:
     - Links
     type: object
-
   Session.1.0.0_Session:
     description: This is the base type for resources and referenceable members.
     properties:
@@ -7425,6 +7777,44 @@ definitions:
     type: object
     required:
     - SecureBootEnable
+  DCIMCoolingCollection_DCIMCoolingCollection:
+    properties:
+      '@odata.context':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.id':
+        format: uri
+        readOnly: true
+        type: string
+      '@odata.type':
+        readOnly: true
+        type: string
+      Description:
+        description: Provides a description of this resource and is used for commonality  in
+          the schema definitions.
+        readOnly: true
+        type: string
+      Members:
+        description: Contains the members of this collection.
+        items:
+          $ref: '#/definitions/odata.4.0.0_idRef'
+        readOnly: true
+        type: array
+      Members@odata.count:
+        readOnly: true
+        type: number
+      Members@odata.navigationLink:
+        $ref: '#/definitions/odata.4.0.0_idRef'
+      Name:
+        description: The name of the resource or array element.
+        readOnly: true
+        type: string
+      Oem:
+        $ref: '#/definitions/Resource_Oem'
+        description: This is the manufacturer/provider specific extension moniker
+          used to divide the Oem object into sections.
+    type: object
   Odata.1.0.1_System:
     properties:
       '@odata.context':

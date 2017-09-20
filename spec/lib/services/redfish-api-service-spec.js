@@ -28,6 +28,11 @@ describe("Redfish Api Service", function() {
         helper.setupInjector([
             helper.require("/lib/services/schema-api-service"),
             helper.require("/lib/services/redfish-api-service"),
+            helper.require("/lib/services/nodes-api-service"),
+            helper.require("/lib/services/workflow-api-service"),
+            helper.require("/lib/services/taskgraph-api-service"),
+            dihelper.simpleWrapper({}, 'Task.Services.OBM'),
+            dihelper.simpleWrapper({}, 'ipmi-obm-service'),
             helper.require("/lib/api/view/view"),
             dihelper.simpleWrapper(function() { arguments[1](); }, 'rimraf'),
             dihelper.simpleWrapper({}, 'Services.Waterline')
