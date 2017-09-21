@@ -60,12 +60,21 @@ describe('Redfish Update Service', function () {
                 "elementName": "Intel(R) Gigabit 4P X520/I350 rNDC - 24:6E:96:1F:51:8D",
                 "currentVersion": "21.1",
                 "FQDD": "NIC.Integrated.1-4-1",
-                "componentType": "APPLICATION"
+                "componentType": "FIRMWARE"
             },
             "NIC2": {
                 "elementName": "Intel(R) Gigabit 4P X520/I350 rNDC - 24:6E:96:1F:51:8c",
                 "currentVersion": "21.1",
                 "FQDD": "NIC.Integrated.1-4-2",
+                "componentType": "FIRMWARE"
+            },
+            "Diagnostics": {
+                "elementName": "Dell 32 Bit uEFI Diagnostics",
+                "FQDD": "Diagnostics.Embedded.1:LC.Embedded.1",
+                "installationDate": "2015-11-26T18:45:06Z",
+                "currentVersion": "4239A24",
+                "rollbackVersion": "",
+                "availableVersion": "",
                 "componentType": "APPLICATION"
             }
         }
@@ -205,11 +214,13 @@ describe('Redfish Update Service', function () {
         this.sandbox.spy(redfish, 'validateSchema');
         this.sandbox.spy(redfish, 'handleError');
         this.sandbox.spy(redfish, 'render');
+        this.sandbox.stub(waterline.nodes, 'find');
         this.sandbox.stub(waterline.obms, 'findAllByNode');
         this.sandbox.stub(waterline.nodes, 'getNodeById');
         this.sandbox.stub(waterline.nodes, 'findByIdentifier');
         this.sandbox.stub(waterline.catalogs, 'find');
         this.sandbox.stub(waterline.catalogs, 'findMostRecent');
+        this.sandbox.stub(waterline.catalogs, 'findLatestCatalogOfSource');
         this.sandbox.stub(workflow, 'createAndRunGraph');
     });
 
@@ -268,25 +279,41 @@ describe('Redfish Update Service', function () {
 
 
     it('should return a valid list of Firmware Inventory from RACADM catalog', function () {
-        waterline.catalogs.find.resolves([mockCatalogRACADM]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogRACADM);
-        waterline.nodes.findByIdentifier.resolves(node1);
+        waterline.nodes.find.resolves([node1]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function(res) {
-                expect(res.body['Members@odata.count']).to.equal(2);
+                expect(res.body['Members@odata.count']).to.equal(3);
                 expect(res.body.Members[0]['@odata.id'])
                     .to.equal("/redfish/v1/UpdateService/FirmwareInventory/PSU-00.24.7A");
                 expect(res.body.Members[1]['@odata.id'])
                     .to.equal("/redfish/v1/UpdateService/FirmwareInventory/iDRAC-2.40.40.40");
+                expect(res.body.Members[2]['@odata.id'])
+                    .to.equal("/redfish/v1/UpdateService/FirmwareInventory/NIC-21.1");
+            });
+    });
+
+
+    it('should return a valid list of Software Inventory from RACADM catalog', function () {
+        waterline.nodes.find.resolves([node1]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
+        return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(res.body['Members@odata.count']).to.equal(1);
+                expect(res.body.Members[0]['@odata.id'])
+                    .to.equal("/redfish/v1/UpdateService/SoftwareInventory/Diagnostics-4239A24");
             });
     });
 
     it('should return a valid list of Firmware Inventory from DMI catalog', function () {
-        waterline.catalogs.find.resolves([mockCatalogDMI]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogDMI);
-        waterline.nodes.findByIdentifier.resolves(node2);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(mockCatalogDMI);
+        waterline.nodes.find.resolves([node2]);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -298,9 +325,8 @@ describe('Redfish Update Service', function () {
     });
 
     it('should return a valid list of Firmware Inventory from IPMI-MC-Info catalog', function () {
-        waterline.catalogs.find.resolves([mockCatalogIPMI]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogIPMI);
-        waterline.nodes.findByIdentifier.resolves(node2);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(mockCatalogIPMI);
+        waterline.nodes.find.resolves([node2]);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -312,9 +338,8 @@ describe('Redfish Update Service', function () {
     });
 
     it('should return a valid list of Firmware Inventory from SMART catalog', function () {
-        waterline.catalogs.find.resolves([mockCatalogSMART]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogSMART);
-        waterline.nodes.findByIdentifier.resolves(node2);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(mockCatalogSMART);
+        waterline.nodes.find.resolves([node2]);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -326,8 +351,9 @@ describe('Redfish Update Service', function () {
     });
 
     it('should return a valid root to RACADM Firmware Inventory by Id (Complex)', function () {
-        waterline.catalogs.find.resolves([mockCatalogRACADM]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogRACADM);
+        waterline.nodes.find.resolves([node1]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
         waterline.nodes.findByIdentifier.resolves(node1);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/PSU-00.24.7A')
             .expect('Content-Type', /^application\/json/)
@@ -340,10 +366,37 @@ describe('Redfish Update Service', function () {
                     .to.equal("/redfish/v1/Chassis/593accd15a45b5dd76e24adf/Power#/PowerSupplies/1");
             });
     });
-    it('should return a valid root to RACADM Firmware Inventory by Id (Non enumeratable Entity)', function () {
-        waterline.catalogs.find.resolves([mockCatalogRACADM]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogRACADM);
+
+    it('should return a invalid root to RACADM Firmware Inventory by Id ', function () {
+        waterline.nodes.find.resolves([node1]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
         waterline.nodes.findByIdentifier.resolves(node1);
+        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/PSU-00.24.7AA')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+    it('should return a valid root to RACADM Firmware Inventory by Id (Non enumeratable Entity)', function () {
+        waterline.nodes.find.resolves([node1]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
+        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/NIC-21.1')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(res.body.RelatedItem.length).to.equal(2);
+                expect(res.body.RelatedItem[0]['@odata.id'])
+                    .to.equal("/redfish/v1/Systems/593acc7e5aa5beed6f1f3082/EthernetInterfaces/NIC.Integrated.1-4-1");
+                expect(res.body.RelatedItem[1]['@odata.id'])
+                    .to.equal("/redfish/v1/Systems/593acc7e5aa5beed6f1f3082/EthernetInterfaces/NIC.Integrated.1-4-2");
+            });
+    });
+
+    it('should return a valid root to RACADM Firmware Inventory by Id (Non enumeratable Entity)', function () {
+        waterline.nodes.find.resolves([node1]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/iDRAC-2.40.40.40')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -354,10 +407,20 @@ describe('Redfish Update Service', function () {
             });
     });
 
+    it('should return a invalid root to RACADM Firmware Inventory by Id ', function () {
+        waterline.nodes.find.resolves([node1]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
+        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/iDRAC2.40.40.40')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+
     it('should return a valid root to IPMI Firmware Inventory by Id (Non enumeratable Entity)', function () {
-        waterline.catalogs.find.resolves([mockCatalogIPMI]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogIPMI);
-        waterline.nodes.findByIdentifier.resolves(node2);
+        waterline.nodes.find.resolves([node2]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node2.id, "ipmi-mc-info").resolves(mockCatalogIPMI);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/BMC-9.08')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -368,10 +431,20 @@ describe('Redfish Update Service', function () {
             });
     });
 
+    it('should return a invalid root to IPMI Firmware Inventory by Id (Non enumeratable Entity)', function () {
+        waterline.nodes.find.resolves([node2]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node2.id, "ipmi-mc-info").resolves(mockCatalogIPMI);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
+        return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory/BC-9.08')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
+
     it('should return a valid root to DMI Firmware Inventory by Id (Non enumeratable Entity)', function () {
-        waterline.catalogs.find.resolves([mockCatalogDMI]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogDMI);
-        waterline.nodes.findByIdentifier.resolves(node2);
+        waterline.nodes.find.resolves([node2]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node2.id, "dmi").resolves(mockCatalogDMI);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/BIOS-S2S_3A14')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -382,63 +455,36 @@ describe('Redfish Update Service', function () {
             });
     });
 
+    it('should return a invalid root to DMI Firmware Inventory by Id (Non enumeratable Entity)', function () {
+        waterline.nodes.find.resolves([node2]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node2.id, "dmi").resolves(mockCatalogDMI);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
+        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/-S2S_3A14')
+            .expect('Content-Type', /^application\/json/)
+            .expect(404);
+    });
+
     it('should return a valid root to SMART Firmware Inventory by Id (Non enumeratable Entity)', function () {
-        waterline.catalogs.find.resolves([mockCatalogSMART]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogSMART);
-        waterline.nodes.findByIdentifier.resolves(node2);
+        waterline.nodes.find.resolves([node2]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node2.id, "smart").resolves(mockCatalogSMART);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/Disk-2.2.1')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function(res) {
                 expect(res.body.RelatedItem.length).to.equal(1);
                 expect(res.body.RelatedItem[0]['@odata.id'])
-                    .to.equal("/redfish/v1/Systems/5947d2cfe6b9b3e113d81984/SimpleStorage/");
+                    .to.equal("/redfish/v1/Systems/5947d2cfe6b9b3e113d81984/SimpleStorage");
             });
     });
 
-   // Unsupported at the moment
-   /* 
-   it('should return a valid list of Software Inventory from RACADM catalog', function () {
-        waterline.catalogs.find.resolves([mockCatalogRACADM]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogRACADM);
-        waterline.nodes.findByIdentifier.resolves(node1);
-        return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory')
+    it('should return a invalid root to SMART Firmware Inventory by Id (Non enumeratable Entity)', function () {
+        waterline.nodes.find.resolves([node2]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node2.id, "smart").resolves(mockCatalogSMART);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
+        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/disk-2.2.1')
             .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function(res) {
-                expect(res.body['Members@odata.count']).to.equal(1);
-                expect(res.body.Members[0]['@odata.id'])
-                    .to.equal("/redfish/v1/UpdateService/SoftwareInventory/NIC-21.1");
-            });
+            .expect(404);
     });
-
-
-    it('should return a valid list of Software Inventory from DMI catalog', function () {
-        waterline.catalogs.find.resolves([mockCatalogDMI]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogDMI);
-        waterline.nodes.findByIdentifier.resolves(node2);
-        return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function(res) {
-                expect(res.body['Members@odata.count']).to.equal(1);
-                expect(res.body.Members[0]['@odata.id'])
-                    .to.equal("/redfish/v1/UpdateService/SoftwareInventory/BIOS-S2S_3A14");
-            });
-    });
-
-    it('should return a valid root to RACADM Software Inventory by Id (Non enumeratable Entity)', function () {
-        waterline.catalogs.find.resolves([mockCatalogRACADM]);
-        waterline.catalogs.findMostRecent.resolves(mockCatalogRACADM);
-        waterline.nodes.findByIdentifier.resolves(node1);
-        return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory/NIC-21.1')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function(res) {
-                expect(res.body.RelatedItem.length).to.equal(2);
-                expect(res.body.RelatedItem[0]['@odata.id'])
-                    .to.equal("/redfish/v1/Systems/593acc7e5aa5beed6f1f3082/EthernetInterfaces/NIC.Integrated.1-4-1");
-            });
-    });*/
 
 });

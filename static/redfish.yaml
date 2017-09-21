@@ -2490,13 +2490,69 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /UpdateService/SoftwareInventory:
+    x-swagger-router-controller: update-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: get a list of software installed on all nodes managed by this instance of RackHD
+      operationId: getSoftwareInventoryList
+      tags: [ "/redfish/v1" ]
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/SoftwareInventoryCollection.SoftwareInventoryCollection"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /UpdateService/SoftwareInventory/{identifier}:
+    x-swagger-router-controller: update-service
+    get:
+      x-privileges: [ 'Login' ]
+      x-authentication-type: [ 'redfish', 'basic' ]
+      summary: retrieve information about a specific software
+      operationId: getSoftwareInventoryById
+      tags: [ "/redfish/v1" ]
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          type: string
+          description: node identifier
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/SoftwareInventory.v1_1_0.SoftwareInventory"
+        400:
+          $ref: "#/responses/status_400"
+        401:
+          $ref: "#/responses/status_401"
+        403:
+          $ref: "#/responses/status_403"
+        404:
+          $ref: "#/responses/status_404"
+        500:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /UpdateService/FirmwareInventory:
     x-swagger-router-controller: update-service
     get:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: get a list of firmware installed on all nodes managed by this instance of RackHD
-      operationId: getInventoryList
+      operationId: getFirmwareInventoryList
       tags: [ "/redfish/v1" ]
       responses:
         200:
@@ -2521,7 +2577,7 @@ paths:
       x-privileges: [ 'Login' ]
       x-authentication-type: [ 'redfish', 'basic' ]
       summary: retrieve information about a specific firmware
-      operationId: getInventoryById
+      operationId: getFirmwareInventoryById
       tags: [ "/redfish/v1" ]
       parameters:
         - name: identifier
@@ -7709,7 +7765,7 @@ definitions:
       Description:
         description: Provides a description of this resource and is used for commonality in the schema definitions.
         readOnly: true
-        type: string
+        type: object
       FirmwareInventory:
         $ref: '#/definitions/SoftwareInventoryCollection.SoftwareInventoryCollection'
         description: An inventory of firmware.
