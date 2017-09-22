@@ -40,5 +40,8 @@
     },
     "Registries": {
         "@odata.id": "<%=basepath%>/Registries"
+    },
+    "JsonSchemas": {
+        "@odata.id": "<%=basepath%>/JsonSchemas"
     }
 }

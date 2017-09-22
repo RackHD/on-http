@@ -8,7 +8,7 @@
 "Members": [
 <% schemas.forEach(function(schema, i, arr) { %>
 {
-"@odata.id": "<%= basepath %>/Schemas/<%= schema %>"
+"@odata.id": "<%= basepath %>/JsonSchemas/<%= schema %>"
 }
 <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
 <% }); %>

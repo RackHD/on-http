@@ -31,7 +31,7 @@ describe('Redfish Schemas', function () {
 
     it('should return valid schemas', function () {
 
-        return helper.request().get('/redfish/v1/Schemas')
+        return helper.request().get('/redfish/v1/JsonSchemas')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function(res) {
@@ -45,7 +45,7 @@ describe('Redfish Schemas', function () {
 
     it('should return valid AccountService schema information ', function () {
 
-        return helper.request().get('/redfish/v1/Schemas/AccountService.v1_1_0')
+        return helper.request().get('/redfish/v1/JsonSchemas/AccountService.v1_1_0')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function(res) {
@@ -64,7 +64,7 @@ describe('Redfish Schemas', function () {
                 return fs.readFileAsync(fromRoot + '/static/DSP8010_2016.3/metadata/Bios_v1.xml', 'utf8');
             })
             .then(function(fileContent){
-                return helper.request().get('/redfish/v1/Schemas/Bios_v1.xml')
+                return helper.request().get('/redfish/v1/JsonSchemas/Bios_v1.xml')
                     .expect('Content-Type', "application/xml; charset=utf-8")
                     .expect(200)
                     .expect(function(res) {
@@ -77,7 +77,7 @@ describe('Redfish Schemas', function () {
     it('should return invalid xml schema information ', function () {
         return Promise.resolve()
             .then(function(){
-                return helper.request().get('/redfish/v1/Schemas/invallid.xml');
+                return helper.request().get('/redfish/v1/JsonSchemas/invallid.xml');
             })
             .then(function(done){
                 done(new Error('should have Failed!'));
@@ -91,7 +91,7 @@ describe('Redfish Schemas', function () {
 
     it('should return 404 on invalid schema information ', function () {
 
-        return helper.request().get('/redfish/v1/Schemas/AccountService.1.0.01')
+        return helper.request().get('/redfish/v1/JsonSchemas/AccountService.1.0.01')
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
