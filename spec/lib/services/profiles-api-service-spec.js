@@ -214,7 +214,8 @@ describe("Http.Services.Api.Profiles", function () {
                     defaults: {
                         graphOptions: {
                             target: node.id,
-                            'skip-reboot-post-discovery': { skipReboot: 'false' }
+                            'skip-reboot-post-discovery': { skipReboot: 'false' },
+                            'shell-reboot': { rebootCode: 1 } 
                         },
                         nodeId: node.id
                     },
@@ -247,7 +248,8 @@ describe("Http.Services.Api.Profiles", function () {
                     defaults: {
                         graphOptions: {
                             target: node.id,
-                            'skip-reboot-post-discovery': { skipReboot: 'false' }
+                            'skip-reboot-post-discovery': { skipReboot: 'false' },
+                            'shell-reboot': { rebootCode: 1 }
                         },
                         nodeId: node.id
                     },
