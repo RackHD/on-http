@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!---->
+<!--################################################################################       -->
+<!--# Redfish Schema:  Rectifier  v0.1.0-->
+<!--#                                                                                      -->
+<!--# For a detailed change log, see the README file contained in the DSP8010 bundle,      -->
+<!--# available at http://www.dmtf.org/standards/redfish                                   -->
+<!--# Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF).                  -->
+<!--# For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright -->
+<!--################################################################################       -->
+<!---->
+<edmx:Edmx xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" Version="4.0">
+
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Core.V1.xml">
+    <edmx:Include Namespace="Org.OData.Core.V1" Alias="OData"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Capabilities.V1.xml">
+    <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Measures.V1.xml">
+    <edmx:Include Namespace="Org.OData.Measures.V1" Alias="Measures"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/Resource_v1.xml">
+    <edmx:Include Namespace="Resource.v1_0_0"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/SensorCollection_v1.xml">
+    <edmx:Include Namespace="SensorCollection"/>
+  </edmx:Reference>
+  <edmx:DataServices>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="Rectifier">
+
+      <EntityType Name="Rectifier" BaseType="Resource.v1_0_0.Resource" Abstract="true">
+        <Annotation Term="OData.Description" String="This is the schema definition for the Rectifier Metrics."/>
+        <Annotation Term="OData.LongDescription" String="This resource shall be used to represent a power metrics resource for a Redfish implementation."/>
+        <Annotation Term="Capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false"/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="true"/>
+            <Annotation Term="OData.Description" String="Power properties can be updated to change limits, exceptions and other writable properties."/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false"/>
+          </Record>
+        </Annotation>
+      </EntityType>
+
+    </Schema>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="Rectifier.v0_1_0">
+
+      <EnumType Name="Status">
+        <Member Name="OK"/>
+        <Member Name="Standby"/>
+        <Member Name="Warning"/>
+        <Member Name="Fault"/>
+      </EnumType>
+
+      <EntityType Name="Rectifier" BaseType="Rectifier.Rectifier">
+
+        <Property Name="FirmwareRevision" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Firmware Revision of Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Firmware Revision of Rectifier."/>
+        </Property>
+
+        <Property Name="HardwareRevision" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Hardware Revision of Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Hardware Revision of Rectifier."/>
+        </Property>
+
+        <Property Name="DateOfManufacture" Type="Edm.DateTimeOffset">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The date of manufacture of Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual date of manufacture of Rectifier."/>
+        </Property>
+
+        <Property Name="Manufacturer" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Manufacturer of Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Manufacturer of Rectifier."/>
+        </Property>
+
+        <Property Name="Model" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Model Number of Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Model Number of Rectifier."/>
+        </Property>
+
+        <Property Name="SerialNumber" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Serial Number of Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Serial Number of Rectifier."/>
+        </Property>
+
+        <Property Name="PartNumber" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Part Number of Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Part Number of Rectifier."/>
+        </Property>
+
+        <Property Name="AssetTag" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Asset Tag of Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Asset Tag of Rectifier."/>
+        </Property>
+
+        <Property Name="PhysicalLocation" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Physical Location of Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Physical Location of Rectifier."/>
+        </Property>
+
+        <!-- Rectifier 1-1 -->
+        <Property Name="RealPower" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Power for Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Power information of this AC Input."/>
+          <Annotation Term="Measures.Unit" String="kW"/>
+        </Property>
+
+        <Property Name="Status" Type="Rectifier.v0_1_0.Status">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Status of Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Status of Rectifier."/>
+          <Annotation Term="Measures.Unit" String="Cel"/>
+        </Property>
+
+        <!-- System -->
+        <Property Name="TotalInputPower" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Total Input Power value for Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Total Input Power value of this AC Input."/>
+          <Annotation Term="Measures.Unit" String="kW"/>
+        </Property>
+
+        <Property Name="InputSourceStatus" Type="Edm.Int64">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Input Source Status value of Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Input Source Status value of Rectifier."/>
+        </Property>
+
+        <Property Name="OutputSourceStatus" Type="Edm.Int64">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Output Source Status value of Rectifier."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Output Source Status value of Rectifier."/>
+        </Property>
+
+        <!-- AC Input -->
+        <NavigationProperty Name="AcInput" Type="Collection(Rectifier.v0_1_0.AcInput)">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/ReadWrite"/>
+          <Annotation Term="OData.Description" String="This is the definition for AC Input."/>
+          <Annotation Term="OData.LongDescription" String="These properties shall be the definition for AC Input for a Redfish implementation."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <!-- DC Bus -->
+        <NavigationProperty Name="DcBus" Type="Collection(Rectifier.v0_1_0.DcBus)">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/ReadWrite"/>
+          <Annotation Term="OData.Description" String="This is the definition for DC Bus."/>
+          <Annotation Term="OData.LongDescription" String="These properties shall be the definition for DC Bus for a Redfish implementation."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <!-- Sensors -->
+        <NavigationProperty Name="Sensors" Type="SensorCollection.SensorCollection" Nullable="false">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="Contains the members of this sensor collection."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <Property Name="Actions" Type="Rectifier.v0_1_0.Actions" Nullable="false">
+          <Annotation Term="OData.Description" String="The available actions for this resource."/>
+          <Annotation Term="OData.LongDescription" String="The Actions property shall contain the available actions for this resource."/>
+        </Property>
+
+      </EntityType>
+
+      <!-- AC Input definition -->
+      <EntityType Name="AcInput" BaseType="Resource.v1_0_0.ReferenceableMember">
+
+        <Property Name="RealPower" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The Real Power for this AC Input."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the Real Power information of this AC Input."/>
+          <Annotation Term="Measures.Unit" String="kW"/>
+        </Property>
+
+        <Property Name="Energy" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The Energy for this AC Input."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the Energy information of this AC Input."/>
+          <Annotation Term="Measures.Unit" String="Hz"/>
+        </Property>
+
+        <Property Name="RmsUnderOverVoltage" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The RMS Under/Over Voltage for this AC Input."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the RMS Under/Over Voltage information of this AC Input."/>
+          <Annotation Term="Measures.Unit" String="V"/>
+        </Property>
+
+        <NavigationProperty Name="Sensors" Type="SensorCollection.SensorCollection" Nullable="false">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="Contains the members of this collection of sensors."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <Property Name="Actions" Type="Rectifier.v0_1_0.AcInputActions" Nullable="false">
+          <Annotation Term="OData.Description" String="The available actions for this resource."/>
+          <Annotation Term="OData.LongDescription" String="The Actions property shall contain the available actions for this resource."/>
+        </Property>
+
+      </EntityType>
+
+      <!-- DC Bus definition -->
+      <EntityType Name="DcBus" BaseType="Resource.v1_0_0.ReferenceableMember">
+
+        <Property Name="Status" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The Status for this DC Bus."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the Status of this DC Bus."/>
+        </Property>
+
+        <NavigationProperty Name="Sensors" Type="SensorCollection.SensorCollection" Nullable="false">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="Contains the members of this collection of sensors."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <Property Name="Actions" Type="Rectifier.v0_1_0.DcBusActions" Nullable="false">
+          <Annotation Term="OData.Description" String="The available actions for this resource."/>
+          <Annotation Term="OData.LongDescription" String="The Actions property shall contain the available actions for this resource."/>
+        </Property>
+
+      </EntityType>
+
+      <ComplexType Name="Actions">
+        <Annotation Term="OData.AdditionalProperties" Bool="false"/>
+        <Annotation Term="OData.Description" String="The available actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain the available actions for this resource."/>
+        <Property Name="Oem" Type="Rectifier.v0_1_0.OemActions" Nullable="false"/>
+      </ComplexType>
+
+      <ComplexType Name="OemActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="true"/>
+        <Annotation Term="OData.Description" String="The available OEM specific actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain any additional OEM actions for this resource."/>
+      </ComplexType>
+
+      <ComplexType Name="AcInputActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="false"/>
+        <Annotation Term="OData.Description" String="The available actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain the available actions for this resource."/>
+        <Property Name="Oem" Type="Rectifier.v0_1_0.AcInputOemActions" Nullable="false"/>
+      </ComplexType>
+
+      <ComplexType Name="AcInputOemActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="true"/>
+        <Annotation Term="OData.Description" String="The available OEM specific actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain any additional OEM actions for this resource."/>
+      </ComplexType>
+
+      <ComplexType Name="DcBusActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="false"/>
+        <Annotation Term="OData.Description" String="The available actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain the available actions for this resource."/>
+        <Property Name="Oem" Type="Rectifier.v0_1_0.DcBusOemActions" Nullable="false"/>
+      </ComplexType>
+
+      <ComplexType Name="DcBusOemActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="true"/>
+        <Annotation Term="OData.Description" String="The available OEM specific actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain any additional OEM actions for this resource."/>
+      </ComplexType>
+
+    </Schema>
+
+  </edmx:DataServices>
+</edmx:Edmx>

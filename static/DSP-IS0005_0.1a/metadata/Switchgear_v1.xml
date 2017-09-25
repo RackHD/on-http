@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!---->
+<!--################################################################################       -->
+<!--# Redfish Schema:  Switchgear  v0.1.0-->
+<!--#                                                                                      -->
+<!--# For a detailed change log, see the README file contained in the DSP8010 bundle,      -->
+<!--# available at http://www.dmtf.org/standards/redfish                                   -->
+<!--# Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF).                  -->
+<!--# For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright -->
+<!--################################################################################       -->
+<!---->
+<edmx:Edmx xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" Version="4.0">
+
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Core.V1.xml">
+    <edmx:Include Namespace="Org.OData.Core.V1" Alias="OData"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Capabilities.V1.xml">
+    <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/Resource_v1.xml">
+    <edmx:Include Namespace="Resource.v1_0_0"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/SensorCollection_v1.xml">
+    <edmx:Include Namespace="SensorCollection"/>
+  </edmx:Reference>
+
+  <edmx:DataServices>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="Switchgear">
+
+      <EntityType Name="Switchgear" BaseType="Resource.v1_0_0.Resource" Abstract="true">
+        <Annotation Term="OData.Description" String="This is the schema definition for the Switchgear Metrics."/>
+        <Annotation Term="OData.LongDescription" String="This resource shall be used to represent a power metrics resource for a Redfish implementation."/>
+        <Annotation Term="Capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false"/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="true"/>
+            <Annotation Term="OData.Description" String="Power properties can be updated to change limits, exceptions and other writable properties."/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false"/>
+          </Record>
+        </Annotation>
+      </EntityType>
+
+    </Schema>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="Switchgear.v0_1_0">
+
+      <EnumType Name="SwitchgearMetering">
+        <Member Name="Amps"/>
+        <Member Name="Volts"/>
+        <Member Name="KW"/>
+        <Member Name="KVA"/>
+        <Member Name="KWH"/>
+        <Member Name="KVAR"/>
+        <Member Name="KVARH"/>
+        <Member Name="PF"/>
+      </EnumType>
+
+      <EntityType Name="Switchgear" BaseType="Switchgear.Switchgear">
+
+        <Property Name="FirmwareRevision" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Firmware Revision of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Firmware Revision of Switchgear."/>
+        </Property>
+
+        <Property Name="HardwareRevision" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Hardware Revision of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Hardware Revision of Switchgear."/>
+        </Property>
+
+        <Property Name="DateOfManufacture" Type="Edm.DateTimeOffset">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The date of manufacture of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual date of manufacture of Switchgear."/>
+        </Property>
+
+        <Property Name="Manufacturer" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Manufacturer of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Manufacturer of Switchgear."/>
+        </Property>
+
+        <Property Name="Model" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Model Number of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Model Number of Switchgear."/>
+        </Property>
+
+        <Property Name="SerialNumber" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Serial Number of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Serial Number of Switchgear."/>
+        </Property>
+
+        <Property Name="PartNumber" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Part Number of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Part Number of Switchgear."/>
+        </Property>
+
+        <Property Name="AssetTag" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Asset Tag of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Asset Tag of Switchgear."/>
+        </Property>
+
+        <Property Name="PhysicalLocation" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Physical Location of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Physical Location of Switchgear."/>
+        </Property>
+
+        <!-- System -->
+        <Property Name="HighVoltageSwitchOpenASide" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual High Voltage Switch Open A Side boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual High Voltage Switch Open A Side boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="HighVoltageSwitchOpenBSide" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual High Voltage Switch Open B Side boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual High Voltage Switch Open B Side boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="HighVoltageSwitchClosedASide" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual High Voltage Switch Closed A Side boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual High Voltage Switch Closed A Side boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="HighVoltageSwitchClosedBSide" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual High Voltage Switch Closed B Side boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual High Voltage Switch Closed B Side boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="SurgeArrestorFailure" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Surge Arrestor Failure boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Surge Arrestor Failure boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="TransformerFanFailure" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Transformer Fan Failure boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Transformer Fan Failure boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="TransformerHighTemp" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Transformer High Temperature boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Transformer High Temperature boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="UPSSubstationCircuitBreakerOpen" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual UPS Substation Circuit Breaker Open boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual UPS Substation Circuit Breaker Open boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="UPSSubstationCircuitBreakerClosed" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual UPS Substation Circuit Breaker Closed boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual UPS Substation Circuit Breaker Closed boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="UPSSubstationCircuitBreakerTripped" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual UPS Substation Circuit Breaker Tripped boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual UPS Substation Circuit Breaker Tripped boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="SubstationXCircuitBreakerOpen" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Substation-X Circuit Breaker Open boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual UPS Substation Circuit Breaker Open boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="SubstationXCircuitBreakerClosed" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Substation-X Circuit Breaker Closed boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual UPS Substation Circuit Breaker Closed boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="SubstationXCircuitBreakerTripped" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Substation-X Circuit Breaker Tripped boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual UPS Substation Circuit Breaker Tripped boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="GroundFault" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Ground Fault boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Ground Fault boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="SubstationSummaryAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Substation Summary Alarm On boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Substation Summary Alarm On boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="PLCFailure" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual PLC Failure boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual PLC Failure boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="SystemMetering" Type="Switchgear.v0_1_0.SwitchgearMetering">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Metering unit type of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Metering unit type (SwitchgearMetering enumeration) of Switchgear."/>
+        </Property>
+
+        <!-- Generator Paralleling Control Cabinet -->
+        <Property Name="PrimaryUtilityBreakerClosed" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Primary Utility Breaker Closed boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Primary Utility Breaker Closed boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="PrimaryUtilityBreakerOpen" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Primary Utility Breaker Open boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Primary Utility Breaker Open boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="AlternateUtilityBreakerClosed" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Alternate Utility Breaker Closed boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Alternate Utility Breaker Closed boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="AlternateUtilityBreakerOpen" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Alternate Utility Breaker Open boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Alternate Utility Breaker Open boolean value of Switchgear."/>
+        </Property>
+
+         <Property Name="MasterControlInAutoMode" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Master Control In Auto Mode boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Master Control In Auto Mode boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="MasterControlInManualMode" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Master Control In Manual Mode boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Master Control In Manual Mode boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="OpenTransitionModeSelected" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Open Transition Mode Selected boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Open Transition Mode Selected boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="ClosedTransitionModeSelected" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Closed Transition Mode Selected boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Closed Transition Mode Selected boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="PeakShavingModeInProgress" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Peak Shaving Mode In Progress boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Peak Shaving Mode Not In Progress boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="AutoRetransferInAuto" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Auto Retransfer in Auto boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Auto Retransfer in Auto boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="AutoRetransferInManual" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Auto Retransfer in Manual boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Auto Retransfer in Manual boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="LoadDemandOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Load Demand On boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Load Demand On boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="LoadAddShedControlLevelX" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Load Add/Shed Control Level X of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Load Add/Shed Control Level X of Switchgear."/>
+        </Property>
+
+        <Property Name="ZeroPowerTransfer" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Zero Power Transfer of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Zero Power Transfer of Switchgear."/>
+        </Property>
+
+        <Property Name="ReturnToUtility" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Return to Utility of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Return to Utility of Switchgear."/>
+        </Property>
+
+        <Property Name="ImportMode" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Import Mode of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Import Mode of Switchgear."/>
+        </Property>
+
+        <Property Name="ExportMode" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Export Mode of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Export Mode of Switchgear."/>
+        </Property>
+
+        <Property Name="TransferFailed" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Transfer Failed boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Transfer Failed boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="SummaryAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Summary Alarm On boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Summary Alarm On boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="PrimaryUtilitySourceFailureMode" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Primary Utility Source Failure Mode of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Primary Utility Source Failure Mode of Switchgear."/>
+        </Property>
+
+        <Property Name="PrimaryUtilitySourceAndGeneratorFailureMode" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Primary Utility Source and Generator Failure Mode of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Primary Utility Source and Generator Failure Mode of Switchgear."/>
+        </Property>
+
+        <Property Name="TransferImminent" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Tranfer Imminent boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Transfer Imminent boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="LoadControlBypass" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Load Control Bypass of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Load Control Bypass of Switchgear."/>
+        </Property>
+
+        <Property Name="NormalMode" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Normal Mode of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Normal Mode of Switchgear."/>
+        </Property>
+
+        <Property Name="GeneratorXOnLine" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Generator X On Line boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Generator X On Line boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="HoldMechanicalPlantStable" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Hold Mechanical Plant Stable boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Hold Mechanical Plant Stable boolean value of Switchgear."/>
+        </Property>
+
+        <!-- Utility Recloser -->
+        <Property Name="PrimaryUtilityReclosureOpen" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Primary Utility Reclosure Open boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Primary Utility Reclosure Open boolean value of Switchgear."/>
+        </Property>
+
+        <Property Name="AlternateUtilityReclosureOpen" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Alternate Utility Reclosure Open boolean value of Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Alternate Utility Reclosure Open boolean value of Switchgear."/>
+        </Property>
+
+        <!-- Critical Boards -->
+        <NavigationProperty Name="CriticalBoards" Type="Collection(Switchgear.v0_1_0.CriticalBoard)">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="This is the definition for Critical Boards."/>
+          <Annotation Term="OData.LongDescription" String="These properties shall be the definition for an Critical Board array for a Redfish implementation."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <!-- Switchgear -->
+        <NavigationProperty Name="Switchgear2" Type="Collection(Switchgear.v0_1_0.Switchgear2)">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="This is the definition for Switchgear 2."/>
+          <Annotation Term="OData.LongDescription" String="These properties shall be the definition for a Switchgear 2 array for a Redfish implementation."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <!-- Generator Paralleling Switchgear -->
+        <NavigationProperty Name="GeneratorParallelingSwitchgear" Type="Collection(Switchgear.v0_1_0.GeneratorParallelingSwitchgear)">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="This is the definition for Generator Paralleling Switchgear."/>
+          <Annotation Term="OData.LongDescription" String="These properties shall be the definition for a Generator Paralleling Switchgear array for a Redfish implementation."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <!-- Sensors -->
+        <NavigationProperty Name="Sensors" Type="SensorCollection.SensorCollection" Nullable="false">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="Contains the members of this collection."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <Property Name="Actions" Type="Switchgear.v0_1_0.Actions" Nullable="false">
+          <Annotation Term="OData.Description" String="The available actions for this resource."/>
+          <Annotation Term="OData.LongDescription" String="The Actions property shall contain the available actions for this resource."/>
+        </Property>
+
+      </EntityType>
+
+      <!-- Critical Board definition -->
+      <EntityType Name="CriticalBoard" BaseType="Resource.v1_0_0.ReferenceableMember">
+
+        <Property Name="MainBreakerOpen" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Main Breaker Open boolean value of CriticalBoard."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Main Breaker Open boolean value of CriticalBoard."/>
+        </Property>
+
+        <Property Name="MainBreakerClosed" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Main Breaker Closed boolean value of CriticalBoard."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Main Breaker Closed boolean value of CriticalBoard."/>
+        </Property>
+
+        <Property Name="MainBreakerTripped" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Main Breaker Tripped boolean value of CriticalBoard."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Main Breaker Tripped boolean value of CriticalBoard."/>
+        </Property>
+
+        <Property Name="LoadBankBreakerOpen" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Load Bank Breaker Open boolean value of CriticalBoard."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Load Bank Breaker Open boolean value of CriticalBoard."/>
+        </Property>
+
+        <Property Name="LoadBankBreakerClosed" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Load Bank Breaker Closed boolean value of CriticalBoard."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Load Bank Breaker Closed boolean value of CriticalBoard."/>
+        </Property>
+
+        <Property Name="LoadBankBreakerTripped" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Load Bank Breaker Tripped boolean value of CriticalBoard."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Load Bank Breaker Tripped boolean value of CriticalBoard."/>
+        </Property>
+
+        <Property Name="CriticalBoardsMetering" Type="Switchgear.v0_1_0.SwitchgearMetering">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Switchgear Metering unit type of CriticalBoard."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Switchgear Metering unit type (CriticalBoardMetering enumeration) of CriticalBoard."/>
+        </Property>
+
+        <Property Name="Actions" Type="Switchgear.v0_1_0.CriticalBoardActions" Nullable="false">
+          <Annotation Term="OData.Description" String="The available actions for this resource."/>
+          <Annotation Term="OData.LongDescription" String="The Actions property shall contain the available actions for this resource."/>
+        </Property>
+
+      </EntityType>
+
+      <!-- Switchgear 2 definition - may need to be renamed -->
+      <EntityType Name="Switchgear2" BaseType="Resource.v1_0_0.ReferenceableMember">
+
+        <Property Name="CircuitBreakerOpen" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Circuit Breaker Open boolean value of Switchgear2."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Circuit Breaker Open boolean value of Switchgear2."/>
+        </Property>
+
+        <Property Name="CircuitBreakerClosed" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Circuit Breaker Closed boolean value of Switchgear2."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Circuit Breaker Closed boolean value of Switchgear2."/>
+        </Property>
+
+        <Property Name="CircuitBreakerTripped" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Circuit Breaker Tripped boolean value of Switchgear2."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Circuit Breaker Tripped boolean value of Switchgear2."/>
+        </Property>
+
+        <Property Name="PLCFailure" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual PLC Failure boolean value of Switchgear2."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual PLC Failure boolean value of Switchgear2."/>
+        </Property>
+
+         <Property Name="InLocalMode" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual In Local Mode boolean value of Switchgear2."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual In Local Mode boolean value of Switchgear2."/>
+        </Property>
+
+         <Property Name="SummaryAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Summary Alarm On boolean value of Switchgear2."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Summary Alarm On boolean value of Switchgear2."/>
+        </Property>
+
+        <Property Name="Switchgear2Metering" Type="Switchgear.v0_1_0.SwitchgearMetering">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Switchgear Metering unit type of Switchgear2."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Switchgear Metering unit type (SwitchgearMetering enumeration) of Switchgear2."/>
+        </Property>
+
+        <Property Name="Actions" Type="Switchgear.v0_1_0.Switchgear2Actions" Nullable="false">
+          <Annotation Term="OData.Description" String="The available actions for this resource."/>
+          <Annotation Term="OData.LongDescription" String="The Actions property shall contain the available actions for this resource."/>
+        </Property>
+
+      </EntityType>
+
+      <EntityType Name="GeneratorParallelingSwitchgear" BaseType="Resource.v1_0_0.ReferenceableMember">
+
+        <Property Name="CircuitBreakerOpen" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Circuit Breaker Open boolean value of GeneratorParallelingSwitchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Circuit Breaker Open boolean value of GeneratorParallelingSwitchgear."/>
+        </Property>
+
+        <Property Name="CircuitBreakerClosed" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Circuit Breaker Closed boolean value of GeneratorParallelingSwitchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Circuit Breaker Closed boolean value of GeneratorParallelingSwitchgear."/>
+        </Property>
+
+        <Property Name="CircuitBreakerTripped" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Circuit Breaker Tripped boolean value of GeneratorParallelingSwitchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Circuit Breaker Tripped boolean value of GeneratorParallelingSwitchgear."/>
+        </Property>
+
+         <Property Name="InLocalMode" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual In Local Mode boolean value of GeneratorParallelingSwitchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual In Local Mode boolean value of GeneratorParallelingSwitchgear."/>
+        </Property>
+
+         <Property Name="SummaryAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Summary Alarm On boolean value of GeneratorParallelingSwitchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Summary Alarm On boolean value of GeneratorParallelingSwitchgear."/>
+        </Property>
+
+        <Property Name="GeneratorParallelingSwitchgearMetering" Type="Switchgear.v0_1_0.SwitchgearMetering">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual GeneratorParallelingSwitchgear Metering unit type of GeneratorParallelingSwitchgear."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual GeneratorParallelingSwitchgear Metering unit type (GeneratorParallelingSwitchgearMetering enumeration) of GeneratorParallelingSwitchgear."/>
+        </Property>
+
+        <Property Name="Actions" Type="Switchgear.v0_1_0.GeneratorParallelingSwitchgearActions" Nullable="false">
+          <Annotation Term="OData.Description" String="The available actions for this resource."/>
+          <Annotation Term="OData.LongDescription" String="The Actions property shall contain the available actions for this resource."/>
+        </Property>
+
+      </EntityType>
+
+      <ComplexType Name="Actions">
+        <Annotation Term="OData.AdditionalProperties" Bool="false"/>
+        <Annotation Term="OData.Description" String="The available actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain the available actions for this resource."/>
+        <Property Name="Oem" Type="Switchgear.v0_1_0.OemActions" Nullable="false"/>
+      </ComplexType>
+
+      <ComplexType Name="OemActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="true"/>
+        <Annotation Term="OData.Description" String="The available OEM specific actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain any additional OEM actions for this resource."/>
+      </ComplexType>
+
+      <ComplexType Name="CriticalBoardActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="false"/>
+        <Annotation Term="OData.Description" String="The available actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain the available actions for this resource."/>
+        <Property Name="Oem" Type="Switchgear.v0_1_0.CriticalBoardOemActions" Nullable="false"/>
+      </ComplexType>
+
+      <ComplexType Name="CriticalBoardOemActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="true"/>
+        <Annotation Term="OData.Description" String="The available OEM specific actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain any additional OEM actions for this resource."/>
+      </ComplexType>
+
+      <ComplexType Name="Switchgear2Actions">
+        <Annotation Term="OData.AdditionalProperties" Bool="false"/>
+        <Annotation Term="OData.Description" String="The available actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain the available actions for this resource."/>
+        <Property Name="Oem" Type="Switchgear.v0_1_0.Switchgear2OemActions" Nullable="false"/>
+      </ComplexType>
+
+      <ComplexType Name="Switchgear2OemActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="true"/>
+        <Annotation Term="OData.Description" String="The available OEM specific actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain any additional OEM actions for this resource."/>
+      </ComplexType>
+
+      <ComplexType Name="GeneratorParallelingSwitchgearActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="false"/>
+        <Annotation Term="OData.Description" String="The available actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain the available actions for this resource."/>
+        <Property Name="Oem" Type="Switchgear.v0_1_0.GeneratorParallelingSwitchgearOemActions" Nullable="false"/>
+      </ComplexType>
+
+      <ComplexType Name="GeneratorParallelingSwitchgearOemActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="true"/>
+        <Annotation Term="OData.Description" String="The available OEM specific actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain any additional OEM actions for this resource."/>
+      </ComplexType>
+
+    </Schema>
+
+  </edmx:DataServices>
+</edmx:Edmx>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!---->
+<!--################################################################################       -->
+<!--# Redfish Schema:  Sensor  v0.1.0-->
+<!--#                                                                                      -->
+<!--# For a detailed change log, see the README file contained in the DSP8010 bundle,      -->
+<!--# available at http://www.dmtf.org/standards/redfish                                   -->
+<!--# Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF).                  -->
+<!--# For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright -->
+<!--################################################################################       -->
+<!---->
+<edmx:Edmx xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" Version="4.0">
+
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Core.V1.xml">
+    <edmx:Include Namespace="Org.OData.Core.V1" Alias="OData"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Capabilities.V1.xml">
+    <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/Resource_v1.xml">
+    <edmx:Include Namespace="Resource"/>
+    <edmx:Include Namespace="Resource.v1_0_0"/>
+  </edmx:Reference>
+
+  <edmx:DataServices>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="Sensor">
+
+      <EntityType Name="Sensor" BaseType="Resource.v1_0_0.Resource" Abstract="true">
+        <Annotation Term="OData.Description" String="This is the schema definition for the Sensor.  It represents the properties for Sensor."/>
+        <Annotation Term="OData.LongDescription" String="This resource shall be used to represent a Sensor resource for a Redfish implementation."/>
+        <Annotation Term="Capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false"/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="true"/>
+            <Annotation Term="OData.Description" String="Sensor properties can be updated to change limits, exceptions and other writable properties."/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false"/>
+          </Record>
+        </Annotation>
+      </EntityType>
+
+    </Schema>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="Sensor.v0_1_0">
+
+      <EntityType Name="Sensor" BaseType="Sensor.Sensor">
+
+        <Annotation Term="OData.Description" String="This schema defines a Sensor to be used in conjunction with data center equipment."/>
+        <Annotation Term="OData.LongDescription" String="This resource shall be used to represent resources that represent the sensor data."/>
+
+        <Property Name="SensorType" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The SensorType for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the SensorType information of this Sensor."/>
+        </Property>
+
+        <Property Name="SensorNumber" Type="Edm.Int64">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The SensorNumber for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the SensorNumber information of this Sensor."/>
+        </Property>
+
+        <Property Name="SensorLocation" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The SensorLocation for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the SensorLocation information of this Sensor."/>
+        </Property>
+
+        <Property Name="Status" Type="Resource.Status" Nullable="false"/>
+
+        <Property Name="CurrentReading" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The CurrentReading for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the CurrentReading information of this Sensor."/>
+        </Property>
+
+        <Property Name="UpperThresholdNonCritical" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The UpperThresholdNonCritical for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the UpperThresholdNonCritical information of this Sensor."/>
+        </Property>
+
+        <Property Name="UpperThresholdCritical" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The UpperThresholdCritical for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the UpperThresholdCritical information of this Sensor."/>
+        </Property>
+
+        <Property Name="UpperThresholdFatal" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The UpperThresholdFatal for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the UpperThresholdFatal information of this Sensor."/>
+        </Property>
+
+        <Property Name="LowerThresholdNonCritical" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The LowerThresholdNonCritical for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the LowerThresholdNonCritical information of this Sensor."/>
+        </Property>
+
+        <Property Name="LowerThresholdCritical" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The LowerThresholdCritical for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the LowerThresholdCritical information of this Sensor."/>
+        </Property>
+
+        <Property Name="LowerThresholdFatal" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The LowerThresholdFatal for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the LowerThresholdFatal information of this Sensor."/>
+        </Property>
+
+        <Property Name="MaxReadingRange" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The MaxReadingRange for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the MaxReadingRange information of this Sensor."/>
+        </Property>
+
+        <Property Name="MinReadingRange" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The MinReadingRange for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the MinReadingRange information of this Sensor."/>
+        </Property>
+
+        <Property Name="PhysicalContext" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The PhysicalContext for this Sensor."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the PhysicalContext information of this Sensor."/>
+        </Property>
+
+        <Property Name="Actions" Type="Sensor.v0_1_0.Actions" Nullable="false">
+          <Annotation Term="OData.Description" String="The available actions for this resource."/>
+          <Annotation Term="OData.LongDescription" String="The Actions property shall contain the available actions for this resource."/>
+        </Property>
+
+      </EntityType>
+
+      <ComplexType Name="Actions">
+        <Annotation Term="OData.AdditionalProperties" Bool="false"/>
+        <Annotation Term="OData.Description" String="The available actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain the available actions for this resource."/>
+        <Property Name="Oem" Type="Sensor.v0_1_0.OemActions" Nullable="false"/>
+      </ComplexType>
+
+      <ComplexType Name="OemActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="true"/>
+        <Annotation Term="OData.Description" String="The available OEM specific actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain any additional OEM actions for this resource."/>
+      </ComplexType>
+
+    </Schema>
+
+  </edmx:DataServices>
+</edmx:Edmx>

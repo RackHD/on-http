@@ -1,7 +1,7 @@
 {
     "@odata.context" : "<%= basepath %>/$metadata#ServiceRoot.ServiceRoot",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#ServiceRoot.v1_1_1.ServiceRoot",
+    "@odata.type": "#ServiceRoot.v1_3_0.ServiceRoot",
     "Oem" : {},
     "Id": "<%= identifier %>",
     "Description": "",
@@ -43,5 +43,11 @@
     },
     "JsonSchemas": {
         "@odata.id": "<%=basepath%>/JsonSchemas"
+    },
+    "DCIMCooling": {
+        "@odata.id": "<%=basepath%>/DCIMCooling"
+    },
+    "DCIMPower": {
+        "@odata.id": "<%=basepath%>/DCIMPower"
     }
 }
