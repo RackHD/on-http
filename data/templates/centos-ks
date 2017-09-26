@@ -15,7 +15,7 @@ selinux --permissive
   bootloader --location=mbr --driveorder=<%=installDisk%> --boot-drive=<%=installDisk%> --append="crashkernel=auth rhgb"
 <% } %>
 services --enabled=NetworkManager,sshd
-network --device=<%=macaddress%> --noipv6 --activate
+#network --device=<%=macaddress%> --noipv6 --activate
 
 # enable syslog
 <% if (typeof remoteLogging !== 'undefined' && remoteLogging) { %>
@@ -113,8 +113,10 @@ net-tools
 (
 #notify the current progress
 <% if( typeof progressMilestones !== 'undefined' && progressMilestones.postConfigUri ) { %>
+    echo "RackHD POST script started - curl notify post progress"
     # the url may contain query, the symbol '&' will mess the command line logic, so the whole url need be wrapped in quotation marks
     /usr/bin/curl -X POST -H 'Content-Type:application/json' "http://<%=server%>:<%=port%><%-progressMilestones.postConfigUri%>" || true
+    echo "RackHD POST script started - curl notify post progress after"
 <% } %>
 
 # PLACE YOUR POST DIRECTIVES HERE
@@ -229,13 +231,26 @@ export PATH
 <% } %>
 
 # Download the service to callback to RackHD after OS installation/reboot completion
+echo "RackHD POST script wget started"
 /usr/bin/wget http://<%=server%>:<%=port%>/api/current/templates/<%=rackhdCallbackScript%>?nodeId=<%=nodeId%> -O /etc/rc.d/init.d/<%=rackhdCallbackScript%>
+echo "RackHD POST script chmod callback script"
 chmod +x /etc/rc.d/init.d/<%=rackhdCallbackScript%>
 # Enable the above service, it should auto-disable after running once
 chkconfig <%=rackhdCallbackScript%> on
+echo "RackHD POST script chkconfig callback script complete"
 
 #signify ORA the installation completed
-/usr/bin/curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
+for retry in $(seq 1 5);
+do
+    /usr/bin/curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
+    if [ $? -eq 0 ]; then
+        echo "Post Notification succeeded"
+        break
+    else
+        echo "Post Notification failed"
+        sleep 1
+    fi
+done;
 
 ) 2>&1 >>/root/install-post-sh.log
 EOF
