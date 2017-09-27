@@ -190,8 +190,17 @@
           <% if( typeof progressMilestones !== 'undefined' && progressMilestones.chrootUri ) { %>
             curl -X POST -H 'Content-Type:application/json' "http://<%=server%>:<%=port%><%-progressMilestones.chrootUri%>" || true
           <% } %>
-
-          curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
+          for retry in $(seq 1 5);
+          do
+              curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
+              if [ $? -eq 0 ]; then
+                  echo "Post Notification succeeded" >> /root/rackhd-post.log
+                  break
+              else
+                  echo "Post Notification failed" >> /root/rackhd-post.log
+                  sleep 1
+              fi
+          done;
           ]]>
         </source>
       </script>
@@ -223,7 +232,17 @@
           <% }) %>
           <% } %>
 
-          curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
+          for retry in $(seq 1 5);
+          do
+              curl -X POST -H 'Content-Type:application/json' http://<%=server%>:<%=port%>/api/current/notification?nodeId=<%=nodeId%>
+              if [ $? -eq 0 ]; then
+                  echo "Post Notification succeeded" >> /root/rackhd-post.log
+                  break
+              else
+                  echo "Post Notification failed" >> /root/rackhd-post.log
+                  sleep 1
+              fi
+          done;
           ]]>
         </source>
       </script>
