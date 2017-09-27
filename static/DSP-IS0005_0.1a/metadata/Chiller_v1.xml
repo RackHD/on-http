@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!---->
+<!--################################################################################       -->
+<!--# Redfish Schema:  Chiller  v0.1.0-->
+<!--#                                                                                      -->
+<!--# For a detailed change log, see the README file contained in the DSP8010 bundle,      -->
+<!--# available at http://www.dmtf.org/standards/redfish                                   -->
+<!--# Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF).                  -->
+<!--# For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright -->
+<!--################################################################################       -->
+<!---->
+<edmx:Edmx xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" Version="4.0">
+
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Core.V1.xml">
+    <edmx:Include Namespace="Org.OData.Core.V1" Alias="OData"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Capabilities.V1.xml">
+    <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Measures.V1.xml">
+    <edmx:Include Namespace="Org.OData.Measures.V1" Alias="Measures"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/RedfishExtensions_v1.xml">
+    <edmx:Include Namespace="Validation.v1_0_0" Alias="Validation"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/Resource_v1.xml">
+    <edmx:Include Namespace="Resource.v1_0_0"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/SensorCollection_v1.xml">
+    <edmx:Include Namespace="SensorCollection"/>
+  </edmx:Reference>
+
+  <edmx:DataServices>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="Chiller">
+
+      <EntityType Name="Chiller" BaseType="Resource.v1_0_0.Resource" Abstract="true">
+        <Annotation Term="OData.Description" String="This is the schema definition for the Chiller Metrics."/>
+        <Annotation Term="OData.LongDescription" String="This resource shall be used to represent a cooling metrics resource for a Redfish implementation."/>
+        <Annotation Term="Capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false"/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="true"/>
+            <Annotation Term="OData.Description" String="Cooling properties can be updated to change limits, exceptions and other writable properties."/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false"/>
+          </Record>
+        </Annotation>
+      </EntityType>
+
+    </Schema>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="Chiller.v0_1_0">
+
+      <EntityType Name="Chiller" BaseType="Chiller.Chiller">
+
+        <Property Name="FirmwareRevision" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Firmware Revision of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Firmware Rev of Chiller."/>
+        </Property>
+
+        <Property Name="HardwareRevision" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Hardware Revision of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Hardware Rev of Chiller."/>
+        </Property>
+
+        <Property Name="DateOfManufacture" Type="Edm.DateTimeOffset">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="Date of manufacture of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual date of manufacture of Chiller."/>
+        </Property>
+
+        <Property Name="Manufacturer" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Manufacturer of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Manufacturer of Chiller."/>
+        </Property>
+
+        <Property Name="Model" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Model Number of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Model Number of Chiller."/>
+        </Property>
+
+        <Property Name="SerialNumber" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Serial Number of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Serial Number of Chiller."/>
+        </Property>
+
+        <Property Name="PartNumber" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Part Number of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Part Number of Chiller."/>
+        </Property>
+
+        <Property Name="AssetTag" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Asset Tag of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Asset Tag of Chiller."/>
+        </Property>
+
+        <Property Name="PhysicalLocation" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Physical Location of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Physical Location of Chiller."/>
+        </Property>
+
+        <!-- Status -->
+        <Property Name="StartCount" Type="Edm.Int64">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Start Count of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Start Count of Chiller."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+        </Property>
+
+        <Property Name="StartSwitch" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Start Switch setting of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Start Switch setting of Chiller."/>
+        </Property>
+
+        <Property Name="OperatingCode" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Operating Code of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Operating Code of Chiller."/>
+        </Property>
+
+        <Property Name="SafetyCode" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Safety Code of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Safety Code of Chiller."/>
+        </Property>
+
+        <Property Name="CyclingCode" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Cycling Code of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Cycling Code of Chiller."/>
+        </Property>
+
+        <Property Name="CHWIsolationValve" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual CHW Isolation Valve setting of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual CHW Isolation Valve setting of Chiller."/>
+        </Property>
+
+        <Property Name="CHWIsolationValveProof" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual CHW Isolation Valve Proof setting of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual CHW Isolation Valve Proof setting of Chiller."/>
+        </Property>
+
+        <Property Name="CWIsolationValve" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual CW Isolation Valve setting of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual CW Isolation Valve setting of Chiller."/>
+        </Property>
+
+        <Property Name="CWIsolationValveProof" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual CHW Isolation Valve Proof setting of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual CHW Isolation Valve Proof setting of Chiller."/>
+        </Property>
+
+        <!-- Setpoints -->
+        <Property Name="ChilledWaterSetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Chilled Water Set Point of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Chilled Water Set Point of Chiller."/>
+          <Annotation Term="Measures.Unit" String="F"/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="75"/>
+        </Property>
+
+        <Property Name="DemandLimitSetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Demand Limit Set Point of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Demand Limit Set Point of Chiller."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+        </Property>
+
+        <Property Name="RemoteReset" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Remote Diagnostic Reset Command Status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Remote Diagnostic Reset Command Status of Chiller."/>
+        </Property>
+
+        <Property Name="ChilledWaterFlowSetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Chilled Water Flow Set Point in GPM of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Chilled Water Flow Set Point of Chiller."/>
+        </Property>
+
+        <Property Name="ColdWaterFlowSetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Cold Water Flow Set Point of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Cold Water Flow Set Point of Chiller."/>
+        </Property>
+
+        <!-- Settings -->
+        <Property Name="ChillerStartStop" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Start/Stop Command value of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Start/Stop Command value of Chiller."/>
+        </Property>
+
+        <Property Name="ChillerEnableDisable" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Enable/Disable Command value of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Enable/Disable Command value of Chiller."/>
+        </Property>
+
+        <Property Name="ChilledWaterPumpStartStop" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Chilled Water Start/Stop Command value of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Chilled WaterStart/Stop Command value of Chiller."/>
+        </Property>
+
+        <Property Name="ColdWaterPumpStartStop" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Cold Water Start/Stop Command value of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Cold Water Start/Stop Command value of Chiller."/>
+        </Property>
+
+        <Property Name="MakeUpWaterPumpStartStop" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Start/Stop Command value of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Start/Stop Command value of Chiller."/>
+        </Property>
+
+        <Property Name="ControlMode" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Control Mode binary value of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Control Mode binary value of Chiller."/>
+        </Property>
+
+        <!-- Unit Metrics -->
+        <Property Name="ChillerRunTime" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Run Time of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Run Time in hours of Chiller."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+        </Property>
+
+        <Property Name="CompressorRunTime" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Run Time of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Run Time in hours of Chiller."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+        </Property>
+
+        <Property Name="ChillerCapacity" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Capacity percentage value of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Capacity percentage value of Chiller."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+        </Property>
+
+        <Property Name="ChillerAvailability" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Availability value of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Availability value of Chiller."/>
+        </Property>
+
+        <!-- Status -->
+        <Property Name="OperatingMode" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Operating Mode of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Operating Mode of Chiller."/>
+        </Property>
+
+        <Property Name="ControlMode2" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Control Mode of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Control Mode of Chiller."/>
+        </Property>
+
+        <Property Name="ChillerRunningStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Chiller Running Status [ON/OFF] of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Chiller Running Status [ON/OFF] of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Status [ON/OFF] of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Compressor Status [ON/OFF] of Chiller."/>
+        </Property>
+
+        <Property Name="ChilledWaterFlowStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Chilled Water Flow Status [FLOW/NO FLOW] of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Chilled Water Flow Status [FLOW/NO FLOW] of Chiller."/>
+        </Property>
+
+        <Property Name="ColdWaterFlowStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Cold Water Flow Status [FLOW/NO FLOW] of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Cold Water Flow Status [FLOW/NO FLOW] of Chiller."/>
+        </Property>
+
+        <Property Name="ChilledWaterPumpStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Chilled Water Pump Status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Chilled Water Pump Status (binary) of Chiller."/>
+        </Property>
+
+        <Property Name="ColdWaterPumpStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Cold Water Pump Status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Cold Water Pump Status (binary) of Chiller."/>
+        </Property>
+
+        <Property Name="LastDiagnostic" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Last Diagnostic of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Last Diagnostic (binary) of Chiller."/>
+        </Property>
+
+        <!-- Alarms -->
+        <Property Name="ShutdownAlarmPresent" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Shutdown Alarm Present status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Shutdown Alarm Present boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="AlarmPresent" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Alarm Present status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the actual Alarm Present boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="MakeUpWaterAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Make Up Water Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Make Up Water Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorDischargeTempSensorAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Discharge Temperature Sensor Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Discharge Temperature Sensor Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorHighPressureAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor High Pressure Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor High Pressure Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorHighPressureTransitionFailure" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor High Pressure Transition Failure status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor High Pressure Transition Failure boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorLowPressureAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Low Pressure Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Low Pressure Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorLowPressureTransitionFailure" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Low Pressure Transition Failure status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Low Pressure Transition Failure boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorOverTemperatureAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Over Temperature Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Over Temperature Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorPumpDownAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Pump Down Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Pump Down Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorRunTimeAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Run Time Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Run Time Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorShortCycleAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Short Cycle Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Short Cycle Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorThermalOverloadAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Thermal Overload Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Thermal Overload Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorLossAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Loss Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Loss Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorLossMasterAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Loss Master Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Loss Master Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CompressorMaintenanceAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Maintenance Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Maintenance Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CondensorAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Condensor Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Condensor Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <Property Name="CondensorVoltageSurgeAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Condensor Voltage Surge Alarm On status of Chiller."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Condensor Voltage Surge Alarm On boolean value of Chiller."/>
+        </Property>
+
+        <!-- AC Input -->
+        <NavigationProperty Name="AcInput" Type="Collection(Chiller.v0_1_0.AcInput)">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/ReadWrite"/>
+          <Annotation Term="OData.Description" String="This is the definition for AcInput."/>
+          <Annotation Term="OData.LongDescription" String="These properties shall be the definition for AcInput for a Redfish implementation."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <!-- Sensors -->
+        <NavigationProperty Name="Sensors" Type="SensorCollection.SensorCollection" Nullable="false">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="Contains the members of this collection."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <Property Name="Actions" Type="Chiller.v0_1_0.Actions" Nullable="false">
+          <Annotation Term="OData.Description" String="The available actions for this resource."/>
+          <Annotation Term="OData.LongDescription" String="The Actions property shall contain the available actions for this resource."/>
+        </Property>
+
+      </EntityType>
+
+      <EntityType Name="AcInput" BaseType="Resource.v1_0_0.ReferenceableMember">
+
+        <Property Name="PercentCurrent" Type="Edm.Int64">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The Current percentage value for this AC Input."/>
+          <Annotation Term="OData.LongDescription" String="This property shall indicate the Current percentage value of this AC Input."/>
+        </Property>
+
+        <!-- RMS Current and RMS Voltage are also AC Input measurements, but not included because they are sensor measurements -Joe -->
+
+        <Property Name="Actions" Type="Chiller.v0_1_0.AcInputActions" Nullable="false">
+          <Annotation Term="OData.Description" String="The available actions for this resource."/>
+          <Annotation Term="OData.LongDescription" String="The Actions property shall contain the available actions for this resource."/>
+        </Property>
+
+      </EntityType>
+
+      <ComplexType Name="Actions">
+        <Annotation Term="OData.AdditionalProperties" Bool="false"/>
+        <Annotation Term="OData.Description" String="The available actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain the available actions for this resource."/>
+        <Property Name="Oem" Type="Chiller.v0_1_0.OemActions" Nullable="false"/>
+      </ComplexType>
+
+      <ComplexType Name="OemActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="true"/>
+        <Annotation Term="OData.Description" String="The available OEM specific actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain any additional OEM actions for this resource."/>
+      </ComplexType>
+
+      <ComplexType Name="AcInputActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="false"/>
+        <Annotation Term="OData.Description" String="The available actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain the available actions for this resource."/>
+        <Property Name="Oem" Type="Chiller.v0_1_0.AcInputOemActions" Nullable="false"/>
+      </ComplexType>
+
+      <ComplexType Name="AcInputOemActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="true"/>
+        <Annotation Term="OData.Description" String="The available OEM specific actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain any additional OEM actions for this resource."/>
+      </ComplexType>
+
+    </Schema>
+
+  </edmx:DataServices>
+</edmx:Edmx>

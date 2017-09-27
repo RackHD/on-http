@@ -38,7 +38,7 @@ describe('Redfish Schemas', function () {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
-                expect(res.body['Members@odata.count']).to.equal(194);
+                expect(res.body['Members@odata.count']).to.equal(236);
 
             });
     });

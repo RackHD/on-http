@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!---->
+<!--################################################################################       -->
+<!--# Redfish Schema:  CRAH  v0.1.0-->
+<!--#                                                                                      -->
+<!--# For a detailed change log, see the README file contained in the DSP8010 bundle,      -->
+<!--# available at http://www.dmtf.org/standards/redfish                                   -->
+<!--# Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF).                  -->
+<!--# For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright -->
+<!--################################################################################       -->
+<!---->
+<edmx:Edmx xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" Version="4.0">
+
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Core.V1.xml">
+    <edmx:Include Namespace="Org.OData.Core.V1" Alias="OData"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Capabilities.V1.xml">
+    <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Measures.V1.xml">
+    <edmx:Include Namespace="Org.OData.Measures.V1" Alias="Measures"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/RedfishExtensions_v1.xml">
+    <edmx:Include Namespace="Validation.v1_0_0" Alias="Validation"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/Resource_v1.xml">
+    <edmx:Include Namespace="Resource.v1_0_0"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/SensorCollection_v1.xml">
+    <edmx:Include Namespace="SensorCollection"/>
+  </edmx:Reference>
+
+  <edmx:DataServices>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="CRAH">
+
+      <EntityType Name="CRAH" BaseType="Resource.v1_0_0.Resource" Abstract="true">
+        <Annotation Term="OData.Description" String="This is the schema definition for the CRAH Metrics."/>
+        <Annotation Term="OData.LongDescription" String="This resource shall be used to represent a cooling metrics resource for a Redfish implementation."/>
+        <Annotation Term="Capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false"/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="true"/>
+            <Annotation Term="OData.Description" String="Cooling properties can be updated to change limits, exceptions and other writable properties."/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false"/>
+          </Record>
+        </Annotation>
+      </EntityType>
+
+    </Schema>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="CRAH.v0_1_0">
+
+      <EntityType Name="CRAH" BaseType="CRAH.CRAH">
+
+        <Property Name="FirmwareRevision" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Firmware Revision of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Firmware Rev of CRAH."/>
+        </Property>
+
+        <Property Name="HardwareRevision" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Hardware Revision of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Hardware Rev of CRAH."/>
+        </Property>
+
+        <Property Name="DateOfManufacture" Type="Edm.DateTimeOffset">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="Date of manufacture of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual date of manufacture of CRAH."/>
+        </Property>
+
+        <Property Name="Manufacturer" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Manufacturer of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Manufacturer of CRAH."/>
+        </Property>
+
+        <Property Name="Model" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Model Number of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Model Number of CRAH."/>
+        </Property>
+
+        <Property Name="SerialNumber" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Serial Number of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Serial Number of CRAH."/>
+        </Property>
+
+        <Property Name="PartNumber" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Part Number of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Part Number of CRAH."/>
+        </Property>
+
+        <Property Name="AssetTag" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Asset Tag of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Asset Tag of CRAH."/>
+        </Property>
+
+        <Property Name="PhysicalLocation" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Physical Location of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Physical Location of CRAH."/>
+        </Property>
+
+        <!-- Setpoints -->
+        <Property Name="TemperatureSetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Temperature Set Point of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Start Count of CRAH."/>
+          <Annotation Term="Measures.Unit" String="C"/>
+        </Property>
+
+        <Property Name="RelativeHumiditySetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Relative Humidity Set Point percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Relative Humidity Set Point percentage value of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="100"/>
+        </Property>
+
+        <Property Name="FanSpeedSetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Speed Set Point percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Speed Set Point percentage value of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="100"/>
+        </Property>
+
+        <!-- Settings -->
+        <Property Name="MinimumFanSpeed" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Minimum Fan Speed percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Minimum Fan Speed percentage value of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="100"/>
+        </Property>
+
+        <Property Name="MaximumFanSpeed" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Maximum Fan Speed percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Maximum Fan Speed percentage value of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="100"/>
+        </Property>
+
+        <Property Name="DehumidificationFanSpeed" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Dehumidification Fan Speed percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Dehumidification Fan Speed percentage value of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="100"/>
+        </Property>
+
+        <Property Name="HighHumidityAlarm" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual High Humidity Alarm setting (percentage value) of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual High Humidity Alarm setting (percentage value) of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="100"/>
+        </Property>
+
+        <Property Name="LowHumidityAlarm" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Low Humidity Alarm setting (percentage value) of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Low Humidity Alarm setting (percentage value) of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="100"/>
+        </Property>
+
+        <Property Name="UnitHiTempAlarmSetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual High Return or Supply Air Temperature Alarm Setting of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual High Return or Supply Air Temperature Alarm Setting of CRAH."/>
+          <Annotation Term="Measures.Unit" String="C"/>
+        </Property>
+
+        <Property Name="UnitLoTempAlarmSetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Low Return or Supply Air Temperature Alarm Setting of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Low Return or Supply Air Temperature Alarm Setting of CRAH."/>
+          <Annotation Term="Measures.Unit" String="C"/>
+        </Property>
+
+        <Property Name="ParameterHiAlarmSetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Parameter High Alarm Set Point of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Parameter High Alarm Set Point of CRAH."/>
+        </Property>
+
+        <Property Name="ParameterLoAlarmSetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Parameter Low Alarm Set Point of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Parameter Low Alarm Set Point of CRAH."/>
+        </Property>
+
+        <Property Name="TemperatureControlDeadband" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Temperature Control Tolerance value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Temperature Control Tolerance value of CRAH."/>
+          <Annotation Term="Measures.Unit" String="C"/>
+        </Property>
+
+        <Property Name="HumidityControlDeadband" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Relative Humidity Control Tolerance percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Relative Humidity Control Tolerance percentage value of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="100"/>
+        </Property>
+
+        <Property Name="FanControlDeadband" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Control Tolerance percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Control Tolerance percentage value of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="100"/>
+        </Property>
+
+        <Property Name="ResetAllAlarms" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Reset All Alarms setting of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Reset All Alarms setting of CRAH."/>
+        </Property>
+
+        <Property Name="PauseUnit" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Pause Unit setting of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Pause Unit setting of CRAH."/>
+        </Property>
+
+        <Property Name="HighWaterTempAlarmSetting" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual High Water Temperature Alarm setting of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual High Water Temperature Alarm setting of CRAH."/>
+          <Annotation Term="Measures.Unit" String="C"/>
+        </Property>
+
+        <Property Name="LowWaterTempAlarmSetting" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Low Water Temperature Alarm setting of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Low Water Temperature Alarm setting of CRAH."/>
+          <Annotation Term="Measures.Unit" String="C"/>
+        </Property>
+
+        <Property Name="UnitChilledWaterFlushCycle" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Chilled Water Flush Cycle binary value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Chilled Water Flush Cycle binary value of CRAH."/>
+        </Property>
+
+        <!-- Unit Metrics -->
+        <Property Name="FanRunTime" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Run Time of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Run Time in hours of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/> <!-- Does hours have a unit? -Joe -->
+        </Property>
+
+        <Property Name="CoolingCapacity" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Cooling Capacity percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Cooling Capacity percentage value of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+        </Property>
+
+        <Property Name="HeatingOutput" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Heating Output percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Heating Output percentage value of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+        </Property>
+
+        <Property Name="CoolingOutput" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Cooling Output percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Cooling Output percentage value of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+        </Property>
+
+        <!-- Status -->
+        <Property Name="UnitStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Status [ON/OFF] of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Status [ON/OFF] of CRAH."/>
+        </Property>
+
+        <Property Name="UnitOperationStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Operation Status [ON/OFF] of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Operation Status [ON/OFF] of CRAH."/>
+        </Property>
+
+        <Property Name="FanStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Status [ON/OFF] of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Status [ON/OFF] of CRAH."/>
+        </Property>
+
+        <Property Name="DehumidifyingStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Dehumidification Status [ON/OFF] of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Dehumidification Status [ON/OFF] of CRAH."/>
+        </Property>
+
+        <Property Name="HumidifyingStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Humidification Status [ON/OFF] of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Humidification Status [ON/OFF] of CRAH."/>
+        </Property>
+
+        <Property Name="UnitCoolingStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Cooling Status [ON/OFF] of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Cooling Status [ON/OFF] of CRAH."/>
+        </Property>
+
+        <Property Name="UnitHeatingStatus" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Heating Status [ON/OFF] of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Heating Status [ON/OFF] of CRAH."/>
+        </Property>
+
+        <Property Name="ChilledWaterValveCommand" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Chilled Water Valve Command percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Chilled Water Valve Command percentage value of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+        </Property>
+
+        <!-- Alarms -->
+        <Property Name="CompressorDischargeTempAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Discharge Temp Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Discharge Temp Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CompressorHighPressureAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor High Pressure Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor High Pressure Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CompressorHighPressureTransitionAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor High Pressure Transition Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor High Pressure Transition Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CompressorLowPressureAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Low Pressure Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Low Pressure Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CompressorLowPressureTransitionAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Low Pressure Transition Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Low Pressure Transition Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CompressorOverTempAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Over Temp Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Over Temp Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CompressorPumpDownAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Pump Down Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Pump Down Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CompressorRunTimeAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Run Time Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Run Time Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CompressorShortCycleAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Short Cycle Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Short Cycle Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CompressorThermalOverloadAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Thermal Overload Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Thermal Overload Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CondensorAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Condensor Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Condensor Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CondensorVoltageSurgeAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Condensor Voltage Surge Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Condensor Voltage Surge Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="FanAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="FanOverloadAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Overload Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Overload Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="AirflowLossAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Airflow Loss Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Airflow Loss Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="DirtyFilterAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Dirty Filter Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Dirty Filter Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="FanRunTimeAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Run Time Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Run Time Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="HiHumidityAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual High Humidity Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual High Humidity Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="LoHumidityAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Low Humidity Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Low Humidity Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="ReturnAirHighTempAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Return Air High Temp Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Return Air High Temp Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="ReturnAirLowTempAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Return Air Low Temp Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Return Air Low Temp Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="ReturnAirTempSensorAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Return Air Temp Sensor Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Return Air Temp Sensor Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="SupplyAirHighTempAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Supply Air High Temp Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Supply Air High Temp Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="SupplyAirLowTempAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Supply Air Low Temp Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Supply Air Low Temp Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="SupplyAirTempSensorAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Supply Air Temp Sensor Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Supply Air Temp Sensor Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="RemoteSensorAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Remote Sensor Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Remote Sensor Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CompressorLossAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Loss Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Loss Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CompressorLossMasterAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Loss Master Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Loss Master Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CompressorMaintenanceAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Compressor Maintenance Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Compressor Maintenance Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="UnitMaintenanceDueAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Maintenance Due Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Maintenance Due Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="UnitOffAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Off Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Off Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="UnitOnAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit On Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit On Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="UnitPowerLossAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Power Loss Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Power Loss Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="UnitServiceRequestAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Service Request Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Service Request Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="UnitShutdownAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Shutdown Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Shutdown Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="UnitShutdownHighPowerAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Shutdown High Power Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Shutdown High Power Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="UnitShutdownPartialAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Shutdown Partial Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Shutdown Partial Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="UnitStandbyAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Standby Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Standby Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="UnitCommunicationLossAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Communication Loss Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Communication Loss Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CustomAlarm1On" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Custom Alarm 1 On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Custom Alarm 1 On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="CustomAlarm2On" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Custom Alarm 2 On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Custom Alarm 2 On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="SmokeDetectedAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Smoke Detected Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Smoke Detected Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="WaterUnderFloorAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Water Under Floor Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Water Under Floor Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="ManualOverrideAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Manual Override Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Manual Override Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="LossOfWaterFlowAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Loss Of Water Flow Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Loss Of Water Flow Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <Property Name="SummaryAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Summary Alarm On status of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Summary Alarm On boolean value of CRAH."/>
+        </Property>
+
+        <!-- General Measurements -->
+        <Property Name="OutsideAirHumidity" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Outside Air Humidity percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the Outside Air Humidity percentage value of CRAH."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+        </Property>
+
+        <Property Name="OutsideAirTemperature" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Outside Air Temperature percentage value of CRAH."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the Outside Air Temperature percentage value of CRAH."/>
+          <Annotation Term="Measures.Unit" String="F"/>
+        </Property>
+
+        <!-- Sensors -->
+        <NavigationProperty Name="Sensors" Type="SensorCollection.SensorCollection" Nullable="false">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="Contains the members of this collection."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <Property Name="Actions" Type="CRAH.v0_1_0.Actions" Nullable="false">
+          <Annotation Term="OData.Description" String="The available actions for this resource."/>
+          <Annotation Term="OData.LongDescription" String="The Actions property shall contain the available actions for this resource."/>
+        </Property>
+
+      </EntityType>
+
+      <ComplexType Name="Actions">
+        <Annotation Term="OData.AdditionalProperties" Bool="false"/>
+        <Annotation Term="OData.Description" String="The available actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain the available actions for this resource."/>
+        <Property Name="Oem" Type="CRAH.v0_1_0.OemActions" Nullable="false"/>
+      </ComplexType>
+
+      <ComplexType Name="OemActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="true"/>
+        <Annotation Term="OData.Description" String="The available OEM specific actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain any additional OEM actions for this resource."/>
+      </ComplexType>
+
+    </Schema>
+
+  </edmx:DataServices>
+</edmx:Edmx>

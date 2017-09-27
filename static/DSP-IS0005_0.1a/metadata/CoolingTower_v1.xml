@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!---->
+<!--################################################################################       -->
+<!--# Redfish Schema:  CoolingTower  v0.1.0                                               -->
+<!--#                                                                                      -->
+<!--# For a detailed change log, see the README file contained in the DSP8010 bundle,      -->
+<!--# available at http://www.dmtf.org/standards/redfish                                   -->
+<!--# Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF).                  -->
+<!--# For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright -->
+<!--################################################################################       -->
+<!---->
+<edmx:Edmx xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" Version="4.0">
+
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Core.V1.xml">
+    <edmx:Include Namespace="Org.OData.Core.V1" Alias="OData"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Capabilities.V1.xml">
+    <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://docs.oasis-open.org/odata/odata/v4.0/errata03/csd01/complete/vocabularies/Org.OData.Measures.V1.xml">
+    <edmx:Include Namespace="Org.OData.Measures.V1" Alias="Measures"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/RedfishExtensions_v1.xml">
+    <edmx:Include Namespace="Validation.v1_0_0" Alias="Validation"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/Resource_v1.xml">
+    <edmx:Include Namespace="Resource.v1_0_0"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/SensorCollection_v1.xml">
+    <edmx:Include Namespace="SensorCollection"/>
+  </edmx:Reference>
+
+  <edmx:DataServices>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="CoolingTower">
+
+      <EntityType Name="CoolingTower" BaseType="Resource.v1_0_0.Resource" Abstract="true">
+        <Annotation Term="OData.Description" String="This is the schema definition for the CoolingTower Metrics."/>
+        <Annotation Term="OData.LongDescription" String="This resource shall be used to represent a cooling metrics resource for a Redfish implementation."/>
+        <Annotation Term="Capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false"/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="true"/>
+            <Annotation Term="OData.Description" String="Cooling properties can be updated to change limits, exceptions and other writable properties."/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false"/>
+          </Record>
+        </Annotation>
+      </EntityType>
+
+    </Schema>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="CoolingTower.v0_1_0">
+
+      <EntityType Name="CoolingTower" BaseType="CoolingTower.CoolingTower">
+        <Property Name="FirmwareRevision" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Firmware Revision of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Firmware Revision of CoolingTower."/>
+        </Property>
+
+        <Property Name="HardwareRevision" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Hardware Revision of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Hardware Revision of CoolingTower."/>
+        </Property>
+
+        <Property Name="DateOfManufacture" Type="Edm.DateTimeOffset">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The date of manufacture of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual date of manufacture of CoolingTower."/>
+        </Property>
+
+        <Property Name="Manufacturer" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Manufacturer of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Manufacturer of CoolingTower."/>
+        </Property>
+
+        <Property Name="Model" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Model Number of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Model Number of CoolingTower."/>
+        </Property>
+
+        <Property Name="SerialNumber" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Serial Number of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Serial Number of CoolingTower."/>
+        </Property>
+
+        <Property Name="PartNumber" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Part Number of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Part Number of CoolingTower."/>
+        </Property>
+
+        <Property Name="AssetTag" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Asset Tag of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Asset Tag of CoolingTower."/>
+        </Property>
+
+        <Property Name="PhysicalLocation" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Physical Location of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Physical Location of CoolingTower."/>
+        </Property>
+
+        <!-- Unspecified Measurement Location -->
+        <Property Name="OperatingLevelSwitch" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Operating Level Switch of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Operating Level Switch of CoolingTower."/>
+        </Property>
+
+        <!-- Setpoints -->
+        <Property Name="ColdWaterFlowSetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Cold Water Flow Set Point of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Cold Water Flow Set Point of CoolingTower."/>
+          <Annotation Term="Measures.Unit" String="F"/>
+        </Property>
+
+        <Property Name="FanVFDModulation" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan VFD Modulation percentage value of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Direct Control of Fan percentage value of CoolingTower."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="100"/>
+        </Property>
+
+        <!-- Settings -->
+        <Property Name="CoolingTowerEnabled" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Enable/Disable status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Enable/Disable status of CoolingTower."/>
+        </Property>
+
+        <Property Name="FanStarted" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Started status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Started status of CoolingTower."/>
+        </Property>
+
+        <Property Name="OverrideConditionLeadLagPosition" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Lead/Lag Position value of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Override Condition Lead/Lag value of CoolingTower."/>
+        </Property>
+
+        <Property Name="VibrationSwitchSetPoint" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Vibration Switch Set Point of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Motor Vibration Switch Set Point in g of CoolingTower."/>
+        </Property>
+
+        <Property Name="FanHighSpeedSetting" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan High Speed Setting percentage value of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan High Speed Setting percentage value of CoolingTower."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="100"/>
+        </Property>
+
+        <Property Name="FanLowSpeedSetting" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Low Speed Setting percentage value of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Low Speed Setting percentage value of CoolingTower."/>
+          <Annotation Term="Validation.Minimum" Int="0"/>
+          <Annotation Term="Validation.Maximum" Int="100"/>
+        </Property>
+
+        <!-- Unit Metrics -->
+        <Property Name="LeadLagPosition" Type="Edm.Decimal">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Lead/Lag Position of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Lead/Lag Position of CoolingTower."/>
+        </Property>
+
+        <Property Name="CoolingTowerAvailable" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Availability of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Availability of CoolingTower."/>
+        </Property>
+
+        <Property Name="RequestSignal" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Request Signal status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the Request Signal to Run Detected (binary value) of CoolingTower."/>
+        </Property>
+
+        <!-- Status -->
+        <Property Name="UnitPoweredOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Unit Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Unit Powered On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="HighFanSpeedStatus" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual High Fan Speed status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual High Fan Speed status (boolean value; true for OFF/false for ON) of CoolingTower."/>
+        </Property>
+
+        <Property Name="FanPoweredOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Powered On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="LowFanSpeedStatus" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Low Fan Speed status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Low Fan Speed status (boolean value; true for OFF/false for ON) of CoolingTower."/>
+        </Property>
+
+        <Property Name="AlarmResetPoweredOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Alarm Reset Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Alarm Reset Powered On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="DrainValveProof" Type="Edm.String">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Drain Valve Proof value of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Test for Drain Valve value of CoolingTower."/>
+        </Property>
+
+        <!-- Alarms -->
+        <Property Name="FanFaultAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Fault Alarm Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Fault Alarm On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="ColdWaterValveFailOpenAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Cold Water Valve Fail Open Alarm Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Cold Water Valve Fail to Open Alarm On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="ColdWaterValveFailCloseAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Cold Water Valve Fail Close Alarm Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Cold Water Valve Fail to Close Alarm On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="CoolingWaterValveFailOpenAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Cooling Water Valve Fail Open Alarm Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Cooling Water Valve Fail to Open Alarm On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="CoolingWaterValveFailCloseAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Cooling Water Valve Fail Close Alarm Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Cooling Water Valve Fail to Close Alarm On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="FanFailureToRunAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Failure to Run Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Failure to Run Alarm On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="FanHighSpeedAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan High Speed Alarm Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual High Speed Run Failure Alarm On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="FanLowSpeedAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Fan Low Speed Alarm Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Low Speed Run Failure Alarm On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="LowFanGearOilLevelAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Low Fan Gear Oil Level Alarm Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Low Fan Gear Oil Level Alarm On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="SumpTankLowLevelAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Sump Tank Low Level Alarm Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Sump Level Reaching Low Value Alarm On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="SumpTankHighLevelAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Sump Tank High Level Alarm Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Sump Level Reaching High Value Alarm On boolean value of CoolingTower."/>
+        </Property>
+
+        <Property Name="VibrationSwitchAlarmOn" Type="Edm.Boolean">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="The actual Vibration Switch Alarm Status of CoolingTower."/>
+          <Annotation Term="OData.LongDescription" String="The value of this property shall represent the actual Fan Motor Vibration Switch Alarm On boolean value of CoolingTower."/>
+        </Property>
+
+        <!-- Sensors -->
+        <NavigationProperty Name="Sensors" Type="SensorCollection.SensorCollection" Nullable="false">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="Contains the members of this collection."/>
+          <Annotation Term="OData.AutoExpand"/>
+        </NavigationProperty>
+
+        <Property Name="Actions" Type="CoolingTower.v0_1_0.Actions" Nullable="false">
+          <Annotation Term="OData.Description" String="The available actions for this resource."/>
+          <Annotation Term="OData.LongDescription" String="The Actions property shall contain the available actions for this resource."/>
+        </Property>
+
+      </EntityType>
+
+      <ComplexType Name="Actions">
+        <Annotation Term="OData.AdditionalProperties" Bool="false"/>
+        <Annotation Term="OData.Description" String="The available actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain the available actions for this resource."/>
+        <Property Name="Oem" Type="CoolingTower.v0_1_0.OemActions" Nullable="false"/>
+      </ComplexType>
+
+      <ComplexType Name="OemActions">
+        <Annotation Term="OData.AdditionalProperties" Bool="true"/>
+        <Annotation Term="OData.Description" String="The available OEM specific actions for this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type shall contain any additional OEM actions for this resource."/>
+      </ComplexType>
+
+    </Schema>
+
+  </edmx:DataServices>
+</edmx:Edmx>
