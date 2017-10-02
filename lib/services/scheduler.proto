@@ -24,6 +24,7 @@ service Scheduler {
   rpc templatesLibPut (templatesLibPutRequest) returns (HttpReply) {}
   rpc templatesMetaGet (templatesMetaGetRequest) returns (HttpReply) {}
   rpc templatesMetaGetByName (templatesMetaGetByNameRequest) returns (HttpReply) {}
+  rpc templatesLibDelete (templatesLibDeleteRequest) returns (HttpReply) {}
   rpc profilesGetLibByName (profilesGetLibByNameRequest) returns (HttpReply) {}
   rpc profilesGetMetadata (profilesGetMetadataRequest) returns (HttpReply) {}
   rpc profilesGetMetadataByName (profilesGetMetadataByNameRequest) returns (HttpReply) {}
@@ -117,6 +118,11 @@ message templatesMetaGetRequest {
 }
 
 message templatesMetaGetByNameRequest {
+  string name = 1;
+  string scope = 2;
+}
+
+message templatesLibDeleteRequest {
   string name = 1;
   string scope = 2;
 }

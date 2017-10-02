@@ -2687,59 +2687,6 @@ paths:
       - Read
       - pollersRead
     x-swagger-router-controller: pollers
-  /profiles:
-    get:
-      description: >
-        Get the list of currently defined profiles. Profiles are scripts
-        used by RackHD to control how a node PXE boots.
-      operationId: profilesGet
-      parameters:
-      - collectionFormat: multi
-        description: List of valid MAC addresses to lookup
-        in: query
-        items:
-          type: string
-        name: macs
-        required: false
-        type: array
-      - collectionFormat: multi
-        description: List of IP addresses to lookup
-        in: query
-        items:
-          type: string
-        name: ips
-        required: false
-        type: array
-      - description:
-          When macs parameter is not passed, passed with IP adds MAC address to lookup
-        in: query
-        name: mac
-        required: false
-        type: string
-      - description: 
-          When macs parameters is not passed, passed with MAC adds IP address to lookup
-        in: query
-        name: ip
-        required: false
-        type: string
-      responses:
-        200:
-          description: Successfully retrieved a list of profiles for specified mac / ip
-          schema:
-            type: object
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-      summary: Get list of profiles
-      tags:
-      - /api/2.0
-      x-authentication-type:
-      - jwt
-      x-privileges:
-      - Read
-      - profilesRead
-    x-swagger-router-controller: profiles
   /profiles/library/{name}:
     get:
       description: Get the contents of a profile specified by its name.
@@ -3762,6 +3709,7 @@ paths:
         type: string
       responses:
         200:
+
           description: Successfully retrieved bootstrap.js
           schema:
             $ref: '#/definitions/VersionsResponse'

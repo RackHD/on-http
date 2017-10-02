@@ -163,7 +163,7 @@ describe('Http.Api.Profiles', function () {
                "createdAt": "2017-09-14T18:18:38.489Z",
                "hash": "w9F3Ve/dOcnhcJBgkGUDZg==",
                "name": "ansible-external-inventory.js",
-               "path": "/home/rackhd/git/2rackhd/rackhd/on-taskgraph/data/templates/ansible-external-inventory.js",
+               "path": "/home/rackhd/git/2rackhd/rackhd/on-taskgraph/data/profiles/ansible-external-inventory.js",
                "scope": "global",
                "updatedAt": "2017-09-18T13:19:10.990Z",
                "id": "2d138ac3-0e70-4dee-ae30-b242658bd2a4"
@@ -187,106 +187,6 @@ describe('Http.Api.Profiles', function () {
                .expect('Content-Type', /^application\/json/)
                .expect(400);
        });
-    });
-
-    describe("SB 2.0 GET /profiles", function() {
-        it("should receive both mac and ip query", function() {
-            return helper.request().get('/api/2.0/profiles?mac=00:01:02:03:04:05&&ip=1.1.1.1')
-                .expect(200)
-                .expect(function() {
-                    expect(profileApiService.getMacAddressInRequest).to.have.been.calledOnce;
-                });
-        });
-
-        it("should send 500 set mac and ip fails", function() {
-            profileApiService.getMacAddressInRequest.rejects(new Error('error'));
-
-            return helper.request().get('/api/2.0/profiles?mac=00:01:02:03:04:05&&ip=1.1.1.1')
-                .expect(500);
-        });
-
-        it("should call getNode with a compute node type", function() {
-            return helper.request().get('/api/2.0/profiles')
-                .query({ macs: [ '00:01:02:03:04:05' ], ips: [ '172.31.128.5' ] })
-                .expect(200)
-                .expect(function() {
-                    expect(profileApiService.getNode).to.have.been.calledWith(
-                        [ '00:01:02:03:04:05' ],
-                        { type: 'compute' }
-                    );
-                });
-        });
-
-        it("should send down redirect.ipxe if 'macs' are not in req.query", function() {
-            profileApiService.getNode.restore();
-
-            return helper.request().get('/api/2.0/profiles')
-                .expect(200)
-                .expect(function() {
-                    expect(profiles.get).to.have.been.calledWith('redirect.ipxe');
-                });
-        });
-
-        it("should send down redirect.ipxe if a node is new", function() {
-            profileApiService.getNode.restore();
-            profileApiService.createNodeAndRunDiscovery.restore();
-
-            return helper.request().get('/api/2.0/profiles')
-                .query({ macs: '00:00:de:ad:be:ef', ips: '172.31.128.5' })
-                .expect(200)
-                .expect(function() {
-                    expect(profiles.get).to.have.been.calledWith('redirect.ipxe');
-                });
-        });
-
-        it("should send a 500 if profileApiService.getNode fails", function() {
-            profileApiService.getNode.rejects(new Error('asdf'));
-
-            return helper.request().get('/api/2.0/profiles')
-                .query({ macs: '00:00:de:ad:be:ef', ips: '172.31.128.5' })
-                .expect(500);
-        });
-
-        it("should send a 200 for a known node with no active graph", function() {
-            profileApiService.createNodeAndRunDiscovery.resolves({});
-            profileApiService.getNode.resolves({});
-            workflowApiService.findActiveGraphForTarget.resolves(null);
-
-            return helper.request().get('/api/2.0/profiles')
-                .query({ macs: '00:00:de:ad:be:ef', ips: '172.31.128.5' })
-                .expect(200);
-        });
-
-        it("should send a 503 on failing to retrieve workflow properties", function() {
-            profileApiService.createNodeAndRunDiscovery.resolves({});
-            profileApiService.getNode.resolves({});
-            workflowApiService.findActiveGraphForTarget.resolves({});
-            taskProtocol.requestProfile.resolves('test.profile');
-            taskProtocol.requestProperties.rejects(new Error('Test workflow properties error'));
-
-            return helper.request().get('/api/2.0/profiles')
-                .query({ macs: '00:00:de:ad:be:ef', ips: '172.31.128.5' })
-                .expect(503)
-                .then(function(resp) {
-                    expect(resp.body.message).to.equal(
-                        'Error: Unable to retrieve workflow properties or profiles');
-                });
-        });
-
-        it("should send down a task specific bootfile for a node with an active task", function() {
-            profileApiService.createNodeAndRunDiscovery.resolves({});
-            profileApiService.getNode.resolves({});
-            workflowApiService.findActiveGraphForTarget.resolves({});
-            taskProtocol.requestProfile.resolves('test.profile');
-            taskProtocol.requestProperties.resolves({});
-
-            return helper.request().get('/api/2.0/profiles')
-                .query({ macs: '00:00:de:ad:be:ef', ips: '172.31.128.5' })
-                .expect(200)
-                .expect(function() {
-                    expect(profiles.get).to.have.been.calledWith('test.profile');
-                });
-        });
     });
 
     describe("2.0 GET /profiles/switch/:vendor", function() {
@@ -407,7 +307,7 @@ describe('Http.Api.Profiles', function () {
                 });
         });
 
-        describe('GET /templates/library/:name', function () {
+        describe('GET /profiles/library/:name', function () {
             it('should return a single profiles', function () {
                 var profileLib = {contents: "SWI=flash:/<%=bootfile%>"};
                 profiles.get.resolves(profileLib);
@@ -418,7 +318,7 @@ describe('Http.Api.Profiles', function () {
                     });
             });
 
-            it('should return 404 for invalid templates name', function() {
+            it('should return 404 for invalid profiles name', function() {
                 profiles.get.rejects();
                 return helper.request().get('/api/2.0/profiles/library/test')
                     .then(function() {
@@ -450,7 +350,7 @@ describe('Http.Api.Profiles', function () {
                     });
             });
 
-            it('should 400 error when templates.put() fails', function () {
+            it('should 400 error when profiles.put() fails', function () {
                 profileApiService.profilesPutLibByName.rejects(new Error('dummy'));
                 return helper.request().put('/api/2.0/profiles/library/123')
                     .send('test_template_foo\n')
