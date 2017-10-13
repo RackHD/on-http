@@ -137,6 +137,7 @@ describe('Redfish Chassis Root', function () {
         this.sandbox.spy(redfish, 'render');
         this.sandbox.spy(redfish, 'handleError');
         this.sandbox.spy(validator, 'validate');
+        this.sandbox.stub(redfish, 'getVendorNameById');
         this.sandbox.stub(waterline.nodes);
         waterline.nodes.findByIdentifier.withArgs('4567efgh4567efgh4567efgh').resolves(enclosure);
         waterline.nodes.findByIdentifier.withArgs('1234abcd1234abcd1234abcd').resolves(system);
@@ -190,6 +191,7 @@ describe('Redfish Chassis Root', function () {
     });
 
     it('should return valid chassis and related targets', function() {
+        redfish.getVendorNameById.resolves({vendor: 'undefined'});
         nodeApi.getNodeCatalogSourceById.resolves({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
@@ -215,6 +217,7 @@ describe('Redfish Chassis Root', function () {
     });
 
     it('should 404 an invalid chassis object', function() {
+        redfish.getVendorNameById.resolves({vendor: 'undefined'});
         return helper.request().get('/redfish/v1/Chassis/ABCDEFG')
         .expect('Content-Type', /^application\/json/)
         .expect(404)
@@ -228,9 +231,6 @@ describe('Redfish Chassis Root', function () {
         var ucsPowerThermalPoller;
         var ucsFanPoller;
 
-        beforeEach('set up mock', function() {
-            this.sandbox.stub(redfish, 'getVendorNameById');
-        });
 
         before('/redfish/v1/Chassis/<identifier>/Thermal/', function() {
             ucsFanPoller = {
@@ -468,9 +468,6 @@ describe('Redfish Chassis Root', function () {
         var ucsPowerThermalPoller;
         var ucsPsuPoller;
 
-        beforeEach('set up mock', function() {
-            this.sandbox.stub(redfish, 'getVendorNameById');
-        });
 
         before('/redfish/v1/Chassis/<identifier>/Power/', function() {
             ucsPowerThermalPoller = {

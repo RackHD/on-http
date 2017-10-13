@@ -9,6 +9,7 @@ describe('Redfish Power', function () {
     var Promise;
     var view;
     var fs;
+    var nodeApi;
 
     var powerNode = {
         id : '59b842950fd2170100ecd04a',
@@ -45,6 +46,7 @@ describe('Redfish Power', function () {
         redfish = helper.injector.get('Http.Api.Services.Redfish');
         waterline = helper.injector.get('Services.Waterline');
         Promise = helper.injector.get('Promise');
+        nodeApi = helper.injector.get('Http.Services.Api.Nodes');
         var nodeFs = helper.injector.get('fs');
         fs = Promise.promisifyAll(nodeFs);
     });
@@ -54,7 +56,8 @@ describe('Redfish Power', function () {
         this.sandbox.spy(redfish, 'render');
         this.sandbox.spy(redfish, 'validateSchema');
         this.sandbox.spy(redfish, 'handleError');
-        this.sandbox.stub(redfish, 'getRedfishCatalog');
+        this.sandbox.stub(nodeApi, 'getNodeCatalogSourceById');
+        this.sandbox.stub(nodeApi, 'getNodeById');
         this.sandbox.stub(waterline.nodes);
         this.sandbox.stub(waterline.catalogs);
 
@@ -209,7 +212,7 @@ describe('Redfish Power', function () {
                 expect(redfish.render.called).to.be.true;
                 expect(res.body.Members[0]['@odata.id']).to.equal(
                     '/redfish/v1/DCIMPower/' + domain + '/' + type +
-                    '/' + powerNode.identifiers[0] + '-' + powerNode.id);
+                    '/' + powerNode.id);
             });
     });
 
@@ -217,10 +220,11 @@ describe('Redfish Power', function () {
         waterline.nodes.needByIdentifier.resolves([powerNode]);
         var domain = powerNode.identifiers[2];
         var type = powerNode.identifiers[3];
-        redfish.getRedfishCatalog.resolves(PduCatalog);
+        nodeApi.getNodeById.resolves(powerNode);
+        nodeApi.getNodeCatalogSourceById.resolves(PduCatalog);
 
         return helper.request().get('/redfish/v1/DCIMPower/' + domain + '/' +
-            type +'/' + powerNode.identifiers[0] + '-'+powerNode.id)
+            type +'/' + powerNode.id)
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function(res) {
