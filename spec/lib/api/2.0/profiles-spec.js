@@ -43,13 +43,8 @@ describe('Http.Api.Profiles', function () {
         this.sandbox.stub(profiles, 'get').resolves();
         this.sandbox.stub(profiles, 'put').resolves();
 
-        this.sandbox.stub(profileApiService, 'getNode').resolves({});
-        this.sandbox.stub(profileApiService, 'createNodeAndRunDiscovery').resolves({});
-        this.sandbox.stub(profileApiService, 'runDiscovery').resolves({});
-        this.sandbox.stub(profileApiService, 'setLookup').resolves();
         this.sandbox.stub(profileApiService, 'profilesMetaGetByName').resolves();
         this.sandbox.stub(profileApiService, 'profilesPutLibByName').resolves();
-        this.sandbox.stub(profileApiService, 'getMacAddressInRequest').resolves();
 
         this.sandbox.stub(waterline.lookups, "findOneByTerm").resolves();
 
