@@ -9,6 +9,7 @@ describe('Redfish Cooling', function () {
     var Promise;
     var view;
     var fs;
+    var nodeApi;
 
     var coolingNode = {
         id: '59b842950fd2170100ecd04c',
@@ -45,6 +46,7 @@ describe('Redfish Cooling', function () {
         redfish = helper.injector.get('Http.Api.Services.Redfish');
         waterline = helper.injector.get('Services.Waterline');
         Promise = helper.injector.get('Promise');
+        nodeApi = helper.injector.get('Http.Services.Api.Nodes');
         var nodeFs = helper.injector.get('fs');
         fs = Promise.promisifyAll(nodeFs);
     });
@@ -54,7 +56,8 @@ describe('Redfish Cooling', function () {
         this.sandbox.spy(redfish, 'render');
         this.sandbox.spy(redfish, 'validateSchema');
         this.sandbox.spy(redfish, 'handleError');
-        this.sandbox.stub(redfish, 'getRedfishCatalog');
+        this.sandbox.stub(nodeApi, 'getNodeById');
+        this.sandbox.stub(nodeApi, 'getNodeCatalogSourceById');
         this.sandbox.stub(waterline.nodes);
         this.sandbox.stub(waterline.catalogs);
 
@@ -200,7 +203,7 @@ describe('Redfish Cooling', function () {
                 expect(redfish.render.called).to.be.true;
                 expect(res.body.Members[0]['@odata.id']).to.equal(
                     '/redfish/v1/DCIMCooling/' + domain + '/' + type +
-                    '/' + coolingNode.identifiers[0] + '-' + coolingNode.id);
+                    '/'  + coolingNode.id);
             });
     });
 
@@ -208,10 +211,11 @@ describe('Redfish Cooling', function () {
         waterline.nodes.needByIdentifier.resolves([coolingNode]);
         var domain = coolingNode.identifiers[2];
         var type = coolingNode.identifiers[3];
-        redfish.getRedfishCatalog.resolves(airHandlingUnit0Catalog);
+        nodeApi.getNodeById.resolves(coolingNode);
+        nodeApi.getNodeCatalogSourceById.resolves(airHandlingUnit0Catalog);
 
         return helper.request().get('/redfish/v1/DCIMCooling/' + domain + '/' +
-            type +'/' + coolingNode.identifiers[0] + '-'+coolingNode.id)
+            type +'/' + coolingNode.id)
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function(res) {

@@ -7,7 +7,7 @@
     <% nodes.forEach(function(node, i, arr) { %>
 
       {
-        "@odata.id": "<%= basepath %>/DCIMCooling/<%=node.identifiers[2]%>/<%=node.identifiers[3]%>/<%=node.identifiers[0]%>-<%= node.id %>"
+        "@odata.id": "<%= basepath %>/DCIMCooling/<%=node.identifiers[2]%>/<%=node.identifiers[3]%>/<%= node.id %>"
       }
     <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
     <% }); %>
