@@ -1,4 +1,5 @@
 {
+  "//": "Copyright 2017, Dell EMC, Inc.",
   "name": "on-http",
   "version": "2.29.0",
   "description": "OnRack Http Server",
@@ -50,7 +51,7 @@
     "passport": "^0.3.2",
     "passport-anonymous": "~1.0.1",
     "passport-http": "~0.3.0",
-    "passport-jwt": "~2.0.0",
+    "passport-jwt": "~3.0.0",
     "passport-local": "^1.0.0",
     "pluralize": "~1.1.2",
     "restify-links": "~1.1.0",

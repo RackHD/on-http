@@ -136,7 +136,7 @@ describe('Http.Server', function () {
                 .expect(400)
                 .expect(function (req) {
                     expect(req.body).to.have.property('message')
-                        .to.equal('Error parsing JSON: Unexpected token b');
+                        .to.match(/Error parsing JSON: Unexpected token b.*/);
                 });
         });
 
