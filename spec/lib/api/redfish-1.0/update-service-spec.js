@@ -25,59 +25,216 @@ describe('Redfish Update Service', function () {
     };
     var mockNode = {id: '58a4799ebaaafbe005dd0bc6', type: 'compute'};
 
-    var mockCatalogRACADM = {
-        "node": "593acc7e5aa5beed6f1f3082",
-        "source": "racadm-firmware-list-catalog",
-        "data": {
-            "PSU1": {
-                "elementName": "Power Supply.Slot.1",
-                "FQDD": "PSU.Slot.1",
-                "installationDate": "2016-08-31T04:18:55Z",
-                "currentVersion": "00.24.7A",
-                "rollbackVersion": "",
-                "availableVersion": "",
-                "componentType": "FIRMWARE"
+    var node1WsmanSoftwareInventory = {
+        "node": "59ca21d73a0bb58304df131d",
+        "source": "software",
+        "data": [
+            {
+                "componentType": {
+                    "value": "FRMW",
+                    "otherAttributes": {}
+                },
+                "elementName": {
+                    "value": "Integrated Dell Remote Access Controller",
+                    "otherAttributes": {}
+                },
+                "identityInfoValue": [
+                    {
+                        "value": "DCIM:firmware:25227",
+                        "otherAttributes": {}
+                    }
+                ],
+                "installationDate": {
+                    "value": "NA",
+                    "otherAttributes": {}
+                },
+                "instanceID": {
+                    "value": "DCIM:PREVIOUS#iDRAC.Embedded.1-1#IDRACinfo",
+                    "otherAttributes": {}
+                },
+                "versionString": {
+                    "value": "2.30.30.30",
+                    "otherAttributes": {}
+                },
+                "any": [
+                    "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n<n1:FQDD xmlns:n1=\"http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_SoftwareIdentity\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:wsen=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" xmlns:wsman=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">iDRAC.Embedded.1-1</n1:FQDD>"
+                ],
+                "otherAttributes": {}
             },
-            "PSU2": {
-                "elementName": "Power Supply.Slot.2",
-                "FQDD": "PSU.Slot.2",
-                "installationDate": "2017-03-10T08:24:14Z",
-                "currentVersion": "00.24.7A",
-                "rollbackVersion": "",
-                "availableVersion": "",
-                "componentType": "FIRMWARE"
+            {
+                "componentType": {
+                    "value": "FRMW",
+                    "otherAttributes": {}
+                },
+                "elementName": {
+                    "value": "Intel(R) Ethernet 10G X520 LOM - 7C:D3:0A:B0:52:9E",
+                    "otherAttributes": {}
+                },
+                "identityInfoValue": [
+                    {
+                        "value": "DCIM:firmware:8086:10FB:1028:06EE",
+                        "otherAttributes": {}
+                    }
+                ],
+                "installationDate": {
+                    "value": "2016-05-13T03:59:52Z",
+                    "otherAttributes": {}
+                },
+                "instanceID": {
+                    "value": "DCIM:INSTALLED#701__NIC.Embedded.1-1-1",
+                    "otherAttributes": {}
+                },
+                "versionString": {
+                    "value": "16.5.0",
+                    "otherAttributes": {}
+                },
+                "any": [
+                    "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n<n1:FQDD xmlns:n1=\"http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_SoftwareIdentity\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:wsen=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" xmlns:wsman=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">NIC.Embedded.1-1-1</n1:FQDD>"
+                ],
+                "otherAttributes": {}
             },
-            "iDRAC": {
-                "elementName": "Integrated Remote Access Controller",
-                "FQDD": "iDRAC.Embedded.1-1",
-                "installationDate": "2017-03-30T09:10:51Z",
-                "currentVersion": "2.40.40.40",
-                "rollbackVersion": "2.30.30.30",
-                "availableVersion": "",
-                "componentType": "FIRMWARE"
+            {
+                "componentType": {
+                    "value": "APAC",
+                    "otherAttributes": {}
+                },
+                "elementName": {
+                    "value": "Lifecycle Controller",
+                    "otherAttributes": {}
+                },
+                "identityInfoValue": [
+                    {
+                        "value": "DCIM:firmware:28897",
+                        "otherAttributes": {}
+                    }
+                ],
+                "installationDate": {
+                    "value": "2016-05-13T04:36:14Z",
+                    "otherAttributes": {}
+                },
+                "instanceID": {
+                    "value": "DCIM:INSTALLED#802__USC.Embedded.1:LC.Embedded.1",
+                    "otherAttributes": {}
+                },
+                "versionString": {
+                    "value": "2.30.30.30",
+                    "otherAttributes": {}
+                },
+                "any": [
+                    "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n<n1:FQDD xmlns:n1=\"http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_SoftwareIdentity\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:wsen=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" xmlns:wsman=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">USC.Embedded.1:LC.Embedded.1</n1:FQDD>"
+                ],
+                "otherAttributes": {}
             },
-            "NIC1": {
-                "elementName": "Intel(R) Gigabit 4P X520/I350 rNDC - 24:6E:96:1F:51:8D",
-                "currentVersion": "21.1",
-                "FQDD": "NIC.Integrated.1-4-1",
-                "componentType": "FIRMWARE"
+            {
+                "componentType": {
+                    "value": "FRMW",
+                    "otherAttributes": {}
+                },
+                "elementName": {
+                    "value": "SGPIO 0:0",
+                    "otherAttributes": {}
+                },
+                "identityInfoValue": [
+                    {
+                        "value": "DCIM:firmware:0",
+                        "otherAttributes": {}
+                    }
+                ],
+                "installationDate": {
+                    "value": "1969-12-31T18:00:00Z",
+                    "otherAttributes": {}
+                },
+                "instanceID": {
+                    "value": "DCIM:INSTALLED#308_C_Enclosure.Internal.0-0:RAID.Slot.1-1",
+                    "otherAttributes": {}
+                },
+                "versionString": {
+                    "value": "NA",
+                    "otherAttributes": {}
+                },
+                "any": [
+                    "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n<n1:FQDD xmlns:n1=\"http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_SoftwareIdentity\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:wsen=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" xmlns:wsman=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">Enclosure.Internal.0-0:RAID.Slot.1-1</n1:FQDD>"
+                ],
+                "otherAttributes": {}
             },
-            "NIC2": {
-                "elementName": "Intel(R) Gigabit 4P X520/I350 rNDC - 24:6E:96:1F:51:8c",
-                "currentVersion": "21.1",
-                "FQDD": "NIC.Integrated.1-4-2",
-                "componentType": "FIRMWARE"
-            },
-            "Diagnostics": {
-                "elementName": "Dell 32 Bit uEFI Diagnostics",
-                "FQDD": "Diagnostics.Embedded.1:LC.Embedded.1",
-                "installationDate": "2015-11-26T18:45:06Z",
-                "currentVersion": "4239A24",
-                "rollbackVersion": "",
-                "availableVersion": "",
-                "componentType": "APPLICATION"
+            {
+                "componentType": {
+                    "value": "FRMW",
+                    "otherAttributes": {}
+                },
+                "elementName": {
+                    "value": "SGPIO 0:0",
+                    "otherAttributes": {}
+                },
+                "identityInfoValue": [
+                    {
+                        "value": "DCIM:firmware:0",
+                        "otherAttributes": {}
+                    }
+                ],
+                "installationDate": {
+                    "value": "1969-12-31T18:00:00Z",
+                    "otherAttributes": {}
+                },
+                "instanceID": {
+                    "value": "DCIM:INSTALLED#308_C_Enclosure.Internal.0-0:RAID.Slot.1-1",
+                    "otherAttributes": {}
+                },
+                "versionString": {
+                    "value": "N A",
+                    "otherAttributes": {}
+                },
+                "any": [
+                    ""
+                ],
+                "otherAttributes": {}
             }
-        }
+        ],
+        "createdAt": "2017-09-28T08:59:09.959Z",
+        "updatedAt": "2017-09-28T08:59:09.959Z",
+        "id": "b478fa7d-63a7-46c3-8f9b-932d2fec7b7a"
+    };
+
+    var node2WsmanSoftwareInventory = {
+        "node": "5947d2cfe6b9b3e113d81984",
+        "source": "software",
+        "data": [
+            {
+                "componentType": {
+                    "value": "FRMW",
+                    "otherAttributes": {}
+                },
+                "elementName": {
+                    "value": "Integrated Dell Remote Access Controller",
+                    "otherAttributes": {}
+                },
+                "identityInfoValue": [
+                    {
+                        "value": "DCIM:firmware:25227",
+                        "otherAttributes": {}
+                    }
+                ],
+                "installationDate": {
+                    "value": "NA",
+                    "otherAttributes": {}
+                },
+                "instanceID": {
+                    "value": "DCIM:PREVIOUS#iDRAC.Embedded.1-1#IDRACinfo",
+                    "otherAttributes": {}
+                },
+                "versionString": {
+                    "value": "2.30.30.30",
+                    "otherAttributes": {}
+                },
+                "any": [
+                    "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n<n1:FQDD xmlns:n1=\"http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_SoftwareIdentity\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:wsen=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" xmlns:wsman=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">iDRAC.Embedded.1-1</n1:FQDD>"
+                ],
+                "otherAttributes": {}
+            }
+        ],
+        "createdAt": "2017-10-19T06:50:06.762Z",
+        "updatedAt": "2017-10-19T06:50:06.762Z",
+        "id": "82d6ca0d-0c25-43a4-951f-fe972280a2f5"
     };
 
     var mockCatalogDMI = {
@@ -161,14 +318,14 @@ describe('Redfish Update Service', function () {
             {
                 "relationType": "enclosedBy",
                 "targets": [
-                    "593accd15a45b5dd76e24adf"
+                    "59ca21d73a0bb58304df131d"
                 ]
             }
         ],
         "tags": [],
         "type": "compute",
         "updatedAt": "2017-06-09T16:29:06.016Z",
-        "id": "593acc7e5aa5beed6f1f3082"
+        "id": "59ca21d73a0bb58304df131d"
     };
 
     var node2 =  {
@@ -237,6 +394,17 @@ describe('Redfish Update Service', function () {
             });
     });
 
+    it('should handle error while rendering result', function() {
+        redfish.render.restore();
+        this.sandbox.stub(redfish, 'render').rejects('test');
+        return helper.request().get('/redfish/v1/UpdateService')
+            .expect('Content-Type', /^application\/json/)
+            .expect(400)
+            .expect(function (response) {
+                expect(response.body).to.have.property('message', 'test');
+            });
+    });
+
     it('should run a graph', function () {
         waterline.nodes.getNodeById.resolves(mockNode);
         waterline.obms.findAllByNode.resolves(obmSettings);
@@ -279,8 +447,9 @@ describe('Redfish Update Service', function () {
 
 
     it('should return a valid list of Firmware Inventory from RACADM catalog', function () {
-        waterline.nodes.find.resolves([node1]);
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.nodes.find.resolves([node1, node2]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "software").resolves(node1WsmanSoftwareInventory);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node2.id, "software").resolves(node2WsmanSoftwareInventory);
         waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory')
             .expect('Content-Type', /^application\/json/)
@@ -288,18 +457,31 @@ describe('Redfish Update Service', function () {
             .expect(function(res) {
                 expect(res.body['Members@odata.count']).to.equal(3);
                 expect(res.body.Members[0]['@odata.id'])
-                    .to.equal("/redfish/v1/UpdateService/FirmwareInventory/PSU-00.24.7A");
+                    .to.equal("/redfish/v1/UpdateService/FirmwareInventory/iDRAC-2.30.30.30");
                 expect(res.body.Members[1]['@odata.id'])
-                    .to.equal("/redfish/v1/UpdateService/FirmwareInventory/iDRAC-2.40.40.40");
+                    .to.equal("/redfish/v1/UpdateService/FirmwareInventory/NIC-16.5.0");
                 expect(res.body.Members[2]['@odata.id'])
-                    .to.equal("/redfish/v1/UpdateService/FirmwareInventory/NIC-21.1");
+                    .to.equal("/redfish/v1/UpdateService/FirmwareInventory/Enclosure-NA");
             });
     });
 
+    it('should handle error while rendering update service', function() {
+        waterline.nodes.find.resolves([node1]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "software").resolves(node1WsmanSoftwareInventory);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
+        redfish.render.restore();
+        this.sandbox.stub(redfish, 'render').rejects('test');
+        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory')
+            .expect('Content-Type', /^application\/json/)
+            .expect(400)
+            .expect(function (response) {
+                expect(response.body).to.have.property('message', 'test');
+            });
+    });
 
     it('should return a valid list of Software Inventory from RACADM catalog', function () {
         waterline.nodes.find.resolves([node1]);
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "software").resolves(node1WsmanSoftwareInventory);
         waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
         return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory')
             .expect('Content-Type', /^application\/json/)
@@ -307,7 +489,21 @@ describe('Redfish Update Service', function () {
             .expect(function(res) {
                 expect(res.body['Members@odata.count']).to.equal(1);
                 expect(res.body.Members[0]['@odata.id'])
-                    .to.equal("/redfish/v1/UpdateService/SoftwareInventory/Diagnostics-4239A24");
+                    .to.equal("/redfish/v1/UpdateService/SoftwareInventory/USC-2.30.30.30");
+            });
+    });
+
+    it('should handle error while rendering result', function() {
+        waterline.nodes.find.resolves([node1]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "software").resolves(node1WsmanSoftwareInventory);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
+        redfish.render.restore();
+        this.sandbox.stub(redfish, 'render').rejects('test');
+        return helper.request().get('/redfish/v1/UpdateService/SoftwareInventory')
+            .expect('Content-Type', /^application\/json/)
+            .expect(400)
+            .expect(function (response) {
+                expect(response.body).to.have.property('message', 'test');
             });
     });
 
@@ -352,64 +548,60 @@ describe('Redfish Update Service', function () {
 
     it('should return a valid root to RACADM Firmware Inventory by Id (Complex)', function () {
         waterline.nodes.find.resolves([node1]);
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "software").resolves(node1WsmanSoftwareInventory);
         waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
         waterline.nodes.findByIdentifier.resolves(node1);
-        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/PSU-00.24.7A')
+        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/Enclosure-NA')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function(res) {
-                expect(res.body.RelatedItem.length).to.equal(2);
+                expect(res.body.RelatedItem.length).to.equal(1);
                 expect(res.body.RelatedItem[0]['@odata.id'])
-                    .to.equal("/redfish/v1/Chassis/593accd15a45b5dd76e24adf/Power#/PowerSupplies/0");
-                expect(res.body.RelatedItem[1]['@odata.id'])
-                    .to.equal("/redfish/v1/Chassis/593accd15a45b5dd76e24adf/Power#/PowerSupplies/1");
+                    .to.equal("/redfish/v1/Chassis/59ca21d73a0bb58304df131d");
             });
     });
 
     it('should return a invalid root to RACADM Firmware Inventory by Id ', function () {
         waterline.nodes.find.resolves([node1]);
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "software").resolves(node1WsmanSoftwareInventory);
         waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
         waterline.nodes.findByIdentifier.resolves(node1);
-        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/PSU-00.24.7AA')
+        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/iDRAC-2.30.30.31')
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
 
     it('should return a valid root to RACADM Firmware Inventory by Id (Non enumeratable Entity)', function () {
         waterline.nodes.find.resolves([node1]);
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "software").resolves(node1WsmanSoftwareInventory);
         waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
-        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/NIC-21.1')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function(res) {
-                expect(res.body.RelatedItem.length).to.equal(2);
-                expect(res.body.RelatedItem[0]['@odata.id'])
-                    .to.equal("/redfish/v1/Systems/593acc7e5aa5beed6f1f3082/EthernetInterfaces/NIC.Integrated.1-4-1");
-                expect(res.body.RelatedItem[1]['@odata.id'])
-                    .to.equal("/redfish/v1/Systems/593acc7e5aa5beed6f1f3082/EthernetInterfaces/NIC.Integrated.1-4-2");
-            });
-    });
-
-    it('should return a valid root to RACADM Firmware Inventory by Id (Non enumeratable Entity)', function () {
-        waterline.nodes.find.resolves([node1]);
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
-        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
-        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/iDRAC-2.40.40.40')
+        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/NIC-16.5.0')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
             .expect(function(res) {
                 expect(res.body.RelatedItem.length).to.equal(1);
                 expect(res.body.RelatedItem[0]['@odata.id'])
-                    .to.equal("/redfish/v1/Managers/593acc7e5aa5beed6f1f3082");
+                    .to.equal("/redfish/v1/Systems/59ca21d73a0bb58304df131d/EthernetInterfaces/NIC.Embedded.1-1-1");
+            });
+    });
+
+    it('should return a valid root to RACADM Firmware Inventory by Id (Non enumeratable Entity)', function () {
+        waterline.nodes.find.resolves([node1]);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "software").resolves(node1WsmanSoftwareInventory);
+        waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
+        return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/iDRAC-2.30.30.30')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function(res) {
+                expect(res.body.RelatedItem.length).to.equal(1);
+                expect(res.body.RelatedItem[0]['@odata.id'])
+                    .to.equal("/redfish/v1/Managers/59ca21d73a0bb58304df131d");
             });
     });
 
     it('should return a invalid root to RACADM Firmware Inventory by Id ', function () {
         waterline.nodes.find.resolves([node1]);
-        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "racadm-firmware-list-catalog").resolves(mockCatalogRACADM);
+        waterline.catalogs.findLatestCatalogOfSource.withArgs(node1.id, "software").resolves(node1WsmanSoftwareInventory);
         waterline.catalogs.findLatestCatalogOfSource.resolves(undefined);
         return helper.request().get('/redfish/v1/UpdateService/FirmwareInventory/iDRAC2.40.40.40')
             .expect('Content-Type', /^application\/json/)

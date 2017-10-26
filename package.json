@@ -44,8 +44,8 @@
     "node-cache": "^4.1.0",
     "node-ssdp": "~2.7.0",
     "on-core": "git+https://github.com/RackHD/on-core.git",
-    "on-tasks": "git+https://github.com/RackHD/on-tasks.git",
     "on-finished": "^2.2.0",
+    "on-tasks": "git+https://github.com/RackHD/on-tasks.git",
     "os-tmpdir": "~1.0.1",
     "passport": "^0.3.2",
     "passport-anonymous": "~1.0.1",
@@ -61,7 +61,8 @@
     "tv4": "~1.2.7",
     "url-parse": "~1.1.1",
     "validator": "^5.2.0",
-    "walk": "~2.3.9"
+    "walk": "~2.3.9",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "apidoc": "^0.12.1",
