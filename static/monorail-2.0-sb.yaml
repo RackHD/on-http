@@ -274,6 +274,36 @@ paths:
       summary: Async microservice response
       tags:
       - /api/2.0
+  /ucsCallback:
+    x-swagger-router-controller: callback
+    post:
+      operationId: ucsCallbackPost
+      summary: |
+        Callback for UCS nodes
+      description: |
+        Callback for UCS nodes
+      parameters:
+        - name: taskId
+          in: query
+          description: |
+            task id for the data
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: Data is accepted and sent
+          schema:
+            type: object
+        400:
+          description: |
+            bad request parameter passed
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /swagger:
     x-swagger-pipe: swagger_raw
   /profiles:
