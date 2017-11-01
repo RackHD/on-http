@@ -1,6 +1,7 @@
+# Copyright © 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
 swagger: "2.0"
 info:
-  version: "1.2.0"
+  version: "1.2.1"
   title: rackhd redfish v1
 # during dev, should point to your local machine
 #host: localhost:8080
