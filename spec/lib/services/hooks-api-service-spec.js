@@ -73,7 +73,7 @@ describe('Http.Services.Api.Hooks', function () {
             done(new Error('Test should fail'));
         })
         .catch(function(err){
-            expect(err.name).equals('AssertionError');
+            expect(err.name).match(/AssertionError.*/);
             done();
         });
     });

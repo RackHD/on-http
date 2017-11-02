@@ -1162,7 +1162,7 @@ describe("Http.Services.Api.Nodes", function () {
         it('should reject an invalid tag array', function() {
             return nodeApiService.addTagsById(node.id, 'tag')
                 .catch(function(e) {
-                    expect(e).to.have.property('name').that.equals('AssertionError');
+                    expect(e).to.have.property('name').to.match(/AssertionError.*/);
                     expect(waterline.nodes.addTags).to.not.be.called;
                     expect(needByIdentifier).to.not.be.called;
                 });
@@ -1180,7 +1180,7 @@ describe("Http.Services.Api.Nodes", function () {
         it('should reject an invalid tag', function() {
             return nodeApiService.removeTagsById(node.id, 1)
                 .catch(function(e) {
-                    expect(e).to.have.property('name').that.equals('AssertionError');
+                    expect(e).to.have.property('name').to.match(/AssertionError.*/);
                     expect(waterline.nodes.remTags).to.not.be.called;
                     expect(needByIdentifier).to.not.be.called;
                 });
@@ -1204,7 +1204,7 @@ describe("Http.Services.Api.Nodes", function () {
         it('should reject an invalid tag', function() {
             return nodeApiService.getNodesByTag(1)
                 .catch(function(e) {
-                    expect(e).to.have.property('name').that.equals('AssertionError');
+                    expect(e).to.have.property('name').to.match(/AssertionError.*/);
                     expect(waterline.nodes.findByTag).to.not.be.called;
                     expect(needByIdentifier).to.not.be.called;
                 });
