@@ -1,3 +1,5 @@
+# Copyright 2015-2017 Dell Inc. or its subsidiaries. All Rights Reserved.
+
 swagger: "2.0"
 info:
   version: "0.0.1"
@@ -274,6 +276,36 @@ paths:
       summary: Async microservice response
       tags:
       - /api/2.0
+  /ucsCallback:
+    x-swagger-router-controller: callback
+    post:
+      operationId: ucsCallbackPost
+      summary: |
+        Callback for UCS nodes
+      description: |
+        Callback for UCS nodes
+      parameters:
+        - name: callbackId 
+          in: query
+          description: |
+            callback id to identify data belongings
+          required: true
+          type: string
+      tags: [ "/api/2.0" ]
+      responses:
+        200:
+          description: Data is accepted and sent
+          schema:
+            type: object
+        400:
+          description: |
+            bad request parameter passed
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /swagger:
     x-swagger-pipe: swagger_raw
   /profiles:
