@@ -5,7 +5,7 @@
 
 describe('Http.Api.Callback v2.0', function () {
     var eventsProtocol, Errors;
-    var taskId = "abc";
+    var callbackId = "abc";
     var data = {"data": "test"};
 
     helper.httpServerBefore();
@@ -25,13 +25,13 @@ describe('Http.Api.Callback v2.0', function () {
         this.sandbox.stub(eventsProtocol, 'publishHttpResponseUuid').resolves();
         return helper.request('http://localhost:8091')
             .post('/api/2.0/ucsCallback')
-            .query({taskId: taskId})
+            .query({callbackId: callbackId})
             .set('Content-Type', 'application/json')
             .send(data)
             .expect(200)
             .expect(function(){
                 expect(eventsProtocol.publishHttpResponseUuid).to.be.calledOnce;
-                expect(eventsProtocol.publishHttpResponseUuid).to.be.calledWith(taskId, data);
+                expect(eventsProtocol.publishHttpResponseUuid).to.be.calledWith(callbackId, data);
             });
     });
 

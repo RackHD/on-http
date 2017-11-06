@@ -285,10 +285,10 @@ paths:
       description: |
         Callback for UCS nodes
       parameters:
-        - name: taskId
+        - name: callbackId 
           in: query
           description: |
-            task id for the data
+            callback id to identify data belongings
           required: true
           type: string
       tags: [ "/api/2.0" ]
