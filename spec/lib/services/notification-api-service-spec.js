@@ -280,7 +280,7 @@ describe('Http.Api.Notification', function () {
             this.sandbox.restore();
             waterline.catalogs.findMostRecent.onCall(0).resolves(undefined);
             waterline.obms.findOne.onCall(0).resolves(undefined);
-            return notificationApiService.redfishAlertProcessing(req)
+            notificationApiService.redfishAlertProcessing(req)
                 .then(function(){
                     done(new Error('should NOT have posted the alert!'));
                 })
@@ -300,7 +300,7 @@ describe('Http.Api.Notification', function () {
             this.sandbox.restore();
             waterline.catalogs.findMostRecent.onCall(0).resolves(bmc);
             waterline.obms.findOne.onCall(0).resolves(deviceInfoCatalog);
-            return notificationApiService.redfishAlertProcessing(badReq)
+            notificationApiService.redfishAlertProcessing(badReq)
                 .then(function(){
                     done(new Error('should NOT have posted the alert!'));
                 })

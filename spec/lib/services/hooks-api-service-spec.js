@@ -9,7 +9,7 @@ describe('Http.Services.Api.Hooks', function () {
     var body = {url: '0.0.0.0', filters: [{nodeId: 'nodeId'}]};
     var hook = {url: '0.0.0.0', id: 'hookId'};
     var _;
-    
+
     before('Http.Services.Api.Hooks before', function() {
         this.sandbox = sinon.sandbox.create();
         helper.setupInjector([
@@ -68,7 +68,7 @@ describe('Http.Services.Api.Hooks', function () {
     });
 
     it('should throw error if hook url string is not a url', function (done) {
-        return hooksApiService.createHook({url: 'abcd'})
+        hooksApiService.createHook({url: 'abcd'})
         .then(function() {
             done(new Error('Test should fail'));
         })
@@ -81,7 +81,7 @@ describe('Http.Services.Api.Hooks', function () {
     it('should throw errors if hook exists', function (done) {
         var existingHook = _.defaults(body, {id: 'test'});
         this.sandbox.stub(waterline.hooks, 'findOne').resolves(existingHook);
-        return hooksApiService.createHook(body)
+        hooksApiService.createHook(body)
         .then(function(){
             done(new Error("test should fail"));
         })
@@ -94,7 +94,7 @@ describe('Http.Services.Api.Hooks', function () {
             done();
         });
     });
-    
+
     it('should delete hook by id', function () {
         var id = 'testId';
         this.sandbox.stub(waterline.hooks, 'destroyByIdentifier').resolves();
@@ -104,7 +104,7 @@ describe('Http.Services.Api.Hooks', function () {
             expect(waterline.hooks.destroyByIdentifier).to.be.calledWith(id);
         });
     });
-    
+
     it('should delete update hook by id', function () {
         var id = 'testId';
         this.sandbox.stub(waterline.hooks, 'updateByIdentifier').resolves(hook);
