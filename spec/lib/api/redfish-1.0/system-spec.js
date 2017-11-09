@@ -2542,7 +2542,7 @@ describe('Redfish Systems Root', function () {
     it('should perform the specified valid reset', function() {
         return helper.request().post('/redfish/v1/Systems/' + node.id +
                                     '/Actions/ComputerSystem.Reset')
-            .send({ reset_type: "ForceRestart"})
+            .send({ ResetType: "ForceRestart"})
             .expect('Content-Type', /^application\/json/)
             .expect(202)
             .expect(function(res) {
@@ -2555,14 +2555,14 @@ describe('Redfish Systems Root', function () {
     it('should 404 a reset on an invalid node', function() {
         return helper.request().post('/redfish/v1/Systems/' + node.id +
                                     'invalid/Actions/ComputerSystem.Reset')
-            .send({ reset_type: "ForceRestart"})
+            .send({ ResetType: "ForceRestart"})
             .expect(404);
     });
 
     it('should 400 an invalid reset type', function() {
         return helper.request().post('/redfish/v1/Systems/' + node.id +
                                     '/Actions/ComputerSystem.Reset')
-            .send({ reset_type: "HalfForceRestart"})
+            .send({ ResetType: "HalfForceRestart"})
             .expect('Content-Type', /^application\/json/)
             .expect(400);
     });
