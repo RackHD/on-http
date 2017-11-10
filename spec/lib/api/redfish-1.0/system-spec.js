@@ -14,7 +14,6 @@ describe('Redfish Systems Root', function () {
     var fs;
     var nodeApi;
     var Errors;
-    var workflowApiService;
     var wsman;
     var lookup;
     var configuration;
@@ -120,7 +119,6 @@ describe('Redfish Systems Root', function () {
         Errors = helper.injector.get('Errors');
         taskProtocol = helper.injector.get('Protocol.Task');
         nodeApi = helper.injector.get('Http.Services.Api.Nodes');
-        workflowApiService = helper.injector.get('Http.Services.Api.Workflows');
         wsman = helper.injector.get('Http.Services.Wsman');
         configuration = helper.injector.get('Services.Configuration');
         lookup = helper.injector.get('Services.Lookup');
@@ -143,7 +141,6 @@ describe('Redfish Systems Root', function () {
         this.sandbox.stub(taskProtocol);
         this.sandbox.stub(nodeApi, "setNodeWorkflowById");
         this.sandbox.stub(nodeApi, "getAllNodes");
-        this.sandbox.stub(workflowApiService, "createAndRunGraph");
         this.sandbox.stub(wsman, "getLog");
         this.sandbox.spy(tv4, "validate");
         this.sandbox.stub(mktemp, 'createFile');
@@ -2691,10 +2688,13 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should return 202 after setting Secure Boot', function() {
-        workflowApiService.createAndRunGraph.resolves();
         return helper.request().post('/redfish/v1/Systems/'+ dellNode.id +'/SecureBoot')
             .send({"SecureBootEnable": true})
-            .expect(202);
+            .expect('Content-Type', /^application\/json/)
+            .expect(202)
+            .expect(function(res) {
+                expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
+            });
     });
 
     it('should 400 on bad request command', function() {
@@ -2704,7 +2704,7 @@ describe('Redfish Systems Root', function () {
     });
 
     it('should 500 on failure when setSecureBoot', function() {
-        workflowApiService.createAndRunGraph.rejects("ERROR");
+        nodeApi.setNodeWorkflowById.rejects("ERROR");
         return helper.request().post('/redfish/v1/Systems/'+ dellNode.id +'/SecureBoot')
             .send({"SecureBootEnable": true})
             .expect(500);
