@@ -12,6 +12,7 @@ describe('Redfish Event Service', function () {
     var messenger;
     var subscription;
     var identifier;
+    var RedfishTool;
     var eventDestination = {
         Destination: 'http://1.1.1.1:8080',
         EventTypes: [
@@ -51,6 +52,7 @@ describe('Redfish Event Service', function () {
         subscription = new Subscription({},{});
         messenger = helper.injector.get('Services.Messenger');
         tv4 = require('tv4');
+        RedfishTool = helper.injector.get('JobUtils.RedfishTool');
     });
 
     beforeEach('set up mocks', function () {
@@ -58,6 +60,7 @@ describe('Redfish Event Service', function () {
         this.sandbox.spy(redfish, 'render');
         this.sandbox.spy(validator, 'validate');
         this.sandbox.stub(messenger);
+        this.sandbox.stub(RedfishTool.prototype, 'clientRequest').resolves();
         messenger.subscribe = this.sandbox.spy(function(name,exchange,callback) {
             callback(eventDestination);
             return Promise.resolve(subscription);
