@@ -6210,7 +6210,7 @@ definitions:
   RackHD.ResetAction_ResetAction:
     description: This is the base type for the reset action.
     properties:
-      reset_type:
+      ResetType:
         enum:
         - 'On'
         - ForceOff
@@ -6222,7 +6222,7 @@ definitions:
         - PushPowerButton
         type: string
     required:
-    - reset_type
+    - ResetType
   Resource_Oem:
     description: Oem extension object.
     properties: {}

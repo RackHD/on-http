@@ -19,12 +19,12 @@
             },
             "additionalProperties": false,
             "properties": {
-                "reset_type": {
+                "ResetType": {
                     "$ref": "http://redfish.dmtf.org/schemas/v1/Resource.json#/definitions/ResetType"
                 }
             },
             "required": [
-                "reset_type"
+                "ResetType"
             ],
             "description": "This is the base type for the reset action."
         }
