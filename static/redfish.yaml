@@ -387,7 +387,9 @@ paths:
             $ref: "#/definitions/Bios.ResetBios"
       responses:
         202:
-          $ref: "#/responses/status_202"
+          description: Success
+          schema:
+            $ref: "#/definitions/odata.4.0.0_idRef"
         400:
           $ref: "#/responses/status_400"
         401:
