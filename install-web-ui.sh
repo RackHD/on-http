@@ -1,4 +1,4 @@
-# Copyright 2017, Dell EMC, Inc.
+# Copyright 2015-2017, Dell EMC, Inc.
 
 cd ./static
 
