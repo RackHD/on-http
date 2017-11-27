@@ -24,6 +24,12 @@
     <edmx:Reference Uri="/redfish/v1/JsonSchemas/ComputerSystemCollection_v1.xml">
         <edmx:Include Namespace="ComputerSystemCollection"/>
     </edmx:Reference>
+    <edmx:Reference Uri="/redfish/v1/JsonSchemas/DCIMCoolingCollection_v1.xml">
+        <edmx:Include Namespace="DCIMCoolingCollection"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/redfish/v1/JsonSchemas/DCIMPowerCollection_v1.xml">
+        <edmx:Include Namespace="DCIMPowerCollection"/>
+    </edmx:Reference>
     <edmx:Reference Uri="/redfish/v1/JsonSchemas/EthernetInterface_v1.xml">
         <edmx:Include Namespace="EthernetInterface"/>
         <edmx:Include Namespace="EthernetInterface.v1_0_0"/>

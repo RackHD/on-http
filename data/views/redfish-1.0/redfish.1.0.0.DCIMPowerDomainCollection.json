@@ -1,7 +1,7 @@
 {
-    "@odata.context" : "/redfish/v1/$metadata#PowerCollection",
+    "@odata.context" : "/redfish/v1/$metadata#DCIMPowerCollection.DCIMPowerCollection",
     "@odata.id": "<%= url %>",
-    "@odata.type": "#PowerCollection.PowerCollection",
+    "@odata.type": "#DCIMPowerCollection.DCIMPowerCollection",
     "Oem" : {},
     "Name": "DCIMPower Collection",
     "Members@odata.count": <%= domains.length %>,

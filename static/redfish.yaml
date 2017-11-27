@@ -5213,25 +5213,22 @@ definitions:
         pattern: '^[A-Za-z][A-Za-z0-9._-]+$'
     type: object
   ManagerAccount.1.0.0_ManagerAccount.post:
-    allOf:
-      - $ref:  "#/definitions/ManagerAccount.1.0.0_ManagerAccount"
-      - type: object
-        required:
-        - Password
-        - RoleId
-        - UserName
-        properties:
-          Password:
-            description: This property is used with a PATCH or PUT to write the password
-              for the account.  This property is null on a GET.
-            type: string
-          RoleId:
-            description: This property contains the Role for this account.
-            type: string
-          UserName:
-            description: This property contains the user name for the account.
-            type: string
-
+    properties:
+      Password:
+        description: This property is used with a PATCH or PUT to write the password
+          for the account.  This property is null on a GET.
+        type: string
+      RoleId:
+        description: This property contains the Role for this account.
+        type: string
+      UserName:
+        description: This property contains the user name for the account.
+        type: string
+    type: object
+    required:
+    - Password
+    - RoleId
+    - UserName
   ManagerAccountCollection_ManagerAccountCollection:
     properties:
       '@odata.context':

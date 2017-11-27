@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!---->
 <!--################################################################################       -->
-<!--# Redfish Schema:  ServiceRoot  v1.1.1-->
+<!--# Redfish Schema:  ServiceRoot  v1.3.0-->
 <!--#                                                                                      -->
 <!--# For a detailed change log, see the README file contained in the DSP8010 bundle,      -->
 <!--# available at http://www.dmtf.org/standards/redfish                                   -->
-<!--# Copyright 2014-2016 Distributed Management Task Force, Inc. (DMTF).                  -->
+<!--# Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF).                  -->
 <!--# For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright -->
 <!--################################################################################       -->
 <!---->
@@ -46,9 +46,6 @@
   <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/SessionService_v1.xml">
     <edmx:Include Namespace="SessionService"/>
   </edmx:Reference>
-  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/Message_v1.xml">
-    <edmx:Include Namespace="Message"/>
-  </edmx:Reference>
   <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/JsonSchemaFileCollection_v1.xml">
     <edmx:Include Namespace="JsonSchemaFileCollection"/>
   </edmx:Reference>
@@ -69,6 +66,15 @@
   </edmx:Reference>
   <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/UpdateService_v1.xml">
     <edmx:Include Namespace="UpdateService"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/CompositionService_v1.xml">
+    <edmx:Include Namespace="CompositionService"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/DCIMCoolingCollection_v1.xml">
+    <edmx:Include Namespace="DCIMCoolingCollection"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="http://redfish.dmtf.org/schemas/v1/DCIMPowerCollection_v1.xml">
+    <edmx:Include Namespace="DCIMPowerCollection"/>
   </edmx:Reference>
 
   <edmx:DataServices>
@@ -111,7 +117,6 @@
         <Singleton Name="Registries" Type="MessageRegistryFileCollection.MessageRegistryFileCollection"/>
         <Singleton Name="JsonSchemas" Type="JsonSchemaFileCollection.JsonSchemaFileCollection"/>
         <Singleton Name="Sessions" Type="SessionCollection.SessionCollection"/>
-        <Singleton Name="UpdateService" Type="UpdateService.UpdateService"/>
       </EntityContainer>
 
       <EntityType Name="ServiceRoot" BaseType="ServiceRoot.ServiceRoot">
@@ -190,6 +195,8 @@
       </EntityType>
 
       <ComplexType Name="Links" BaseType="Resource.Links">
+        <Annotation Term="OData.Description" String="Contains references to other resources that are related to this resource."/>
+        <Annotation Term="OData.LongDescription" String="This type, as described by the Redfish Specification, shall contain references to resources that are related to, but not contained by (subordinate to), this resource."/>
         <NavigationProperty Name="Sessions" Type="SessionCollection.SessionCollection" Nullable="false">
           <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
           <Annotation Term="OData.Description" String="Link to a collection of Sessions."/>
@@ -213,6 +220,11 @@
     <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="ServiceRoot.v1_0_4">
       <Annotation Term="OData.Description" String="This version was created to show annotations in previous namespaces were updated."/>
       <EntityType Name="ServiceRoot" BaseType="ServiceRoot.v1_0_3.ServiceRoot"/>
+    </Schema>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="ServiceRoot.v1_0_5">
+      <Annotation Term="OData.Description" String="This version was created to show annotations in previous namespaces were updated."/>
+      <EntityType Name="ServiceRoot" BaseType="ServiceRoot.v1_0_4.ServiceRoot"/>
     </Schema>
 
     <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="ServiceRoot.v1_1_0">
@@ -247,9 +259,56 @@
         <Singleton Name="StorageSystems" Type="StorageSystemCollection.StorageSystemCollection"/>
         <Singleton Name="StorageServices" Type="StorageServiceCollection.StorageServiceCollection"/>
         <Singleton Name="Fabrics" Type="FabricCollection.FabricCollection"/>
+        <Singleton Name="UpdateService" Type="UpdateService.UpdateService"/>
       </EntityContainer>
 
       <EntityType Name="ServiceRoot" BaseType="ServiceRoot.v1_1_0.ServiceRoot"/>
+
+    </Schema>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="ServiceRoot.v1_1_2">
+      <Annotation Term="OData.Description" String="This version was created to show annotations in previous namespaces were updated."/>
+      <EntityType Name="ServiceRoot" BaseType="ServiceRoot.v1_1_1.ServiceRoot"/>
+    </Schema>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="ServiceRoot.v1_2_0">
+
+      <EntityContainer Name="ServiceContainer" Extends="ServiceRoot.v1_1_1.ServiceContainer">
+        <Singleton Name="CompositionService" Type="CompositionService.CompositionService"/>
+      </EntityContainer>
+
+      <EntityType Name="ServiceRoot" BaseType="ServiceRoot.v1_1_2.ServiceRoot">
+        <NavigationProperty Name="CompositionService" Type="CompositionService.CompositionService" Nullable="false">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="This is a link to the CompositionService."/>
+          <Annotation Term="OData.LongDescription" String="The classes structure shall only contain a reference to a resource that complies to the CompositionService schema."/>
+          <Annotation Term="OData.AutoExpandReferences"/>
+        </NavigationProperty>
+      </EntityType>
+
+    </Schema>
+
+    <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="ServiceRoot.v1_3_0">
+
+      <EntityContainer Name="ServiceContainer" Extends="ServiceRoot.v1_2_0.ServiceContainer">
+        <Singleton Name="DCIMCooling" Type="DCIMCoolingCollection.DCIMCoolingCollection"/>
+        <Singleton Name="DCIMPower" Type="DCIMPowerCollection.DCIMPowerCollection"/>
+      </EntityContainer>
+
+      <EntityType Name="ServiceRoot" BaseType="ServiceRoot.v1_2_0.ServiceRoot">
+        <NavigationProperty Name="DCIMCooling" Type="DCIMCoolingCollection.DCIMCoolingCollection" Nullable="false">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="This is a link to a collection of DCIMCooling domains."/>
+          <Annotation Term="OData.LongDescription" String="The classes structure shall only contain a reference to a resource that complies to the DCIMCooling schema."/>
+          <Annotation Term="OData.AutoExpandReferences"/>
+        </NavigationProperty>
+        <NavigationProperty Name="DCIMPower" Type="DCIMPowerCollection.DCIMPowerCollection" Nullable="false">
+          <Annotation Term="OData.Permissions" EnumMember="OData.Permission/Read"/>
+          <Annotation Term="OData.Description" String="This is a link to a collection of DCIMPower domains."/>
+          <Annotation Term="OData.LongDescription" String="The classes structure shall only contain a reference to a resource that complies to the DCIMPower schema."/>
+          <Annotation Term="OData.AutoExpandReferences"/>
+        </NavigationProperty>
+      </EntityType>
 
     </Schema>
 
