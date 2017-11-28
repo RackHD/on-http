@@ -312,6 +312,18 @@ describe('Redfish Managers', function () {
             });
     });
 
+    it('should return the RackHD manager with no relations', function() {
+        waterline.nodes.find.resolves([]);
+        return helper.request().get('/redfish/v1/Managers/RackHD')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
     it('should patch the RackHD manager', function() {
         waterline.nodes.find.resolves([node]);
         return helper.request().patch('/redfish/v1/Managers/RackHD')
