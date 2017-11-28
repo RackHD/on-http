@@ -21,7 +21,33 @@ describe('Http.Api.Callback v2.0', function () {
         this.sandbox.restore();
     });
 
-    it('should return a 200 for ucsCallback success', function () {
+    it('should return a 200 for ucsCallback success at northbound', function () {
+        this.sandbox.stub(eventsProtocol, 'publishHttpResponseUuid').resolves();
+        return helper.request()
+            .post('/api/2.0/ucsCallback')
+            .query({callbackId: callbackId})
+            .set('Content-Type', 'application/json')
+            .send(data)
+            .expect(200)
+            .expect(function(){
+                expect(eventsProtocol.publishHttpResponseUuid).to.be.calledOnce;
+                expect(eventsProtocol.publishHttpResponseUuid).to.be.calledWith(callbackId, data);
+            });
+    });
+
+    it('should return a 400 for ucsCallback failure at northbound', function () {
+        this.sandbox.stub(eventsProtocol, 'publishHttpResponseUuid').resolves();
+        return helper.request()
+            .post('/api/2.0/ucsCallback')
+            .set('Content-Type', 'application/json')
+            .send(data)
+            .expect(400)
+            .expect(function(){
+                expect(eventsProtocol.publishHttpResponseUuid).to.not.be.calledOnce;
+            });
+    });
+
+    it('should return a 200 for ucsCallback success at southbound', function () {
         this.sandbox.stub(eventsProtocol, 'publishHttpResponseUuid').resolves();
         return helper.request('http://localhost:8091')
             .post('/api/2.0/ucsCallback')
@@ -35,7 +61,7 @@ describe('Http.Api.Callback v2.0', function () {
             });
     });
 
-    it('should return a 400 for ucsCallback failure', function () {
+    it('should return a 400 for ucsCallback failure at southbound', function () {
         this.sandbox.stub(eventsProtocol, 'publishHttpResponseUuid').resolves();
         return helper.request('http://localhost:8091')
             .post('/api/2.0/ucsCallback')
