@@ -20,7 +20,7 @@ describe('Redfish Update Service', function () {
     ];
     var badPayload = {"junk": "junk"};
     var goodPayload = {
-        "ImageURI": "/home/rackhd/tmp/installer.exe",
+        "ImageURI": "http://192.111.111.111/installer.exe",
         "Targets": ["58a4799ebaaafbe005dd0bc6"]
     };
     var mockNode = {id: '58a4799ebaaafbe005dd0bc6', type: 'compute'};
