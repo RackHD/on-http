@@ -3084,6 +3084,74 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should throw 500 internal error for post volume with Name error', function() {
+        var redfishVolumeCreate = {
+            "username": "someuser",
+            "password": "somepassword",
+            "volume": {
+                "Id": "AnId",
+                "Name": "name 123",
+                "CapacityBytes": 1234567,
+                "VolumeType": "NonRedundant",
+                "Links": {
+                    "Drives@odata.count": 3,
+                    "Drives": [{
+                        "@odata.id": "/redfish/v1/Systems/SomeNodeId/Storage/RAID.Integrated.1-1/Drives/0"
+                    },
+                    {
+                        "@odata.id": "/redfish/v1/Systems/SomeNodeId/Storage/RAID.Integrated.1-1/Drives/1"
+                    },
+                    {
+                        "@odata.id": "/redfish/v1/Systems/SomeNodeId/Storage/RAID.Integrated.1-1/Drives/2"
+                    }]
+                }
+            }
+        };
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id +
+            '/Storage/RAID_Integrated_1-1/Volumes')
+            .send(redfishVolumeCreate)
+            .expect('Content-Type', /^application\/json/)
+            .expect(500)
+            .expect(function(res) {
+                expect(res.error.message).to.equal('cannot POST /redfish/v1/Systems/DELLabcd1234abcd1234abcd/Storage/RAID_Integrated_1-1/Volumes (500)');
+            });
+    });
+
+    it('should throw 500 internal error for post volume without Drives', function() {
+        var redfishVolumeCreate = {
+            "username": "someuser",
+            "password": "somepassword",
+            "volume": {
+                "Id": "AnId",
+                "Name": "name 123",
+                "CapacityBytes": 1234567,
+                "VolumeType": "NonRedundant",
+                "Links": {
+                    "Drives@odata.count": 3,
+                    "Drives": []
+                }
+            }
+        };
+        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+            node: dellNode.id,
+            source: 'dummysource',
+            data: dellCatalogData
+        }));
+        return helper.request().post('/redfish/v1/Systems/' + dellNode.id +
+            '/Storage/RAID_Integrated_1-1/Volumes')
+            .send(redfishVolumeCreate)
+            .expect('Content-Type', /^application\/json/)
+            .expect(500)
+            .expect(function(res) {
+                expect(res.error.message).to.equal('cannot POST /redfish/v1/Systems/DELLabcd1234abcd1234abcd/Storage/RAID_Integrated_1-1/Volumes (500)');
+            });
+    });
+
     it('should return a valid create volume for devices with DELL catalogs (raid type Mirrored)', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
             node: dellNode.id,
