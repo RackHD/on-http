@@ -31,7 +31,7 @@
     "express-urlrewrite": "~1.2.0",
     "fs-extra": "~0.30.0",
     "glob": "^4.3.2",
-    "grpc": "^1.0.0",
+    "grpc": "~1.7.0",
     "http-proxy-middleware": "~0.11.0",
     "ip": "~1.1.2",
     "js-yaml": "^3.6.1",
