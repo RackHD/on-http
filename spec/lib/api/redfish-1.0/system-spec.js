@@ -3107,11 +3107,11 @@ describe('Redfish Systems Root', function () {
                 }
             }
         };
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
             node: dellNode.id,
             source: 'dummysource',
             data: dellCatalogData
-        }));
+        });
         return helper.request().post('/redfish/v1/Systems/' + dellNode.id +
             '/Storage/RAID_Integrated_1-1/Volumes')
             .send(redfishVolumeCreate)
@@ -3137,11 +3137,11 @@ describe('Redfish Systems Root', function () {
                 }
             }
         };
-        waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
             node: dellNode.id,
             source: 'dummysource',
             data: dellCatalogData
-        }));
+        });
         return helper.request().post('/redfish/v1/Systems/' + dellNode.id +
             '/Storage/RAID_Integrated_1-1/Volumes')
             .send(redfishVolumeCreate)
