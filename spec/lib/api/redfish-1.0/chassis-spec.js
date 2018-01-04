@@ -16,8 +16,10 @@ describe('Redfish Chassis Root', function () {
     var Errors;
     var enclosure = {
         id: '4567efgh4567efgh4567efgh',
+        identifiers: ['ident'],
         name: 'Enclosure Node ABCDEFG',
         type: 'enclosure',
+        obms: [],
         relations: [
             {
                 relationType: 'encloses',
@@ -29,6 +31,7 @@ describe('Redfish Chassis Root', function () {
     };
     var system = {
         id: '1234abcd1234abcd1234abcd',
+        identifiers: ['ident'],
         name: 'name',
         type: 'compute',
         obmSettings: [
@@ -49,6 +52,38 @@ describe('Redfish Chassis Root', function () {
         ]
     };
 
+    var redfishNode =     {
+        autoDiscover: false,
+        catalogs: "/api/2.0/nodes/5a09dadfcd6a2a01006f4f87/catalogs",
+        ibms: [],
+        id: "5a09dadfcd6a2a01006f4f87",
+        identifiers: [
+            "System.Embedded.1",
+            "http://172.23.0.1:8000/redfish/v1/Systems/System.Embedded.1",
+            "NNRZST2-CN747517150043"
+        ],
+        name: "System",
+        obms: [
+            {
+                "ref": "/api/2.0/obms/5a09dadfcd6a2a01006f4f88",
+                "service": "redfish-obm-service"
+            }
+        ],
+        pollers: "/api/2.0/nodes/5a09dadfcd6a2a01006f4f87/pollers",
+        relations: [
+            {
+                info: null,
+                relationType: "managedBy",
+                targets: [
+                    "5a09dadfcd6a2a01006f4f89"
+                ]
+            }
+        ],
+        tags: "/api/2.0/nodes/5a09dadfcd6a2a01006f4f87/tags",
+        type: "redfish",
+        workflows: "/api/2.0/nodes/5a09dadfcd6a2a01006f4f87/workflows"
+    };
+
     var catalogData = {
         dmi: {
             chassis : {
@@ -67,8 +102,10 @@ describe('Redfish Chassis Root', function () {
 
     var ucsEnclosure = {
         id: 'aaaabbbbcccc111122223333',
+        identifiers: ['10.240.19.70:sys/rack-unit-2'],
         name: 'sys/chassis-1',
         type: 'enclosure',
+        obms: [],
         relations: [
             {
                 relationType: 'encloses',
@@ -81,6 +118,7 @@ describe('Redfish Chassis Root', function () {
 
     var ucsSystem = {
         id: 'ddddeeeeffff444455556666',
+        identifiers: ['10.240.19.70:sys/rack-unit-2'],
         name: 'name',
         type: 'compute',
         obmSettings: [
@@ -137,25 +175,33 @@ describe('Redfish Chassis Root', function () {
         this.sandbox.spy(redfish, 'render');
         this.sandbox.spy(redfish, 'handleError');
         this.sandbox.spy(validator, 'validate');
-        this.sandbox.stub(redfish, 'getVendorNameById');
         this.sandbox.stub(waterline.nodes);
+        this.sandbox.stub(waterline.catalogs);
         waterline.nodes.findByIdentifier.withArgs('4567efgh4567efgh4567efgh').resolves(enclosure);
         waterline.nodes.findByIdentifier.withArgs('1234abcd1234abcd1234abcd').resolves(system);
         waterline.nodes.findByIdentifier.withArgs('aaaabbbbcccc111122223333').resolves(ucsEnclosure);
         waterline.nodes.findByIdentifier.withArgs('ddddeeeeffff444455556666').resolves(ucsSystem);
+        waterline.nodes.findByIdentifier.withArgs(redfishNode.id).resolves(redfishNode);
         waterline.nodes.findByIdentifier.resolves();
+        waterline.nodes.needByIdentifier.withArgs('4567efgh4567efgh4567efgh').resolves(enclosure);
+        waterline.nodes.needByIdentifier.withArgs('1234abcd1234abcd1234abcd').resolves(system);
+        waterline.nodes.needByIdentifier.withArgs('aaaabbbbcccc111122223333').resolves(ucsEnclosure);
+        waterline.nodes.needByIdentifier.withArgs('ddddeeeeffff444455556666').resolves(ucsSystem);
+        waterline.nodes.needByIdentifier.withArgs(redfishNode.id).resolves(redfishNode);
+        waterline.nodes.needByIdentifier.resolves();
+        waterline.nodes.getNodeById.withArgs('4567efgh4567efgh4567efgh').resolves(enclosure);
+        waterline.nodes.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(system);
+        waterline.nodes.getNodeById.withArgs('aaaabbbbcccc111122223333').resolves(ucsEnclosure);
+        waterline.nodes.getNodeById.withArgs('ddddeeeeffff444455556666').resolves(ucsSystem);
+        waterline.nodes.getNodeById.withArgs(redfishNode.id).resolves(redfishNode);
+        waterline.nodes.getNodeById.resolves();
         this.sandbox.stub(taskProtocol);
         this.sandbox.stub(env, "get").resolves({});
         this.sandbox.stub(nodeApi, "getAllNodes");
-        this.sandbox.stub(nodeApi, "getNodeCatalogSourceById");
+        //this.sandbox.stub(nodeApi, "getNodeCatalogSourceById");
         this.sandbox.stub(nodeApi, "getPollersByNodeId");
-        this.sandbox.stub(nodeApi, "getNodeById");
-        nodeApi.getNodeById.withArgs('4567efgh4567efgh4567efgh').resolves(enclosure);
-        nodeApi.getNodeById.withArgs('1234abcd1234abcd1234abcd').resolves(system);
-        nodeApi.getNodeById.withArgs('aaaabbbbcccc111122223333').resolves(ucsEnclosure);
-        nodeApi.getNodeById.withArgs('ddddeeeeffff444455556666').resolves(ucsSystem);
-        nodeApi.getNodeById.rejects(new Errors.NotFoundError('Not Found'));
         nodeApi.getAllNodes.resolves([enclosure]);
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
     });
 
     helper.httpServerAfter();
@@ -190,9 +236,23 @@ describe('Redfish Chassis Root', function () {
             });
     });
 
-    it('should return valid chassis and related targets', function() {
-        redfish.getVendorNameById.resolves({vendor: 'undefined'});
-        nodeApi.getNodeCatalogSourceById.resolves({
+    it('should return a valid Redfish chassis root', function () {
+        nodeApi.getAllNodes.resolves([redfishNode]);
+        return helper.request().get('/redfish/v1/Chassis')
+            .expect(200)
+            .expect('Content-Type', /^application\/json/)
+            .expect(function(res) {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+                expect(res.body['Members@odata.count']).to.equal(1);
+                expect(res.body.Members[0]['@odata.id'])
+                    .to.equal('/redfish/v1/Chassis/' + redfishNode.identifiers[2]);
+            });
+    });
+
+    it('should return valid chassis and related targets', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
             node: '1234abcd1234abcd1234abcd',
             source: 'dummysource',
             data: catalogData
@@ -216,8 +276,29 @@ describe('Redfish Chassis Root', function () {
             });
     });
 
-    it('should 404 an invalid chassis object', function() {
-        redfish.getVendorNameById.resolves({vendor: 'undefined'});
+    it('should return valid redfish chassis and related targets', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+
+        return helper.request().get('/redfish/v1/Chassis/' + redfishNode.id)
+            .expect('Content-Type', /^application\/json/)
+            .expect(200);
+    });
+
+    it('should return 501 redfish chassis with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Chassis/' + redfishNode.id)
+            .expect('Content-Type', /^application\/json/)
+            .expect(501);
+    });
+
+    it('should 404 an invalid chassis object', function () {
+        //redfish.getVendorNameById.rejects(new Errors.NotFoundError('Not Found'));
         return helper.request().get('/redfish/v1/Chassis/ABCDEFG')
         .expect('Content-Type', /^application\/json/)
         .expect(404)
@@ -262,19 +343,9 @@ describe('Redfish Chassis Root', function () {
             };
         });
 
-        it('should return an error when get system vendor faild', function() {
-            redfish.getVendorNameById.rejects('ERROR');
-            return helper.request().get('/redfish/v1/Chassis/' + ucsSystem.id + '/Thermal')
-                .expect('Content-Type', /^application\/json/)
-                .expect(500)
-                .expect(function() {
-                    expect(redfish.handleError.called).to.be.true;
-                });
-        });
-
         it('should return a valid UCS thermal object', function() {
             nodeApi.getPollersByNodeId.resolves([ucsPowerThermalPoller, ucsFanPoller]);
-            redfish.getVendorNameById.resolves({vendor: 'Cisco'});
+            //redfish.getVendorNameById.resolves({vendor: 'Cisco', node: ucsSystem});
             taskProtocol.requestPollerCache.withArgs('59bafde8dbbbc7a37814054c', { latestOnly: true })
             .resolves(
                 [
@@ -327,7 +398,7 @@ describe('Redfish Chassis Root', function () {
         });
 
         it('should 404 an invalid UCS chassis object', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Cisco'});
+            //redfish.getVendorNameById.resolves({vendor: 'Cisco', node: ucsSystem});
             nodeApi.getPollersByNodeId.rejects('ERROR');
             return helper.request().get('/redfish/v1/Chassis/' + ucsSystem.id + '/Thermal')
                 .expect('Content-Type', /^application\/json/)
@@ -337,11 +408,11 @@ describe('Redfish Chassis Root', function () {
                 });
         });
 
-        it('should return valid UCS chassis and related targets', function() {
+        it('should return valid UCS chassis and related targets', function () {
             nodeApi.getPollersByNodeId.resolves([]);
-            redfish.getVendorNameById.resolves({vendor: 'Other'});
-            nodeApi.getNodeCatalogSourceById.onCall(0).returns(Promise.reject(new Errors.NotFoundError('geoff not found')));
-            nodeApi.getNodeCatalogSourceById.returns(Promise.resolve({
+            //redfish.getVendorNameById.resolves({vendor: 'Other', node: ucsEnclosure});
+            waterline.catalogs.findLatestCatalogOfSource.onCall(0).returns(Promise.reject(new Errors.NotFoundError('geoff not found')));
+            waterline.catalogs.findLatestCatalogOfSource.returns(Promise.resolve({
                 node: '1234abcd1234abcd1234abcd',
                 source: 'dummysource',
                 data: ucsCatalogData
@@ -359,7 +430,7 @@ describe('Redfish Chassis Root', function () {
 
 
         it('should return a valid thermal object', function () {
-            redfish.getVendorNameById.resolves({vendor: 'Other'});
+            //redfish.getVendorNameById.resolves({vendor: 'Other', node: enclosure});
             nodeApi.getPollersByNodeId.resolves([{
                 config: { command: 'sdr', inCondition: {} }
             }]);
@@ -405,8 +476,29 @@ describe('Redfish Chassis Root', function () {
                 });
         });
 
+        it('should return valid redfish thermal object', function () {
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: redfishNode.id,
+                source: 'dummysource',
+                data: {}
+            });
+
+
+            return helper.request().get('/redfish/v1/Chassis/' + redfishNode.id + '/Thermal')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200);
+        });
+
+        it('should return 501 redfish thermal with no catalog', function () {
+            waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+            return helper.request().get('/redfish/v1/Chassis/' + redfishNode.id + '/Thermal')
+                .expect('Content-Type', /^application\/json/)
+                .expect(501);
+        });
+
         it('should return a valid power object', function () {
-            redfish.getVendorNameById.resolves({vendor: 'Other'});
+            //redfish.getVendorNameById.resolves({vendor: 'Other', node: enclosure});
             nodeApi.getPollersByNodeId.resolves([{
                 config: { command: 'sdr', inCondition: {} }
             }]);
@@ -452,9 +544,30 @@ describe('Redfish Chassis Root', function () {
                 });
         });
 
+        it('should return valid redfish power object', function () {
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: redfishNode.id,
+                source: 'dummysource',
+                data: {}
+            });
+
+
+            return helper.request().get('/redfish/v1/Chassis/' + redfishNode.id + '/Power')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200);
+        });
+
+        it('should return 501 redfish power with no catalog', function () {
+            waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+            return helper.request().get('/redfish/v1/Chassis/' + redfishNode.id + '/Power')
+                .expect('Content-Type', /^application\/json/)
+                .expect(501);
+        });
+
 
         it('should 404 an invalid chassis thermal object', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Other'});
+            //redfish.getVendorNameById.rejects(new Errors.NotFoundError('Not Found'));
             return helper.request().get('/redfish/v1/Chassis/ABCDEFG/Thermal')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404)
@@ -491,19 +604,9 @@ describe('Redfish Chassis Root', function () {
             };
         });
 
-        it('should return an error when get system vendor faild', function() {
-            redfish.getVendorNameById.rejects('ERROR');
-            return helper.request().get('/redfish/v1/Chassis/' + ucsSystem.id + '/Power')
-                .expect('Content-Type', /^application\/json/)
-                .expect(500)
-                .expect(function() {
-                    expect(redfish.handleError.called).to.be.true;
-                });
-        });
-
         it('should return a valid UCS power object', function() {
             nodeApi.getPollersByNodeId.resolves([ucsPowerThermalPoller, ucsPsuPoller]);
-            redfish.getVendorNameById.resolves({vendor: 'Cisco'});
+            //redfish.getVendorNameById.resolves({vendor: 'Cisco', node: ucsSystem});
             taskProtocol.requestPollerCache.withArgs('59bafde8dbbbc7a37814054c', {latestOnly: true})
             .resolves([
                 {
@@ -551,7 +654,7 @@ describe('Redfish Chassis Root', function () {
         });
 
         it('should 404 an invalid UCS power object', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Cisco'});
+            //redfish.getVendorNameById.resolves({vendor: 'Cisco', node: ucsSystem});
             nodeApi.getPollersByNodeId.rejects('ERROR');
             return helper.request().get('/redfish/v1/Chassis/' + ucsSystem.id + '/Power')
                 .expect('Content-Type', /^application\/json/)
@@ -562,7 +665,7 @@ describe('Redfish Chassis Root', function () {
         });
 
         it('should return a valid non-ucs power object', function () {
-            redfish.getVendorNameById.resolves({vendor: 'Other'});
+            //redfish.getVendorNameById.resolves({vendor: 'Other', node: enclosure});
             nodeApi.getPollersByNodeId.resolves([{
                 config: { command: 'sdr', inCondition: {} }
             }]);
@@ -609,7 +712,7 @@ describe('Redfish Chassis Root', function () {
         });
 
         it('should 404 an invalid chassis power object', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Other'});
+            //redfish.getVendorNameById.rejects(new Errors.NotFoundError('Not Found'));
             return helper.request().get('/redfish/v1/Chassis/ABCDEFG/Power')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404)

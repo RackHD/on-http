@@ -8,8 +8,13 @@
     "Members": [
         <% nodes.forEach(function(node, i, arr) { %>
         {
-            "@odata.id": "<%= basepath %>/Chassis/<%= node.id %>"
-        }
+            <% if (node.obms[0] !== undefined && node.obms[0].service === 'redfish-obm-service')
+            {%>
+                "@odata.id": "<%= basepath %>/Chassis/<%= node.identifiers[2] %>"
+            <%} else {%>
+                "@odata.id": "<%= basepath %>/Chassis/<%= node.id %>"
+            <%}%>
+}
         <%= ( arr.length > 0 && i < arr.length-1 ) ? ',': '' %>
         <% }); %>
     ]

@@ -97,6 +97,53 @@ describe('Redfish Systems Root', function () {
         ]
     };
 
+    var redfishNode =     {
+        autoDiscover: false,
+        catalogs: "/api/2.0/nodes/5a09dadfcd6a2a01006f4f87/catalogs",
+        ibms: [],
+        id: "5a09dadfcd6a2a01006f4f87",
+        identifiers: [
+            "System.Embedded.1",
+            "http://172.23.0.1:8000/redfish/v1/Systems/System.Embedded.1",
+            "NNRZST2-CN747517150043"
+        ],
+        name: "System",
+        obms: [
+            {
+                "ref": "/api/2.0/obms/5a09dadfcd6a2a01006f4f88",
+                "service": "redfish-obm-service"
+            }
+        ],
+        pollers: "/api/2.0/nodes/5a09dadfcd6a2a01006f4f87/pollers",
+        relations: [
+            {
+                info: null,
+                relationType: "managedBy",
+                targets: [
+                    "5a09dadfcd6a2a01006f4f89"
+                ]
+            }
+        ],
+        type: "redfish",
+        workflows: "/api/2.0/nodes/5a09dadfcd6a2a01006f4f87/workflows"
+    };
+
+    var redfishNodeObm  = {
+        config: {
+            host: "1.2.3.4",
+            username: "myuser",
+            password: "mypass",
+            port: "8000",
+            protocol: "http",
+            root: "/redfish/v1/Systems/System.Embedded.1",
+            uri: "http://1.2.3.4:8000/redfish/v1",
+            verifySSL: false
+        },
+        id: "5a09dadfcd6a2a01006f4f88",
+        node: "/api/2.0/nodes/5a09dadfcd6a2a01006f4f87",
+        service: "redfish-obm-service"
+    };
+
     // Skip reading the entry from Mongo and return the entry directly
     function redirectGet(entry) {
         if( entry !== 'error.2.0.json') {
@@ -146,14 +193,36 @@ describe('Redfish Systems Root', function () {
         this.sandbox.stub(mktemp, 'createFile');
         this.sandbox.stub(fs, 'writeFile');
 
-        waterline.nodes.getNodeById.resolves();
         waterline.nodes.needByIdentifier.resolves();
 
         waterline.nodes.needByIdentifier.withArgs(node.id).resolves(Promise.resolve(node));
         waterline.nodes.needByIdentifier.withArgs(dellNode.id).resolves(Promise.resolve(dellNode));
+        waterline.nodes.needByIdentifier.withArgs(ucsNode.id).resolves(Promise.resolve(ucsNode));
+        waterline.nodes.needByIdentifier.withArgs(redfishNode.id).resolves(Promise.resolve(redfishNode));
+
+        waterline.nodes.getNodeById.withArgs(dellNode.id).resolves(Promise.resolve(dellNode));
+        waterline.nodes.getNodeById.withArgs('bad' + dellNode.id).resolves(Promise.resolve(undefined));
 
         waterline.nodes.getNodeById.withArgs(node.id).resolves(Promise.resolve(node));
-        waterline.nodes.getNodeById.withArgs(dellNode.id).resolves(Promise.resolve(dellNode));
+        waterline.nodes.getNodeById.withArgs('bad' + node.id).resolves(Promise.resolve(undefined));
+
+        waterline.nodes.getNodeById.withArgs(ucsNode.id).resolves(Promise.resolve(ucsNode));
+        waterline.nodes.getNodeById.withArgs('bad' + ucsNode.id).resolves(Promise.resolve(undefined));
+
+        waterline.nodes.getNodeById.withArgs(redfishNode.id).resolves(Promise.resolve(redfishNode));
+        waterline.nodes.getNodeById.withArgs('bad' + redfishNode.id).resolves(Promise.resolve(undefined));
+
+        waterline.nodes.findByIdentifier.withArgs(dellNode.id).resolves(Promise.resolve(dellNode));
+        waterline.nodes.findByIdentifier.withArgs('bad' + dellNode.id).resolves(Promise.resolve(undefined));
+
+        waterline.nodes.findByIdentifier.withArgs(node.id).resolves(Promise.resolve(node));
+        waterline.nodes.findByIdentifier.withArgs('bad' + node.id).resolves(Promise.resolve(undefined));
+
+        waterline.nodes.findByIdentifier.withArgs(ucsNode.id).resolves(Promise.resolve(ucsNode));
+        waterline.nodes.findByIdentifier.withArgs('bad' + ucsNode.id).resolves(Promise.resolve(undefined));
+
+        waterline.nodes.findByIdentifier.withArgs(redfishNode.id).resolves(Promise.resolve(redfishNode));
+        waterline.nodes.findByIdentifier.withArgs('bad' + redfishNode.id).resolves(Promise.resolve(undefined));
 
         waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
         nodeApi.setNodeWorkflowById.resolves({instanceId: 'abcdef'});
@@ -161,12 +230,17 @@ describe('Redfish Systems Root', function () {
         waterline.obms.findByNode.resolves(undefined);
         waterline.obms.findByNode.withArgs(node.id, 'ipmi-obm-service', true).resolves(Promise.resolve(nodeObm));
         waterline.obms.findByNode.withArgs(dellNode.id, 'dell-wsman-obm-service', true).resolves(Promise.resolve(dellNodeObm));
+        waterline.obms.findByNode.withArgs(redfishNode.id, 'redfish-obm-service', true).resolves(Promise.resolve(redfishNodeObm));
 
         mktemp.createFile.withArgs('/nfs/XXXXXX.xml')
         .resolves(Promise.resolve('/nfs/file.xml'));
         fs.writeFile.withArgs('/nfs/file.xml',xmlData, function() {})
         .resolves(Promise.resolve(undefined));
     });
+
+     afterEach('restore sanbox', function(){
+         this.sandbox.restore();
+     });
 
     helper.httpServerAfter();
 
@@ -1014,7 +1088,7 @@ describe('Redfish Systems Root', function () {
     ];
 
     it('should return a valid system root', function () {
-        waterline.nodes.find.resolves([node]);
+        nodeApi.getAllNodes.resolves([node,dellNode]);
         return helper.request().get('/redfish/v1/Systems')
             .expect('Content-Type', /^application\/json/)
             .expect(200)
@@ -1022,20 +1096,14 @@ describe('Redfish Systems Root', function () {
                 expect(tv4.validate.called).to.be.true;
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
-                expect(res.body['Members@odata.count']).to.equal(1);
+                expect(res.body['Members@odata.count']).to.equal(2);
                 expect(res.body.Members[0]['@odata.id']).to.equal('/redfish/v1/Systems/' + node.id);
+                expect(res.body.Members[1]['@odata.id']).to.equal('/redfish/v1/Systems/' + dellNode.id);
             });
     });
 
     describe('Get Systems By Indentifier', function () {
-        beforeEach('set up mocks', function(){
-            this.sandbox.stub(redfish, 'getVendorNameById');
-        });
         it('should return a valid system', function() {
-            redfish.getVendorNameById.resolves({
-                node: node,
-                vendor: 'undefined'
-            });
             waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
                 node: node.id,
                 source: 'dummysource',
@@ -1061,10 +1129,6 @@ describe('Redfish Systems Root', function () {
         });
 
         it('should return a valid system for device with DELL catalogs', function() {
-            redfish.getVendorNameById.resolves({
-                node: dellNode,
-                vendor: 'Dell'
-            });
             waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
                 node: dellNode.id,
                 source: 'dummysource',
@@ -1090,10 +1154,6 @@ describe('Redfish Systems Root', function () {
         });
 
         it('should return a valid system with sku', function() {
-            redfish.getVendorNameById.resolves({
-                node: node,
-                vendor: 'notDellAndCisco'
-            });
             waterline.nodes.needByIdentifier.withArgs(node.id)
             .resolves(Promise.resolve({
                 id: node.id,
@@ -1126,11 +1186,6 @@ describe('Redfish Systems Root', function () {
         });
 
        it('should return a valid  Cisco system', function() {
-            redfish.getVendorNameById.resolves({
-                node: ucsNode,
-                vendor: 'Cisco'
-            });
-
             this.sandbox.stub(nodeApi, "getNodeCatalogSourceById");
             nodeApi.getNodeCatalogSourceById.withArgs(ucsNode.id, 'UCS').resolves({
                 node: ucsNode.id,
@@ -1171,17 +1226,35 @@ describe('Redfish Systems Root', function () {
                     expect(redfish.render.called).to.be.true;
                 });
         });
-        it('should 404 an invalid system', function(){
-            redfish.getVendorNameById.resolves({
-                node: node,
-                vendor: 'Dell'
+
+        it('should return valid redfish system and related targets', function () {
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: redfishNode.id,
+                source: 'dummysource',
+                data: {}
             });
+
+            return helper.request().get('/redfish/v1/Systems/' + redfishNode.id)
+                .expect(200)
+                .expect('Content-Type', /^application\/json/);
+        });
+
+        it('should return 501 redfish system with no catalog', function () {
+            waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+            return helper.request().get('/redfish/v1/Systems/' + redfishNode.id)
+                .expect(501)
+                .expect('Content-Type', /^application\/json/);
+        });
+
+        it('should 404 an invalid system', function(){
             return helper.request().get('/redfish/v1/Systems/bad' + node.id)
+                .expect(404)
                 .expect('Content-Type', /^application\/json/)
                 .expect(404)
                 .expect(function(err) {
                     console.log(err.body.error['@Message.ExtendedInfo'][1].Message);
-                });
+            });
         });
     });
 
@@ -1191,10 +1264,30 @@ describe('Redfish Systems Root', function () {
             .expect(404);
     });
 
-    it('should 404 a non-Dell identifier for bios query', function() {
+    it('should 404 a non-Dell or redfish identifier for bios query', function() {
         return helper.request().get('/redfish/v1/Systems/' + node.id + '/Bios')
             .expect('Content-Type', /^application\/json/)
             .expect(404);
+    });
+
+    it('should return a valid bios block for redfish catalog', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/Bios')
+            .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 bios block for redfish with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/Bios')
+            .expect(501)
+            .expect('Content-Type', /^application\/json/);
     });
 
     it('should return a valid bios block for Dell-based catalog', function() {
@@ -1240,6 +1333,26 @@ describe('Redfish Systems Root', function () {
                 expect(redfish.render.called).to.be.true;
             });
     });
+    it('should return a valid bios settings block for redfish catalog', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/Bios/Settings')
+            .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 bios setings block for redfish with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/Bios/Settings')
+            .expect(501)
+            .expect('Content-Type', /^application\/json/);
+    });
+
 
     it('should 404 an invalid system for bios settings patch', function() {
         return helper.request().patch('/redfish/v1/Systems/bad' + node.id + '/Bios/Settings')
@@ -1267,6 +1380,13 @@ describe('Redfish Systems Root', function () {
             .send({ "@odata.context": "string", "@odata.id": "string", "@odata.type": "string", "Actions": { "Oem": {} }, "AttributeRegistry": "string", "Attributes": { "X": "y"}, "Description": "string", "Id": "string", "Name": "string", "Oem": {} })
             .expect('Content-Type', /^application\/json/)
             .expect(202);
+    });
+
+    it('should 202 for a redfish bios settings patch', function() {
+        return helper.request().patch('/redfish/v1/Systems/' + redfishNode.id + '/Bios/Settings')
+        .send({"Id": "string", "Name": "string"})
+        .expect(202)
+        .expect('Content-Type', /^application\/json/);
     });
 
     it('should 404 an invalid system for Bios.ChangePassword post', function() {
@@ -1323,6 +1443,13 @@ describe('Redfish Systems Root', function () {
             .expect(202);
     });
 
+    it('should return a 202 for valid redfish identifier for Bios.ResetBios', function() {
+        return helper.request().post('/redfish/v1/Systems/' + redfishNode.id + '/Bios.ResetBios')
+        .send({"target": {},"title": {}})
+        .expect(202)
+        .expect('Content-Type', /^application\/json/);
+    });
+
     it('should return a 202 for a Dell-based bios change password SetupPassword', function() {
         // Force a southbound interface through httpEndpoints
         configuration.set('httpEndpoints', httpEndpoints);
@@ -1335,6 +1462,13 @@ describe('Redfish Systems Root', function () {
             .send({ PasswordName: "SetupPassword", OldPassword: "somepass", NewPassword: "newpass"})
             .expect('Content-Type', /^application\/json/)
             .expect(202);
+    });
+
+    it('should return a 202 for a redfish bios change password SetupPassword', function() {
+        return helper.request().post('/redfish/v1/Systems/' + redfishNode.id + '/Bios.ChangePassword')
+        .send({ PasswordName: "SetupPassword", OldPassword: "somepass", NewPassword: "newpass"})
+        .expect(202)
+        .expect('Content-Type', /^application\/json/);
     });
 
     it('should 400 an invalid password name for Bios.ChangePassword post', function() {
@@ -1590,22 +1724,56 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    /*
+        **** EthernetInterface - redfish
+    */
+
+    it('should return a valid ethernet collection for a redfish node', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/EthernetInterfaces')
+            .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish ethernet collection with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/EthernetInterfaces')
+            .expect(501)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return a valid ethernet with valid index for a redfish node', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/EthernetInterfaces/eth0')
+            .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish ethernet with valid index with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/EthernetInterfaces/eth0')
+            .expect(501)
+            .expect('Content-Type', /^application\/json/);
+    });
+
     describe('/redfish/v1/Systems/<identifier>/Processors', function() {
-        var ucsNode;
         var ucsCatalog;
-        var ucsNodeId;
 
         before('/redfish/v1/Systems/<identifier>/Processors before', function(){
-            ucsNodeId = "599337d6ff99ed24305bc58a";
-            ucsNode =  {
-                "id": ucsNodeId,
-                "identifiers": [
-                   "10.240.19.70:sys/rack-unit-2"
-                ],
-                "name": "sys/rack-unit-2"
-            };
             ucsCatalog = {
-                node: ucsNodeId,
+                node: ucsNode.id,
                 source: 'UCS',
                 data: {num_of_cpus: 2}
             };
@@ -1613,11 +1781,12 @@ describe('Redfish Systems Root', function () {
 
         it('should return a valid UCS processor list', function() {
             waterline.catalogs.findLatestCatalogOfSource
-                .withArgs(ucsNodeId, 'UCS').resolves(ucsCatalog);
-            waterline.nodes.needByIdentifier.withArgs(ucsNodeId).resolves(ucsNode);
-            waterline.nodes.getNodeById.withArgs(ucsNodeId).resolves(ucsNode);
-
-            return helper.request().get('/redfish/v1/Systems/' + ucsNodeId + '/Processors')
+                .withArgs(ucsNode.id, 'UCS').resolves({
+                node: ucsNode.id,
+                source: 'UCS',
+                data: {num_of_cpus: 2}
+            });
+            return helper.request().get('/redfish/v1/Systems/' + ucsNode.id + '/Processors')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
                 .expect(function() {
@@ -1644,7 +1813,7 @@ describe('Redfish Systems Root', function () {
                 });
         });
 
-        it('should return a valid processor list for non-DELL/Ucs nodes', function() {
+        it('should return a valid processor list for non-DELL/Ucs/redfish nodes', function() {
             waterline.catalogs.findLatestCatalogOfSource.resolves({
                 node: '1234abcd1234abcd1234abcd',
                 source: 'dummysource',
@@ -1659,6 +1828,18 @@ describe('Redfish Systems Root', function () {
                     expect(validator.validate.called).to.be.true;
                     expect(redfish.render.called).to.be.true;
                 });
+        });
+
+        it('should return a valid processor list for redfish nodes', function () {
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: redfishNode.id,
+                source: 'dummysource',
+                data: {}
+            });
+
+            return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/Processors')
+                .expect(200)
+                .expect('Content-Type', /^application\/json/);
         });
 
         it('should 404 an invalid processor list with invalid nodeId', function() {
@@ -1679,40 +1860,15 @@ describe('Redfish Systems Root', function () {
         });
     });
 
-
-
-
     describe('/redfish/v1/Systems/<identifier>/Processors/{socketId}', function(){
-        var ucsNode;
         var ucsCatalog;
         var ucsProcessorInfo;
         var dellProcessorInfo;
         var redfishProcessorInfo;
 
-        beforeEach('set up mock for Processors', function() {
-            this.sandbox.stub(redfish, 'getVendorNameById');
-        });
-
         before('/redfish/v1/Systems/<identifier>/Processors/{socketId} before', function(){
-            ucsNode = {
-                id : "59a59317f4c25e4d18e6073c",
-                autoDiscover : false,
-                identifiers : [
-                    "10.240.19.70:sys/chassis-1"
-                ],
-                name : "sys/cisconode",
-                relations : [
-                    {
-                        relationType : "encloses",
-                        targets : [ "599444b0303bbe8c07ef004e" ]
-                    }
-                ],
-                tags : [ ],
-                type : "enclosure"
-            };
-
             ucsCatalog = {
-                node: "59a59317f4c25e4d18e6073c",
+                node: "5994f712d0e1e80257af9ff3",
                 source : "UCS:board",
                 data : {
                     "child_action": null,
@@ -1769,7 +1925,7 @@ describe('Redfish Systems Root', function () {
 
             ucsProcessorInfo = {
                 "@odata.context": "/redfish/v1/$metadata#Processor.Processor",
-                "@odata.id": "/redfish/v1/Systems/59a59317f4c25e4d18e6073c/Processors/0",
+                "@odata.id": "/redfish/v1/Systems/5994f712d0e1e80257af9ff3/Processors/0",
                 "@odata.type": "#Processor.v1_0_0.Processor",
                 "Oem": {},
                 "Id": "0",
@@ -1850,23 +2006,12 @@ describe('Redfish Systems Root', function () {
 
         });
 
-        it('should return an error when get system vendor fails', function() {
-            redfish.getVendorNameById.rejects('ERROR');
-            return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Processors/0')
-                .expect('Content-Type', /^application\/json/)
-                .expect(500)
-                .expect(function() {
-                    expect(redfish.handleError.called).to.be.true;
-                });
-        });
-
         it('should return a valid processor for a DELL node', function() {
             waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
                 node: 'Dell1234abcd1234abcd1234abcd',
                 source: 'dummysource',
                 data: dellCatalogData
             }));
-            redfish.getVendorNameById.resolves({vendor: 'Dell'});
 
             return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Processors/0')
                 .expect('Content-Type', /^application\/json/)
@@ -1879,13 +2024,32 @@ describe('Redfish Systems Root', function () {
                 });
         });
 
+        it('should return a valid processor for a redfish node', function () {
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: redfishNode.id,
+                source: 'dummysource',
+                data: {}
+            });
+
+            return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/Processors/0')
+                .expect(200)
+                .expect('Content-Type', /^application\/json/);
+        });
+
+        it('should return 501 redfish system with no catalog', function () {
+            waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+            return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/Processors/0')
+                .expect(501)
+                .expect('Content-Type', /^application\/json/);
+        });
+
         it('should throw an invalid socketId for a DELL node', function() {
             waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
                 node: '1234abcd1234abcd1234abcd',
                 source: 'dummysource',
                 data: dellCatalogData
             }));
-            redfish.getVendorNameById.resolves({vendor: 'Dell'});
 
             return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/Processors/100')
                 .expect('Content-Type', /^application\/json/)
@@ -1897,9 +2061,6 @@ describe('Redfish Systems Root', function () {
 
         it('should return a valid processor for a Cisco node', function() {
             waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve(ucsCatalog));
-            waterline.nodes.needByIdentifier.withArgs(ucsNode.id).resolves(Promise.resolve(ucsNode));
-            redfish.getVendorNameById.resolves({vendor: 'Cisco'});
-
             return helper.request().get('/redfish/v1/Systems/' + ucsNode.id + '/Processors/0')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
@@ -1913,9 +2074,6 @@ describe('Redfish Systems Root', function () {
 
         it('should throw an invalid socketId error for Cisco Node', function() {
             waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve(ucsCatalog));
-            waterline.nodes.needByIdentifier.withArgs(ucsNode.id).resolves(Promise.resolve(ucsNode));
-            redfish.getVendorNameById.resolves({vendor: 'Cisco'});
-
             return helper.request().get('/redfish/v1/Systems/' + ucsNode.id + '/Processors/100')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404)
@@ -1932,8 +2090,6 @@ describe('Redfish Systems Root', function () {
                 data: catalogData
             }));
             waterline.nodes.needByIdentifier.withArgs(node.id).resolves(Promise.resolve(node));
-            redfish.getVendorNameById.resolves({vendor: 'other'});
-
             return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/0')
                 .expect('Content-Type', /^application\/json/)
                 .expect(200)
@@ -1952,8 +2108,6 @@ describe('Redfish Systems Root', function () {
                 data: catalogData
             }));
             waterline.nodes.needByIdentifier.withArgs(node.id).resolves(Promise.resolve(node));
-            redfish.getVendorNameById.resolves({vendor: 'other'});
-
             return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/100')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404)
@@ -1963,21 +2117,18 @@ describe('Redfish Systems Root', function () {
         });
 
         it('should 404 an invalid processor', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Dell'});
             return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/bad')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
 
         it('should 404 an invalid processor', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Cisco'});
             return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/bad')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
         });
 
         it('should 404 an invalid processor', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Other'});
             return helper.request().get('/redfish/v1/Systems/' + node.id + '/Processors/bad')
                 .expect('Content-Type', /^application\/json/)
                 .expect(404);
@@ -1989,22 +2140,12 @@ describe('Redfish Systems Root', function () {
         **** simple storage
     */
     describe('/redfish/v1/Systems/<identifier>/SimpleStorage', function() {
-        var ucsNode;
         var ucsCatalog;
         var ucsSimpleStorageInfo;
 
-        beforeEach('set up mock for /redfish/v1/Systems/<identifier>/SimpleStorage', function() {
-            this.sandbox.stub(redfish, 'getVendorNameById');
-        });
-
         before('/redfish/v1/Systems/<identifier>/SimpleStorage', function() {
-            ucsNode = {
-                id: '599337d6ff99ed24305bc58b',
-                identifiers: ["10.240.19.70:sys/board"],
-            };
-
             ucsCatalog = {
-                "node" : "599337d6ff99ed24305bc58b",
+                "node" : "5994f712d0e1e80257af9ff3",
                 "source" : "UCS:board",
                 "data" : {
                     "vendor" : "Cisco Systems Inc",
@@ -2045,41 +2186,31 @@ describe('Redfish Systems Root', function () {
 
             ucsSimpleStorageInfo = {
                 "@odata.context": "/redfish/v1/$metadata#SimpleStorageCollection.SimpleStorageCollection",
-                "@odata.id": "/redfish/v1/Systems/599337d6ff99ed24305bc58b/SimpleStorage",
+                "@odata.id": "/redfish/v1/Systems/5994f712d0e1e80257af9ff3/SimpleStorage",
                 "@odata.type": "#SimpleStorageCollection.SimpleStorageCollection",
                 "Oem": {},
                 "Name": "Simple Storage Collection",
                 "Members@odata.count": 4,
                 "Members": [
                     {
-                      "@odata.id": "/redfish/v1/Systems/599337d6ff99ed24305bc58b/SimpleStorage/SAS_01_00_0_4"
+                      "@odata.id": "/redfish/v1/Systems/5994f712d0e1e80257af9ff3/SimpleStorage/SAS_01_00_0_4"
                     },
                     {
-                      "@odata.id": "/redfish/v1/Systems/599337d6ff99ed24305bc58b/SimpleStorage/SAS_01_00_0_1"
+                      "@odata.id": "/redfish/v1/Systems/5994f712d0e1e80257af9ff3/SimpleStorage/SAS_01_00_0_1"
                     },
                     {
-                      "@odata.id": "/redfish/v1/Systems/599337d6ff99ed24305bc58b/SimpleStorage/PCH_01_00_0_1"
+                      "@odata.id": "/redfish/v1/Systems/5994f712d0e1e80257af9ff3/SimpleStorage/PCH_01_00_0_1"
                     },
                     {
-                      "@odata.id": "/redfish/v1/Systems/599337d6ff99ed24305bc58b/SimpleStorage/FlexFlash_01_00_0_1"
+                      "@odata.id": "/redfish/v1/Systems/5994f712d0e1e80257af9ff3/SimpleStorage/FlexFlash_01_00_0_1"
                     }
                 ]
             };
 
         });
 
-        it('should return an error when get system vendor fails', function() {
-            redfish.getVendorNameById.rejects('ERROR');
-            return helper.request().get('/redfish/v1/Systems/' + ucsNode.id + '/SimpleStorage')
-                .expect('Content-Type', /^application\/json/)
-                .expect(500)
-                .expect(function() {
-                    expect(redfish.handleError.called).to.be.true;
-                });
-        });
 
         it('should return a valid Cisco simple storage list', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Cisco'});
             waterline.nodes.needByIdentifier.withArgs(ucsNode.id).resolves(ucsNode);
             waterline.catalogs.findLatestCatalogOfSource.resolves(ucsCatalog);
 
@@ -2095,7 +2226,6 @@ describe('Redfish Systems Root', function () {
         });
 
         it('should return a valid simple storage list for devices with DELL catalogs', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Dell'});
             waterline.catalogs.findLatestCatalogOfSource.resolves({
                 node: '1234abcd1234abcd1234abcd',
                 source: 'dummysource',
@@ -2112,8 +2242,7 @@ describe('Redfish Systems Root', function () {
                 });
         });
 
-        it('should return a valid simple storage list for non-Dell & non-Cisco catalogs', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Other'});
+        it('should return a valid simple storage list for non-Dell & non-Cisco catalogs (not redfish)', function() {
             waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves({
                 node: '1234abcd1234abcd1234abcd',
                 source: 'dummysource',
@@ -2136,8 +2265,28 @@ describe('Redfish Systems Root', function () {
                 });
         });
 
+        it('should return a valid simple storage list for redfish catalogs', function () {
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: redfishNode.id,
+                source: 'dummysource',
+                data: {}
+            });
+
+            return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/SimpleStorage')
+                .expect(200)
+                .expect('Content-Type', /^application\/json/);
+        });
+
+        it('should return 501 redfish simple storage device with no catalog', function () {
+            waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+            return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/SimpleStorage')
+                .expect(501)
+                .expect('Content-Type', /^application\/json/);
+        });
+
+
         it('should 404 an invalid simple storage for Dell node', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Dell'});
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('No node found'));
 
             return helper.request().get('/redfish/v1/Systems/' + dellNode.id + '/SimpleStorage')
@@ -2146,7 +2295,6 @@ describe('Redfish Systems Root', function () {
         });
 
         it('should 404 an invalid simple storage for Cisco node', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Cisco'});
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('No node found'));
 
             return helper.request().get('/redfish/v1/Systems/' + ucsNode.id + '/SimpleStorage')
@@ -2155,7 +2303,6 @@ describe('Redfish Systems Root', function () {
         });
 
         it('should 404 an invalid simple storage for non-Dell & non-Cisco node', function() {
-            redfish.getVendorNameById.resolves({vendor: 'Other'});
             waterline.nodes.needByIdentifier.rejects(new Errors.NotFoundError('No node found'));
 
             return helper.request().get('/redfish/v1/Systems/' + node.id + '/SimpleStorage')
@@ -2208,6 +2355,29 @@ describe('Redfish Systems Root', function () {
                 });
         });
 
+        it('should return 501 redfish simple storage device with no catalog', function () {
+            waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+            return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                        '/SimpleStorage/RAID_Integrated_1-1')
+                .expect(501)
+                .expect('Content-Type', /^application\/json/);
+        });
+
+        it('should return a valid simple storage device for devices with redfidh catalogs', function () {
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: redfishNode.id,
+                source: 'dummysource',
+                data: {}
+            });
+
+            return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                        '/SimpleStorage/RAID_Integrated_1-1')
+                .expect(200)
+                .expect('Content-Type', /^application\/json/);
+        });
+
+
         it('should 404 an invalid simple storage device', function() {
             return helper.request().get('/redfish/v1/Systems/' + ucsNode.id +
                                         '/SimpleStorage/bad')
@@ -2218,20 +2388,8 @@ describe('Redfish Systems Root', function () {
     });
 
     describe('Get Cisco valid simple storage device', function(){
-        beforeEach('set up mocks', function(){
-            this.sandbox.stub(redfish, 'getVendorNameById');
-            this.sandbox.stub(nodeApi, "getNodeCatalogSourceById");
-        });
-        afterEach('restore sanbox', function(){
-            this.sandbox.restore();
-        });
-
         it('should return a valid simple storage device with valid contoller', function(){
-            redfish.getVendorNameById.resolves({
-                node: node,
-                vendor: 'Cisco'
-            });
-            nodeApi.getNodeCatalogSourceById.withArgs(ucsNode.id, 'UCS:board').resolves({
+            waterline.catalogs.findLatestCatalogOfSource.withArgs(ucsNode.id, 'UCS:board').resolves({
                 node: ucsNode.id,
                 source: 'UCS:board',
                 data:{
@@ -2267,11 +2425,7 @@ describe('Redfish Systems Root', function () {
                 });
         });
         it('should return a invalid simple storage device with undefined controller', function(){
-            redfish.getVendorNameById.resolves({
-                node: node,
-                vendor: 'Cisco'
-            });
-            nodeApi.getNodeCatalogSourceById.withArgs(ucsNode.id, 'UCS:board').resolves({
+            waterline.catalogs.findLatestCatalogOfSource.withArgs(ucsNode.id, 'UCS:board').resolves({
                 node: ucsNode.id,
                 source: 'UCS:board',
                 data: {
@@ -2300,6 +2454,40 @@ describe('Redfish Systems Root', function () {
                 expect(redfish.render.called).to.be.true;
             });
     });
+    it('should return a valid dell node log service', function() {
+        return helper.request().get('/redfish/v1/Systems/' + dellNode.id +
+                                    '/LogServices')
+            .expect('Content-Type', /^application\/json/)
+            .expect(200)
+            .expect(function() {
+                expect(tv4.validate.called).to.be.true;
+                expect(validator.validate.called).to.be.true;
+                expect(redfish.render.called).to.be.true;
+            });
+    });
+
+    it('should return a valid log service for redfish devices', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices')
+        .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish log service for devices with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices')
+        .expect(501)
+            .expect('Content-Type', /^application\/json/);
+    });
+
 
     it('should return a valid sel log service', function() {
         waterline.workitems.findPollers.resolves([{
@@ -2332,6 +2520,28 @@ describe('Redfish Systems Root', function () {
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
             });
+    });
+
+    it('should return a valid sel log service for redfish devices', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices/sel')
+        .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish sel log service for devices with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices/sel')
+        .expect(501)
+            .expect('Content-Type', /^application\/json/);
     });
 
     it('should 404 an invalid sel log service', function() {
@@ -2404,6 +2614,27 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid sel log service entry collection for redfish devices', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices/sel/Entries')
+        .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish sel log service entry collection for devices with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices/sel/Entries')
+        .expect(501)
+            .expect('Content-Type', /^application\/json/);
+    });
 
     it('should 404 an invalid sel log service entry list', function() {
         return helper.request().get('/redfish/v1/Systems/bad' + node.id +
@@ -2514,6 +2745,28 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid sel log service entry collection for redfish devices', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices/sel/Entries/23')
+        .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish sel log service entry collection for devices with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices/sel/Entries/23')
+        .expect(501)
+            .expect('Content-Type', /^application\/json/);
+    });
+
     it('should 404 an invalid sel log service entry', function() {
         waterline.workitems.findPollers.resolves([{
             config: { command: 'sel' }
@@ -2546,38 +2799,74 @@ describe('Redfish Systems Root', function () {
             .expect(404);
     });
 
-    it('should return a valid reset type list', function() {
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
-                                    '/Actions/ComputerSystem.Reset')
-            .expect('Content-Type', /^application\/json/)
-            .expect(200)
-            .expect(function() {
-                expect(view.get.called).to.be.true;
-            });
-    });
+    describe('Get ComputerSystem.Reset', function(){
+        it('should return a valid reset type list', function() {
+            return helper.request().get('/redfish/v1/Systems/' + node.id +
+                                        '/Actions/ComputerSystem.Reset')
+                .expect('Content-Type', /^application\/json/)
+                .expect(200)
+                .expect(function() {
+                   expect(view.get.called).to.be.true;
+                });
+        });
 
-    it('should 404 a reset type list on an invalid node', function() {
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
-                                    'invalid/Actions/ComputerSystem.Reset')
+        it('should 404 a reset type list on an invalid node', function() {
+            return helper.request().get('/redfish/v1/Systems/bad' + node.id +
+                                         '/Actions/ComputerSystem.Reset')
             .expect(404);
-    });
+        });
 
-    it('should perform the specified valid reset', function() {
-        return helper.request().post('/redfish/v1/Systems/' + node.id +
-                                    '/Actions/ComputerSystem.Reset')
-            .send({ ResetType: "ForceRestart"})
-            .expect('Content-Type', /^application\/json/)
-            .expect(202)
-            .expect(function(res) {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
+        it('should return a valid reset type list for redfish devices', function () {
+            waterline.catalogs.findLatestCatalogOfSource.resolves({
+                node: redfishNode.id,
+                source: 'dummysource',
+                data: {}
             });
+
+            return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/Actions/ComputerSystem.Reset')
+            .expect(200)
+                .expect('Content-Type', /^application\/json/);
+        });
+
+        it('should return 501 redfish getreset type list for devices with no catalog', function () {
+            waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+            return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/Actions/ComputerSystem.Reset')
+            .expect(501)
+                .expect('Content-Type', /^application\/json/);
+        });
+
+
+        it('should perform the specified valid reset', function() {
+            return helper.request().post('/redfish/v1/Systems/' + node.id +
+                                         '/Actions/ComputerSystem.Reset')
+                .send({ ResetType: "ForceRestart"})
+                .expect('Content-Type', /^application\/json/)
+                .expect(202)
+                .expect(function(res) {
+                    expect(tv4.validate.called).to.be.true;
+                    expect(validator.validate.called).to.be.true;
+                    expect(res.body['@odata.id']).to.equal('/redfish/v1/TaskService/Tasks/abcdef');
+                });
+
+        });
+
+        it('should perform the specified valid reset for a redfish device', function() {
+            return helper.request().post('/redfish/v1/Systems/' + redfishNode.id +
+                                         '/Actions/ComputerSystem.Reset')
+                .send({ ResetType: "ForceRestart"})
+                .expect('Content-Type', /^application\/json/)
+                .expect(202);
+
+        });
+
     });
 
     it('should 404 a reset on an invalid node', function() {
-        return helper.request().post('/redfish/v1/Systems/' + node.id +
-                                    'invalid/Actions/ComputerSystem.Reset')
+        return helper.request().post('/redfish/v1/Systems/bad' + node.id +
+                                    '/Actions/ComputerSystem.Reset')
             .send({ ResetType: "ForceRestart"})
             .expect(404);
     });
@@ -2680,6 +2969,27 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return valid SecureBoot status for redfish catalog', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/SecureBoot')
+            .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return valid SecureBoot status for redfish with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/SecureBoot')
+            .expect(501)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+
     it('should 501 on failure when getSecureBoot', function() {
         waterline.catalogs.findLatestCatalogOfSource.rejects("ERROR");
         return helper.request().get('/redfish/v1/Systems/'+ node.id +'/SecureBoot')
@@ -2723,6 +3033,28 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid lc log service for redfish catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices/lc')
+            .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish lc log service with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices/lc')
+        .expect(501)
+            .expect('Content-Type', /^application\/json/);
+    });
+
     it('should 404 an invalid lc log service', function() {
         wsman.getLog.withArgs(sinon.match.any, 'LC').resolves(wsmanLcLog);
         return helper.request().get('/redfish/v1/Systems/bad' + node.id +
@@ -2744,6 +3076,28 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid lc log service entry collection for redfish catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices/lc/Entries')
+            .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish lc log service entry collection with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices/lc/Entries')
+        .expect(501)
+            .expect('Content-Type', /^application\/json/);
+    });
+
     it('should 404 an invalid lc log service entry collection', function() {
         wsman.getLog.withArgs(sinon.match.any, 'LC').resolves(wsmanLcLog);
         return helper.request().get('/redfish/v1/Systems/bad' + dellNode.id +
@@ -2763,6 +3117,28 @@ describe('Redfish Systems Root', function () {
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
             });
+    });
+
+    it('should return a valid lc log service entry for redfish catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices/lc/Entries/1234567')
+            .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish lc log service entry with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/LogServices/lc/Entries/1234567')
+        .expect(501)
+            .expect('Content-Type', /^application\/json/);
     });
 
     it('should 404 an invalid lc log service entry', function() {
@@ -2803,7 +3179,7 @@ describe('Redfish Systems Root', function () {
 
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
             node: '1234abcd1234abcd1234abcd',
-            source: 'dmi',
+            source: 'smart',
             data: smartCatalog
         }));
 
@@ -2842,18 +3218,24 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid simple storage list for redfish catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
 
-    it('should return a valid  Redfish storage list', function() {
-        waterline.catalogs.find.resolves(Promise.resolve(redfishCatalogArray));
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id + '/Storage')
-            .expect('Content-Type', /^application\/json/)
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/Storage')
             .expect(200)
-            .expect(function() {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
-            });
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish simple storage device with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id + '/Storage')
+            .expect(501)
+            .expect('Content-Type', /^application\/json/);
     });
 
     it('should 404 an invalid storage', function() {
@@ -2906,19 +3288,26 @@ describe('Redfish Systems Root', function () {
             });
     });
 
-    it('should return a valid Redfish storage device', function () {
-        waterline.catalogs.find.resolves(Promise.resolve(redfishCatalogArray));
+    it('should return a valid simple storage list for redfish catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
 
-
-        return helper.request().get('/redfish/v1/Systems/' + node.id +
-            '/Storage/AHCI.Embedded.1-1')
-            .expect('Content-Type', /^application\/json/)
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/Storage/RAID_Integrated_1-1')
             .expect(200)
-            .expect(function () {
-                expect(tv4.validate.called).to.be.true;
-                expect(validator.validate.called).to.be.true;
-                expect(redfish.render.called).to.be.true;
-            });
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish simple storage list with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/Storage/RAID_Integrated_1-1')
+            .expect(501)
+            .expect('Content-Type', /^application\/json/);
     });
 
     it('should 404 an invalid storage device', function () {
@@ -2967,7 +3356,7 @@ describe('Redfish Systems Root', function () {
     });
 
 
-   it('should return a valid storage drive with non-DELL catalogs (SATADOM)', function () {
+    it('should return a valid storage drive with non-DELL catalogs (SATADOM)', function () {
         waterline.catalogs.findLatestCatalogOfSource.withArgs(node.id, 'smart').resolves(Promise.resolve({
             node: node.id,
             source: 'dummysource',
@@ -2983,6 +3372,28 @@ describe('Redfish Systems Root', function () {
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
             });
+    });
+
+    it('should return a valid storage drive with redfish catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Drives/W8G3MUUX')
+            .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish storage drive with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Drives/W8G3MUUX')
+        .expect(501)
+            .expect('Content-Type', /^application\/json/);
     });
 
     it('should return a valid volume list for devices with DELL catalogs', function() {
@@ -3001,6 +3412,28 @@ describe('Redfish Systems Root', function () {
                 expect(validator.validate.called).to.be.true;
                 expect(redfish.render.called).to.be.true;
             });
+    });
+
+    it('should return a valid volume list for devices with DELL catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes')
+            .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish volume list with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes')
+        .expect(501)
+            .expect('Content-Type', /^application\/json/);
     });
 
    it('should 404 requests for volumes from devices with non-DELL (wsman) catalogs', function () {
@@ -3028,9 +3461,6 @@ describe('Redfish Systems Root', function () {
             .expect('Content-Type', /^application\/json/)
             .expect(404);
     });
-
-
-
 
     it('should return a valid volume for devices with DELL catalogs', function() {
         waterline.catalogs.findLatestCatalogOfSource.resolves(Promise.resolve({
@@ -3271,4 +3701,78 @@ describe('Redfish Systems Root', function () {
             });
     });
 
+    it('should return a valid volume for devices with redfish catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes/0')
+            .expect(200)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return 501 redfish volume for devices with no catalog', function () {
+        waterline.catalogs.findLatestCatalogOfSource.rejects(new Errors.NotFoundError());
+
+        return helper.request().get('/redfish/v1/Systems/' + redfishNode.id +
+                                    '/Storage/RAID_Integrated_1-1/Volumes/0')
+        .expect(501)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return a valid add hot spare for devices with redfish catalogs', function() {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().post('/redfish/v1/Systems/' + redfishNode.id +
+                                     '/Storage/RAID_Integrated_1-1/Drives/0')
+        .send({
+            "username": "someuser",
+            "password": "somepassword",
+            "hotspareType": "dhs",
+            "volumeId": "0"
+        })
+        .expect(202)
+        .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return a valid delete volume for devices with redfish catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().delete('/redfish/v1/Systems/' + redfishNode.id +
+                                       '/Storage/RAID_Integrated_1-1/Volumes/0')
+            .send({ username: "bogusname", password: "somepassword"})
+            // TODO: expect 202 getting 200?
+            .expect(202)
+            .expect('Content-Type', /^application\/json/);
+    });
+
+    it('should return a valid create volume for devices with redfish catalogs', function () {
+        waterline.catalogs.findLatestCatalogOfSource.resolves({
+            node: redfishNode.id,
+            source: 'dummysource',
+            data: {}
+        });
+
+        return helper.request().post('/redfish/v1/Systems/' + redfishNode.id +
+                                     '/Storage/RAID_Integrated_1-1/Volumes')
+            .send({
+                username: "someuser",
+                password: "somepassword",
+                volumeId: "0"
+            })
+            // TODO: expect 202 getting 200?
+            .expect(202)
+            .expect('Content-Type', /^application\/json/);
+    });
 });
