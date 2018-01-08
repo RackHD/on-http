@@ -10,6 +10,7 @@ describe("Redfish Api Service", function() {
     var _;
     var env;
     var waterline;
+    var nodeApi;
     var testObj = {
         '@odata.context': '/redfish/v1/$metadata#Systems',
         '@odata.id': '/redfish/v1/Systems/',
@@ -43,12 +44,12 @@ describe("Redfish Api Service", function() {
 
         env = helper.injector.get('Services.Environment');
         waterline = helper.injector.get('Services.Waterline');
+        nodeApi = helper.injector.get('Http.Services.Api.Nodes'); 
         sinon.stub(env, "get").resolves();
 
         sinon.stub(view, "get").resolves({contents: JSON.stringify(testObj)});
-        waterline.nodes = {
-            getNodeById: sinon.stub()
-        };
+       
+        sinon.stub(nodeApi, 'getNodeByIdentifier');
     });
 
     beforeEach(function() {
@@ -77,7 +78,7 @@ describe("Redfish Api Service", function() {
     describe("getVendorNameById", function() {
 
         beforeEach('getVendorNameById beforeEach', function(){
-            waterline.nodes.getNodeById.reset();
+            nodeApi.getNodeByIdentifier.reset();
         });
 
         it('should get Cisco vendor name by identifier', function() {
@@ -89,13 +90,13 @@ describe("Redfish Api Service", function() {
                 ]
             };
 
-            waterline.nodes.getNodeById.resolves(sampleDataInfo);
+            nodeApi.getNodeByIdentifier.resolves(sampleDataInfo);
             return redfish.getVendorNameById(id)
                 .then(function(result){
                     expect(result.vendor).to.equal("Cisco");
                     expect(result.node).to.deep.equal(sampleDataInfo);
-                    expect(waterline.nodes.getNodeById).to.be.calledOnce;
-                    expect(waterline.nodes.getNodeById).to.be
+                    expect(nodeApi.getNodeByIdentifier).to.be.calledOnce;
+                    expect(nodeApi.getNodeByIdentifier).to.be
                         .calledWith("599337d6ff99ed24305bc58a");
                 });
         });
@@ -109,13 +110,13 @@ describe("Redfish Api Service", function() {
                 ]
             };
 
-            waterline.nodes.getNodeById.resolves(sampleDataInfo);
+            nodeApi.getNodeByIdentifier.resolves(sampleDataInfo);
             return redfish.getVendorNameById(id)
                 .then(function(result){
                     expect(result.vendor).to.equal("Dell");
                     expect(result.node).to.deep.equal(sampleDataInfo);
-                    expect(waterline.nodes.getNodeById).to.be.calledOnce;
-                    expect(waterline.nodes.getNodeById).to.be.calledWith("5bc58a");
+                    expect(nodeApi.getNodeByIdentifier).to.be.calledOnce;
+                    expect(nodeApi.getNodeByIdentifier).to.be.calledWith("5bc58a");
                 });
         });
 
@@ -128,19 +129,19 @@ describe("Redfish Api Service", function() {
                 ]
             };
 
-            waterline.nodes.getNodeById.resolves(sampleDataInfo);
+            nodeApi.getNodeByIdentifier.resolves(sampleDataInfo);
             return redfish.getVendorNameById(id)
                 .then(function(result){
-                    expect(result.vendor).to.equal(undefined);
+                    expect(result.vendor).to.equal('Other');
                     expect(result.node).to.deep.equal(sampleDataInfo);
-                    expect(waterline.nodes.getNodeById).to.be.calledOnce;
-                    expect(waterline.nodes.getNodeById).to.be.calledWith("5bc58a");
+                    expect(nodeApi.getNodeByIdentifier).to.be.calledOnce;
+                    expect(nodeApi.getNodeByIdentifier).to.be.calledWith("5bc58a");
                 });
         });
 
         it('should not get vendor name by Identifier', function() {
             var id = "testid";
-            waterline.nodes.getNodeById.resolves(null);
+            nodeApi.getNodeByIdentifier.resolves(null);
             return redfish.getVendorNameById(id)
                 .then(function(){
                     throw new Error("Test should be failed in this case.");
