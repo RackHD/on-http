@@ -39,7 +39,7 @@
     "lodash": "^3.10.1",
     "mktemp": "^0.4.0",
     "mockery": "^2.0.0",
-    "moment": "~2.11.1",
+    "moment": "^2.11.1",
     "mongodb": "^1.4.28",
     "multer": "~1.1.0",
     "node-cache": "^4.1.0",
