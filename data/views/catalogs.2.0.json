@@ -1,6 +1,16 @@
 {
     "id": "<%= id %>",
     "node": "<%=basepath%>/nodes/<%=node%>",
+    <% if ( typeof(createdAt.toISOString) === "function" ) { %>
+    "createdAt": "<%= createdAt.toISOString() %>",
+    <% } else { %>
+    "createdAt": "<%= createdAt %>",
+    <% } %>
+    <% if ( typeof(updatedAt.toISOString) === "function" ) { %>
+    "updatedAt": "<%= updatedAt.toISOString() %>",
+    <% } else { %>
+    "updatedAt": "<%= updatedAt %>",
+    <% } %>
 
     <% if (source !== null) { %>
     "source": "<%= source %>",

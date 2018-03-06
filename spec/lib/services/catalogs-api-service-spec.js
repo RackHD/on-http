@@ -15,7 +15,7 @@ describe("Http.Services.Api.Catalogs", function () {
         waterline = helper.injector.get('Services.Waterline');
         waterline.catalogs = {
             needByIdentifier: sinon.stub().resolves(),
-            find: sinon.stub().resolves([])
+            findMongo: sinon.stub().resolves([])
         };
 
         catalogService = helper.injector.get("Http.Services.Api.Catalogs");
@@ -29,14 +29,14 @@ describe("Http.Services.Api.Catalogs", function () {
         });
         it('Run getCatalog', function() {
             var mockCatalog = [{ id: 'foobar' }];
-            waterline.catalogs.find.resolves([mockCatalog]);
+            waterline.catalogs.findMongo.resolves([mockCatalog]);
             return catalogService.getCatalog().then(function (catalogs) {
                 expect(catalogs).to.deep.equal([mockCatalog]);
             });
         });
 
         it('should return empty array if no catalog informations are found', function () {
-            waterline.catalogs.find.resolves([]);
+            waterline.catalogs.findMongo.resolves([]);
             var mockCatalog = [];
             return catalogService.getCatalog().should.eventually.become(mockCatalog);
         });
@@ -56,7 +56,7 @@ describe("Http.Services.Api.Catalogs", function () {
         });
 
         it('should return empty array if no specific catalog information are found', function () {
-            waterline.catalogs.find.resolves({});
+            waterline.catalogs.findMongo.resolves({});
             var mockCatalog = {};
             return catalogService.getCatalog().should.eventually.become(mockCatalog);
         });

@@ -22,21 +22,23 @@ describe('2.0 Http.Api.Catalogs', function () {
 
     beforeEach('set up mocks', function() {
         stubNeedByIdentifier = this.sandbox.stub(waterline.catalogs, "needByIdentifier");
-        stubFind = this.sandbox.stub(waterline.catalogs, "find");
+        stubFind = this.sandbox.stub(waterline.catalogs, "findMongo");
     });
 
     helper.httpServerAfter();
 
     describe("GET /catalogs", function() {
 
-        it("should a list of all catalogs", function() {
+        it("should get a list of all catalogs", function() {
 
             stubFind.returns(Promise.resolve([
                 {
                     id: '123',
                     node: '123',
                     source: 'foo',
-                    data: { something: 'here' }
+                    data: { something: 'here' },
+                    updatedAt: new Date(),
+                    createdAt: new Date()
                 }
             ]));
 
@@ -67,7 +69,9 @@ describe('2.0 Http.Api.Catalogs', function () {
                     id: '123',
                     node: '123',
                     source: 'foo',
-                    data: { something: 'here' }
+                    data: { something: 'here' },
+                    updatedAt: new Date(),
+                    createdAt: new Date()
                 }
             ]));
 
@@ -89,7 +93,9 @@ describe('2.0 Http.Api.Catalogs', function () {
                     id: '123',
                     node: '123',
                     source: 'foo',
-                    data: { something: 'here' }
+                    data: { something: 'here' },
+                    updatedAt: new Date(),
+                    createdAt: new Date()
                 }));
 
             return helper.request().get('/api/2.0/catalogs/123')
