@@ -822,11 +822,27 @@ describe('2.0 Http.Api.Nodes', function () {
                 });
         });
 
+        it('should call removeTagsById with special characters', function() {
+            return helper.request().delete('/api/2.0/nodes/123/tags/tag name')
+                .expect(204)
+                .expect(function() {
+                    expect(nodesApi.removeTagsById).to.have.been.calledWith('123', 'tag name');
+                });
+        });
+
         it('should call masterDelTagById', function() {
             return helper.request().delete('/api/2.0/nodes/tags/name')
                 .expect(204)
                 .expect(function() {
                     expect(nodesApi.masterDelTagById).to.have.been.calledWith('name');
+                });
+        });
+
+        it('should call masterDelTagById with special characters', function () {
+            return helper.request().delete('/api/2.0/nodes/tags/tag name')
+                .expect(204)
+                .expect(function() {
+                    expect(nodesApi.masterDelTagById).to.have.been.calledWith('tag name');
                 });
         });
     });
