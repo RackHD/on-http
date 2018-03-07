@@ -1220,6 +1220,13 @@ describe("Http.Services.Api.Nodes", function () {
                     expect(waterline.nodes.remTags).to.have.been.calledWith(node1.id,tagName);
                 });
         });
+
+        it('should throw NotFoundError when the specified tag is not found in nodes', function() {
+            var tagName = 'name1';
+            waterline.nodes.findByTag.resolves([]);
+            return expect(nodeApiService.masterDelTagById(tagName))
+                .to.be.rejectedWith(Errors.NotFoundError);
+        });
     });
 
     describe('Obms', function() {
