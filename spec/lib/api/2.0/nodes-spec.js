@@ -449,7 +449,9 @@ describe('2.0 Http.Api.Nodes', function () {
                         source: 'dummysource',
                         data: {
                             foo: 'bar'
-                        }
+                        },
+                        createdAt: new Date(),
+                        updatedAt: new Date() 
                     }
                 ]
             };
