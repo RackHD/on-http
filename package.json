@@ -1,7 +1,7 @@
 {
   "//": "Copyright 2017, Dell EMC, Inc.",
   "name": "on-http",
-  "version": "2.47.0",
+  "version": "2.48.0",
   "description": "OnRack Http Server",
   "main": "index.js",
   "scripts": {
